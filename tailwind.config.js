@@ -5,6 +5,9 @@ module.exports = {
 	],
 	theme: {
 	  extend: {
+		fontFamily: {
+		  sans: ['var(--font-satoshi)', 'system-ui', 'sans-serif'],
+		},
 		colors: {
 		  // Main color palette
 		  white: '#fafafa',

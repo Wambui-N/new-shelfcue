@@ -92,15 +92,16 @@ export function Navigation() {
           >
             <Link href="/" className="flex items-center group">
               <motion.div
-                className="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-3 relative overflow-hidden"
-                whileHover={{ rotate: 180 }}
+                className="w-8 h-8 mr-3 relative"
+                whileHover={{ rotate: 5 }}
                 transition={{ duration: 0.3 }}
               >
-                <motion.div
-                  className="w-4 h-4 bg-background rounded-full"
+                <motion.img
+                  src={isDark ? "/sc-light-logo.png" : "/sc-logo.png"}
+                  alt="ShelfCue Logo"
+                  className="w-full h-full object-contain"
                   animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [1, 0.8, 1]
+                    scale: [1, 1.05, 1],
                   }}
                   transition={{
                     duration: 2,

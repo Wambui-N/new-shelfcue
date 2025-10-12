@@ -1,0 +1,168 @@
+"use client"
+
+import { useState, useEffect } from 'react'
+import { FormPreview } from '@/components/builder/FormPreview'
+import { FontLoader } from '@/components/FontLoader'
+import { supabase } from '@/lib/supabase'
+import { FormData } from '@/types/form'
+import { motion } from 'framer-motion'
+import { AlertCircle, Loader2 } from 'lucide-react'
+
+interface PublicFormPageProps {
+  params: Promise<{ formId: string }>
+}
+
+export default function PublicFormPage({ params }: PublicFormPageProps) {
+  const [formData, setFormData] = useState<FormData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [formId, setFormId] = useState<string>('')
+
+  useEffect(() => {
+    const getFormId = async () => {
+      const resolvedParams = await params
+      setFormId(resolvedParams.formId)
+    }
+    getFormId()
+  }, [params])
+
+  useEffect(() => {
+    if (!formId) return
+
+    const fetchForm = async () => {
+      setLoading(true)
+      try {
+        const { data, error } = await supabase
+          .from('forms')
+          .select('*')
+          .eq('id', formId)
+          .eq('status', 'published')
+          .single()
+
+        if (error) {
+          console.error('Supabase error:', error)
+          throw error
+        }
+
+        if (!data) {
+          setError('Form not found or not published.')
+          return
+        }
+
+        console.log('Fetched public form:', data)
+
+        const defaultTheme = {
+          primaryColor: '#151419',
+          backgroundColor: '#fafafa',
+          textColor: '#151419',
+          borderRadius: 8,
+          fontFamily: 'Satoshi'
+        }
+
+        const defaultSettings = {
+          showTitle: true,
+          showDescription: true,
+          submitButtonText: 'Submit',
+          successMessage: 'Thank you for your submission!',
+          collectEmail: false,
+          allowMultipleSubmissions: true
+        }
+
+        setFormData({
+          id: formId,
+          title: data.title || 'Form',
+          description: data.description || '',
+          status: data.status || 'published',
+          fields: data.fields || [],
+          theme: data.theme ? { ...defaultTheme, ...data.theme } : defaultTheme,
+          settings: data.settings ? { ...defaultSettings, ...data.settings } : defaultSettings
+        } as FormData)
+      } catch (error: any) {
+        console.error('Error fetching form:', {
+          message: error?.message,
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          error
+        })
+        setError('Form not found or an error occurred.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchForm()
+  }, [formId])
+
+  const handleSubmit = async (submissionData: Record<string, any>) => {
+    try {
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formId: formId, data: submissionData }),
+      })
+
+      if (!response.ok) {
+        const errorResult = await response.json()
+        throw new Error(errorResult.error || 'Failed to submit the form.')
+      }
+
+      // Dispatch event to refresh dashboard counts
+      window.dispatchEvent(new CustomEvent('submissionReceived'))
+    } catch (err: any) {
+      console.error('Error submitting form:', err)
+      throw err
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading form...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-destructive" />
+          </div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Form Not Available</h2>
+          <p className="text-muted-foreground">{error}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (formData) {
+    return (
+      <>
+        <FontLoader fontFamily={formData.theme.fontFamily} />
+        <div 
+          className="min-h-screen py-8"
+          style={{
+            backgroundColor: formData.theme.backgroundColor,
+            fontFamily: formData.theme.fontFamily
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="max-w-2xl mx-auto px-4"
+          >
+            <FormPreview formData={formData} onSubmit={handleSubmit} />
+          </motion.div>
+        </div>
+      </>
+    )
+  }
+
+  return null
+}

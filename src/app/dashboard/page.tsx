@@ -1,200 +1,436 @@
 "use client"
 
-import { useAuth } from '@/contexts/AuthContext'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { useRouter } from 'next/navigation'
+import { Badge } from '@/components/ui/badge'
+import { useAuth } from '@/contexts/AuthContext'
+import { supabase } from '@/lib/supabase'
+import { motion } from 'framer-motion'
+import { DashboardSkeleton } from '@/components/skeletons/DashboardSkeleton'
 import {
-  BarChart3,
-  Users,
   FileText,
-  Settings,
+  Users,
+  Clock,
+  ArrowRight,
+  ChevronUp,
+  ChevronDown,
   Plus,
-  TrendingUp,
-  Activity,
-  Calendar
+  MoreVertical,
+  Eye,
+  Edit,
+  MessageSquare,
+  Activity
 } from 'lucide-react'
-import Link from 'next/link'
+
+interface FormRecord {
+  id: string
+  title: string
+  description?: string
+  created_at: string
+  status: 'draft' | 'published'
+  submissions?: number
+}
+
+interface SubmissionRecord {
+  id: string
+  form_id: string
+  data: Record<string, any>
+  created_at: string
+  forms?: { title: string } | { title: string }[]
+}
 
 export default function DashboardPage() {
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
   const router = useRouter()
 
-  const handleSignOut = async () => {
-    await signOut()
-    router.push('/')
+  const [forms, setForms] = useState<FormRecord[]>([])
+  const [recentSubmissions, setRecentSubmissions] = useState<SubmissionRecord[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const [dashboardStats, setDashboardStats] = useState({
+    totalForms: 0,
+    publishedForms: 0,
+    leadsThisWeek: 0,
+    lastLeadTime: null as string | null
+  })
+
+  const [historicalStats, setHistoricalStats] = useState({
+    submissionsLastWeek: 0
+  })
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) return
+
+      setLoading(true)
+      try {
+        // Fetch forms data
+        const { data: formsData, error: formsError } = await supabase
+          .from('forms')
+          .select('id, title, description, created_at, status')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+
+        if (!formsError) {
+          setForms(formsData as FormRecord[])
+          const publishedCount = formsData?.filter(form => form.status === 'published').length || 0
+          setDashboardStats(prev => ({
+            ...prev,
+            totalForms: formsData?.length || 0,
+            publishedForms: publishedCount
+          }))
+        }
+
+        // Fetch recent submissions
+        const { data: submissionsData, error: submissionsError } = await supabase
+          .from('submissions')
+          .select(`
+            id, form_id, data, created_at,
+            forms!inner (
+              title
+            )
+          `)
+          .eq('forms.user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(7)
+
+        if (!submissionsError) {
+          setRecentSubmissions(submissionsData || [])
+
+          // Calculate leads this week
+          const oneWeekAgo = new Date()
+          oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+          const leadsThisWeek = submissionsData?.filter(sub =>
+            new Date(sub.created_at) >= oneWeekAgo
+          ).length || 0
+
+          // Get last lead time
+          const lastLeadTime = submissionsData?.[0]?.created_at || null
+
+          setDashboardStats(prev => ({
+            ...prev,
+            leadsThisWeek,
+            lastLeadTime
+          }))
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [user])
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+
+    if (diffInHours < 1) return 'Just now'
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`
+
+    const diffInDays = Math.floor(diffInHours / 24)
+    if (diffInDays === 1) return 'Yesterday'
+    if (diffInDays < 7) return `${diffInDays} days ago`
+
+    return date.toLocaleDateString()
   }
 
-  // Mock data for dashboard stats
-  const stats = [
-    {
-      title: "Total Forms",
-      value: "12",
-      change: "+2 this month",
-      icon: <FileText className="w-8 h-8" />,
-      color: "text-blue-600"
-    },
-    {
-      title: "Total Leads",
-      value: "1,247",
-      change: "+18% from last month",
-      icon: <Users className="w-8 h-8" />,
-      color: "text-green-600"
-    },
-    {
-      title: "Conversion Rate",
-      value: "3.2%",
-      change: "+0.5% from last month",
-      icon: <TrendingUp className="w-8 h-8" />,
-      color: "text-purple-600"
-    },
-    {
-      title: "This Month",
-      value: "89",
-      change: "Active leads",
-      icon: <Activity className="w-8 h-8" />,
-      color: "text-orange-600"
-    }
-  ]
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
 
-  const recentForms = [
-    { name: "Newsletter Signup", leads: 45, status: "Active" },
-    { name: "Contact Form", leads: 23, status: "Active" },
-    { name: "Demo Request", leads: 12, status: "Active" },
-    { name: "Feedback Survey", leads: 9, status: "Draft" }
-  ]
+  const getSubmitterName = (submission: SubmissionRecord) => {
+    const data = submission.data
+    return data.name || data.full_name || data.email || 'Anonymous'
+  }
+
+  const getTrendPercentage = () => {
+    const currentWeek = dashboardStats.leadsThisWeek
+    const lastWeek = historicalStats.submissionsLastWeek
+    if (lastWeek === 0) return currentWeek > 0 ? 100 : 0
+    return Math.round(((currentWeek - lastWeek) / lastWeek) * 100)
+  }
+
+  if (loading) {
+    return <DashboardSkeleton />
+  }
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            Welcome back, {user?.email?.split('@')[0]}! 👋
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Here's what's happening with your forms today.
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Link href="/dashboard/forms/new">
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Plus className="w-4 h-4 mr-2" />
-              New Form
-            </Button>
-          </Link>
-          <Button
-            onClick={handleSignOut}
-            variant="outline"
-            className="border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+      {/* Welcome Banner with Quick Stats */}
+      <motion.div
+        className="bg-gradient-to-r from-primary via-primary to-accent rounded-3xl p-8 text-primary-foreground shadow-xl"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="mb-8">
+          <motion.h1
+            className="text-4xl font-bold mb-3"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
           >
-            Sign Out
-          </Button>
+            Welcome back, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}!
+          </motion.h1>
+          <motion.p
+            className="text-primary-foreground/80 text-lg"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+          >
+            Here's what's happening with your forms today
+          </motion.p>
         </div>
-      </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <Card key={index} className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{stat.title}</p>
-                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                <p className="text-xs text-muted-foreground mt-1">{stat.change}</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Active Forms */}
+          <Link href="/dashboard/forms">
+            <motion.div
+              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20"
+              whileHover={{ scale: 1.02, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-primary-foreground/20 rounded-xl">
+                  <FileText className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <ArrowRight className="w-5 h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
               </div>
-              <div className={`${stat.color} opacity-20`}>
-                {stat.icon}
+              <div className="text-4xl font-bold mb-2">{dashboardStats.publishedForms}</div>
+              <div className="text-primary-foreground/80 text-sm font-medium">Active Forms</div>
+            </motion.div>
+          </Link>
+
+          {/* Leads This Week */}
+          <Link href="/dashboard/submissions">
+            <motion.div
+              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20"
+              whileHover={{ scale: 1.02, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-primary-foreground/20 rounded-xl">
+                  <Users className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <div className="flex items-center gap-2">
+                  {getTrendPercentage() > 0 ? (
+                    <ChevronUp className="w-4 h-4 text-primary-foreground/80" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-primary-foreground/80" />
+                  )}
+                  <span className="text-sm text-primary-foreground/80 font-medium">
+                    {getTrendPercentage()}%
+                  </span>
+                </div>
               </div>
+              <div className="text-4xl font-bold mb-2">{dashboardStats.leadsThisWeek}</div>
+              <div className="text-primary-foreground/80 text-sm font-medium">Leads This Week</div>
+            </motion.div>
+          </Link>
+
+          {/* Last Lead */}
+          <Link href="/dashboard/submissions">
+            <motion.div
+              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20"
+              whileHover={{ scale: 1.02, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-primary-foreground/20 rounded-xl">
+                  <Clock className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <ArrowRight className="w-5 h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
+              </div>
+              <div className="text-2xl font-bold mb-2">
+                {dashboardStats.lastLeadTime ? formatTimeAgo(dashboardStats.lastLeadTime) : 'No leads yet'}
+              </div>
+              <div className="text-primary-foreground/80 text-sm font-medium">Last Lead</div>
+            </motion.div>
+          </Link>
+        </div>
+      </motion.div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+        {/* Recent Activity */}
+        <motion.div
+          className="xl:col-span-1"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+        >
+          <Card className="shadow-sm border-border">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-foreground">Recent Activity</h3>
+                <Link href="/dashboard/submissions" className="text-sm text-primary hover:text-primary/80 font-medium transition-colors">
+                  View All →
+                </Link>
+              </div>
+
+              {recentSubmissions.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">No submissions yet</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Share your forms to start capturing leads!
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {recentSubmissions.slice(0, 5).map((submission) => (
+                    <motion.div
+                      key={submission.id}
+                      className="flex items-center gap-3 p-4 rounded-xl hover:bg-accent transition-colors group border border-transparent hover:border-border"
+                      whileHover={{ x: 4 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground text-sm font-semibold flex-shrink-0">
+                        {getInitials(getSubmitterName(submission))}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground truncate">
+                          {getSubmitterName(submission)}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          via {Array.isArray(submission.forms) ? submission.forms[0]?.title : submission.forms?.title || 'Unknown Form'}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {formatTimeAgo(submission.created_at)}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </div>
           </Card>
-        ))}
-      </div>
+        </motion.div>
 
-      {/* Recent Forms and Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Forms */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Recent Forms</h3>
-            <Link href="/dashboard/forms">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                View All
-              </Button>
-            </Link>
-          </div>
-          <div className="space-y-4">
-            {recentForms.map((form, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-background-secondary rounded-lg">
+        {/* Your Forms Section */}
+        <motion.div
+          className="xl:col-span-3"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+        >
+          <Card className="shadow-sm border-border">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
                 <div>
-                  <p className="font-medium text-foreground">{form.name}</p>
-                  <p className="text-sm text-muted-foreground">{form.leads} leads</p>
+                  <h3 className="text-2xl font-bold text-foreground">Your Forms</h3>
+                  <p className="text-muted-foreground mt-1">Manage and track your form performance</p>
                 </div>
-                <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  form.status === 'Active'
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                    : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
-                }`}>
-                  {form.status}
-                </div>
+                <Link href="/dashboard/forms/new">
+                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create New Form
+                  </Button>
+                </Link>
               </div>
-            ))}
-          </div>
-        </Card>
 
-        {/* Quick Actions */}
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
-          <div className="space-y-3">
-            <Link href="/dashboard/forms/new">
-              <Button variant="outline" className="w-full justify-start border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground">
-                <Plus className="w-4 h-4 mr-3" />
-                Create New Form
-              </Button>
-            </Link>
-            <Link href="/dashboard/analytics">
-              <Button variant="outline" className="w-full justify-start border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground">
-                <BarChart3 className="w-4 h-4 mr-3" />
-                View Analytics
-              </Button>
-            </Link>
-            <Link href="/dashboard/settings">
-              <Button variant="outline" className="w-full justify-start border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground">
-                <Settings className="w-4 h-4 mr-3" />
-                Account Settings
-              </Button>
-            </Link>
-          </div>
-        </Card>
+              {forms.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <FileText className="w-10 h-10 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-3">No forms yet</h3>
+                  <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                    Create your first form to start collecting data and building your lead generation system.
+                  </p>
+                  <Link href="/dashboard/forms/new">
+                    <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3 shadow-sm">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Your First Form
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {forms.slice(0, 6).map((form, index) => (
+                    <motion.div
+                      key={form.id}
+                      className="flex items-center gap-4 p-6 bg-background border border-border rounded-2xl hover:shadow-lg hover:border-primary/20 transition-all duration-300 group"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1, duration: 0.4 }}
+                      whileHover={{ y: -2 }}
+                    >
+                      {/* Form Icon */}
+                      <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-8 h-8 text-primary" />
+                      </div>
+
+                      {/* Form Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-semibold text-foreground truncate text-lg">{form.title}</h3>
+                          <Badge variant={form.status === 'published' ? 'default' : 'secondary'} className="text-xs">
+                            {form.status === 'published' ? 'Active' : 'Draft'}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Users className="w-4 h-4" />
+                            {form.submissions || 0} submissions
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            {formatTimeAgo(form.created_at)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Quick Actions */}
+                      <div className="hidden sm:flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <Button variant="ghost" size="sm" className="h-10 w-10 p-0 hover:bg-accent">
+                          <Link href={`/dashboard/forms/${form.id}/edit`}>
+                            <Edit className="w-4 h-4" />
+                          </Link>
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-10 w-10 p-0 hover:bg-accent">
+                          <Link href={`/dashboard/forms/${form.id}`}>
+                            <Eye className="w-4 h-4" />
+                          </Link>
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-10 w-10 p-0 hover:bg-accent">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </motion.div>
+                  ))}
+
+                  {forms.length > 6 && (
+                    <div className="text-center pt-6">
+                      <Link
+                        href="/dashboard/forms"
+                        className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium transition-colors"
+                      >
+                        View all {forms.length} forms
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </Card>
+        </motion.div>
       </div>
-
-      {/* Recent Activity */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h3>
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4 p-3 bg-background-secondary rounded-lg">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm text-foreground">New lead received from Newsletter Signup</p>
-              <p className="text-xs text-muted-foreground">2 minutes ago</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4 p-3 bg-background-secondary rounded-lg">
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm text-foreground">Form "Contact Form" updated</p>
-              <p className="text-xs text-muted-foreground">1 hour ago</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4 p-3 bg-background-secondary rounded-lg">
-            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm text-foreground">Monthly analytics report generated</p>
-              <p className="text-xs text-muted-foreground">1 day ago</p>
-            </div>
-          </div>
-        </div>
-      </Card>
     </div>
   )
 }

@@ -9,7 +9,7 @@ import { motion } from 'framer-motion'
 export function PricingSection() {
   const plans = [
     {
-      name: "Starter",
+      name: "Free",
       price: "$0",
       period: "forever",
       description: "Perfect for getting started with lead capture",
@@ -43,25 +43,6 @@ export function PricingSection() {
       cta: "Start Free Trial",
       popular: true,
       color: "from-primary to-accent"
-    },
-    {
-      name: "Enterprise",
-      price: "$99",
-      period: "per month",
-      description: "For large teams and high-volume needs",
-      features: [
-        "Unlimited leads",
-        "Unlimited forms",
-        "All Professional features",
-        "Advanced security",
-        "Custom integrations",
-        "Dedicated support",
-        "SLA guarantee",
-        "Custom contracts"
-      ],
-      cta: "Contact Sales",
-      popular: false,
-      color: "from-purple-500 to-pink-500"
     }
   ]
 
@@ -159,7 +140,7 @@ export function PricingSection() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8 lg:gap-10 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-10 max-w-4xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={index}
@@ -261,21 +242,13 @@ export function PricingSection() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 + 0.8, duration: 0.6 }}
                 >
-                  {plan.name === "Enterprise" ? (
+                  <Link href="/auth/signup">
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button className={`w-full bg-gradient-to-r ${plan.color} text-white hover:shadow-lg transition-all duration-300`}>
+                      <Button className={`w-full ${plan.popular ? `bg-gradient-to-r ${plan.color} text-white hover:shadow-lg` : 'border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground'} transition-all duration-300`}>
                         {plan.cta}
                       </Button>
                     </motion.div>
-                  ) : (
-                    <Link href="/auth/signup">
-                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button className={`w-full ${plan.popular ? `bg-gradient-to-r ${plan.color} text-white hover:shadow-lg` : 'border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground'} transition-all duration-300`}>
-                          {plan.cta}
-                        </Button>
-                      </motion.div>
-                    </Link>
-                  )}
+                  </Link>
                 </motion.div>
               </Card>
             </motion.div>

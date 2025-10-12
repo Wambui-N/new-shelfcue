@@ -102,12 +102,17 @@ export function Footer() {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center mr-4 relative overflow-hidden">
-                <motion.div
-                  className="w-6 h-6 bg-background rounded-full"
+              <motion.div
+                className="w-10 h-10 mr-4 relative"
+                whileHover={{ rotate: 5 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.img
+                  src="/sc-logo.png"
+                  alt="ShelfCue Logo"
+                  className="w-full h-full object-contain"
                   animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [1, 0.8, 1]
+                    scale: [1, 1.05, 1],
                   }}
                   transition={{
                     duration: 2,
@@ -115,7 +120,7 @@ export function Footer() {
                     ease: "easeInOut"
                   }}
                 />
-              </div>
+              </motion.div>
               <span className="text-2xl font-bold text-foreground">ShelfCue</span>
             </motion.div>
 

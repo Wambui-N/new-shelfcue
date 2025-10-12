@@ -4,11 +4,9 @@ import Link from "next/link"
 
 interface AuthLayoutProps {
   children: React.ReactNode
-  title: string
-  subtitle: string
 }
 
-export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
+export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       {/* Back Button */}
@@ -28,16 +26,6 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
           <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
             <div className="w-6 h-6 bg-background rounded-full"></div>
           </div>
-        </div>
-
-        {/* Title and Subtitle */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">
-            {title}
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            {subtitle}
-          </p>
         </div>
 
         {/* Auth Form */}
