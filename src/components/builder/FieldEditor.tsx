@@ -46,7 +46,7 @@ const fieldTypes = [
   { type: 'text', label: 'Text Input', icon: <Text className="w-4 h-4" /> },
   { type: 'email_field', label: 'Email Field', icon: <Mail className="w-4 h-4" /> },
   { type: 'phone_field', label: 'Phone Field', icon: <Phone className="w-4 h-4" /> },
-  { type: 'country', label: 'Country Selector', icon: <Globe className="w-4 h-4" /> },
+  { type: 'country', label: 'Country', icon: <Globe className="w-4 h-4" /> },
   { type: 'textarea', label: 'Textarea', icon: <FileText className="w-4 h-4" /> },
   { type: 'select', label: 'Dropdown', icon: <List className="w-4 h-4" /> },
   { type: 'radio', label: 'Radio Buttons', icon: <Radio className="w-4 h-4" /> },
@@ -54,7 +54,7 @@ const fieldTypes = [
   { type: 'number', label: 'Number', icon: <Hash className="w-4 h-4" /> },
   { type: 'date', label: 'Date', icon: <Calendar className="w-4 h-4" /> },
   { type: 'url', label: 'URL', icon: <Link className="w-4 h-4" /> },
-  { type: 'meeting', label: 'Meeting Booking', icon: <Clock className="w-4 h-4" /> },
+  { type: 'meeting', label: 'Book Meeting', icon: <Clock className="w-4 h-4" /> },
   { type: 'file', label: 'File Upload', icon: <Upload className="w-4 h-4" /> }
 ] as const
 

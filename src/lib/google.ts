@@ -58,20 +58,20 @@ export async function getGoogleClient(userId: string): Promise<GoogleAPIClient |
       return null
     }
 
-    // Check if token is expired
-    const now = Date.now()
+    // Check if token is expired (expires_at is stored as Unix timestamp in seconds)
+    const now = Math.floor(Date.now() / 1000) // Convert to seconds
     if (data.expires_at && data.expires_at < now) {
       // Token expired, need to refresh
       const client = new GoogleAPIClient(data.access_token, data.refresh_token)
       const newCredentials = await client.refreshAccessToken()
 
-      // Update tokens in database
+      // Update tokens in database (expires_at in seconds)
       await supabase
         .from('user_google_tokens')
         .update({
           access_token: newCredentials.access_token,
           refresh_token: newCredentials.refresh_token || data.refresh_token,
-          expires_at: now + (newCredentials.expires_in || 3600) * 1000,
+          expires_at: now + (newCredentials.expires_in || 3600),
           updated_at: new Date().toISOString()
         })
         .eq('user_id', userId)
