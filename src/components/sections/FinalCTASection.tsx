@@ -1,0 +1,158 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { ArrowRight, Check } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
+export function FinalCTASection() {
+  const benefits = [
+    "No credit card required",
+    "Cancel anytime",
+    "5-minute setup",
+  ];
+
+  return (
+    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-background/50 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden opacity-30">
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      </div>
+
+      <motion.div
+        className="container mx-auto max-w-4xl relative z-10"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          {/* Headline */}
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
+            Ready to Stop{" "}
+            <span className="text-dark-gray">
+              Losing Leads?
+            </span>
+          </h2>
+
+          {/* Sub-headline */}
+          <motion.p
+            className="text-base md:text-lg text-foreground-muted mb-8 max-w-2xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Join founders who capture{" "}
+            <span className="font-semibold text-foreground">47% more leads</span>{" "}
+            with beautiful, effortless forms.
+          </motion.p>
+
+          {/* CTA Button */}
+          <motion.div
+            className="mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <Link href="/auth/signup">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  size="default"
+                  className="group bg-black text-white hover:bg-dark-gray hover:shadow-xl transition-all duration-300 text-base px-8 py-4 rounded-lg font-semibold"
+                >
+                  <span className="mr-2">Start My 14-Day Free Trial</span>
+                  <motion.div
+                    className="inline-block"
+                    whileHover={{ x: 2 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.div>
+                </Button>
+              </motion.div>
+            </Link>
+          </motion.div>
+
+          {/* Risk Reversal */}
+          <motion.div
+            className="flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm text-foreground-muted"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            {benefits.map((benefit, index) => (
+              <motion.div
+                key={index}
+                className="flex items-center gap-2"
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <motion.div
+                  className="w-4 h-4 rounded-full bg-light-gray flex items-center justify-center"
+                  whileHover={{ scale: 1.2, rotate: 10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Check className="w-2 h-2 text-black" />
+                </motion.div>
+                <span className="font-medium">{benefit}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Stats Banner */}
+        <motion.div
+          className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
+          {[
+            { value: "1,000+", label: "Happy Founders" },
+            { value: "50,000+", label: "Leads Captured" },
+            { value: "< 2min", label: "Average Setup" },
+          ].map((stat, index) => (
+            <motion.div
+              key={index}
+              className="text-center p-4 rounded-lg bg-card/50 backdrop-blur-sm border border-border hover:border-primary/30 transition-all duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
+              whileHover={{ y: -2, scale: 1.02 }}
+            >
+              <p className="text-2xl font-bold text-foreground mb-1">
+                {stat.value}
+              </p>
+              <p className="text-xs text-foreground-muted">{stat.label}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.div>
+    </section>
+  );
+}
+

@@ -16,46 +16,46 @@ import { Card } from "@/components/ui/card";
 export function FeaturesSection() {
   const features = [
     {
-      icon: <Clock className="w-8 h-8" />,
+      icon: <Zap className="w-8 h-8" />,
       title: "60-Second Setup",
       description:
-        "Get your first form live in under a minute. No complex configurations or technical knowledge required.",
-      gradient: "from-blue-500 to-cyan-500",
+        "Get your first form capturing leads in under a minute. No technical skills required.",
+      gradient: "bg-dark-gray",
+    },
+    {
+      icon: <Target className="w-8 h-8" />,
+      title: "Beautiful & Mobile-First",
+      description:
+        "Clean, conversion-optimized forms that work perfectly on any device. No design skills needed.",
+      gradient: "bg-light-gray",
     },
     {
       icon: <Sheet className="w-8 h-8" />,
-      title: "Google Sheets Sync",
+      title: "Automatic Google Sheets Sync",
       description:
-        "Automatically sync all leads to your Google Sheets. Never miss a potential customer again.",
-      gradient: "from-green-500 to-emerald-500",
-    },
-    {
-      icon: <Zap className="w-8 h-8" />,
-      title: "Lightning Fast",
-      description:
-        "Built for speed. Forms load instantly and submissions are processed in real-time.",
-      gradient: "from-yellow-500 to-orange-500",
+        "Every lead automatically goes to your spreadsheet. Never manually export data again.",
+      gradient: "bg-black",
     },
     {
       icon: <Shield className="w-8 h-8" />,
-      title: "Enterprise Security",
+      title: "Never Lose a Lead",
       description:
-        "Bank-level security with end-to-end encryption. Your data is safe with us.",
-      gradient: "from-purple-500 to-pink-500",
+        "Temporary backup storage ensures zero lost submissions, even if sync fails.",
+      gradient: "bg-dark-gray",
     },
     {
-      icon: <Users className="w-8 h-8" />,
-      title: "Team Collaboration",
+      icon: <Sparkles className="w-8 h-8" />,
+      title: "No Website Needed",
       description:
-        "Share forms with your team, assign leads, and track performance together.",
-      gradient: "from-indigo-500 to-blue-500",
+        "Beautiful standalone pages and QR codes. Start capturing leads today.",
+      gradient: "bg-light-gray",
     },
     {
       icon: <BarChart3 className="w-8 h-8" />,
-      title: "Advanced Analytics",
+      title: "Built for Your Brand",
       description:
-        "Detailed insights on form performance, conversion rates, and lead quality.",
-      gradient: "from-red-500 to-rose-500",
+        "Add your logo, colors, and branding in seconds. Make every form feel like yours.",
+      gradient: "bg-black",
     },
   ];
 
@@ -99,7 +99,7 @@ export function FeaturesSection() {
   return (
     <section
       id="features"
-      className="py-20 px-4 sm:px-6 lg:px-8 bg-background-secondary relative overflow-hidden"
+      className="py-16 px-4 sm:px-6 lg:px-8 bg-background-secondary relative overflow-hidden"
     >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
@@ -108,46 +108,44 @@ export function FeaturesSection() {
       </div>
 
       <motion.div
-        className="container mx-auto relative z-10"
+        className="container mx-auto relative z-10 max-w-5xl"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
       >
         <motion.div
-          className="text-center mb-20"
+          className="text-center mb-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-8 border border-primary/20"
+            className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium mb-6 border border-primary/20"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.2 }}
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-3 h-3" />
             <span>Why Choose ShelfCue</span>
           </motion.div>
 
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
-            Everything You Need to
-            <span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Capture Leads
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
+            Simple Form Building,{" "}
+            <span className="text-dark-gray">
+              Powerful Results
             </span>
           </h2>
 
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-            From setup to conversion, we've built every feature with one goal in
-            mind:
+          <p className="text-base md:text-lg text-foreground-muted max-w-3xl mx-auto leading-relaxed">
+            Everything you need to capture leads{" "}
             <span className="text-foreground font-medium">
-              {" "}
-              make lead capture effortless.
+              without the complexity
             </span>
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
             <motion.div
               key={index}
@@ -158,7 +156,7 @@ export function FeaturesSection() {
               }}
               className="group"
             >
-              <Card className="relative p-8 h-full border-0 shadow-sm bg-card/50 backdrop-blur-sm hover:shadow-xl transition-all duration-500 group-hover:bg-card">
+              <Card className="relative p-6 h-full border-0 shadow-sm bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-500 group-hover:bg-card">
                 {/* Gradient Background */}
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-lg`}
@@ -166,27 +164,27 @@ export function FeaturesSection() {
 
                 <div className="relative z-10">
                   <motion.div
-                    className={`w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-lg`}
+                    className={`w-12 h-12 ${feature.gradient} rounded-xl flex items-center justify-center mx-auto mb-4 text-white shadow-md`}
                     variants={iconVariants}
                     whileHover="hover"
                   >
                     {feature.icon}
                   </motion.div>
 
-                  <h3 className="text-xl font-semibold mb-4 text-foreground text-center group-hover:text-primary transition-colors duration-300">
+                  <h3 className="text-lg font-semibold mb-3 text-foreground text-center group-hover:text-dark-gray transition-colors duration-300">
                     {feature.title}
                   </h3>
 
-                  <p className="text-muted-foreground leading-relaxed text-center group-hover:text-foreground/80 transition-colors duration-300">
+                  <p className="text-sm text-foreground-muted leading-relaxed text-center group-hover:text-foreground/80 transition-colors duration-300">
                     {feature.description}
                   </p>
                 </div>
 
                 {/* Hover Effect Border */}
                 <motion.div
-                  className="absolute inset-0 rounded-lg border-2 border-transparent group-hover:border-primary/20 transition-all duration-500"
+                  className="absolute inset-0 rounded-lg border-2 border-transparent group-hover:border-light-gray transition-all duration-500"
                   initial={false}
-                  whileHover={{ borderColor: "rgba(21, 20, 25, 0.2)" }}
+                  whileHover={{ borderColor: "#cfcecb" }}
                 />
               </Card>
             </motion.div>
@@ -195,18 +193,18 @@ export function FeaturesSection() {
 
         {/* Bottom CTA */}
         <motion.div
-          className="text-center mt-16"
+          className="text-center mt-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           <motion.div
-            className="inline-flex items-center gap-3 px-6 py-3 bg-primary/5 border border-primary/20 rounded-full text-primary font-medium hover:bg-primary/10 transition-all duration-300 cursor-pointer"
-            whileHover={{ scale: 1.05, y: -2 }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-light-gray/30 border border-light-gray rounded-lg text-black text-sm font-medium hover:bg-light-gray/50 transition-all duration-300 cursor-pointer"
+            whileHover={{ scale: 1.05, y: -1 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Target className="w-5 h-5" />
+            <Target className="w-4 h-4" />
             <span>Ready to get started?</span>
           </motion.div>
         </motion.div>

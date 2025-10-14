@@ -16,68 +16,43 @@ export function FAQSection() {
 
   const faqs = [
     {
-      category: "Getting Started",
+      category: "Setup & Getting Started",
       icon: <Zap className="w-6 h-6" />,
       color: "text-yellow-500",
       questions: [
         {
-          question: "How do I create my first form?",
+          question: "How long does setup really take?",
           answer:
-            "Creating your first form is simple! After signing up, click the 'Create Form' button in your dashboard. Choose from our pre-built templates or start from scratch. Customize the fields, styling, and settings, then publish it with a single click.",
+            "Most users have their first form live in under 2 minutes. Our intuitive builder and streamlined process means you can start capturing leads almost instantly—no complex configuration needed.",
         },
         {
-          question: "Do I need technical skills to use ShelfCue?",
+          question: "Do I need a website?",
           answer:
-            "Not at all! ShelfCue is designed for non-technical users. Our drag-and-drop form builder and intuitive interface make it easy for anyone to create professional forms without coding knowledge.",
-        },
-        {
-          question: "How quickly can I get started?",
-          answer:
-            "You can have your first form live in under 60 seconds! Our streamlined onboarding process gets you up and running immediately after signing up.",
+            "No! Every form gets a beautiful standalone page and QR code. You can share your form link anywhere—social media, email, or print the QR code. No website required.",
         },
       ],
     },
     {
-      category: "Features & Integrations",
-      icon: <MessageCircle className="w-6 h-6" />,
+      category: "Reliability & Support",
+      icon: <Shield className="w-6 h-6" />,
       color: "text-blue-500",
       questions: [
         {
-          question: "Which platforms do you integrate with?",
+          question: "What if the Google Sheets sync breaks?",
           answer:
-            "We integrate with Google Sheets, Zapier, Slack, email services, CRM systems like HubSpot and Salesforce, and many more. We're constantly adding new integrations based on user feedback.",
-        },
-        {
-          question: "Can I customize the look of my forms?",
-          answer:
-            "Absolutely! You can fully customize colors, fonts, layouts, and branding to match your website perfectly. We also offer white-label options for enterprise customers.",
-        },
-        {
-          question: "Do you support conditional logic?",
-          answer:
-            "Yes! Our advanced form builder includes conditional logic that shows or hides fields based on user responses, creating dynamic and personalized form experiences.",
+            "That's what our \"Never Lose a Lead\" guarantee is for! We temporarily store all submissions as backup. If the sync fails for any reason, your leads are safe and will be synced automatically once the connection is restored.",
         },
       ],
     },
     {
-      category: "Pricing & Billing",
+      category: "Billing & Cancellation",
       icon: <CreditCard className="w-6 h-6" />,
       color: "text-green-500",
       questions: [
         {
-          question: "What's included in the free plan?",
+          question: "Can I cancel anytime?",
           answer:
-            "Our free Starter plan includes up to 100 leads per month, 3 forms, Google Sheets integration, email notifications, and basic analytics. It's perfect for testing and small projects.",
-        },
-        {
-          question: "Can I change or cancel my plan anytime?",
-          answer:
-            "Yes, you can upgrade, downgrade, or cancel your plan at any time. Changes take effect immediately, and you'll only be charged for the time you've used the service.",
-        },
-        {
-          question: "Do you offer refunds?",
-          answer:
-            "We offer a 30-day money-back guarantee on all paid plans. If you're not satisfied, contact our support team within 30 days for a full refund.",
+            "Yes, no lock-in. You can cancel anytime with one click. You'll still have access until the end of your billing period, and you can export all your data instantly.",
         },
       ],
     },
@@ -118,7 +93,7 @@ export function FAQSection() {
   return (
     <section
       id="faq"
-      className="py-20 px-4 sm:px-6 lg:px-8 bg-background-secondary relative overflow-hidden"
+      className="py-16 px-4 sm:px-6 lg:px-8 bg-background-secondary relative overflow-hidden"
     >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
@@ -136,61 +111,57 @@ export function FAQSection() {
       </div>
 
       <motion.div
-        className="container mx-auto max-w-5xl relative z-10"
+        className="container mx-auto max-w-4xl relative z-10"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
       >
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-8 border border-primary/20"
+            className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium mb-6 border border-primary/20"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.2 }}
           >
-            <HelpCircle className="w-4 h-4" />
+            <HelpCircle className="w-3 h-3" />
             <span>Got Questions?</span>
           </motion.div>
 
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
-            Frequently Asked
-            <span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Questions
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
+            Questions?{" "}
+            <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+              We Have Answers.
             </span>
           </h2>
 
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-            Everything you need to know about getting started with ShelfCue.
-            <span className="text-foreground font-medium">
-              {" "}
-              Can't find what you're looking for? We're here to help.
-            </span>
+          <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Everything you need to know about Shelfcue.
           </p>
         </motion.div>
 
-        <div className="space-y-12">
+        <div className="space-y-8">
           {faqs.map((category, categoryIndex) => (
             <motion.div
               key={category.category}
               variants={categoryVariants}
-              className="bg-card rounded-2xl p-8 border border-border shadow-sm"
+              className="bg-card rounded-xl p-6 border border-border shadow-sm"
             >
               <motion.h3
-                className="text-2xl font-bold text-foreground mb-8 flex items-center gap-4"
-                whileHover={{ x: 4 }}
+                className="text-lg font-bold text-foreground mb-6 flex items-center gap-3"
+                whileHover={{ x: 2 }}
                 transition={{ duration: 0.2 }}
               >
                 <motion.div
-                  className={`p-3 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 ${category.color}`}
+                  className={`p-2 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 ${category.color}`}
                   animate={{
-                    rotate: [0, 5, -5, 0],
-                    scale: [1, 1.05, 1],
+                    rotate: [0, 3, -3, 0],
+                    scale: [1, 1.02, 1],
                   }}
                   transition={{
                     duration: 4,
@@ -202,7 +173,7 @@ export function FAQSection() {
                 {category.category}
               </motion.h3>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {category.questions.map((faq, faqIndex) => {
                   const globalIndex = categoryIndex * 10 + faqIndex;
                   const isOpen = openItems.has(globalIndex);
@@ -210,16 +181,16 @@ export function FAQSection() {
                   return (
                     <motion.div
                       key={faqIndex}
-                      className="border border-border rounded-xl overflow-hidden"
+                      className="border border-border rounded-lg overflow-hidden"
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: faqIndex * 0.1, duration: 0.5 }}
-                      whileHover={{ scale: 1.01 }}
+                      whileHover={{ scale: 1.005 }}
                     >
                       <motion.button
                         onClick={() => toggleItem(globalIndex)}
-                        className="w-full text-left p-6 bg-background hover:bg-background-secondary transition-all duration-300 group"
+                        className="w-full text-left p-4 bg-background hover:bg-background-secondary transition-all duration-300 group"
                         whileHover={{
                           backgroundColor: "rgba(20, 20, 25, 0.02)",
                         }}
@@ -227,7 +198,7 @@ export function FAQSection() {
                       >
                         <div className="flex items-center justify-between">
                           <h4
-                            className={`font-semibold text-lg transition-colors duration-300 group-hover:text-primary ${
+                            className={`font-semibold text-sm transition-colors duration-300 group-hover:text-primary ${
                               isOpen ? "text-primary" : "text-foreground"
                             }`}
                           >
@@ -236,11 +207,11 @@ export function FAQSection() {
                           <motion.div
                             animate={{ rotate: isOpen ? 45 : 0 }}
                             transition={{ duration: 0.3 }}
-                            className={`w-5 h-5 flex items-center justify-center ml-4 transition-colors duration-300 ${
+                            className={`w-4 h-4 flex items-center justify-center ml-3 transition-colors duration-300 ${
                               isOpen ? "text-primary" : "text-muted-foreground"
                             }`}
                           >
-                            <span className="text-xl font-bold">+</span>
+                            <span className="text-lg font-bold">+</span>
                           </motion.div>
                         </div>
                       </motion.button>
@@ -254,10 +225,10 @@ export function FAQSection() {
                             transition={{ duration: 0.3 }}
                             className="overflow-hidden"
                           >
-                            <div className="px-6 pb-6 pt-2">
-                              <div className="w-full h-px bg-border mb-4"></div>
+                            <div className="px-4 pb-4 pt-2">
+                              <div className="w-full h-px bg-border mb-3"></div>
                               <motion.p
-                                className="text-muted-foreground leading-relaxed"
+                                className="text-sm text-muted-foreground leading-relaxed"
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1, duration: 0.3 }}
@@ -278,27 +249,27 @@ export function FAQSection() {
 
         {/* Contact CTA */}
         <motion.div
-          className="text-center mt-16"
+          className="text-center mt-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           <motion.div
-            className="inline-flex flex-col sm:flex-row items-center gap-4 px-8 py-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-2xl border border-primary/20"
-            whileHover={{ scale: 1.02, y: -2 }}
+            className="inline-flex flex-col sm:flex-row items-center gap-3 px-6 py-3 bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20"
+            whileHover={{ scale: 1.02, y: -1 }}
             transition={{ duration: 0.2 }}
           >
             <div className="text-center sm:text-left">
-              <p className="text-foreground font-medium mb-1">
+              <p className="text-foreground font-medium text-sm mb-1">
                 Still have questions?
               </p>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground text-xs">
                 Our support team is here to help
               </p>
             </div>
             <motion.button
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-full font-medium hover:bg-primary/90 transition-colors duration-300"
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
