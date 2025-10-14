@@ -126,7 +126,7 @@ export default function BillingPage() {
 				},
 				body: JSON.stringify({ 
 					email: session.user.email,
-					amount: 2900 // ₦29.00 in kobo
+					amount: 2900 // $29.00 in cents
 				}),
 			});
 

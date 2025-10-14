@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
 				channel: txData.authorization.channel,
 				is_reusable: txData.authorization.reusable,
 				is_default: true,
-			},
+			} as any,
 			{
 				onConflict: "paystack_authorization_code",
 			},
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
 				current_period_end: periodEnd.toISOString(),
 				cancel_at_period_end: false,
 				cancelled_at: null,
-			}, {
+			} as any, {
 				onConflict: "user_id"
 			});
 
@@ -149,11 +149,11 @@ export async function GET(request: NextRequest) {
 		await supabase.from("invoices").insert({
 			user_id: user.id,
 			invoice_number: invoiceNumber,
-			amount: txData.amount / 100, // Convert from kobo to naira
-			currency: txData.currency,
+			amount: txData.amount / 100, // Convert from cents to dollars
+			currency: "USD",
 			status: "paid",
 			paid_at: txData.paid_at,
-		});
+		} as any);
 
 		// Update transaction with subscription ID
 		const { data: newSubscription } = await supabase
@@ -174,7 +174,7 @@ export async function GET(request: NextRequest) {
       message: "Payment verified successfully",
       subscription: {
         status: "active",
-        billing_cycle: billingCycle,
+        billing_cycle: "monthly",
         current_period_end: periodEnd.toISOString(),
       },
     });

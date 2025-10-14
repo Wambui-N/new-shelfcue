@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     console.log("📝 Request body:", body);
-    const { email, amount = 2900 } = body; // Default to ₦29.00 in kobo
+    const { email, amount = 2900 } = body; // Default to $29.00 in cents
 
     if (!email) {
       console.log("❌ No email provided");
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     // Initialize transaction (following official Paystack docs)
     const initResponse = await paystack.initializeTransaction({
       email: user.email || "",
-      amount: amount, // Amount in kobo
+      amount: amount, // Amount in cents
       reference,
       callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing/verify`,
       metadata: {
@@ -83,13 +83,13 @@ export async function POST(request: NextRequest) {
     await supabase.from("payment_transactions").insert({
       user_id: user.id,
       paystack_reference: reference,
-      amount: amount / 100, // Convert from kobo to naira for storage
-      currency: "NGN",
+      amount: amount / 100, // Convert from cents to dollars for storage
+      currency: "USD",
       status: "pending",
       metadata: {
         subscription_type: "professional",
       },
-    });
+    } as any);
 
     console.log("✅ Transaction initialized successfully");
 

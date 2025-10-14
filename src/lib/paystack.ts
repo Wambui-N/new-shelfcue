@@ -10,7 +10,7 @@ interface PaystackConfig {
 
 interface InitializeTransactionParams {
   email: string;
-  amount: number; // Amount in kobo (1 Naira = 100 kobo)
+  amount: number; // Amount in cents (1 Dollar = 100 cents)
   reference?: string;
   callback_url?: string;
   plan?: string; // Paystack plan code
