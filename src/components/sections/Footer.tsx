@@ -119,7 +119,7 @@ export function Footer() {
                 transition={{ duration: 0.3 }}
               >
                 <motion.img
-                  src="/sc-logo.png"
+                  src="/1.png"
                   alt="ShelfCue Logo"
                   className="w-full h-full object-contain"
                   animate={{

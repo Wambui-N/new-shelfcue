@@ -21,6 +21,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { TrialBanner } from "@/components/subscriptions/TrialBanner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -430,6 +431,9 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Trial Banner */}
+          <TrialBanner />
 
           {/* Page Content */}
           <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>

@@ -3,6 +3,7 @@ import { getGoogleClient } from "@/lib/google";
 import { createCalendarEventFromSubmission } from "@/lib/googleCalendar";
 import { GoogleSheetsService } from "@/lib/googleSheets";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { incrementUsage, canPerformAction } from "@/lib/subscriptionLimits";
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,6 +42,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Form not found or not published" },
         { status: 404 },
+      );
+    }
+
+    // Check submission limit for form owner
+    const limitCheck = await canPerformAction(form.user_id, "submissions_per_month");
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        { 
+          error: "Submission limit reached",
+          message: "This form has reached its submission limit for this month. Please contact the form owner.",
+        },
+        { status: 429 },
       );
     }
 
@@ -150,6 +163,9 @@ export async function POST(request: NextRequest) {
     ]).catch((error) => {
       console.error("Error in background tasks:", error);
     });
+
+    // Increment submission usage counter
+    await incrementUsage(form.user_id, "submissions", 1);
 
     return NextResponse.json({
       success: true,

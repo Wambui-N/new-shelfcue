@@ -1,10 +1,10 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 // Client for frontend (RLS enabled)
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -12,9 +12,20 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
+// Export a function to create client instances
+export const createClient = () => {
+  return createSupabaseClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+    },
+  });
+};
+
 // Admin client for API routes (bypasses RLS)
 // IMPORTANT: Only use this in API routes (server-side), never in client components
-let _supabaseAdmin: ReturnType<typeof createClient> | null = null;
+let _supabaseAdmin: ReturnType<typeof createSupabaseClient> | null = null;
 
 export const getSupabaseAdmin = () => {
   // Only create admin client on server
@@ -33,7 +44,7 @@ export const getSupabaseAdmin = () => {
       );
     }
 
-    _supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+    _supabaseAdmin = createSupabaseClient(supabaseUrl, serviceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
