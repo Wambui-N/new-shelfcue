@@ -19,10 +19,11 @@ import {
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
+import { AccountSkeleton } from '@/components/skeletons/DashboardSkeleton'
 
 export default function AccountPage() {
   const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
@@ -37,8 +38,13 @@ export default function AccountPage() {
         full_name: user.user_metadata?.full_name || '',
         email: user.email || ''
       })
+      setLoading(false)
     }
   }, [user])
+
+  if (loading) {
+    return <AccountSkeleton />
+  }
 
   const handleSave = async () => {
     if (!user) return

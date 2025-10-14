@@ -212,11 +212,63 @@ export function FieldEditor() {
                         rows={3}
                       />
                     ) : field.type === 'meeting' ? (
-                      <Input
-                        placeholder={field.placeholder || 'Select meeting time...'}
-                        onChange={(e) => updateField(field.id, { placeholder: e.target.value })}
-                        className="text-sm"
-                      />
+                      <div className="space-y-4">
+                        <Input
+                          placeholder={field.placeholder || 'Select meeting time...'}
+                          onChange={(e) => updateField(field.id, { placeholder: e.target.value })}
+                          className="text-sm"
+                        />
+                        
+                        {/* Meeting Duration */}
+                        <div>
+                          <Label className="text-sm mb-2">Meeting Duration</Label>
+                          <select
+                            value={field.meetingSettings?.duration || 30}
+                            onChange={(e) => updateField(field.id, {
+                              meetingSettings: {
+                                ...field.meetingSettings,
+                                duration: Number(e.target.value)
+                              }
+                            })}
+                            className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+                          >
+                            <option value={15}>15 minutes</option>
+                            <option value={30}>30 minutes</option>
+                            <option value={45}>45 minutes</option>
+                            <option value={60}>1 hour</option>
+                            <option value={90}>1.5 hours</option>
+                            <option value={120}>2 hours</option>
+                          </select>
+                        </div>
+
+                        {/* Buffer Time */}
+                        <div>
+                          <Label className="text-sm mb-2">Buffer Time Between Meetings</Label>
+                          <select
+                            value={field.meetingSettings?.bufferTime || 0}
+                            onChange={(e) => updateField(field.id, {
+                              meetingSettings: {
+                                ...field.meetingSettings,
+                                bufferTime: Number(e.target.value)
+                              }
+                            })}
+                            className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+                          >
+                            <option value={0}>No buffer</option>
+                            <option value={5}>5 minutes</option>
+                            <option value={10}>10 minutes</option>
+                            <option value={15}>15 minutes</option>
+                            <option value={30}>30 minutes</option>
+                          </select>
+                        </div>
+
+                        {/* Calendar Selection - Will be populated during publish */}
+                        <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                          <p className="text-xs text-blue-600 dark:text-blue-400">
+                            📅 Calendar will be selected when you publish this form
+                          </p>
+                        </div>
+                      </div>
                     ) : field.type === 'file' ? (
                       <Input
                         placeholder={field.placeholder || 'Upload files...'}

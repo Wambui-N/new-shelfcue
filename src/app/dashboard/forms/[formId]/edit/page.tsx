@@ -8,6 +8,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { FormData } from '@/types/form'
+import { FormEditSkeleton } from '@/components/skeletons/DashboardSkeleton'
 
 interface EditFormPageProps {
   params: Promise<{ formId: string }>

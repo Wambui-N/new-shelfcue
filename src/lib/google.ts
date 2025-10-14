@@ -1,5 +1,5 @@
 import { google } from 'googleapis'
-import { supabase } from './supabase'
+import { getSupabaseAdmin } from './supabase'
 
 export class GoogleAPIClient {
   private oauth2Client: any
@@ -47,7 +47,10 @@ export class GoogleAPIClient {
 // Helper function to get Google client for a user
 export async function getGoogleClient(userId: string): Promise<GoogleAPIClient | null> {
   try {
-    const { data, error } = await supabase
+    // Use admin client to bypass RLS
+    const supabaseAdmin = getSupabaseAdmin()
+    
+    const { data, error } = await supabaseAdmin
       .from('user_google_tokens')
       .select('access_token, refresh_token, expires_at')
       .eq('user_id', userId)
@@ -65,8 +68,8 @@ export async function getGoogleClient(userId: string): Promise<GoogleAPIClient |
       const client = new GoogleAPIClient(data.access_token, data.refresh_token)
       const newCredentials = await client.refreshAccessToken()
 
-      // Update tokens in database (expires_at in seconds)
-      await supabase
+      // Update tokens in database (expires_at in seconds) using admin client
+      await supabaseAdmin
         .from('user_google_tokens')
         .update({
           access_token: newCredentials.access_token,

@@ -10,6 +10,8 @@ import { FieldEditor } from './FieldEditor'
 import { FormSettings } from './FormSettings'
 import { ThemeEditor } from './ThemeEditor'
 import { ShareDialog } from './ShareDialog'
+import { MeetingConfigDialog } from './MeetingConfigDialog'
+import { PublishProgressDialog } from './PublishProgressDialog'
 import { useFormStore } from '@/store/formStore'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -41,6 +43,15 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   const [deviceView, setDeviceView] = useState<'desktop' | 'mobile'>('desktop')
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [showShareDialog, setShowShareDialog] = useState(false)
+  const [showMeetingConfigDialog, setShowMeetingConfigDialog] = useState(false)
+  const [showPublishProgress, setShowPublishProgress] = useState(false)
+  const [pendingPublish, setPendingPublish] = useState(false)
+  const [publishProgress, setPublishProgress] = useState<{
+    saving?: 'pending' | 'loading' | 'completed' | 'error'
+    sheet?: 'pending' | 'loading' | 'completed' | 'error'
+    drive?: 'pending' | 'loading' | 'completed' | 'error'
+    meeting?: 'pending' | 'loading' | 'completed' | 'error'
+  }>({})
   const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastSavedDataRef = useRef<string>('')
 
@@ -177,10 +188,85 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   }
 
   const handlePublish = async () => {
+    console.log('🔵 Publish button clicked')
+    
+    if (!user) {
+      console.error('Cannot publish: user not authenticated')
+      alert('You must be logged in to publish forms.')
+      return
+    }
+
+    console.log('✓ User authenticated:', user.id)
+    console.log('✓ Form data:', { 
+      id: formData.id, 
+      title: formData.title, 
+      fieldsCount: formData.fields.length 
+    })
+
+    // Check if form has meeting fields without calendar configured
+    const meetingFields = formData.fields.filter(f => f.type === 'meeting')
+    console.log('📅 Meeting fields found:', meetingFields.length)
+    
+    const hasMeetingWithoutCalendar = meetingFields.some(f => !f.meetingSettings?.calendarId)
+    console.log('📅 Has meeting without calendar?', hasMeetingWithoutCalendar)
+    
+    if (hasMeetingWithoutCalendar) {
+      // Show meeting config dialog first
+      console.log('📅 Showing meeting config dialog...')
+      setPendingPublish(true)
+      setShowMeetingConfigDialog(true)
+      return
+    }
+
+    console.log('🚀 Proceeding with publish...')
+    // Continue with normal publish flow
+    await executePublish()
+  }
+
+  const handleMeetingCalendarSelected = (calendarId: string) => {
+    // Update all meeting fields with the selected calendar
+    const updatedFields = formData.fields.map(field => {
+      if (field.type === 'meeting') {
+        return {
+          ...field,
+          meetingSettings: {
+            ...field.meetingSettings,
+            calendarId
+          }
+        }
+      }
+      return field
+    })
+    
+    updateForm({ fields: updatedFields })
+    
+    // Now proceed with publish
+    if (pendingPublish) {
+      setPendingPublish(false)
+      // Execute publish after a short delay to ensure state is updated
+      setTimeout(() => executePublish(), 100)
+    }
+  }
+
+  const executePublish = async () => {
     if (!user) {
       console.error('Cannot publish: user not authenticated')
       return
     }
+
+    // Determine which steps will be needed
+    const hasMeetingFields = formData.fields.some(f => f.type === 'meeting')
+    const hasFileFields = formData.fields.some(f => f.type === 'file')
+
+    // Initialize progress state
+    const initialProgress: typeof publishProgress = {
+      saving: 'pending',
+      sheet: 'pending',
+      ...(hasFileFields && { drive: 'pending' }),
+      ...(hasMeetingFields && { meeting: 'pending' })
+    }
+    setPublishProgress(initialProgress)
+    setShowPublishProgress(true)
 
     let formToPublish = formData
 
@@ -195,6 +281,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         formToPublish = { ...formData, id: savedForm.id }
       } catch (error) {
         console.error('Failed to save form before publishing:', error)
+        setShowPublishProgress(false)
         alert('Failed to save form. Please try again.')
         return
       }
@@ -206,18 +293,11 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     try {
       console.log('Publishing form:', formToPublish.id || 'new form')
       
-      // STEP 1: Force save the form first to ensure it exists in the database
+      // STEP 1: Save the form
       console.log('Step 1: Saving form to database...')
-      console.log('Current form data:', {
-        id: formToPublish.id,
-        title: formToPublish.title,
-        fieldsCount: formToPublish.fields?.length,
-        status: formToPublish.status
-      })
+      setPublishProgress(prev => ({ ...prev, saving: 'loading' }))
       
       const savedForm = await handleSave()
-      
-      console.log('Save result:', savedForm)
       
       if (!savedForm || !savedForm.id) {
         console.error('❌ Save failed - no form returned')
@@ -225,22 +305,19 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       }
       
       console.log('✓ Form saved successfully with ID:', savedForm.id)
-      console.log('Saved form data:', {
-        id: savedForm.id,
-        title: savedForm.title,
-        status: savedForm.status,
-        user_id: savedForm.user_id
-      })
+      setPublishProgress(prev => ({ ...prev, saving: 'completed' }))
       
       // Update formToPublish with the confirmed ID
       formToPublish = { ...formToPublish, id: savedForm.id }
 
-      // STEP 2: Wait for database to ensure record is committed and visible
+      // STEP 2: Wait for database consistency
       console.log('Step 2: Waiting for database consistency...')
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await new Promise(resolve => setTimeout(resolve, 1500))
 
-      // STEP 3: Call the enhanced publish API with the confirmed form ID
-      console.log('Step 3: Publishing form via API...')
+      // STEP 3: Create Google Sheet
+      console.log('Step 3: Creating Google Sheet...')
+      setPublishProgress(prev => ({ ...prev, sheet: 'loading' }))
+      
       const publishResponse = await fetch('/api/forms/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -280,40 +357,34 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       const publishResult = await publishResponse.json()
       console.log('✅ Form published successfully with integrations:', publishResult)
 
+      // Mark sheet creation as completed
+      setPublishProgress(prev => ({ ...prev, sheet: 'completed' }))
+
+      // Mark drive creation as completed if it was done
+      if (publishResult.results?.drive?.created) {
+        setPublishProgress(prev => ({ ...prev, drive: 'completed' }))
+      }
+
+      // Mark meeting configuration as completed if it exists
+      const hasMeetingFields = formToPublish.fields.some(f => f.type === 'meeting')
+      if (hasMeetingFields) {
+        setPublishProgress(prev => ({ ...prev, meeting: 'completed' }))
+      }
+
       setSaveStatus('saved')
-      setIsDirty(false)
+      setDirty(false)
       updateForm({ status: 'published' })
 
-      // Show success message with Google Sheets emphasis
-      const hasMeeting = formToPublish.fields.some(f => f.type === 'meeting')
-      const hasFile = formToPublish.fields.some(f => f.type === 'file')
-      
-      let message = '🎉 Form Published Successfully!\n'
-      
-      // Emphasize Google Sheets (core feature)
-      if (publishResult.results?.sheet?.created) {
-        message += '\n✅ Google Sheet Created'
-        message += '\n   Submissions will sync automatically!'
-        if (publishResult.results?.sheet?.url) {
-          message += '\n\n📊 View Sheet: ' + publishResult.results.sheet.url
-        }
-      } else if (publishResult.results?.sheet?.connected) {
-        message += '\n✅ Connected to Google Sheet'
-        message += '\n   Submissions will sync automatically!'
-      }
-      
-      // Additional features
-      if (publishResult.results?.drive?.created) {
-        message += '\n✅ Drive folder created for file uploads'
-      }
-      
-      if (hasMeeting) message += '\n✅ Meeting booking enabled'
-      
-      alert(message)
+      // Wait a moment to show all completed before redirecting
+      await new Promise(resolve => setTimeout(resolve, 1500))
+
+      // Redirect to form view page after successful publish
+      router.push(`/dashboard/forms/${savedForm.id}`)
 
     } catch (error: any) {
       console.error('Publish error:', error)
       setSaveStatus('error')
+      setShowPublishProgress(false)
       alert(`Failed to publish form: ${error.message}`)
     } finally {
       setSaving(false)
@@ -564,6 +635,13 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         formId={formData.id || ''}
         formTitle={formData.title || 'Untitled Form'}
         formStatus={formData.status}
+      />
+
+      <MeetingConfigDialog
+        open={showMeetingConfigDialog}
+        onOpenChange={setShowMeetingConfigDialog}
+        onConfirm={handleMeetingCalendarSelected}
+        userId={user?.id || ''}
       />
     </div>
   )

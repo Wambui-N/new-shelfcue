@@ -78,13 +78,17 @@ export async function GET(request: NextRequest) {
       currentTime: Math.floor(Date.now() / 1000)
     })
     
-    const { error: dbError } = await supabase.from('user_google_tokens').upsert({
-      user_id: userId,
-      access_token: tokens.access_token!,
-      refresh_token: tokens.refresh_token || '',
-      expires_at: expiresAt,
-      updated_at: new Date().toISOString()
-    })
+    const { error: dbError } = await supabase
+      .from('user_google_tokens')
+      .upsert({
+        user_id: userId,
+        access_token: tokens.access_token!,
+        refresh_token: tokens.refresh_token || '',
+        expires_at: expiresAt,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id'  // Specify that we want to update based on user_id conflicts
+      })
 
     if (dbError) {
       console.error('Error storing Google tokens:', dbError)
