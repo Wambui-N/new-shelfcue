@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function DashboardSkeleton() {
   return (
@@ -45,7 +45,10 @@ export function DashboardSkeleton() {
         </div>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
+            <div
+              key={i}
+              className="flex items-center justify-between p-4 border rounded-lg"
+            >
               <div className="flex-1">
                 <Skeleton className="h-5 w-48 mb-2" />
                 <Skeleton className="h-3 w-32" />
@@ -59,7 +62,7 @@ export function DashboardSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function FormsListSkeleton() {
@@ -97,7 +100,7 @@ export function FormsListSkeleton() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 export function SubmissionsSkeleton() {
@@ -145,7 +148,7 @@ export function SubmissionsSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function AnalyticsSkeleton() {
@@ -188,7 +191,10 @@ export function AnalyticsSkeleton() {
         <Skeleton className="h-6 w-40 mb-4" />
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+            <div
+              key={i}
+              className="flex items-center justify-between p-3 border rounded-lg"
+            >
               <div className="flex-1">
                 <Skeleton className="h-5 w-48 mb-1" />
                 <Skeleton className="h-3 w-32" />
@@ -203,7 +209,7 @@ export function AnalyticsSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function SettingsSkeleton() {
@@ -232,7 +238,7 @@ export function SettingsSkeleton() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 export function AccountSkeleton() {
@@ -285,7 +291,7 @@ export function AccountSkeleton() {
         <Skeleton className="h-10 w-40" />
       </div>
     </div>
-  )
+  );
 }
 
 export function BillingSkeleton() {
@@ -314,7 +320,10 @@ export function BillingSkeleton() {
         <Skeleton className="h-6 w-40 mb-4" />
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+            <div
+              key={i}
+              className="flex items-center justify-between p-3 border rounded-lg"
+            >
               <div className="flex-1">
                 <Skeleton className="h-5 w-32 mb-1" />
                 <Skeleton className="h-3 w-24" />
@@ -328,7 +337,7 @@ export function BillingSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function FormEditSkeleton() {
@@ -385,7 +394,7 @@ export function FormEditSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function FormViewSkeleton() {
@@ -411,16 +420,16 @@ export function FormViewSkeleton() {
       <div className="bg-card rounded-lg p-8 border max-w-2xl mx-auto">
         <Skeleton className="h-10 w-96 mb-4" />
         <Skeleton className="h-5 w-full mb-8" />
-        
+
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="mb-6">
             <Skeleton className="h-5 w-40 mb-2" />
             <Skeleton className="h-12 w-full" />
           </div>
         ))}
-        
+
         <Skeleton className="h-12 w-full mt-8" />
       </div>
     </div>
-  )
+  );
 }

@@ -1,111 +1,113 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+import { motion } from "framer-motion";
 import {
-  CreditCard,
-  Download,
+  ArrowRight,
+  BarChart3,
   Calendar,
   CheckCircle,
+  CreditCard,
   Crown,
-  Zap,
-  Users,
+  Download,
   FileText,
-  BarChart3,
   Shield,
-  ArrowRight,
-  Star
-} from 'lucide-react'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { BillingSkeleton } from '@/components/skeletons/DashboardSkeleton'
+  Star,
+  Users,
+  Zap,
+} from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { BillingSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export default function BillingPage() {
-  const [currentPlan] = useState('free') // Mock current plan
-  const [loading, setLoading] = useState(true)
+  const [currentPlan] = useState("free"); // Mock current plan
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Simulate loading
-    const timer = setTimeout(() => setLoading(false), 500)
-    return () => clearTimeout(timer)
-  }, [])
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (loading) {
-    return <BillingSkeleton />
+    return <BillingSkeleton />;
   }
 
   const plans = [
     {
-      name: 'Free',
-      price: '$0',
-      period: 'forever',
-      description: 'Perfect for getting started',
+      name: "Free",
+      price: "$0",
+      period: "forever",
+      description: "Perfect for getting started",
       features: [
-        'Up to 100 leads/month',
-        '3 forms',
-        'Google Sheets integration',
-        'Email notifications',
-        'Basic analytics',
-        'Community support'
+        "Up to 100 leads/month",
+        "3 forms",
+        "Google Sheets integration",
+        "Email notifications",
+        "Basic analytics",
+        "Community support",
       ],
-      current: currentPlan === 'free',
+      current: currentPlan === "free",
       popular: false,
-      color: 'from-gray-500 to-gray-600'
+      color: "from-gray-500 to-gray-600",
     },
     {
-      name: 'Professional',
-      price: '$29',
-      period: 'per month',
-      description: 'For growing businesses that need more',
+      name: "Professional",
+      price: "$29",
+      period: "per month",
+      description: "For growing businesses that need more",
       features: [
-        'Up to 10,000 leads/month',
-        'Unlimited forms',
-        'Google Sheets integration',
-        'Advanced analytics',
-        'Team collaboration',
-        'Priority support',
-        'Custom branding',
-        'API access'
+        "Up to 10,000 leads/month",
+        "Unlimited forms",
+        "Google Sheets integration",
+        "Advanced analytics",
+        "Team collaboration",
+        "Priority support",
+        "Custom branding",
+        "API access",
       ],
-      current: currentPlan === 'pro',
+      current: currentPlan === "pro",
       popular: true,
-      color: 'from-primary to-accent'
-    }
-  ]
+      color: "from-primary to-accent",
+    },
+  ];
 
   const invoices = [
     {
-      id: 'INV-001',
-      date: '2024-01-01',
-      amount: '$29.00',
-      status: 'paid' as const,
-      downloadUrl: '#'
+      id: "INV-001",
+      date: "2024-01-01",
+      amount: "$29.00",
+      status: "paid" as const,
+      downloadUrl: "#",
     },
     {
-      id: 'INV-002',
-      date: '2024-02-01',
-      amount: '$29.00',
-      status: 'paid' as const,
-      downloadUrl: '#'
+      id: "INV-002",
+      date: "2024-02-01",
+      amount: "$29.00",
+      status: "paid" as const,
+      downloadUrl: "#",
     },
     {
-      id: 'INV-003',
-      date: '2024-03-01',
-      amount: '$29.00',
-      status: 'pending' as const,
-      downloadUrl: '#'
-    }
-  ]
+      id: "INV-003",
+      date: "2024-03-01",
+      amount: "$29.00",
+      status: "pending" as const,
+      downloadUrl: "#",
+    },
+  ];
 
   return (
     <div className="space-y-8 max-w-6xl">
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Billing & Plans</h1>
-        <p className="text-muted-foreground mt-1">Manage your subscription and billing information</p>
+        <p className="text-muted-foreground mt-1">
+          Manage your subscription and billing information
+        </p>
       </div>
 
       {/* Current Plan */}
@@ -116,12 +118,16 @@ export default function BillingPage() {
               <Crown className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-foreground">Current Plan</h2>
-              <p className="text-sm text-muted-foreground">Your active subscription</p>
+              <h2 className="text-xl font-semibold text-foreground">
+                Current Plan
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Your active subscription
+              </p>
             </div>
           </div>
           <Badge className="bg-primary text-primary-foreground">
-            {plans.find(p => p.current)?.name || 'Free'}
+            {plans.find((p) => p.current)?.name || "Free"}
           </Badge>
         </div>
 
@@ -129,28 +135,28 @@ export default function BillingPage() {
           <div className="p-4 bg-background-secondary rounded-xl">
             <FileText className="w-5 h-5 text-primary mb-2" />
             <div className="text-2xl font-bold text-foreground">
-              {currentPlan === 'free' ? '3' : '∞'}
+              {currentPlan === "free" ? "3" : "∞"}
             </div>
             <div className="text-xs text-muted-foreground">Forms Limit</div>
           </div>
           <div className="p-4 bg-background-secondary rounded-xl">
             <Users className="w-5 h-5 text-green-600 mb-2" />
             <div className="text-2xl font-bold text-foreground">
-              {currentPlan === 'free' ? '100' : '10,000'}
+              {currentPlan === "free" ? "100" : "10,000"}
             </div>
             <div className="text-xs text-muted-foreground">Leads/Month</div>
           </div>
           <div className="p-4 bg-background-secondary rounded-xl">
             <BarChart3 className="w-5 h-5 text-purple-600 mb-2" />
             <div className="text-2xl font-bold text-foreground">
-              {currentPlan === 'free' ? 'Basic' : 'Advanced'}
+              {currentPlan === "free" ? "Basic" : "Advanced"}
             </div>
             <div className="text-xs text-muted-foreground">Analytics</div>
           </div>
           <div className="p-4 bg-background-secondary rounded-xl">
             <Shield className="w-5 h-5 text-orange-600 mb-2" />
             <div className="text-2xl font-bold text-foreground">
-              {currentPlan === 'free' ? 'Standard' : 'Priority'}
+              {currentPlan === "free" ? "Standard" : "Priority"}
             </div>
             <div className="text-xs text-muted-foreground">Support</div>
           </div>
@@ -159,7 +165,9 @@ export default function BillingPage() {
 
       {/* Available Plans */}
       <div>
-        <h2 className="text-2xl font-bold text-foreground mb-6">Available Plans</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-6">
+          Available Plans
+        </h2>
         <div className="grid md:grid-cols-2 gap-6">
           {plans.map((plan, index) => (
             <motion.div
@@ -168,7 +176,9 @@ export default function BillingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1, duration: 0.4 }}
             >
-              <Card className={`p-8 border-2 ${plan.current ? 'border-primary' : 'border-border'} shadow-sm`}>
+              <Card
+                className={`p-8 border-2 ${plan.current ? "border-primary" : "border-border"} shadow-sm`}
+              >
                 {plan.popular && (
                   <div className="flex justify-end mb-4">
                     <Badge className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
@@ -179,12 +189,18 @@ export default function BillingPage() {
                 )}
 
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-foreground mb-2">{plan.name}</h3>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">
+                    {plan.name}
+                  </h3>
                   <div className="mb-4">
-                    <span className={`text-4xl font-bold bg-gradient-to-r ${plan.color} bg-clip-text text-transparent`}>
+                    <span
+                      className={`text-4xl font-bold bg-gradient-to-r ${plan.color} bg-clip-text text-transparent`}
+                    >
                       {plan.price}
                     </span>
-                    <span className="text-muted-foreground ml-2">/{plan.period}</span>
+                    <span className="text-muted-foreground ml-2">
+                      /{plan.period}
+                    </span>
                   </div>
                   <p className="text-muted-foreground">{plan.description}</p>
                 </div>
@@ -193,7 +209,9 @@ export default function BillingPage() {
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-muted-foreground">{feature}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {feature}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -201,14 +219,18 @@ export default function BillingPage() {
                 <Button
                   className={`w-full ${
                     plan.current
-                      ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                      ? "bg-muted text-muted-foreground cursor-not-allowed"
                       : plan.popular
-                      ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg'
-                      : 'border-border text-muted-foreground hover:bg-accent'
+                        ? "bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg"
+                        : "border-border text-muted-foreground hover:bg-accent"
                   }`}
                   disabled={plan.current}
                 >
-                  {plan.current ? 'Current Plan' : plan.name === 'Free' ? 'Downgrade' : 'Upgrade'}
+                  {plan.current
+                    ? "Current Plan"
+                    : plan.name === "Free"
+                      ? "Downgrade"
+                      : "Upgrade"}
                 </Button>
               </Card>
             </motion.div>
@@ -218,44 +240,69 @@ export default function BillingPage() {
 
       {/* Billing History */}
       <div>
-        <h2 className="text-2xl font-bold text-foreground mb-6">Billing History</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-6">
+          Billing History
+        </h2>
         <Card className="shadow-sm border-border">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-foreground">Invoice</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-foreground">Date</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-foreground">Amount</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-foreground">Status</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-foreground">Actions</th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-foreground">
+                    Invoice
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-foreground">
+                    Date
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-foreground">
+                    Amount
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-foreground">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {invoices.map((invoice) => (
-                  <tr key={invoice.id} className="hover:bg-accent/50 transition-colors">
+                  <tr
+                    key={invoice.id}
+                    className="hover:bg-accent/50 transition-colors"
+                  >
                     <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-foreground">{invoice.id}</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {invoice.id}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Calendar className="w-4 h-4" />
-                        {new Date(invoice.date).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
+                        {new Date(invoice.date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
                         })}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-foreground">{invoice.amount}</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {invoice.amount}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <Badge
-                        variant={invoice.status === 'paid' ? 'default' : 'secondary'}
-                        className={invoice.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : ''}
+                        variant={
+                          invoice.status === "paid" ? "default" : "secondary"
+                        }
+                        className={
+                          invoice.status === "paid"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                            : ""
+                        }
                       >
-                        {invoice.status === 'paid' ? 'Paid' : 'Pending'}
+                        {invoice.status === "paid" ? "Paid" : "Pending"}
                       </Badge>
                     </td>
                     <td className="px-6 py-4">
@@ -274,6 +321,5 @@ export default function BillingPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
-

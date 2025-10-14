@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { ArrowRight, Sparkles, Zap, Users } from 'lucide-react'
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles, Users, Zap } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
   const containerVariants = {
@@ -12,10 +12,10 @@ export function HeroSection() {
       opacity: 1,
       transition: {
         staggerChildren: 0.2,
-        delayChildren: 0.1
-      }
-    }
-  }
+        delayChildren: 0.1,
+      },
+    },
+  };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -24,10 +24,10 @@ export function HeroSection() {
       y: 0,
       transition: {
         duration: 0.8,
-        ease: "easeOut"
-      }
-    }
-  }
+        ease: "easeOut",
+      },
+    },
+  };
 
   const floatingVariants = {
     animate: {
@@ -36,10 +36,10 @@ export function HeroSection() {
       transition: {
         duration: 6,
         repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  }
+        ease: "easeInOut",
+      },
+    },
+  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-background-secondary/50 to-background">
@@ -49,24 +49,24 @@ export function HeroSection() {
           className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3]
+            opacity: [0.3, 0.5, 0.3],
           }}
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
         />
         <motion.div
           className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl"
           animate={{
             scale: [1.2, 1, 1.2],
-            opacity: [0.2, 0.4, 0.2]
+            opacity: [0.2, 0.4, 0.2],
           }}
           transition={{
             duration: 10,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
         />
       </div>
@@ -114,13 +114,22 @@ export function HeroSection() {
           className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed"
         >
           The effortless lead capture system for founders who hate complex tech.
-          <span className="text-foreground font-medium"> Built for scale, designed for simplicity.</span>
+          <span className="text-foreground font-medium">
+            {" "}
+            Built for scale, designed for simplicity.
+          </span>
         </motion.p>
 
         {/* CTA Buttons */}
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
+        >
           <Link href="/auth/signup">
-            <Button size="lg" className="group bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300 text-lg px-8 py-4 rounded-full">
+            <Button
+              size="lg"
+              className="group bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300 text-lg px-8 py-4 rounded-full"
+            >
               <span className="mr-2">Start Free Trial</span>
               <motion.div
                 className="inline-block"
@@ -133,8 +142,8 @@ export function HeroSection() {
           </Link>
           <motion.button
             onClick={() => {
-              const demoSection = document.querySelector('#demo')
-              demoSection?.scrollIntoView({ behavior: 'smooth' })
+              const demoSection = document.querySelector("#demo");
+              demoSection?.scrollIntoView({ behavior: "smooth" });
             }}
             className="text-muted-foreground hover:text-foreground transition-colors duration-300 text-lg font-medium group"
             whileHover={{ scale: 1.05 }}
@@ -157,9 +166,21 @@ export function HeroSection() {
           className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
         >
           {[
-            { number: "10,000+", label: "Active Users", icon: <Users className="w-6 h-6" /> },
-            { number: "99.9%", label: "Uptime SLA", icon: <Zap className="w-6 h-6" /> },
-            { number: "< 2min", label: "Setup Time", icon: <Sparkles className="w-6 h-6" /> }
+            {
+              number: "10,000+",
+              label: "Active Users",
+              icon: <Users className="w-6 h-6" />,
+            },
+            {
+              number: "99.9%",
+              label: "Uptime SLA",
+              icon: <Zap className="w-6 h-6" />,
+            },
+            {
+              number: "< 2min",
+              label: "Setup Time",
+              icon: <Sparkles className="w-6 h-6" />,
+            },
           ].map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -173,8 +194,12 @@ export function HeroSection() {
               >
                 {stat.icon}
               </motion.div>
-              <div className="text-3xl font-bold text-foreground mb-1">{stat.number}</div>
-              <div className="text-muted-foreground text-sm uppercase tracking-wide">{stat.label}</div>
+              <div className="text-3xl font-bold text-foreground mb-1">
+                {stat.number}
+              </div>
+              <div className="text-muted-foreground text-sm uppercase tracking-wide">
+                {stat.label}
+              </div>
             </motion.div>
           ))}
         </motion.div>
@@ -189,7 +214,7 @@ export function HeroSection() {
         transition={{
           duration: 2,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: "easeInOut",
         }}
       >
         <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center">
@@ -201,11 +226,11 @@ export function HeroSection() {
             transition={{
               duration: 2,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
           />
         </div>
       </motion.div>
     </section>
-  )
+  );
 }

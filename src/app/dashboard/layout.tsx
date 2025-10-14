@@ -1,128 +1,136 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Home,
-  FileText,
-  Mail,
   BarChart3,
-  Settings,
-  LogOut,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
-  User,
   CreditCard,
+  FileText,
+  Home,
+  LogOut,
+  Mail,
   Menu,
-  X
-} from 'lucide-react'
-import { ProtectedRoute } from '@/components/ProtectedRoute'
-import { useAuth } from '@/contexts/AuthContext'
-import { supabase } from '@/lib/supabase'
-import { motion, AnimatePresence } from 'framer-motion'
+  Settings,
+  User,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 interface DashboardLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 function DashboardLayoutContent({ children }: DashboardLayoutProps) {
-  const { user, signOut } = useAuth()
-  const router = useRouter()
-  const pathname = usePathname()
+  const { user, signOut } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Real data from database
-  const [activeFormsCount, setActiveFormsCount] = useState(0)
-  const [newSubmissionsCount, setNewSubmissionsCount] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [activeFormsCount, setActiveFormsCount] = useState(0);
+  const [newSubmissionsCount, setNewSubmissionsCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const handleSignOut = async () => {
-    await signOut()
-    router.push('/')
-  }
+    await signOut();
+    router.push("/");
+  };
 
   // Fetch real data from database
   useEffect(() => {
     const fetchCounts = async () => {
-      if (!user) return
+      if (!user) return;
 
       try {
-        setLoading(true)
+        setLoading(true);
 
         // Fetch active forms count (published forms)
         const { data: forms, error: formsError } = await supabase
-          .from('forms')
-          .select('id, status')
-          .eq('user_id', user.id)
-          .eq('status', 'published')
+          .from("forms")
+          .select("id, status")
+          .eq("user_id", user.id)
+          .eq("status", "published");
 
         if (!formsError) {
-          setActiveFormsCount(forms?.length || 0)
+          setActiveFormsCount(forms?.length || 0);
         }
 
         // Fetch new submissions count (submissions from last 7 days)
-        const sevenDaysAgo = new Date()
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
         const { data: submissions, error: submissionsError } = await supabase
-          .from('submissions')
-          .select('id')
-          .gte('created_at', sevenDaysAgo.toISOString())
-          .in('form_id', forms?.map(form => form.id) || [])
+          .from("submissions")
+          .select("id")
+          .gte("created_at", sevenDaysAgo.toISOString())
+          .in("form_id", forms?.map((form) => form.id) || []);
 
         if (!submissionsError) {
-          setNewSubmissionsCount(submissions?.length || 0)
+          setNewSubmissionsCount(submissions?.length || 0);
         }
-
       } catch (error) {
-        console.error('Error fetching counts:', error)
+        console.error("Error fetching counts:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchCounts()
-  }, [user])
+    fetchCounts();
+  }, [user]);
 
   const primaryNavItems = [
     {
-      href: '/dashboard',
-      label: 'Dashboard',
+      href: "/dashboard",
+      label: "Dashboard",
       icon: Home,
-      badge: null
+      badge: null,
     },
     {
-      href: '/dashboard/forms',
-      label: 'Forms',
+      href: "/dashboard/forms",
+      label: "Forms",
       icon: FileText,
-      badge: loading ? '...' : (activeFormsCount > 0 ? activeFormsCount.toString() : null)
+      badge: loading
+        ? "..."
+        : activeFormsCount > 0
+          ? activeFormsCount.toString()
+          : null,
     },
     {
-      href: '/dashboard/submissions',
-      label: 'Submissions',
+      href: "/dashboard/submissions",
+      label: "Submissions",
       icon: Mail,
-      badge: loading ? '...' : (newSubmissionsCount > 0 ? newSubmissionsCount.toString() : null)
+      badge: loading
+        ? "..."
+        : newSubmissionsCount > 0
+          ? newSubmissionsCount.toString()
+          : null,
     },
     {
-      href: '/dashboard/analytics',
-      label: 'Analytics',
+      href: "/dashboard/analytics",
+      label: "Analytics",
       icon: BarChart3,
-      badge: null
-    }
-  ]
+      badge: null,
+    },
+  ];
 
   const userMenuItems = [
-    { href: '/dashboard/account', label: 'Account Settings', icon: User },
-    { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
-    { href: '#', label: 'Logout', icon: LogOut, action: handleSignOut }
-  ]
+    { href: "/dashboard/account", label: "Account Settings", icon: User },
+    { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
+    { href: "#", label: "Logout", icon: LogOut, action: handleSignOut },
+  ];
 
   return (
     <ProtectedRoute>
@@ -130,7 +138,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
         {/* Desktop Sidebar */}
         <motion.aside
           className={`fixed inset-y-0 left-0 z-10 hidden sm:flex flex-col border-r border-border bg-background shadow-sm transition-all duration-300 ${
-            sidebarCollapsed ? 'w-16' : 'w-64'
+            sidebarCollapsed ? "w-16" : "w-64"
           }`}
           initial={false}
           animate={{ width: sidebarCollapsed ? 64 : 256 }}
@@ -144,14 +152,18 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <img src="/1.png" alt="ShelfCue" className="w-5 h-5 object-contain" />
+                  <img
+                    src="/1.png"
+                    alt="ShelfCue"
+                    className="w-5 h-5 object-contain"
+                  />
                 </motion.div>
                 <AnimatePresence>
                   {!sidebarCollapsed && (
                     <motion.span
                       className="text-lg font-bold text-foreground"
                       initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: 'auto' }}
+                      animate={{ opacity: 1, width: "auto" }}
                       exit={{ opacity: 0, width: 0 }}
                       transition={{ duration: 0.2 }}
                     >
@@ -184,12 +196,15 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                     href={item.href}
                     className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all hover:bg-accent hover:text-accent-foreground ${
                       pathname === item.href
-                        ? 'bg-primary/10 text-primary font-semibold'
-                        : 'text-muted-foreground'
+                        ? "bg-primary/10 text-primary font-semibold"
+                        : "text-muted-foreground"
                     }`}
                     title={sidebarCollapsed ? item.label : undefined}
                   >
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
                       <item.icon className="h-5 w-5 flex-shrink-0" />
                     </motion.div>
                     <AnimatePresence>
@@ -204,7 +219,10 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                             {item.label}
                           </motion.span>
                           {item.badge && (
-                            <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                            <Badge
+                              variant="secondary"
+                              className="text-xs bg-primary/10 text-primary"
+                            >
                               {item.badge}
                             </Badge>
                           )}
@@ -222,13 +240,16 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
               <Link
                 href="/dashboard/settings"
                 className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all hover:bg-accent hover:text-accent-foreground ${
-                  pathname === '/dashboard/settings'
-                    ? 'bg-primary/10 text-primary font-semibold'
-                    : 'text-muted-foreground'
+                  pathname === "/dashboard/settings"
+                    ? "bg-primary/10 text-primary font-semibold"
+                    : "text-muted-foreground"
                 }`}
-                title={sidebarCollapsed ? 'Settings' : undefined}
+                title={sidebarCollapsed ? "Settings" : undefined}
               >
-                <motion.div whileHover={{ scale: 1.1, rotate: 30 }} whileTap={{ scale: 0.95 }}>
+                <motion.div
+                  whileHover={{ scale: 1.1, rotate: 30 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Settings className="h-5 w-5 flex-shrink-0" />
                 </motion.div>
                 <AnimatePresence>
@@ -249,17 +270,19 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all hover:bg-accent w-full"
-                  title={sidebarCollapsed ? 'User Menu' : undefined}
+                  title={sidebarCollapsed ? "User Menu" : undefined}
                 >
                   <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-sm font-semibold flex-shrink-0">
-                    {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                    {user?.user_metadata?.full_name?.charAt(0) ||
+                      user?.email?.charAt(0) ||
+                      "U"}
                   </div>
                   <AnimatePresence>
                     {!sidebarCollapsed && (
                       <>
                         <div className="flex-1 text-left min-w-0">
                           <div className="font-medium text-foreground truncate text-sm">
-                            {user?.user_metadata?.full_name || 'User'}
+                            {user?.user_metadata?.full_name || "User"}
                           </div>
                           <div className="text-xs text-muted-foreground truncate">
                             {user?.email}
@@ -290,11 +313,11 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                           key={item.label}
                           onClick={() => {
                             if (item.action) {
-                              item.action()
+                              item.action();
                             } else {
-                              router.push(item.href)
+                              router.push(item.href);
                             }
-                            setUserMenuOpen(false)
+                            setUserMenuOpen(false);
                           }}
                           className="w-full flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                           whileHover={{ x: 4 }}
@@ -315,21 +338,27 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
         {/* Main Content */}
         <div
           className={`flex flex-col flex-1 transition-all duration-300 ${
-            sidebarCollapsed ? 'sm:pl-16' : 'sm:pl-64'
+            sidebarCollapsed ? "sm:pl-16" : "sm:pl-64"
           }`}
         >
           {/* Mobile Header */}
           <div className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/95 backdrop-blur-sm px-4 sm:hidden">
             <Link href="/dashboard" className="flex items-center gap-2">
               <img src="/sc-logo.png" alt="ShelfCue" className="w-6 h-6" />
-              <span className="text-sm font-bold text-foreground">ShelfCue</span>
+              <span className="text-sm font-bold text-foreground">
+                ShelfCue
+              </span>
             </Link>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {mobileMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </Button>
           </div>
 
@@ -345,8 +374,14 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
               >
                 <div className="flex flex-col h-full p-4">
                   <div className="flex items-center justify-between mb-8">
-                    <span className="text-lg font-bold text-foreground">Menu</span>
-                    <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(false)}>
+                    <span className="text-lg font-bold text-foreground">
+                      Menu
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
                       <X className="h-5 w-5" />
                     </Button>
                   </div>
@@ -359,8 +394,8 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                         onClick={() => setMobileMenuOpen(false)}
                         className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
                           pathname === item.href
-                            ? 'bg-primary/10 text-primary'
-                            : 'text-muted-foreground hover:bg-accent'
+                            ? "bg-primary/10 text-primary"
+                            : "text-muted-foreground hover:bg-accent"
                         }`}
                       >
                         <item.icon className="h-5 w-5" />
@@ -397,15 +432,13 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
           </AnimatePresence>
 
           {/* Page Content */}
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">
-            {children}
-          </main>
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
         </div>
       </div>
     </ProtectedRoute>
-  )
+  );
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  return <DashboardLayoutContent>{children}</DashboardLayoutContent>
+  return <DashboardLayoutContent>{children}</DashboardLayoutContent>;
 }

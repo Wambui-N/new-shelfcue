@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
+import { Calendar, Clock, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,80 +10,85 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Calendar, Clock, Loader2 } from 'lucide-react'
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 interface MeetingConfigDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: (calendarId: string) => void
-  userId: string
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: (calendarId: string) => void;
+  userId: string;
 }
 
 interface GoogleCalendar {
-  id: string
-  summary: string
-  description?: string
-  primary?: boolean
+  id: string;
+  summary: string;
+  description?: string;
+  primary?: boolean;
 }
 
 export function MeetingConfigDialog({
   open,
   onOpenChange,
   onConfirm,
-  userId
+  userId,
 }: MeetingConfigDialogProps) {
-  const [calendars, setCalendars] = useState<GoogleCalendar[]>([])
-  const [selectedCalendar, setSelectedCalendar] = useState<string>('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [calendars, setCalendars] = useState<GoogleCalendar[]>([]);
+  const [selectedCalendar, setSelectedCalendar] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open && userId) {
-      console.log('📅 MeetingConfigDialog opened, fetching calendars for user:', userId)
-      fetchCalendars()
+      console.log(
+        "📅 MeetingConfigDialog opened, fetching calendars for user:",
+        userId,
+      );
+      fetchCalendars();
     }
-  }, [open, userId])
+  }, [open, userId]);
 
   const fetchCalendars = async () => {
-    console.log('📅 Fetching calendars...')
-    setLoading(true)
-    setError(null)
+    console.log("📅 Fetching calendars...");
+    setLoading(true);
+    setError(null);
     try {
-      const response = await fetch(`/api/google/calendars?userId=${userId}`)
-      console.log('📅 Calendar fetch response:', response.status)
-      
+      const response = await fetch(`/api/google/calendars?userId=${userId}`);
+      console.log("📅 Calendar fetch response:", response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to fetch calendars')
+        throw new Error("Failed to fetch calendars");
       }
-      const data = await response.json()
-      console.log('📅 Calendars fetched:', data.calendars?.length || 0)
-      setCalendars(data.calendars || [])
-      
+      const data = await response.json();
+      console.log("📅 Calendars fetched:", data.calendars?.length || 0);
+      setCalendars(data.calendars || []);
+
       // Auto-select primary calendar if available
-      const primaryCalendar = data.calendars?.find((cal: GoogleCalendar) => cal.primary)
+      const primaryCalendar = data.calendars?.find(
+        (cal: GoogleCalendar) => cal.primary,
+      );
       if (primaryCalendar) {
-        setSelectedCalendar(primaryCalendar.id)
+        setSelectedCalendar(primaryCalendar.id);
       }
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleConfirm = () => {
-    console.log('📅 Confirming calendar selection:', selectedCalendar)
+    console.log("📅 Confirming calendar selection:", selectedCalendar);
     if (selectedCalendar) {
-      onConfirm(selectedCalendar)
-      onOpenChange(false)
+      onConfirm(selectedCalendar);
+      onOpenChange(false);
     } else {
-      console.log('⚠️ No calendar selected')
+      console.log("⚠️ No calendar selected");
     }
-  }
+  };
 
-  console.log('📅 MeetingConfigDialog render - open:', open, 'userId:', userId)
-  
+  console.log("📅 MeetingConfigDialog render - open:", open, "userId:", userId);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
@@ -93,7 +98,8 @@ export function MeetingConfigDialog({
             Configure Meeting Booking
           </DialogTitle>
           <DialogDescription>
-            Select which Google Calendar should be used to check availability and book meetings for this form.
+            Select which Google Calendar should be used to check availability
+            and book meetings for this form.
           </DialogDescription>
         </DialogHeader>
 
@@ -101,7 +107,9 @@ export function MeetingConfigDialog({
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              <span className="ml-2 text-sm text-muted-foreground">Loading calendars...</span>
+              <span className="ml-2 text-sm text-muted-foreground">
+                Loading calendars...
+              </span>
             </div>
           ) : error ? (
             <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
@@ -117,11 +125,15 @@ export function MeetingConfigDialog({
             </div>
           ) : calendars.length === 0 ? (
             <div className="p-4 bg-muted rounded-lg">
-              <p className="text-sm text-muted-foreground">No calendars found</p>
+              <p className="text-sm text-muted-foreground">
+                No calendars found
+              </p>
             </div>
           ) : (
             <div>
-              <Label className="text-sm font-medium mb-2">Select Calendar</Label>
+              <Label className="text-sm font-medium mb-2">
+                Select Calendar
+              </Label>
               <div className="space-y-2 max-h-[300px] overflow-y-auto">
                 {calendars.map((calendar) => (
                   <button
@@ -130,16 +142,18 @@ export function MeetingConfigDialog({
                     onClick={() => setSelectedCalendar(calendar.id)}
                     className={`w-full text-left p-3 rounded-lg border transition-all ${
                       selectedCalendar === calendar.id
-                        ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
-                        : 'border-input hover:border-primary/50 hover:bg-accent'
+                        ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                        : "border-input hover:border-primary/50 hover:bg-accent"
                     }`}
                   >
                     <div className="flex items-start gap-2">
-                      <div className={`w-4 h-4 rounded-full border-2 mt-0.5 flex-shrink-0 ${
-                        selectedCalendar === calendar.id
-                          ? 'border-primary bg-primary'
-                          : 'border-input'
-                      }`}>
+                      <div
+                        className={`w-4 h-4 rounded-full border-2 mt-0.5 flex-shrink-0 ${
+                          selectedCalendar === calendar.id
+                            ? "border-primary bg-primary"
+                            : "border-input"
+                        }`}
+                      >
                         {selectedCalendar === calendar.id && (
                           <div className="w-full h-full rounded-full bg-white scale-50" />
                         )}
@@ -174,8 +188,12 @@ export function MeetingConfigDialog({
               <div className="text-xs text-blue-600 dark:text-blue-400">
                 <p className="font-medium mb-1">How it works:</p>
                 <ul className="space-y-1 list-disc list-inside">
-                  <li>Available time slots are checked against this calendar</li>
-                  <li>Booked meetings are automatically added to this calendar</li>
+                  <li>
+                    Available time slots are checked against this calendar
+                  </li>
+                  <li>
+                    Booked meetings are automatically added to this calendar
+                  </li>
                   <li>Prevents double-booking by checking for conflicts</li>
                 </ul>
               </div>
@@ -184,10 +202,7 @@ export function MeetingConfigDialog({
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
@@ -200,6 +215,5 @@ export function MeetingConfigDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

@@ -1,24 +1,25 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Card } from '@/components/ui/card'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
-import { Settings, Bell, Mail, Moon, Zap } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { SettingsSkeleton } from '@/components/skeletons/DashboardSkeleton'
+import { motion } from "framer-motion";
+import { Bell, Mail, Moon, Settings, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
+import { SettingsSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 
 export default function SettingsPage() {
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Simulate loading
-    const timer = setTimeout(() => setLoading(false), 500)
-    return () => clearTimeout(timer)
-  }, [])
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (loading) {
-    return <SettingsSkeleton />
+    return <SettingsSkeleton />;
   }
 
   return (
@@ -26,7 +27,9 @@ export default function SettingsPage() {
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-        <p className="text-muted-foreground mt-1">Manage your preferences and notifications</p>
+        <p className="text-muted-foreground mt-1">
+          Manage your preferences and notifications
+        </p>
       </div>
 
       {/* Notifications */}
@@ -41,16 +44,27 @@ export default function SettingsPage() {
               <Bell className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-foreground">Notifications</h2>
-              <p className="text-sm text-muted-foreground">Manage how you receive updates</p>
+              <h2 className="text-xl font-semibold text-foreground">
+                Notifications
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Manage how you receive updates
+              </p>
             </div>
           </div>
 
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="email-notifications" className="text-foreground font-medium">Email Notifications</Label>
-                <p className="text-sm text-muted-foreground">Receive email updates about new submissions</p>
+                <Label
+                  htmlFor="email-notifications"
+                  className="text-foreground font-medium"
+                >
+                  Email Notifications
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive email updates about new submissions
+                </p>
               </div>
               <Switch id="email-notifications" defaultChecked />
             </div>
@@ -59,8 +73,15 @@ export default function SettingsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="weekly-reports" className="text-foreground font-medium">Weekly Reports</Label>
-                <p className="text-sm text-muted-foreground">Get a weekly summary of your form performance</p>
+                <Label
+                  htmlFor="weekly-reports"
+                  className="text-foreground font-medium"
+                >
+                  Weekly Reports
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Get a weekly summary of your form performance
+                </p>
               </div>
               <Switch id="weekly-reports" defaultChecked />
             </div>
@@ -69,8 +90,15 @@ export default function SettingsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="form-alerts" className="text-foreground font-medium">Form Alerts</Label>
-                <p className="text-sm text-muted-foreground">Get notified when a form receives a new submission</p>
+                <Label
+                  htmlFor="form-alerts"
+                  className="text-foreground font-medium"
+                >
+                  Form Alerts
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Get notified when a form receives a new submission
+                </p>
               </div>
               <Switch id="form-alerts" defaultChecked />
             </div>
@@ -90,16 +118,27 @@ export default function SettingsPage() {
               <Settings className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-foreground">Preferences</h2>
-              <p className="text-sm text-muted-foreground">Customize your experience</p>
+              <h2 className="text-xl font-semibold text-foreground">
+                Preferences
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Customize your experience
+              </p>
             </div>
           </div>
 
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="auto-publish" className="text-foreground font-medium">Auto-publish Forms</Label>
-                <p className="text-sm text-muted-foreground">Automatically publish new forms after creation</p>
+                <Label
+                  htmlFor="auto-publish"
+                  className="text-foreground font-medium"
+                >
+                  Auto-publish Forms
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Automatically publish new forms after creation
+                </p>
               </div>
               <Switch id="auto-publish" />
             </div>
@@ -108,8 +147,15 @@ export default function SettingsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="show-branding" className="text-foreground font-medium">Show ShelfCue Branding</Label>
-                <p className="text-sm text-muted-foreground">Display "Powered by ShelfCue" on your forms</p>
+                <Label
+                  htmlFor="show-branding"
+                  className="text-foreground font-medium"
+                >
+                  Show ShelfCue Branding
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Display "Powered by ShelfCue" on your forms
+                </p>
               </div>
               <Switch id="show-branding" defaultChecked />
             </div>
@@ -117,6 +163,5 @@ export default function SettingsPage() {
         </Card>
       </motion.div>
     </div>
-  )
+  );
 }
-

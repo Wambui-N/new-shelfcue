@@ -1,172 +1,183 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo, useState } from 'react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Checkbox } from '@/components/ui/checkbox'
+import { motion } from "framer-motion";
+import {
+  Archive,
+  Calendar,
+  CheckCircle,
+  ChevronDown,
+  Download,
+  Eye,
+  Filter,
+  LayoutGrid,
+  Mail,
+  MoreVertical,
+  Search,
+  Table as TableIcon,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { SubmissionsSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Search,
-  Filter,
-  X,
-  Eye,
-  Archive,
-  Trash2,
-  CheckCircle,
-  MoreVertical,
-  LayoutGrid,
-  Table as TableIcon,
-  ChevronDown,
-  Mail,
-  Calendar,
-  Download
-} from 'lucide-react'
-import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/contexts/AuthContext'
-import { SubmissionsSkeleton } from '@/components/skeletons/DashboardSkeleton'
-import { motion } from 'framer-motion'
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 type Submission = {
-  id: string
-  form_id: string
-  data: Record<string, any>
-  created_at: string
-  forms?: { title: string } | { title: string }[]
-}
+  id: string;
+  form_id: string;
+  data: Record<string, any>;
+  created_at: string;
+  forms?: { title: string } | { title: string }[];
+};
 
-type FormSummary = { id: string; title: string }
+type FormSummary = { id: string; title: string };
 
 export default function SubmissionsPage() {
-  const { user } = useAuth()
-  const [submissions, setSubmissions] = useState<Submission[]>([])
-  const [forms, setForms] = useState<FormSummary[]>([])
-  const [loading, setLoading] = useState(true)
-  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedFormId, setSelectedFormId] = useState<string | null>(null)
-  const [detailSubmission, setDetailSubmission] = useState<Submission | null>(null)
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const { user } = useAuth();
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [forms, setForms] = useState<FormSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"table" | "card">("table");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
+  const [detailSubmission, setDetailSubmission] = useState<Submission | null>(
+    null,
+  );
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    fetchSubmissions()
-    fetchForms()
-  }, [user])
+    fetchSubmissions();
+    fetchForms();
+  }, [user]);
 
   const fetchForms = async () => {
-    if (!user) return
+    if (!user) return;
 
     try {
       const { data, error } = await supabase
-        .from('forms')
-        .select('id, title')
-        .eq('user_id', user.id)
+        .from("forms")
+        .select("id, title")
+        .eq("user_id", user.id);
 
       if (!error) {
-        setForms(data || [])
+        setForms(data || []);
       }
     } catch (error) {
-      console.error('Error fetching forms:', error)
+      console.error("Error fetching forms:", error);
     }
-  }
+  };
 
   const fetchSubmissions = async () => {
-    if (!user) return
+    if (!user) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('submissions')
+        .from("submissions")
         .select(`
           id, form_id, data, created_at,
           forms!inner (
             title
           )
         `)
-        .eq('forms.user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(100)
+        .eq("forms.user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(100);
 
       if (!error) {
-        setSubmissions(data || [])
+        setSubmissions(data || []);
       }
     } catch (error) {
-      console.error('Error fetching submissions:', error)
+      console.error("Error fetching submissions:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const filteredSubmissions = useMemo(() => {
-    let filtered = submissions
+    let filtered = submissions;
 
     // Search filter
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(sub => {
-        const name = String(sub.data?.name || sub.data?.full_name || '')
-        const email = String(sub.data?.email || '')
-        return name.toLowerCase().includes(query) || email.toLowerCase().includes(query)
-      })
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((sub) => {
+        const name = String(sub.data?.name || sub.data?.full_name || "");
+        const email = String(sub.data?.email || "");
+        return (
+          name.toLowerCase().includes(query) ||
+          email.toLowerCase().includes(query)
+        );
+      });
     }
 
     // Form filter
     if (selectedFormId) {
-      filtered = filtered.filter(sub => sub.form_id === selectedFormId)
+      filtered = filtered.filter((sub) => sub.form_id === selectedFormId);
     }
 
-    return filtered
-  }, [submissions, searchQuery, selectedFormId])
+    return filtered;
+  }, [submissions, searchQuery, selectedFormId]);
 
   const getName = (submission: Submission) => {
-    return String(submission.data?.name || submission.data?.full_name || 'Lead')
-  }
+    return String(
+      submission.data?.name || submission.data?.full_name || "Lead",
+    );
+  };
 
   const getEmail = (submission: Submission) => {
-    return String(submission.data?.email || '')
-  }
+    return String(submission.data?.email || "");
+  };
 
   const getFormTitle = (submission: Submission) => {
-    return Array.isArray(submission.forms) ? submission.forms[0]?.title : submission.forms?.title || 'Form'
-  }
+    return Array.isArray(submission.forms)
+      ? submission.forms[0]?.title
+      : submission.forms?.title || "Form";
+  };
 
   const getTimeAgo = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60 * 60),
+    );
 
-    if (diffInHours < 1) return 'Just now'
-    if (diffInHours < 24) return `${diffInHours}h ago`
-    const diffInDays = Math.floor(diffInHours / 24)
-    if (diffInDays < 7) return `${diffInDays}d ago`
-    return date.toLocaleDateString()
-  }
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+    return date.toLocaleDateString();
+  };
 
   const handleSelectSubmission = (id: string) => {
-    const newSelected = new Set(selectedIds)
+    const newSelected = new Set(selectedIds);
     if (newSelected.has(id)) {
-      newSelected.delete(id)
+      newSelected.delete(id);
     } else {
-      newSelected.add(id)
+      newSelected.add(id);
     }
-    setSelectedIds(newSelected)
-  }
+    setSelectedIds(newSelected);
+  };
 
   if (loading) {
-    return <SubmissionsSkeleton />
+    return <SubmissionsSkeleton />;
   }
 
   return (
@@ -175,7 +186,9 @@ export default function SubmissionsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Submissions</h1>
-          <p className="text-muted-foreground mt-1">View and manage all form submissions</p>
+          <p className="text-muted-foreground mt-1">
+            View and manage all form submissions
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" className="border-border">
@@ -190,20 +203,22 @@ export default function SubmissionsPage() {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           {/* View Toggle */}
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground mr-2">View:</span>
+            <span className="text-sm font-medium text-muted-foreground mr-2">
+              View:
+            </span>
             <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
               <Button
-                variant={viewMode === 'card' ? 'default' : 'ghost'}
+                variant={viewMode === "card" ? "default" : "ghost"}
                 size="sm"
-                onClick={() => setViewMode('card')}
+                onClick={() => setViewMode("card")}
                 className="h-8 px-3"
               >
                 <LayoutGrid className="w-4 h-4" />
               </Button>
               <Button
-                variant={viewMode === 'table' ? 'default' : 'ghost'}
+                variant={viewMode === "table" ? "default" : "ghost"}
                 size="sm"
-                onClick={() => setViewMode('table')}
+                onClick={() => setViewMode("table")}
                 className="h-8 px-3"
               >
                 <TableIcon className="w-4 h-4" />
@@ -226,7 +241,7 @@ export default function SubmissionsPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setSearchQuery('')}
+                  onClick={() => setSearchQuery("")}
                   className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
                 >
                   <X className="w-4 h-4" />
@@ -239,7 +254,10 @@ export default function SubmissionsPage() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="h-10 px-3">
                   <Filter className="w-4 h-4 mr-2" />
-                  {selectedFormId ? forms.find(f => f.id === selectedFormId)?.title || 'Form' : 'All Forms'}
+                  {selectedFormId
+                    ? forms.find((f) => f.id === selectedFormId)?.title ||
+                      "Form"
+                    : "All Forms"}
                   <ChevronDown className="w-4 h-4 ml-2" />
                 </Button>
               </DropdownMenuTrigger>
@@ -247,8 +265,11 @@ export default function SubmissionsPage() {
                 <DropdownMenuItem onClick={() => setSelectedFormId(null)}>
                   All Forms
                 </DropdownMenuItem>
-                {forms.map(form => (
-                  <DropdownMenuItem key={form.id} onClick={() => setSelectedFormId(form.id)}>
+                {forms.map((form) => (
+                  <DropdownMenuItem
+                    key={form.id}
+                    onClick={() => setSelectedFormId(form.id)}
+                  >
                     {form.title}
                   </DropdownMenuItem>
                 ))}
@@ -265,13 +286,15 @@ export default function SubmissionsPage() {
             <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6">
               <Mail className="w-12 h-12 text-muted-foreground" />
             </div>
-            <h3 className="text-2xl font-bold text-foreground mb-3">No submissions yet</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-3">
+              No submissions yet
+            </h3>
             <p className="text-muted-foreground text-center mb-8 max-w-md text-lg">
               Share your forms to start receiving submissions.
             </p>
           </div>
         </Card>
-      ) : viewMode === 'card' ? (
+      ) : viewMode === "card" ? (
         // Card View
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredSubmissions.map((submission, index) => (
@@ -288,11 +311,17 @@ export default function SubmissionsPage() {
                       {getName(submission).slice(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <div className="font-medium text-foreground">{getName(submission)}</div>
+                      <div className="font-medium text-foreground">
+                        {getName(submission)}
+                      </div>
                       {getEmail(submission) && (
-                        <div className="text-xs text-muted-foreground">{getEmail(submission)}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {getEmail(submission)}
+                        </div>
                       )}
-                      <div className="text-xs text-muted-foreground mt-1">{getFormTitle(submission)}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {getFormTitle(submission)}
+                      </div>
                     </div>
                   </div>
                   <Button
@@ -321,20 +350,35 @@ export default function SubmissionsPage() {
                   <th className="w-12 px-4 py-3 text-left">
                     <Checkbox />
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Name</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Email</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Form</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Submitted</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Actions</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                    Name
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                    Email
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                    Form
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                    Submitted
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {filteredSubmissions.map((submission) => (
-                  <tr key={submission.id} className="hover:bg-accent/50 transition-colors">
+                  <tr
+                    key={submission.id}
+                    className="hover:bg-accent/50 transition-colors"
+                  >
                     <td className="px-4 py-4">
                       <Checkbox
                         checked={selectedIds.has(submission.id)}
-                        onCheckedChange={() => handleSelectSubmission(submission.id)}
+                        onCheckedChange={() =>
+                          handleSelectSubmission(submission.id)
+                        }
                       />
                     </td>
                     <td className="px-4 py-4">
@@ -342,11 +386,15 @@ export default function SubmissionsPage() {
                         <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground text-xs font-semibold">
                           {getName(submission).slice(0, 2).toUpperCase()}
                         </div>
-                        <span className="text-sm font-medium text-foreground">{getName(submission)}</span>
+                        <span className="text-sm font-medium text-foreground">
+                          {getName(submission)}
+                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <span className="text-sm text-muted-foreground">{getEmail(submission)}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {getEmail(submission)}
+                      </span>
                     </td>
                     <td className="px-4 py-4">
                       <Badge variant="secondary" className="text-xs">
@@ -354,7 +402,9 @@ export default function SubmissionsPage() {
                       </Badge>
                     </td>
                     <td className="px-4 py-4">
-                      <span className="text-sm text-muted-foreground">{getTimeAgo(submission.created_at)}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {getTimeAgo(submission.created_at)}
+                      </span>
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-1">
@@ -368,12 +418,18 @@ export default function SubmissionsPage() {
                         </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => setDetailSubmission(submission)}>
+                            <DropdownMenuItem
+                              onClick={() => setDetailSubmission(submission)}
+                            >
                               <Eye className="w-4 h-4 mr-2" />
                               View Details
                             </DropdownMenuItem>
@@ -402,23 +458,35 @@ export default function SubmissionsPage() {
       )}
 
       {/* Submission Detail Dialog */}
-      <Dialog open={detailSubmission !== null} onOpenChange={() => setDetailSubmission(null)}>
+      <Dialog
+        open={detailSubmission !== null}
+        onOpenChange={() => setDetailSubmission(null)}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-foreground">
               Submission Details
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Received {detailSubmission && getTimeAgo(detailSubmission.created_at)} via {detailSubmission && getFormTitle(detailSubmission)}
+              Received{" "}
+              {detailSubmission && getTimeAgo(detailSubmission.created_at)} via{" "}
+              {detailSubmission && getFormTitle(detailSubmission)}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             {detailSubmission && (
               <div className="space-y-4">
                 {Object.entries(detailSubmission.data).map(([key, value]) => (
-                  <div key={key} className="border-b border-border pb-3 last:border-0">
-                    <label className="text-sm font-medium text-foreground capitalize">{key.replace(/_/g, ' ')}</label>
-                    <p className="text-sm text-muted-foreground mt-1">{String(value)}</p>
+                  <div
+                    key={key}
+                    className="border-b border-border pb-3 last:border-0"
+                  >
+                    <label className="text-sm font-medium text-foreground capitalize">
+                      {key.replace(/_/g, " ")}
+                    </label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {String(value)}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -427,6 +495,5 @@ export default function SubmissionsPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
-

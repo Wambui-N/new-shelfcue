@@ -1,83 +1,86 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
+import { motion } from "framer-motion";
+import {
+  AlertCircle,
+  Calendar,
+  CheckCircle,
+  ExternalLink,
+  Link as LinkIcon,
+  Loader2,
+  Plus,
+  Sheet,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  Sheet,
-  Calendar,
-  Plus,
-  CheckCircle,
-  ExternalLink,
-  Loader2,
-  AlertCircle,
-  Link as LinkIcon
-} from 'lucide-react'
-import { useAuth } from '@/contexts/AuthContext'
-import { supabase } from '@/lib/supabase'
-import { motion } from 'framer-motion'
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 interface GoogleIntegrationPanelProps {
-  formId: string
-  formFields: Array<{ id: string; label: string; type: string }>
+  formId: string;
+  formFields: Array<{ id: string; label: string; type: string }>;
 }
 
-export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegrationPanelProps) {
-  const { user } = useAuth()
-  const [isGoogleConnected, setIsGoogleConnected] = useState(false)
-  const [connectedSheet, setConnectedSheet] = useState<any>(null)
-  const [connectedCalendar, setConnectedCalendar] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  
+export function GoogleIntegrationPanel({
+  formId,
+  formFields,
+}: GoogleIntegrationPanelProps) {
+  const { user } = useAuth();
+  const [isGoogleConnected, setIsGoogleConnected] = useState(false);
+  const [connectedSheet, setConnectedSheet] = useState<any>(null);
+  const [connectedCalendar, setConnectedCalendar] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
   // Sheets dialog
-  const [showSheetsDialog, setShowSheetsDialog] = useState(false)
-  const [creatingSheet, setCreatingSheet] = useState(false)
-  const [newSheetName, setNewSheetName] = useState('')
+  const [showSheetsDialog, setShowSheetsDialog] = useState(false);
+  const [creatingSheet, setCreatingSheet] = useState(false);
+  const [newSheetName, setNewSheetName] = useState("");
 
   // Calendar dialog
-  const [showCalendarDialog, setShowCalendarDialog] = useState(false)
-  const [calendars, setCalendars] = useState<any[]>([])
-  const [loadingCalendars, setLoadingCalendars] = useState(false)
+  const [showCalendarDialog, setShowCalendarDialog] = useState(false);
+  const [calendars, setCalendars] = useState<any[]>([]);
+  const [loadingCalendars, setLoadingCalendars] = useState(false);
 
   useEffect(() => {
-    checkGoogleConnection()
-    fetchConnectedIntegrations()
-  }, [user, formId])
+    checkGoogleConnection();
+    fetchConnectedIntegrations();
+  }, [user, formId]);
 
   const checkGoogleConnection = async () => {
-    if (!user) return
+    if (!user) return;
 
     try {
       const { data, error } = await supabase
-        .from('user_google_tokens')
-        .select('id')
-        .eq('user_id', user.id)
-        .single()
+        .from("user_google_tokens")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
 
-      setIsGoogleConnected(!!data && !error)
+      setIsGoogleConnected(!!data && !error);
     } catch (error) {
-      setIsGoogleConnected(false)
+      setIsGoogleConnected(false);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const fetchConnectedIntegrations = async () => {
-    if (!user || !formId) return
+    if (!user || !formId) return;
 
     try {
       const { data: form } = await supabase
-        .from('forms')
+        .from("forms")
         .select(`
           default_sheet_connection_id,
           default_calendar_id,
@@ -88,110 +91,112 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
             sheet_url
           )
         `)
-        .eq('id', formId)
-        .single()
+        .eq("id", formId)
+        .single();
 
       if (form) {
         if (form.sheet_connections) {
-          setConnectedSheet(Array.isArray(form.sheet_connections) 
-            ? form.sheet_connections[0] 
-            : form.sheet_connections)
+          setConnectedSheet(
+            Array.isArray(form.sheet_connections)
+              ? form.sheet_connections[0]
+              : form.sheet_connections,
+          );
         }
         if (form.default_calendar_id) {
-          setConnectedCalendar({ id: form.default_calendar_id })
+          setConnectedCalendar({ id: form.default_calendar_id });
         }
       }
     } catch (error) {
-      console.error('Error fetching integrations:', error)
+      console.error("Error fetching integrations:", error);
     }
-  }
+  };
 
   const handleConnectGoogle = () => {
     // Redirect to Google OAuth
-    window.location.href = '/api/auth/google'
-  }
+    window.location.href = "/api/auth/google";
+  };
 
   const handleCreateSheet = async () => {
-    if (!user || !newSheetName) return
+    if (!user || !newSheetName) return;
 
-    setCreatingSheet(true)
+    setCreatingSheet(true);
     try {
-      const headers = formFields.map(field => field.label)
+      const headers = formFields.map((field) => field.label);
 
-      const response = await fetch('/api/sheets/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/sheets/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: user.id,
           title: newSheetName,
           headers,
           formId,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to create sheet')
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create sheet");
       }
 
-      const data = await response.json()
-      
+      const data = await response.json();
+
       setConnectedSheet({
         sheet_id: data.spreadsheetId,
         sheet_name: newSheetName,
         sheet_url: data.spreadsheetUrl,
-      })
-      
-      setShowSheetsDialog(false)
-      setNewSheetName('')
+      });
+
+      setShowSheetsDialog(false);
+      setNewSheetName("");
     } catch (error: any) {
-      console.error('Error creating sheet:', error)
-      alert(error.message || 'Failed to create Google Sheet')
+      console.error("Error creating sheet:", error);
+      alert(error.message || "Failed to create Google Sheet");
     } finally {
-      setCreatingSheet(false)
+      setCreatingSheet(false);
     }
-  }
+  };
 
   const handleLoadCalendars = async () => {
-    if (!user) return
+    if (!user) return;
 
-    setLoadingCalendars(true)
+    setLoadingCalendars(true);
     try {
-      const response = await fetch(`/api/google/calendars?userId=${user.id}`)
-      
+      const response = await fetch(`/api/google/calendars?userId=${user.id}`);
+
       if (!response.ok) {
-        throw new Error('Failed to fetch calendars')
+        throw new Error("Failed to fetch calendars");
       }
 
-      const data = await response.json()
-      setCalendars(data.calendars || [])
+      const data = await response.json();
+      setCalendars(data.calendars || []);
     } catch (error: any) {
-      console.error('Error loading calendars:', error)
-      alert(error.message || 'Failed to load calendars')
+      console.error("Error loading calendars:", error);
+      alert(error.message || "Failed to load calendars");
     } finally {
-      setLoadingCalendars(false)
+      setLoadingCalendars(false);
     }
-  }
+  };
 
   const handleSelectCalendar = async (calendarId: string) => {
-    if (!user || !formId) return
+    if (!user || !formId) return;
 
     try {
       const { error } = await supabase
-        .from('forms')
+        .from("forms")
         .update({ default_calendar_id: calendarId })
-        .eq('id', formId)
-        .eq('user_id', user.id)
+        .eq("id", formId)
+        .eq("user_id", user.id);
 
-      if (error) throw error
+      if (error) throw error;
 
-      setConnectedCalendar({ id: calendarId })
-      setShowCalendarDialog(false)
+      setConnectedCalendar({ id: calendarId });
+      setShowCalendarDialog(false);
     } catch (error: any) {
-      console.error('Error connecting calendar:', error)
-      alert(error.message || 'Failed to connect calendar')
+      console.error("Error connecting calendar:", error);
+      alert(error.message || "Failed to connect calendar");
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -200,7 +205,7 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
       </Card>
-    )
+    );
   }
 
   if (!isGoogleConnected) {
@@ -231,9 +236,13 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
             Connect Google Account
           </h3>
           <p className="text-muted-foreground mb-6">
-            Connect your Google account to sync form submissions to Google Sheets and create calendar events automatically.
+            Connect your Google account to sync form submissions to Google
+            Sheets and create calendar events automatically.
           </p>
-          <Button onClick={handleConnectGoogle} className="bg-primary text-primary-foreground">
+          <Button
+            onClick={handleConnectGoogle}
+            className="bg-primary text-primary-foreground"
+          >
             <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -244,7 +253,7 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
           </Button>
         </div>
       </Card>
-    )
+    );
   }
 
   return (
@@ -258,7 +267,9 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
             </div>
             <div>
               <h3 className="font-semibold text-foreground">Google Sheets</h3>
-              <p className="text-sm text-muted-foreground">Sync submissions automatically</p>
+              <p className="text-sm text-muted-foreground">
+                Sync submissions automatically
+              </p>
             </div>
           </div>
           {connectedSheet && (
@@ -271,12 +282,14 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
             <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
               <div className="flex items-center gap-2">
                 <Sheet className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{connectedSheet.sheet_name}</span>
+                <span className="text-sm font-medium">
+                  {connectedSheet.sheet_name}
+                </span>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => window.open(connectedSheet.sheet_url, '_blank')}
+                onClick={() => window.open(connectedSheet.sheet_url, "_blank")}
               >
                 <ExternalLink className="w-4 h-4" />
               </Button>
@@ -288,7 +301,8 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
         ) : (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Create a new Google Sheet or connect an existing one to automatically sync form submissions.
+              Create a new Google Sheet or connect an existing one to
+              automatically sync form submissions.
             </p>
             <Button
               onClick={() => setShowSheetsDialog(true)}
@@ -311,7 +325,9 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
             </div>
             <div>
               <h3 className="font-semibold text-foreground">Google Calendar</h3>
-              <p className="text-sm text-muted-foreground">Create events from submissions</p>
+              <p className="text-sm text-muted-foreground">
+                Create events from submissions
+              </p>
             </div>
           </div>
           {connectedCalendar && (
@@ -335,12 +351,13 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
         ) : (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Connect a Google Calendar to automatically create events when forms are submitted.
+              Connect a Google Calendar to automatically create events when
+              forms are submitted.
             </p>
             <Button
               onClick={() => {
-                setShowCalendarDialog(true)
-                handleLoadCalendars()
+                setShowCalendarDialog(true);
+                handleLoadCalendars();
               }}
               variant="outline"
               className="w-full"
@@ -424,7 +441,8 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
           <DialogHeader>
             <DialogTitle>Select Google Calendar</DialogTitle>
             <DialogDescription>
-              Choose which calendar to use for creating events from form submissions
+              Choose which calendar to use for creating events from form
+              submissions
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -444,12 +462,19 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
                     <div className="flex items-center gap-3">
                       <div
                         className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: calendar.backgroundColor || '#4285F4' }}
+                        style={{
+                          backgroundColor:
+                            calendar.backgroundColor || "#4285F4",
+                        }}
                       />
                       <div>
-                        <div className="font-medium text-sm">{calendar.summary}</div>
+                        <div className="font-medium text-sm">
+                          {calendar.summary}
+                        </div>
                         {calendar.description && (
-                          <div className="text-xs text-muted-foreground">{calendar.description}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {calendar.description}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -460,13 +485,14 @@ export function GoogleIntegrationPanel({ formId, formFields }: GoogleIntegration
             ) : (
               <div className="text-center py-8">
                 <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">No calendars found</p>
+                <p className="text-sm text-muted-foreground">
+                  No calendars found
+                </p>
               </div>
             )}
           </div>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
-

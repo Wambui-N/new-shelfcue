@@ -1,41 +1,41 @@
-"use client"
+"use client";
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function AuthCallbackPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      const { data, error } = await supabase.auth.getSession()
+      const { data, error } = await supabase.auth.getSession();
 
       if (error) {
-        console.error('Error getting session:', error)
-        router.push('/auth/signin?error=auth_callback_error')
-        return
+        console.error("Error getting session:", error);
+        router.push("/auth/signin?error=auth_callback_error");
+        return;
       }
 
       if (data.session) {
         // Store Google tokens if available
         if (data.session.provider_token) {
-          await supabase.from('user_google_tokens').upsert({
+          await supabase.from("user_google_tokens").upsert({
             user_id: data.session.user.id,
             access_token: data.session.provider_token,
-            refresh_token: data.session.provider_refresh_token || '',
+            refresh_token: data.session.provider_refresh_token || "",
             expires_at: Date.now() + (data.session.expires_in || 3600) * 1000,
-          })
+          });
         }
 
-        router.push('/dashboard')
+        router.push("/dashboard");
       } else {
-        router.push('/auth/signin?error=no_session')
+        router.push("/auth/signin?error=no_session");
       }
-    }
+    };
 
-    handleAuthCallback()
-  }, [router])
+    handleAuthCallback();
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
@@ -44,5 +44,5 @@ export default function AuthCallbackPage() {
         <p>Completing sign in...</p>
       </div>
     </div>
-  )
+  );
 }

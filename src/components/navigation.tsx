@@ -1,82 +1,84 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { useAuth } from '@/contexts/AuthContext'
-import { Moon, Sun, Menu, X } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, Moon, Sun, X } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function Navigation() {
-  const [isDark, setIsDark] = useState(false)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
-  const { user, signOut } = useAuth()
+  const [isDark, setIsDark] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const { user, signOut } = useAuth();
 
   // Initialize theme from localStorage or system preference
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme')
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const savedTheme = localStorage.getItem("theme");
+    const systemDark = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
 
-    if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
-      setIsDark(true)
-      document.documentElement.classList.add('dark')
+    if (savedTheme === "dark" || (!savedTheme && systemDark)) {
+      setIsDark(true);
+      document.documentElement.classList.add("dark");
     }
-  }, [])
+  }, []);
 
   // Track scroll position for navigation styling
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
+      setIsScrolled(window.scrollY > 50);
+    };
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Toggle dark mode
   const toggleDarkMode = () => {
-    const newDark = !isDark
-    setIsDark(newDark)
+    const newDark = !isDark;
+    setIsDark(newDark);
 
     if (newDark) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
     } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
     }
-  }
+  };
 
   // Navigation items
   const navigationItems = [
-    { name: 'Features', href: '#features' },
-    { name: 'Demo', href: '#demo' },
-    { name: 'Comparison', href: '#comparison' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'FAQ', href: '#faq' },
-  ]
+    { name: "Features", href: "#features" },
+    { name: "Demo", href: "#demo" },
+    { name: "Comparison", href: "#comparison" },
+    { name: "Pricing", href: "#pricing" },
+    { name: "FAQ", href: "#faq" },
+  ];
 
   // Handle smooth scrolling for anchor links
   const handleNavClick = (href: string, e?: React.MouseEvent) => {
-    if (href.startsWith('#')) {
-      e?.preventDefault()
-      const element = document.querySelector(href)
+    if (href.startsWith("#")) {
+      e?.preventDefault();
+      const element = document.querySelector(href);
       if (element) {
         element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        })
+          behavior: "smooth",
+          block: "start",
+        });
       }
     }
-  }
+  };
 
   return (
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-background/95 backdrop-blur-lg border-b border-border shadow-sm'
-          : 'bg-transparent'
+          ? "bg-background/95 backdrop-blur-lg border-b border-border shadow-sm"
+          : "bg-transparent"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -106,7 +108,7 @@ export function Navigation() {
                   transition={{
                     duration: 2,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                 />
               </motion.div>
@@ -157,7 +159,11 @@ export function Navigation() {
                     animate={{ rotate: isDark ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                    {isDark ? (
+                      <Sun className="h-4 w-4" />
+                    ) : (
+                      <Moon className="h-4 w-4" />
+                    )}
                   </motion.div>
                 </Button>
               </motion.div>
@@ -172,7 +178,10 @@ export function Navigation() {
                 {user ? (
                   <>
                     <Link href="/dashboard">
-                      <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+                      <Button
+                        variant="ghost"
+                        className="text-muted-foreground hover:text-foreground"
+                      >
                         Dashboard
                       </Button>
                     </Link>
@@ -187,7 +196,10 @@ export function Navigation() {
                 ) : (
                   <>
                     <Link href="/auth/signin">
-                      <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+                      <Button
+                        variant="ghost"
+                        className="text-muted-foreground hover:text-foreground"
+                      >
                         Sign In
                       </Button>
                     </Link>
@@ -214,7 +226,11 @@ export function Navigation() {
                 animate={{ rotate: isMenuOpen ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
               >
-                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                {isMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
               </motion.div>
             </Button>
           </div>
@@ -235,8 +251,8 @@ export function Navigation() {
                   <motion.button
                     key={item.name}
                     onClick={(e) => {
-                      handleNavClick(item.href, e)
-                      setIsMenuOpen(false)
+                      handleNavClick(item.href, e);
+                      setIsMenuOpen(false);
                     }}
                     className="text-muted-foreground hover:text-foreground block px-3 py-2 text-base font-medium w-full text-left"
                     initial={{ opacity: 0, x: -20 }}
@@ -260,9 +276,13 @@ export function Navigation() {
                       animate={{ rotate: isDark ? 180 : 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      {isDark ? <Sun className="h-4 w-4 mr-2" /> : <Moon className="h-4 w-4 mr-2" />}
+                      {isDark ? (
+                        <Sun className="h-4 w-4 mr-2" />
+                      ) : (
+                        <Moon className="h-4 w-4 mr-2" />
+                      )}
                     </motion.div>
-                    {isDark ? 'Light Mode' : 'Dark Mode'}
+                    {isDark ? "Light Mode" : "Dark Mode"}
                   </Button>
                 </div>
 
@@ -270,16 +290,22 @@ export function Navigation() {
                 <div className="px-3 py-2 space-y-2">
                   {user ? (
                     <>
-                      <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="ghost" className="w-full text-muted-foreground hover:text-foreground justify-start">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Button
+                          variant="ghost"
+                          className="w-full text-muted-foreground hover:text-foreground justify-start"
+                        >
                           Dashboard
                         </Button>
                       </Link>
                       <Button
                         variant="outline"
                         onClick={() => {
-                          signOut()
-                          setIsMenuOpen(false)
+                          signOut();
+                          setIsMenuOpen(false);
                         }}
                         className="w-full border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                       >
@@ -288,12 +314,21 @@ export function Navigation() {
                     </>
                   ) : (
                     <>
-                      <Link href="/auth/signin" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="ghost" className="w-full text-muted-foreground hover:text-foreground justify-start">
+                      <Link
+                        href="/auth/signin"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Button
+                          variant="ghost"
+                          className="w-full text-muted-foreground hover:text-foreground justify-start"
+                        >
                           Sign In
                         </Button>
                       </Link>
-                      <Link href="/auth/signup" onClick={() => setIsMenuOpen(false)}>
+                      <Link
+                        href="/auth/signup"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
                         <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
                           Get Started
                         </Button>
@@ -307,5 +342,5 @@ export function Navigation() {
         </AnimatePresence>
       </div>
     </motion.nav>
-  )
+  );
 }

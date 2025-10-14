@@ -62,7 +62,8 @@ const satoshi = localFont({
 
 export const metadata: Metadata = {
   title: "ShelfCue - Effortless Lead Capture",
-  description: "The effortless lead capture system for founders who hate complex tech. Built for scale, designed for simplicity.",
+  description:
+    "The effortless lead capture system for founders who hate complex tech. Built for scale, designed for simplicity.",
 };
 
 export default function RootLayout({
@@ -75,15 +76,17 @@ export default function RootLayout({
       <head>
         {/* Preconnect to Google Fonts for better performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
       </head>
       <body
         className={`${satoshi.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

@@ -1,51 +1,60 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Pause, RotateCcw, Smartphone, Monitor, Tablet } from 'lucide-react'
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Monitor,
+  Pause,
+  Play,
+  RotateCcw,
+  Smartphone,
+  Tablet,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function DemoSection() {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentStep, setCurrentStep] = useState(0)
-  const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [deviceType, setDeviceType] = useState<"mobile" | "tablet" | "desktop">(
+    "desktop",
+  );
 
   const demoSteps = [
     {
       title: "Create Form",
       description: "Design your lead capture form in seconds",
-      content: "Newsletter Signup Form"
+      content: "Newsletter Signup Form",
     },
     {
       title: "Add Fields",
       description: "Drag and drop form fields with ease",
-      content: "Name, Email, Company, Message"
+      content: "Name, Email, Company, Message",
     },
     {
       title: "Customize Design",
       description: "Match your brand colors and styling",
-      content: "Modern, Clean Interface"
+      content: "Modern, Clean Interface",
     },
     {
       title: "Integrate & Publish",
       description: "Connect to Google Sheets and go live",
-      content: "Live Form Ready!"
-    }
-  ]
+      content: "Live Form Ready!",
+    },
+  ];
 
   useEffect(() => {
     if (isPlaying) {
       const interval = setInterval(() => {
-        setCurrentStep((prev) => (prev + 1) % demoSteps.length)
-      }, 2000)
-      return () => clearInterval(interval)
+        setCurrentStep((prev) => (prev + 1) % demoSteps.length);
+      }, 2000);
+      return () => clearInterval(interval);
     }
-  }, [isPlaying])
+  }, [isPlaying]);
 
   const deviceSizes = {
     mobile: { width: 375, height: 667, icon: Smartphone },
     tablet: { width: 768, height: 1024, icon: Tablet },
-    desktop: { width: 1200, height: 800, icon: Monitor }
-  }
+    desktop: { width: 1200, height: 800, icon: Monitor },
+  };
 
   return (
     <section id="demo" className="py-20 px-4 sm:px-6 lg:px-8 bg-background">
@@ -73,7 +82,8 @@ export function DemoSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Watch how easy it is to create professional lead capture forms that convert.
+            Watch how easy it is to create professional lead capture forms that
+            convert.
           </motion.p>
         </motion.div>
 
@@ -89,22 +99,22 @@ export function DemoSection() {
             {/* Device Selector */}
             <div className="flex justify-center gap-4">
               {Object.entries(deviceSizes).map(([key, device]) => {
-                const Icon = device.icon
+                const Icon = device.icon;
                 return (
                   <motion.button
                     key={key}
                     onClick={() => setDeviceType(key as any)}
                     className={`p-3 rounded-xl border-2 transition-all duration-300 ${
                       deviceType === key
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border hover:border-primary/50'
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border hover:border-primary/50"
                     }`}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <Icon className="w-6 h-6" />
                   </motion.button>
-                )
+                );
               })}
             </div>
 
@@ -115,12 +125,15 @@ export function DemoSection() {
                   key={index}
                   className={`p-6 rounded-2xl border-2 transition-all duration-500 ${
                     currentStep === index
-                      ? 'border-primary bg-primary/5 shadow-lg'
-                      : 'border-border hover:border-primary/30'
+                      ? "border-primary bg-primary/5 shadow-lg"
+                      : "border-border hover:border-primary/30"
                   }`}
                   animate={{
                     scale: currentStep === index ? 1.02 : 1,
-                    backgroundColor: currentStep === index ? 'rgba(20, 20, 25, 0.05)' : 'transparent'
+                    backgroundColor:
+                      currentStep === index
+                        ? "rgba(20, 20, 25, 0.05)"
+                        : "transparent",
                   }}
                   transition={{ duration: 0.3 }}
                 >
@@ -128,20 +141,25 @@ export function DemoSection() {
                     <motion.div
                       className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                         currentStep === index
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted text-muted-foreground'
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground"
                       }`}
                       animate={{
-                        backgroundColor: currentStep === index ? '#151419' : '#cfcecb',
-                        color: currentStep === index ? '#fafafa' : '#585552'
+                        backgroundColor:
+                          currentStep === index ? "#151419" : "#cfcecb",
+                        color: currentStep === index ? "#fafafa" : "#585552",
                       }}
                     >
                       {index + 1}
                     </motion.div>
                     <div className="flex-1">
-                      <h3 className={`font-semibold mb-2 transition-colors duration-300 ${
-                        currentStep === index ? 'text-foreground' : 'text-muted-foreground'
-                      }`}>
+                      <h3
+                        className={`font-semibold mb-2 transition-colors duration-300 ${
+                          currentStep === index
+                            ? "text-foreground"
+                            : "text-muted-foreground"
+                        }`}
+                      >
                         {step.title}
                       </h3>
                       <p className="text-muted-foreground text-sm leading-relaxed">
@@ -161,13 +179,17 @@ export function DemoSection() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                {isPlaying ? 'Pause' : 'Play Demo'}
+                {isPlaying ? (
+                  <Pause className="w-4 h-4" />
+                ) : (
+                  <Play className="w-4 h-4" />
+                )}
+                {isPlaying ? "Pause" : "Play Demo"}
               </motion.button>
               <motion.button
                 onClick={() => {
-                  setCurrentStep(0)
-                  setIsPlaying(false)
+                  setCurrentStep(0);
+                  setIsPlaying(false);
                 }}
                 className="flex items-center gap-2 px-6 py-3 border border-border text-muted-foreground rounded-full hover:bg-accent hover:text-accent-foreground transition-all duration-300"
                 whileHover={{ scale: 1.05 }}
@@ -192,10 +214,15 @@ export function DemoSection() {
               className={`relative mx-auto bg-muted rounded-3xl p-4 shadow-2xl border border-border`}
               style={{
                 width: deviceSizes[deviceType].width,
-                height: deviceSizes[deviceType].height
+                height: deviceSizes[deviceType].height,
               }}
               animate={{
-                scale: deviceType === 'desktop' ? 0.8 : deviceType === 'tablet' ? 0.9 : 1,
+                scale:
+                  deviceType === "desktop"
+                    ? 0.8
+                    : deviceType === "tablet"
+                      ? 0.9
+                      : 1,
               }}
               transition={{ duration: 0.5 }}
             >
@@ -225,25 +252,25 @@ export function DemoSection() {
                     className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-6 text-primary"
                     animate={{
                       scale: [1, 1.1, 1],
-                      rotate: [0, 5, -5, 0]
+                      rotate: [0, 5, -5, 0],
                     }}
                     transition={{
                       duration: 2,
                       repeat: Infinity,
-                      ease: "easeInOut"
+                      ease: "easeInOut",
                     }}
                   >
                     <motion.div
                       animate={{
-                        scale: [1, 1.2, 1]
+                        scale: [1, 1.2, 1],
                       }}
                       transition={{
                         duration: 1.5,
                         repeat: Infinity,
-                        ease: "easeInOut"
+                        ease: "easeInOut",
                       }}
                     >
-                      {demoSteps[currentStep].icon || '📝'}
+                      {(demoSteps[currentStep] as any).icon || "📝"}
                     </motion.div>
                   </motion.div>
 
@@ -263,15 +290,15 @@ export function DemoSection() {
                     className="w-full max-w-sm bg-background rounded-xl p-4 border border-border shadow-sm"
                     animate={{
                       boxShadow: [
-                        '0 2px 8px rgba(0,0,0,0.1)',
-                        '0 4px 16px rgba(0,0,0,0.15)',
-                        '0 2px 8px rgba(0,0,0,0.1)'
-                      ]
+                        "0 2px 8px rgba(0,0,0,0.1)",
+                        "0 4px 16px rgba(0,0,0,0.15)",
+                        "0 2px 8px rgba(0,0,0,0.1)",
+                      ],
                     }}
                     transition={{
                       duration: 2,
                       repeat: Infinity,
-                      ease: "easeInOut"
+                      ease: "easeInOut",
                     }}
                   >
                     <div className="text-left space-y-3">
@@ -289,12 +316,12 @@ export function DemoSection() {
               className="absolute -top-4 -right-4 w-8 h-8 bg-accent rounded-full flex items-center justify-center"
               animate={{
                 y: [0, -10, 0],
-                rotate: [0, 180, 360]
+                rotate: [0, 180, 360],
               }}
               transition={{
                 duration: 4,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
             >
               <span className="text-xs">✨</span>
@@ -304,12 +331,12 @@ export function DemoSection() {
               className="absolute -bottom-4 -left-4 w-6 h-6 bg-primary rounded-full flex items-center justify-center"
               animate={{
                 scale: [1, 1.3, 1],
-                opacity: [0.5, 1, 0.5]
+                opacity: [0.5, 1, 0.5],
               }}
               transition={{
                 duration: 3,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
             >
               <span className="text-xs text-primary-foreground">⚡</span>
@@ -318,5 +345,5 @@ export function DemoSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth()
-  const router = useRouter()
+  const { user, loading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/auth/signin')
+      router.push("/auth/signin");
     }
-  }, [user, loading, router])
+  }, [user, loading, router]);
 
   // Show loading spinner while checking authentication
   if (loading) {
@@ -27,14 +27,14 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Redirect to sign-in if not authenticated
   if (!user) {
-    return null
+    return null;
   }
 
   // Render children if authenticated
-  return <>{children}</>
+  return <>{children}</>;
 }

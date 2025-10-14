@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { motion } from 'framer-motion'
-import { Home, ArrowLeft, FileText } from 'lucide-react'
+import { motion } from "framer-motion";
+import { ArrowLeft, FileText, Home } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export default function DashboardNotFound() {
   return (
@@ -48,7 +48,10 @@ export default function DashboardNotFound() {
             transition={{ delay: 0.4, duration: 0.6 }}
             className="flex flex-col sm:flex-row gap-3 justify-center"
           >
-            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button
+              asChild
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
               <Link href="/dashboard">
                 <Home className="w-4 h-4 mr-2" />
                 Dashboard
@@ -62,5 +65,5 @@ export default function DashboardNotFound() {
         </Card>
       </motion.div>
     </div>
-  )
+  );
 }

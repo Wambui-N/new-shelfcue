@@ -1,47 +1,63 @@
-"use client"
+"use client";
 
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { Twitter, Linkedin, Github, Mail, Heart, ArrowUp } from 'lucide-react'
+import { motion } from "framer-motion";
+import { ArrowUp, Github, Heart, Linkedin, Mail, Twitter } from "lucide-react";
+import Link from "next/link";
 
 export function Footer() {
   const footerLinks = {
     product: [
-      { name: 'Features', href: '#features' },
-      { name: 'Demo', href: '#demo' },
-      { name: 'Pricing', href: '#pricing' },
-      { name: 'FAQ', href: '#faq' }
+      { name: "Features", href: "#features" },
+      { name: "Demo", href: "#demo" },
+      { name: "Pricing", href: "#pricing" },
+      { name: "FAQ", href: "#faq" },
     ],
     company: [
-      { name: 'About', href: '/about' },
-      { name: 'Blog', href: '/blog' },
-      { name: 'Careers', href: '/careers' },
-      { name: 'Contact', href: '/contact' }
+      { name: "About", href: "/about" },
+      { name: "Blog", href: "/blog" },
+      { name: "Careers", href: "/careers" },
+      { name: "Contact", href: "/contact" },
     ],
     resources: [
-      { name: 'Documentation', href: '/docs' },
-      { name: 'Help Center', href: '/help' },
-      { name: 'Community', href: '/community' },
-      { name: 'Status', href: '/status' }
+      { name: "Documentation", href: "/docs" },
+      { name: "Help Center", href: "/help" },
+      { name: "Community", href: "/community" },
+      { name: "Status", href: "/status" },
     ],
     legal: [
-      { name: 'Privacy Policy', href: '/privacy' },
-      { name: 'Terms of Service', href: '/terms' },
-      { name: 'Cookie Policy', href: '/cookies' },
-      { name: 'Security', href: '/security' }
-    ]
-  }
+      { name: "Privacy Policy", href: "/privacy" },
+      { name: "Terms of Service", href: "/terms" },
+      { name: "Cookie Policy", href: "/cookies" },
+      { name: "Security", href: "/security" },
+    ],
+  };
 
   const socialLinks = [
-    { name: 'Twitter', href: 'https://twitter.com/shelfcue', icon: <Twitter className="w-5 h-5" /> },
-    { name: 'LinkedIn', href: 'https://linkedin.com/company/shelfcue', icon: <Linkedin className="w-5 h-5" /> },
-    { name: 'GitHub', href: 'https://github.com/shelfcue', icon: <Github className="w-5 h-5" /> },
-    { name: 'Email', href: 'mailto:hello@shelfcue.com', icon: <Mail className="w-5 h-5" /> }
-  ]
+    {
+      name: "Twitter",
+      href: "https://twitter.com/shelfcue",
+      icon: <Twitter className="w-5 h-5" />,
+    },
+    {
+      name: "LinkedIn",
+      href: "https://linkedin.com/company/shelfcue",
+      icon: <Linkedin className="w-5 h-5" />,
+    },
+    {
+      name: "GitHub",
+      href: "https://github.com/shelfcue",
+      icon: <Github className="w-5 h-5" />,
+    },
+    {
+      name: "Email",
+      href: "mailto:hello@shelfcue.com",
+      icon: <Mail className="w-5 h-5" />,
+    },
+  ];
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -49,10 +65,10 @@ export function Footer() {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.1
-      }
-    }
-  }
+        delayChildren: 0.1,
+      },
+    },
+  };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -61,10 +77,10 @@ export function Footer() {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  }
+        ease: "easeOut",
+      },
+    },
+  };
 
   return (
     <footer className="bg-background border-t border-border relative overflow-hidden">
@@ -74,12 +90,12 @@ export function Footer() {
           className="absolute bottom-0 left-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
-            opacity: [0.2, 0.4, 0.2]
+            opacity: [0.2, 0.4, 0.2],
           }}
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
         />
       </div>
@@ -93,10 +109,7 @@ export function Footer() {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
           {/* Company Info */}
-          <motion.div
-            className="lg:col-span-2"
-            variants={itemVariants}
-          >
+          <motion.div className="lg:col-span-2" variants={itemVariants}>
             <motion.div
               className="flex items-center mb-6"
               whileHover={{ scale: 1.05 }}
@@ -117,16 +130,18 @@ export function Footer() {
                   transition={{
                     duration: 2,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                 />
               </motion.div>
-              <span className="text-2xl font-bold text-foreground">ShelfCue</span>
+              <span className="text-2xl font-bold text-foreground">
+                ShelfCue
+              </span>
             </motion.div>
 
             <p className="text-muted-foreground mb-6 leading-relaxed max-w-md">
-              The effortless lead capture system for founders who hate complex tech.
-              Built for scale, designed for simplicity.
+              The effortless lead capture system for founders who hate complex
+              tech. Built for scale, designed for simplicity.
             </p>
 
             <div className="flex space-x-4">
@@ -251,12 +266,12 @@ export function Footer() {
             <motion.div
               animate={{
                 scale: [1, 1.3, 1],
-                rotate: [0, 10, -10, 0]
+                rotate: [0, 10, -10, 0],
               }}
               transition={{
                 duration: 2,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
             >
               <Heart className="w-4 h-4 text-red-500 fill-current" />
@@ -276,5 +291,5 @@ export function Footer() {
         </motion.div>
       </motion.div>
     </footer>
-  )
+  );
 }

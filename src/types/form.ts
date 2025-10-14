@@ -1,6 +1,20 @@
 export interface FormField {
   id: string;
-  type: 'text' | 'email' | 'textarea' | 'select' | 'radio' | 'checkbox' | 'number' | 'date' | 'phone' | 'url' | 'meeting' | 'email_field' | 'phone_field' | 'country';
+  type:
+    | "text"
+    | "email"
+    | "textarea"
+    | "select"
+    | "radio"
+    | "checkbox"
+    | "number"
+    | "date"
+    | "phone"
+    | "url"
+    | "meeting"
+    | "email_field"
+    | "phone_field"
+    | "country";
   label: string;
   placeholder?: string;
   required: boolean;
@@ -30,7 +44,7 @@ export interface FormData {
   id?: string;
   title: string;
   description?: string;
-  status: 'draft' | 'published';
+  status: "draft" | "published";
   fields: FormField[];
   theme: {
     primaryColor: string;

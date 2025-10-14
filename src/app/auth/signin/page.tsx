@@ -1,56 +1,56 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useAuth } from '@/contexts/AuthContext'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignInPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { signIn, signInWithGoogle } = useAuth()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { signIn, signInWithGoogle } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!email || !password) {
-      setError('Please fill in all fields')
-      return
+      setError("Please fill in all fields");
+      return;
     }
 
-    setIsLoading(true)
-    setError('')
+    setIsLoading(true);
+    setError("");
 
-    const { error } = await signIn(email, password)
+    const { error } = await signIn(email, password);
 
     if (error) {
-      setError(error.message)
-      setIsLoading(false)
+      setError(error.message);
+      setIsLoading(false);
     } else {
-      router.push('/dashboard')
+      router.push("/dashboard");
     }
-  }
+  };
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true)
-    setError('')
+    setIsLoading(true);
+    setError("");
 
-    const { error } = await signInWithGoogle()
+    const { error } = await signInWithGoogle();
 
     if (error) {
-      setError(error.message)
-      setIsLoading(false)
+      setError(error.message);
+      setIsLoading(false);
     }
     // For OAuth, the loading state will be handled by the callback page
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -78,7 +78,7 @@ export default function SignInPage() {
         <div className="relative">
           <Input
             id="password"
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="bg-background-secondary border-border text-foreground placeholder:text-muted-foreground focus:border-border pr-10"
@@ -103,9 +103,7 @@ export default function SignInPage() {
       </div>
 
       {/* Error Message */}
-      {error && (
-        <p className="text-destructive text-sm">{error}</p>
-      )}
+      {error && <p className="text-destructive text-sm">{error}</p>}
 
       {/* Sign In Button */}
       <Button
@@ -113,7 +111,7 @@ export default function SignInPage() {
         className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
         disabled={isLoading || !email || !password}
       >
-        {isLoading ? 'Signing in...' : 'Sign in'}
+        {isLoading ? "Signing in..." : "Sign in"}
       </Button>
 
       {/* Magic Link */}
@@ -166,5 +164,5 @@ export default function SignInPage() {
         Single sign-on (SSO)
       </Button>
     </form>
-  )
+  );
 }

@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Check, Star, Sparkles, Zap, Crown } from 'lucide-react'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion } from "framer-motion";
+import { Check, Crown, Sparkles, Star, Zap } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export function PricingSection() {
   const plans = [
@@ -19,11 +19,11 @@ export function PricingSection() {
         "Google Sheets integration",
         "Email notifications",
         "Basic analytics",
-        "Community support"
+        "Community support",
       ],
       cta: "Get Started Free",
       popular: false,
-      color: "from-gray-500 to-gray-600"
+      color: "from-gray-500 to-gray-600",
     },
     {
       name: "Professional",
@@ -38,13 +38,13 @@ export function PricingSection() {
         "Team collaboration",
         "Priority support",
         "Custom branding",
-        "API access"
+        "API access",
       ],
       cta: "Start Free Trial",
       popular: true,
-      color: "from-primary to-accent"
-    }
-  ]
+      color: "from-primary to-accent",
+    },
+  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -52,16 +52,16 @@ export function PricingSection() {
       opacity: 1,
       transition: {
         staggerChildren: 0.2,
-        delayChildren: 0.1
-      }
-    }
-  }
+        delayChildren: 0.1,
+      },
+    },
+  };
 
   const cardVariants = {
     hidden: {
       opacity: 0,
       y: 50,
-      scale: 0.9
+      scale: 0.9,
     },
     visible: {
       opacity: 1,
@@ -69,37 +69,40 @@ export function PricingSection() {
       scale: 1,
       transition: {
         duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  }
+        ease: "easeOut",
+      },
+    },
+  };
 
   return (
-    <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-background-secondary relative overflow-hidden">
+    <section
+      id="pricing"
+      className="py-20 px-4 sm:px-6 lg:px-8 bg-background-secondary relative overflow-hidden"
+    >
       {/* Background Elements */}
       <div className="absolute inset-0 opacity-5">
         <motion.div
           className="absolute top-1/4 right-1/4 w-72 h-72 bg-primary/20 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.3, 1],
-            opacity: [0.3, 0.6, 0.3]
+            opacity: [0.3, 0.6, 0.3],
           }}
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
         />
         <motion.div
           className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl"
           animate={{
             scale: [1.2, 1, 1.2],
-            opacity: [0.2, 0.5, 0.2]
+            opacity: [0.2, 0.5, 0.2],
           }}
           transition={{
             duration: 10,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
         />
       </div>
@@ -148,15 +151,17 @@ export function PricingSection() {
               whileHover={{
                 y: plan.popular ? -12 : -8,
                 scale: plan.popular ? 1.05 : 1.02,
-                transition: { duration: 0.3, ease: "easeOut" }
+                transition: { duration: 0.3, ease: "easeOut" },
               }}
-              className={`relative group ${plan.popular ? 'z-10' : ''}`}
+              className={`relative group ${plan.popular ? "z-10" : ""}`}
             >
-              <Card className={`relative p-8 h-full border-2 transition-all duration-500 ${
-                plan.popular
-                  ? 'border-primary shadow-2xl bg-card/95 backdrop-blur-sm scale-105'
-                  : 'border-border hover:border-primary/30 hover:shadow-lg'
-              }`}>
+              <Card
+                className={`relative p-8 h-full border-2 transition-all duration-500 ${
+                  plan.popular
+                    ? "border-primary shadow-2xl bg-card/95 backdrop-blur-sm scale-105"
+                    : "border-border hover:border-primary/30 hover:shadow-lg"
+                }`}
+              >
                 {/* Popular Badge */}
                 {plan.popular && (
                   <motion.div
@@ -192,10 +197,14 @@ export function PricingSection() {
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <span className={`text-4xl md:text-5xl font-bold bg-gradient-to-r ${plan.color} bg-clip-text text-transparent`}>
+                    <span
+                      className={`text-4xl md:text-5xl font-bold bg-gradient-to-r ${plan.color} bg-clip-text text-transparent`}
+                    >
                       {plan.price}
                     </span>
-                    <span className="text-muted-foreground ml-2 text-lg">/{plan.period}</span>
+                    <span className="text-muted-foreground ml-2 text-lg">
+                      /{plan.period}
+                    </span>
                   </motion.div>
 
                   <p className="text-muted-foreground leading-relaxed">
@@ -218,7 +227,10 @@ export function PricingSection() {
                       initial={{ opacity: 0, x: -20 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
-                      transition={{ delay: (index * 0.1) + (featureIndex * 0.1) + 0.4, duration: 0.5 }}
+                      transition={{
+                        delay: index * 0.1 + featureIndex * 0.1 + 0.4,
+                        duration: 0.5,
+                      }}
                     >
                       <motion.div
                         className="w-5 h-5 text-primary mr-3 mt-0.5 flex-shrink-0"
@@ -243,8 +255,13 @@ export function PricingSection() {
                   transition={{ delay: index * 0.1 + 0.8, duration: 0.6 }}
                 >
                   <Link href="/auth/signup">
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button className={`w-full ${plan.popular ? `bg-gradient-to-r ${plan.color} text-white hover:shadow-lg` : 'border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground'} transition-all duration-300`}>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button
+                        className={`w-full ${plan.popular ? `bg-gradient-to-r ${plan.color} text-white hover:shadow-lg` : "border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"} transition-all duration-300`}
+                      >
                         {plan.cta}
                       </Button>
                     </motion.div>
@@ -274,10 +291,12 @@ export function PricingSection() {
             >
               <Zap className="w-5 h-5" />
             </motion.div>
-            <span className="font-medium">30-day money-back guarantee • No setup fees • Cancel anytime</span>
+            <span className="font-medium">
+              30-day money-back guarantee • No setup fees • Cancel anytime
+            </span>
           </motion.div>
         </motion.div>
       </motion.div>
     </section>
-  )
+  );
 }

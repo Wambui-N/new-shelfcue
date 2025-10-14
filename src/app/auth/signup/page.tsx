@@ -1,67 +1,67 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useAuth } from '@/contexts/AuthContext'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const router = useRouter()
-  const { signUp, signInWithGoogle } = useAuth()
+  const router = useRouter();
+  const { signUp, signInWithGoogle } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!email || !password || !confirmPassword) {
-      setError('Please fill in all fields')
-      return
+      setError("Please fill in all fields");
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
+      setError("Passwords do not match");
+      return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long')
-      return
+      setError("Password must be at least 6 characters long");
+      return;
     }
 
-    setIsLoading(true)
-    setError('')
+    setIsLoading(true);
+    setError("");
 
-    const { error } = await signUp(email, password)
-
-      if (error) {
-        setError(error.message)
-        setIsLoading(false)
-      } else {
-        // Redirect to welcome page for Google connection
-        router.push('/auth/welcome')
-      }
-  }
-
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true)
-    setError('')
-
-    const { error } = await signInWithGoogle()
+    const { error } = await signUp(email, password);
 
     if (error) {
-      setError(error.message)
-      setIsLoading(false)
+      setError(error.message);
+      setIsLoading(false);
+    } else {
+      // Redirect to welcome page for Google connection
+      router.push("/auth/welcome");
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    setError("");
+
+    const { error } = await signInWithGoogle();
+
+    if (error) {
+      setError(error.message);
+      setIsLoading(false);
     }
     // For OAuth, the loading state will be handled by the callback page
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -89,7 +89,7 @@ export default function SignUpPage() {
         <div className="relative">
           <Input
             id="password"
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="bg-background-secondary border-border text-foreground placeholder:text-muted-foreground focus:border-border pr-10"
@@ -130,9 +130,7 @@ export default function SignUpPage() {
       </div>
 
       {/* Error Message */}
-      {error && (
-        <p className="text-destructive text-sm">{error}</p>
-      )}
+      {error && <p className="text-destructive text-sm">{error}</p>}
 
       {/* Sign Up Button */}
       <Button
@@ -140,7 +138,7 @@ export default function SignUpPage() {
         className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
         disabled={isLoading || !email || !password || !confirmPassword}
       >
-        {isLoading ? 'Creating account...' : 'Create account'}
+        {isLoading ? "Creating account..." : "Create account"}
       </Button>
 
       {/* Divider */}
@@ -184,16 +182,22 @@ export default function SignUpPage() {
 
       {/* Terms and Privacy */}
       <div className="text-center text-xs text-muted-foreground">
-        By creating an account, you agree to our{' '}
-        <a href="/terms" className="text-muted-foreground hover:text-foreground underline">
+        By creating an account, you agree to our{" "}
+        <a
+          href="/terms"
+          className="text-muted-foreground hover:text-foreground underline"
+        >
           Terms of Service
-        </a>{' '}
-        and{' '}
-        <a href="/privacy" className="text-muted-foreground hover:text-foreground underline">
+        </a>{" "}
+        and{" "}
+        <a
+          href="/privacy"
+          className="text-muted-foreground hover:text-foreground underline"
+        >
           Privacy Policy
         </a>
         .
       </div>
     </form>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export function CTASection() {
   return (
@@ -9,7 +9,8 @@ export function CTASection() {
           Ready to Transform Your Lead Generation?
         </h2>
         <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Join thousands of businesses already using ShelfCue to capture and convert more leads.
+          Join thousands of businesses already using ShelfCue to capture and
+          convert more leads.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/auth/signup">
@@ -23,5 +24,5 @@ export function CTASection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

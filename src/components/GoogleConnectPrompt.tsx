@@ -1,38 +1,41 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { motion } from 'framer-motion'
-import { CheckCircle, Sheet, Calendar, Shield, Zap } from 'lucide-react'
+import { motion } from "framer-motion";
+import { Calendar, CheckCircle, Sheet, Shield, Zap } from "lucide-react";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 interface GoogleConnectPromptProps {
-  onConnect: () => void
-  onSkip: () => void
+  onConnect: () => void;
+  onSkip: () => void;
 }
 
-export function GoogleConnectPrompt({ onConnect, onSkip }: GoogleConnectPromptProps) {
+export function GoogleConnectPrompt({
+  onConnect,
+  onSkip,
+}: GoogleConnectPromptProps) {
   const permissions = [
     {
       icon: <Sheet className="w-5 h-5" />,
-      title: 'Google Sheets',
-      description: 'Automatically sync form submissions to spreadsheets',
-      color: 'bg-green-100 text-green-600'
+      title: "Google Sheets",
+      description: "Automatically sync form submissions to spreadsheets",
+      color: "bg-green-100 text-green-600",
     },
     {
       icon: <Calendar className="w-5 h-5" />,
-      title: 'Google Calendar',
-      description: 'Create calendar events from form submissions',
-      color: 'bg-blue-100 text-blue-600'
+      title: "Google Calendar",
+      description: "Create calendar events from form submissions",
+      color: "bg-blue-100 text-blue-600",
     },
     {
       icon: <Shield className="w-5 h-5" />,
-      title: 'Secure Access',
-      description: 'Your data is encrypted and never shared with third parties',
-      color: 'bg-purple-100 text-purple-600'
-    }
-  ]
+      title: "Secure Access",
+      description: "Your data is encrypted and never shared with third parties",
+      color: "bg-purple-100 text-purple-600",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
@@ -49,15 +52,18 @@ export function GoogleConnectPrompt({ onConnect, onSkip }: GoogleConnectPromptPr
               className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6"
               animate={{
                 scale: [1, 1.05, 1],
-                rotate: [0, 5, -5, 0]
+                rotate: [0, 5, -5, 0],
               }}
               transition={{
                 duration: 3,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
             >
-              <svg className="w-10 h-10 text-primary-foreground" viewBox="0 0 24 24">
+              <svg
+                className="w-10 h-10 text-primary-foreground"
+                viewBox="0 0 24 24"
+              >
                 <path
                   fill="currentColor"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -95,7 +101,9 @@ export function GoogleConnectPrompt({ onConnect, onSkip }: GoogleConnectPromptPr
                 transition={{ delay: index * 0.1 + 0.3, duration: 0.4 }}
               >
                 <div className="flex items-start gap-4 p-4 bg-background-secondary rounded-xl border border-border">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${permission.color}`}>
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${permission.color}`}
+                  >
                     {permission.icon}
                   </div>
                   <div className="flex-1">
@@ -123,12 +131,22 @@ export function GoogleConnectPrompt({ onConnect, onSkip }: GoogleConnectPromptPr
                   Permissions We'll Request
                 </h4>
                 <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-                  <li>• <strong>View and manage Google Sheets</strong> - To sync form submissions</li>
-                  <li>• <strong>View and manage Google Calendar</strong> - To create events</li>
-                  <li>• <strong>View Google Drive files</strong> - To list your existing sheets</li>
+                  <li>
+                    • <strong>View and manage Google Sheets</strong> - To sync
+                    form submissions
+                  </li>
+                  <li>
+                    • <strong>View and manage Google Calendar</strong> - To
+                    create events
+                  </li>
+                  <li>
+                    • <strong>View Google Drive files</strong> - To list your
+                    existing sheets
+                  </li>
                 </ul>
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-3">
-                  You can revoke access anytime from your Google Account settings
+                  You can revoke access anytime from your Google Account
+                  settings
                 </p>
               </div>
             </div>
@@ -148,11 +166,7 @@ export function GoogleConnectPrompt({ onConnect, onSkip }: GoogleConnectPromptPr
               </svg>
               Connect Google Account
             </Button>
-            <Button
-              onClick={onSkip}
-              variant="outline"
-              className="flex-1 h-12"
-            >
+            <Button onClick={onSkip} variant="outline" className="flex-1 h-12">
               Skip for Now
             </Button>
           </div>
@@ -163,6 +177,5 @@ export function GoogleConnectPrompt({ onConnect, onSkip }: GoogleConnectPromptPr
         </Card>
       </motion.div>
     </div>
-  )
+  );
 }
-

@@ -1,11 +1,11 @@
-import { create } from 'zustand';
-import { FormData, FormField } from '@/types/form';
+import { create } from "zustand";
+import type { FormData, FormField } from "@/types/form";
 
 interface FormStore {
   formData: FormData;
   isDirty: boolean;
   isSaving: boolean;
-  
+
   // Actions
   updateForm: (updates: Partial<FormData>) => void;
   addField: (field: FormField) => void;
@@ -19,25 +19,25 @@ interface FormStore {
 }
 
 const defaultForm: FormData = {
-  title: '',
-  description: '',
-  status: 'draft',
+  title: "",
+  description: "",
+  status: "draft",
   fields: [],
   theme: {
-    primaryColor: '#151419',
-    backgroundColor: '#fafafa',
-    textColor: '#151419',
+    primaryColor: "#151419",
+    backgroundColor: "#fafafa",
+    textColor: "#151419",
     borderRadius: 8,
-    fontFamily: 'Satoshi'
+    fontFamily: "Satoshi",
   },
   settings: {
     showTitle: true,
     showDescription: true,
-    submitButtonText: 'Submit',
-    successMessage: 'Thank you for your submission!',
+    submitButtonText: "Submit",
+    successMessage: "Thank you for your submission!",
     collectEmail: false,
-    allowMultipleSubmissions: true
-  }
+    allowMultipleSubmissions: true,
+  },
 };
 
 export const useFormStore = create<FormStore>((set, get) => ({
@@ -48,7 +48,7 @@ export const useFormStore = create<FormStore>((set, get) => ({
   updateForm: (updates) => {
     set((state) => ({
       formData: { ...state.formData, ...updates },
-      isDirty: true
+      isDirty: true,
     }));
   },
 
@@ -56,9 +56,9 @@ export const useFormStore = create<FormStore>((set, get) => ({
     set((state) => ({
       formData: {
         ...state.formData,
-        fields: [...state.formData.fields, field]
+        fields: [...state.formData.fields, field],
       },
-      isDirty: true
+      isDirty: true,
     }));
   },
 
@@ -67,10 +67,10 @@ export const useFormStore = create<FormStore>((set, get) => ({
       formData: {
         ...state.formData,
         fields: state.formData.fields.map((field) =>
-          field.id === fieldId ? { ...field, ...updates } : field
-        )
+          field.id === fieldId ? { ...field, ...updates } : field,
+        ),
       },
-      isDirty: true
+      isDirty: true,
     }));
   },
 
@@ -78,9 +78,9 @@ export const useFormStore = create<FormStore>((set, get) => ({
     set((state) => ({
       formData: {
         ...state.formData,
-        fields: state.formData.fields.filter((field) => field.id !== fieldId)
+        fields: state.formData.fields.filter((field) => field.id !== fieldId),
       },
-      isDirty: true
+      isDirty: true,
     }));
   },
 
@@ -89,13 +89,13 @@ export const useFormStore = create<FormStore>((set, get) => ({
       const fields = [...state.formData.fields];
       const [movedField] = fields.splice(fromIndex, 1);
       fields.splice(toIndex, 0, movedField);
-      
+
       return {
         formData: {
           ...state.formData,
-          fields
+          fields,
         },
-        isDirty: true
+        isDirty: true,
       };
     });
   },
@@ -103,7 +103,7 @@ export const useFormStore = create<FormStore>((set, get) => ({
   loadForm: (form) => {
     set({
       formData: form,
-      isDirty: false
+      isDirty: false,
     });
   },
 
@@ -111,7 +111,7 @@ export const useFormStore = create<FormStore>((set, get) => ({
     set({
       formData: defaultForm,
       isDirty: false,
-      isSaving: false
+      isSaving: false,
     });
   },
 
@@ -121,5 +121,5 @@ export const useFormStore = create<FormStore>((set, get) => ({
 
   setSaving: (saving) => {
     set({ isSaving: saving });
-  }
+  },
 }));

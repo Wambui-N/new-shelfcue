@@ -1,11 +1,11 @@
-import { HeroSection } from '@/components/sections/HeroSection'
-import { DemoSection } from '@/components/sections/DemoSection'
-import { FeaturesSection } from '@/components/sections/FeaturesSection'
-import { ComparisonSection } from '@/components/sections/ComparisonSection'
-import { PricingSection } from '@/components/sections/PricingSection'
-import { FAQSection } from '@/components/sections/FAQSection'
-import { Footer } from '@/components/sections/Footer'
-import { Navigation } from '@/components/navigation'
+import { Navigation } from "@/components/navigation";
+import { ComparisonSection } from "@/components/sections/ComparisonSection";
+import { DemoSection } from "@/components/sections/DemoSection";
+import { FAQSection } from "@/components/sections/FAQSection";
+import { FeaturesSection } from "@/components/sections/FeaturesSection";
+import { Footer } from "@/components/sections/Footer";
+import { HeroSection } from "@/components/sections/HeroSection";
+import { PricingSection } from "@/components/sections/PricingSection";
 
 export default function HomePage() {
   return (
@@ -19,5 +19,5 @@ export default function HomePage() {
       <FAQSection />
       <Footer />
     </div>
-  )
+  );
 }

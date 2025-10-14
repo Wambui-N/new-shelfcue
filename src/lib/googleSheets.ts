@@ -1,10 +1,10 @@
-import { GoogleAPIClient } from './google'
+import type { GoogleAPIClient } from "./google";
 
 export class GoogleSheetsService {
-  private client: GoogleAPIClient
+  private client: GoogleAPIClient;
 
   constructor(client: GoogleAPIClient) {
-    this.client = client
+    this.client = client;
   }
 
   /**
@@ -12,7 +12,7 @@ export class GoogleSheetsService {
    */
   async createSheet(title: string, headers?: string[]) {
     try {
-      const sheets = this.client.getSheets()
+      const sheets = this.client.getSheets();
 
       // Create a new spreadsheet
       const response = await sheets.spreadsheets.create({
@@ -23,34 +23,34 @@ export class GoogleSheetsService {
           sheets: [
             {
               properties: {
-                title: 'Form Responses',
+                title: "Form Responses",
               },
             },
           ],
         },
-      })
+      });
 
-      const spreadsheetId = response.data.spreadsheetId
+      const spreadsheetId = response.data.spreadsheetId;
 
       // If headers provided, add them as the first row
       if (headers && headers.length > 0 && spreadsheetId) {
         await sheets.spreadsheets.values.update({
           spreadsheetId,
-          range: 'Form Responses!A1',
-          valueInputOption: 'RAW',
+          range: "Form Responses!A1",
+          valueInputOption: "RAW",
           requestBody: {
-            values: [['Submitted at', ...headers]],
+            values: [["Submitted at", ...headers]],
           },
-        })
+        });
       }
 
       return {
         spreadsheetId: spreadsheetId!,
         spreadsheetUrl: response.data.spreadsheetUrl!,
-      }
+      };
     } catch (error) {
-      console.error('Error creating Google Sheet:', error)
-      throw error
+      console.error("Error creating Google Sheet:", error);
+      throw error;
     }
   }
 
@@ -59,53 +59,57 @@ export class GoogleSheetsService {
    */
   async getSheets() {
     try {
-      const drive = this.client.getDrive()
+      const drive = this.client.getDrive();
 
       const response = await drive.files.list({
         q: "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
-        fields: 'files(id, name, createdTime, modifiedTime, webViewLink)',
-        orderBy: 'modifiedTime desc',
+        fields: "files(id, name, createdTime, modifiedTime, webViewLink)",
+        orderBy: "modifiedTime desc",
         pageSize: 50,
-      })
+      });
 
-      return response.data.files || []
+      return response.data.files || [];
     } catch (error) {
-      console.error('Error fetching Google Sheets:', error)
-      throw error
+      console.error("Error fetching Google Sheets:", error);
+      throw error;
     }
   }
 
   /**
    * Append data to a Google Sheet
    */
-  async append(spreadsheetId: string, data: any[], sheetName: string = 'Form Responses') {
+  async append(
+    spreadsheetId: string,
+    data: any[],
+    sheetName: string = "Form Responses",
+  ) {
     try {
-      const sheets = this.client.getSheets()
+      const sheets = this.client.getSheets();
 
       // Add timestamp as first column in DD/MM/YYYY format
-      const timestamp = new Date().toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit', 
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-      const rowData = [timestamp, ...data]
+      const timestamp = new Date().toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const rowData = [timestamp, ...data];
 
       const response = await sheets.spreadsheets.values.append({
         spreadsheetId,
         range: `${sheetName}!A:A`,
-        valueInputOption: 'RAW',
-        insertDataOption: 'INSERT_ROWS',
+        valueInputOption: "RAW",
+        insertDataOption: "INSERT_ROWS",
         requestBody: {
           values: [rowData],
         },
-      })
+      });
 
-      return response.data
+      return response.data;
     } catch (error) {
-      console.error('Error appending to Google Sheet:', error)
-      throw error
+      console.error("Error appending to Google Sheet:", error);
+      throw error;
     }
   }
 
@@ -114,41 +118,44 @@ export class GoogleSheetsService {
    */
   async getSpreadsheetDetails(spreadsheetId: string) {
     try {
-      const sheets = this.client.getSheets()
+      const sheets = this.client.getSheets();
 
       const response = await sheets.spreadsheets.get({
         spreadsheetId,
-        fields: 'properties,sheets.properties',
-      })
+        fields: "properties,sheets.properties",
+      });
 
-      return response.data
+      return response.data;
     } catch (error) {
-      console.error('Error getting spreadsheet details:', error)
-      throw error
+      console.error("Error getting spreadsheet details:", error);
+      throw error;
     }
   }
 
   /**
    * Update sheet headers based on form fields
    */
-  async updateHeaders(spreadsheetId: string, headers: string[], sheetName: string = 'Form Responses') {
+  async updateHeaders(
+    spreadsheetId: string,
+    headers: string[],
+    sheetName: string = "Form Responses",
+  ) {
     try {
-      const sheets = this.client.getSheets()
+      const sheets = this.client.getSheets();
 
       await sheets.spreadsheets.values.update({
         spreadsheetId,
         range: `${sheetName}!A1`,
-        valueInputOption: 'RAW',
+        valueInputOption: "RAW",
         requestBody: {
-          values: [['Submitted at', ...headers]],
+          values: [["Submitted at", ...headers]],
         },
-      })
+      });
 
-      return true
+      return true;
     } catch (error) {
-      console.error('Error updating sheet headers:', error)
-      throw error
+      console.error("Error updating sheet headers:", error);
+      throw error;
     }
   }
 }
-

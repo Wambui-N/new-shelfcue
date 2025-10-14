@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface AuthLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
@@ -11,7 +11,12 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       {/* Back Button */}
       <div className="absolute top-8 left-8">
-        <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+        <Button
+          variant="ghost"
+          size="sm"
+          asChild
+          className="text-muted-foreground hover:text-foreground"
+        >
           <Link href="/">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -37,11 +42,17 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         <div className="text-center mt-8">
           <p className="text-muted-foreground text-sm">
             You acknowledge that you read, and agree, to our{" "}
-            <Link href="/terms" className="text-muted-foreground hover:text-foreground underline">
+            <Link
+              href="/terms"
+              className="text-muted-foreground hover:text-foreground underline"
+            >
               Terms of Service
             </Link>{" "}
             and our{" "}
-            <Link href="/privacy" className="text-muted-foreground hover:text-foreground underline">
+            <Link
+              href="/privacy"
+              className="text-muted-foreground hover:text-foreground underline"
+            >
               Privacy Policy
             </Link>
             .
@@ -49,5 +60,5 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

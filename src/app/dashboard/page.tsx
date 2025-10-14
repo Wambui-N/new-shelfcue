@@ -1,169 +1,178 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { useAuth } from '@/contexts/AuthContext'
-import { supabase } from '@/lib/supabase'
-import { motion } from 'framer-motion'
-import { DashboardSkeleton } from '@/components/skeletons/DashboardSkeleton'
+import { motion } from "framer-motion";
 import {
-  FileText,
-  Users,
-  Clock,
+  Activity,
   ArrowRight,
-  ChevronUp,
   ChevronDown,
-  Plus,
-  MoreVertical,
-  Eye,
+  ChevronUp,
+  Clock,
   Edit,
+  Eye,
+  FileText,
   MessageSquare,
-  Activity
-} from 'lucide-react'
+  MoreVertical,
+  Plus,
+  Users,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 interface FormRecord {
-  id: string
-  title: string
-  description?: string
-  created_at: string
-  status: 'draft' | 'published'
-  submissions?: number
+  id: string;
+  title: string;
+  description?: string;
+  created_at: string;
+  status: "draft" | "published";
+  submissions?: number;
 }
 
 interface SubmissionRecord {
-  id: string
-  form_id: string
-  data: Record<string, any>
-  created_at: string
-  forms?: { title: string } | { title: string }[]
+  id: string;
+  form_id: string;
+  data: Record<string, any>;
+  created_at: string;
+  forms?: { title: string } | { title: string }[];
 }
 
 export default function DashboardPage() {
-  const { user } = useAuth()
-  const router = useRouter()
+  const { user } = useAuth();
+  const router = useRouter();
 
-  const [forms, setForms] = useState<FormRecord[]>([])
-  const [recentSubmissions, setRecentSubmissions] = useState<SubmissionRecord[]>([])
-  const [loading, setLoading] = useState(true)
+  const [forms, setForms] = useState<FormRecord[]>([]);
+  const [recentSubmissions, setRecentSubmissions] = useState<
+    SubmissionRecord[]
+  >([]);
+  const [loading, setLoading] = useState(true);
 
   const [dashboardStats, setDashboardStats] = useState({
     totalForms: 0,
     publishedForms: 0,
     leadsThisWeek: 0,
-    lastLeadTime: null as string | null
-  })
+    lastLeadTime: null as string | null,
+  });
 
   const [historicalStats, setHistoricalStats] = useState({
-    submissionsLastWeek: 0
-  })
+    submissionsLastWeek: 0,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user) return
+      if (!user) return;
 
-      setLoading(true)
+      setLoading(true);
       try {
         // Fetch forms data
         const { data: formsData, error: formsError } = await supabase
-          .from('forms')
-          .select('id, title, description, created_at, status')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
+          .from("forms")
+          .select("id, title, description, created_at, status")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
 
         if (!formsError) {
-          setForms(formsData as FormRecord[])
-          const publishedCount = formsData?.filter(form => form.status === 'published').length || 0
-          setDashboardStats(prev => ({
+          setForms(formsData as FormRecord[]);
+          const publishedCount =
+            formsData?.filter((form) => form.status === "published").length ||
+            0;
+          setDashboardStats((prev) => ({
             ...prev,
             totalForms: formsData?.length || 0,
-            publishedForms: publishedCount
-          }))
+            publishedForms: publishedCount,
+          }));
         }
 
         // Fetch recent submissions
-        const { data: submissionsData, error: submissionsError } = await supabase
-          .from('submissions')
-          .select(`
+        const { data: submissionsData, error: submissionsError } =
+          await supabase
+            .from("submissions")
+            .select(`
             id, form_id, data, created_at,
             forms!inner (
               title
             )
           `)
-          .eq('forms.user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(7)
+            .eq("forms.user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(7);
 
         if (!submissionsError) {
-          setRecentSubmissions(submissionsData || [])
+          setRecentSubmissions(submissionsData || []);
 
           // Calculate leads this week
-          const oneWeekAgo = new Date()
-          oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-          const leadsThisWeek = submissionsData?.filter(sub =>
-            new Date(sub.created_at) >= oneWeekAgo
-          ).length || 0
+          const oneWeekAgo = new Date();
+          oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+          const leadsThisWeek =
+            submissionsData?.filter(
+              (sub) => new Date(sub.created_at) >= oneWeekAgo,
+            ).length || 0;
 
           // Get last lead time
-          const lastLeadTime = submissionsData?.[0]?.created_at || null
+          const lastLeadTime = submissionsData?.[0]?.created_at || null;
 
-          setDashboardStats(prev => ({
+          setDashboardStats((prev) => ({
             ...prev,
             leadsThisWeek,
-            lastLeadTime
-          }))
+            lastLeadTime,
+          }));
         }
       } catch (error) {
-        console.error('Error fetching dashboard data:', error)
+        console.error("Error fetching dashboard data:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [user])
+    fetchData();
+  }, [user]);
 
   const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60 * 60),
+    );
 
-    if (diffInHours < 1) return 'Just now'
-    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours < 24)
+      return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
 
-    const diffInDays = Math.floor(diffInHours / 24)
-    if (diffInDays === 1) return 'Yesterday'
-    if (diffInDays < 7) return `${diffInDays} days ago`
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays === 1) return "Yesterday";
+    if (diffInDays < 7) return `${diffInDays} days ago`;
 
-    return date.toLocaleDateString()
-  }
+    return date.toLocaleDateString();
+  };
 
   const getInitials = (name: string) => {
     return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
       .toUpperCase()
-      .slice(0, 2)
-  }
+      .slice(0, 2);
+  };
 
   const getSubmitterName = (submission: SubmissionRecord) => {
-    const data = submission.data
-    return data.name || data.full_name || data.email || 'Anonymous'
-  }
+    const data = submission.data;
+    return data.name || data.full_name || data.email || "Anonymous";
+  };
 
   const getTrendPercentage = () => {
-    const currentWeek = dashboardStats.leadsThisWeek
-    const lastWeek = historicalStats.submissionsLastWeek
-    if (lastWeek === 0) return currentWeek > 0 ? 100 : 0
-    return Math.round(((currentWeek - lastWeek) / lastWeek) * 100)
-  }
+    const currentWeek = dashboardStats.leadsThisWeek;
+    const lastWeek = historicalStats.submissionsLastWeek;
+    if (lastWeek === 0) return currentWeek > 0 ? 100 : 0;
+    return Math.round(((currentWeek - lastWeek) / lastWeek) * 100);
+  };
 
   if (loading) {
-    return <DashboardSkeleton />
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -182,7 +191,11 @@ export default function DashboardPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
-            Welcome back, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}!
+            Welcome back,{" "}
+            {user?.user_metadata?.full_name ||
+              user?.email?.split("@")[0] ||
+              "User"}
+            !
           </motion.h1>
           <motion.p
             className="text-primary-foreground/80 text-lg"
@@ -208,8 +221,12 @@ export default function DashboardPage() {
                 </div>
                 <ArrowRight className="w-5 h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
               </div>
-              <div className="text-4xl font-bold mb-2">{dashboardStats.publishedForms}</div>
-              <div className="text-primary-foreground/80 text-sm font-medium">Active Forms</div>
+              <div className="text-4xl font-bold mb-2">
+                {dashboardStats.publishedForms}
+              </div>
+              <div className="text-primary-foreground/80 text-sm font-medium">
+                Active Forms
+              </div>
             </motion.div>
           </Link>
 
@@ -235,8 +252,12 @@ export default function DashboardPage() {
                   </span>
                 </div>
               </div>
-              <div className="text-4xl font-bold mb-2">{dashboardStats.leadsThisWeek}</div>
-              <div className="text-primary-foreground/80 text-sm font-medium">Leads This Week</div>
+              <div className="text-4xl font-bold mb-2">
+                {dashboardStats.leadsThisWeek}
+              </div>
+              <div className="text-primary-foreground/80 text-sm font-medium">
+                Leads This Week
+              </div>
             </motion.div>
           </Link>
 
@@ -254,9 +275,13 @@ export default function DashboardPage() {
                 <ArrowRight className="w-5 h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
               </div>
               <div className="text-2xl font-bold mb-2">
-                {dashboardStats.lastLeadTime ? formatTimeAgo(dashboardStats.lastLeadTime) : 'No leads yet'}
+                {dashboardStats.lastLeadTime
+                  ? formatTimeAgo(dashboardStats.lastLeadTime)
+                  : "No leads yet"}
               </div>
-              <div className="text-primary-foreground/80 text-sm font-medium">Last Lead</div>
+              <div className="text-primary-foreground/80 text-sm font-medium">
+                Last Lead
+              </div>
             </motion.div>
           </Link>
         </div>
@@ -274,8 +299,13 @@ export default function DashboardPage() {
           <Card className="shadow-sm border-border">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-foreground">Recent Activity</h3>
-                <Link href="/dashboard/submissions" className="text-sm text-primary hover:text-primary/80 font-medium transition-colors">
+                <h3 className="text-xl font-semibold text-foreground">
+                  Recent Activity
+                </h3>
+                <Link
+                  href="/dashboard/submissions"
+                  className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
+                >
                   View All →
                 </Link>
               </div>
@@ -285,7 +315,9 @@ export default function DashboardPage() {
                   <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                     <MessageSquare className="w-8 h-8 text-muted-foreground" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">No submissions yet</h3>
+                  <h3 className="font-semibold text-foreground mb-2">
+                    No submissions yet
+                  </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Share your forms to start capturing leads!
                   </p>
@@ -307,7 +339,10 @@ export default function DashboardPage() {
                           {getSubmitterName(submission)}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
-                          via {Array.isArray(submission.forms) ? submission.forms[0]?.title : submission.forms?.title || 'Unknown Form'}
+                          via{" "}
+                          {Array.isArray(submission.forms)
+                            ? submission.forms[0]?.title
+                            : submission.forms?.title || "Unknown Form"}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {formatTimeAgo(submission.created_at)}
@@ -332,8 +367,12 @@ export default function DashboardPage() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-2xl font-bold text-foreground">Your Forms</h3>
-                  <p className="text-muted-foreground mt-1">Manage and track your form performance</p>
+                  <h3 className="text-2xl font-bold text-foreground">
+                    Your Forms
+                  </h3>
+                  <p className="text-muted-foreground mt-1">
+                    Manage and track your form performance
+                  </p>
                 </div>
                 <Link href="/editor/new">
                   <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
@@ -348,9 +387,12 @@ export default function DashboardPage() {
                   <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <FileText className="w-10 h-10 text-muted-foreground" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-3">No forms yet</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3">
+                    No forms yet
+                  </h3>
                   <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                    Create your first form to start collecting data and building your lead generation system.
+                    Create your first form to start collecting data and building
+                    your lead generation system.
                   </p>
                   <Link href="/editor/new">
                     <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3 shadow-sm">
@@ -378,9 +420,18 @@ export default function DashboardPage() {
                       {/* Form Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold text-foreground truncate text-lg">{form.title}</h3>
-                          <Badge variant={form.status === 'published' ? 'default' : 'secondary'} className="text-xs">
-                            {form.status === 'published' ? 'Active' : 'Draft'}
+                          <h3 className="font-semibold text-foreground truncate text-lg">
+                            {form.title}
+                          </h3>
+                          <Badge
+                            variant={
+                              form.status === "published"
+                                ? "default"
+                                : "secondary"
+                            }
+                            className="text-xs"
+                          >
+                            {form.status === "published" ? "Active" : "Draft"}
                           </Badge>
                         </div>
                         <div className="flex items-center gap-6 text-sm text-muted-foreground">
@@ -397,17 +448,29 @@ export default function DashboardPage() {
 
                       {/* Quick Actions */}
                       <div className="hidden sm:flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <Button variant="ghost" size="sm" className="h-10 w-10 p-0 hover:bg-accent">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-10 w-10 p-0 hover:bg-accent"
+                        >
                           <Link href={`/editor/${form.id}`}>
                             <Edit className="w-4 h-4" />
                           </Link>
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-10 w-10 p-0 hover:bg-accent">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-10 w-10 p-0 hover:bg-accent"
+                        >
                           <Link href={`/dashboard/forms/${form.id}`}>
                             <Eye className="w-4 h-4" />
                           </Link>
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-10 w-10 p-0 hover:bg-accent">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-10 w-10 p-0 hover:bg-accent"
+                        >
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </div>
@@ -432,5 +495,5 @@ export default function DashboardPage() {
         </motion.div>
       </div>
     </div>
-  )
+  );
 }
