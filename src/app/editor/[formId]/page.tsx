@@ -10,11 +10,11 @@ import { supabase } from '@/lib/supabase'
 import { FormData } from '@/types/form'
 import { FormEditSkeleton } from '@/components/skeletons/DashboardSkeleton'
 
-interface EditFormPageProps {
+interface EditorPageProps {
   params: Promise<{ formId: string }>
 }
 
-export default function EditFormPage({ params }: EditFormPageProps) {
+function EditorPage({ params }: EditorPageProps) {
   const router = useRouter()
   const { user } = useAuth()
   const { loadForm } = useFormStore()
@@ -49,8 +49,6 @@ export default function EditFormPage({ params }: EditFormPageProps) {
         if (!data) {
           throw new Error('Form not found')
         }
-
-        console.log('Fetched form data:', data)
 
         // Check if user owns this form
         if (data.user_id !== user.id) {
@@ -120,19 +118,22 @@ export default function EditFormPage({ params }: EditFormPageProps) {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading form editor...</p>
-        </div>
-      </div>
-    )
+    return <FormEditSkeleton />
   }
 
   return (
-    <div className="fixed inset-0 z-[100] bg-background">
+    <div className="fixed inset-0 bg-background">
       <FormBuilder onBack={handleBack} />
     </div>
   )
 }
+
+// Wrap with ProtectedRoute
+export default function ProtectedEditorPage(props: EditorPageProps) {
+  return (
+    <ProtectedRoute>
+      <EditorPage {...props} />
+    </ProtectedRoute>
+  )
+}
+

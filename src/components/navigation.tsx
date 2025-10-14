@@ -97,7 +97,7 @@ export function Navigation() {
                 transition={{ duration: 0.3 }}
               >
                 <motion.img
-                  src={isDark ? "/sc-light-logo.png" : "/sc-logo.png"}
+                  src={isDark ? "/2.png" : "/1.png"}
                   alt="ShelfCue Logo"
                   className="w-full h-full object-contain"
                   animate={{

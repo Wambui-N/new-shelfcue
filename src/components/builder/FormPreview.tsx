@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
+import { MeetingTimePicker } from '@/components/ui/meeting-time-picker'
 import { FormData } from '@/types/form'
 import { motion } from 'framer-motion'
 import { CheckCircle, AlertCircle } from 'lucide-react'
@@ -454,64 +455,16 @@ export function FormPreview({ formData, onSubmit }: FormPreviewProps) {
 
       case 'meeting':
         return (
-          <select
-            {...commonProps}
+          <MeetingTimePicker
             value={formValues[field.id] || ''}
-            onChange={(e) => handleInputChange(field.id, e.target.value)}
-            className="w-full px-3 py-2 border rounded-md bg-background"
-            style={{ 
-              borderColor: formData.theme.primaryColor + '40',
-              color: formData.theme.textColor 
-            }}
-          >
-            <option value="">Select time...</option>
-            <option value="2024-01-15T09:00">Monday, Jan 15 - 9:00 AM</option>
-            <option value="2024-01-15T14:00">Monday, Jan 15 - 2:00 PM</option>
-            <option value="2024-01-16T10:00">Tuesday, Jan 16 - 10:00 AM</option>
-            <option value="2024-01-16T15:00">Tuesday, Jan 16 - 3:00 PM</option>
-          </select>
+            onChange={(datetime) => handleInputChange(field.id, datetime)}
+            duration={field.meetingSettings?.duration || 30}
+            bufferTime={field.meetingSettings?.bufferTime || 0}
+            placeholder="Select date and time"
+            className="w-full"
+          />
         )
 
-      case 'file':
-        return (
-          <div className="space-y-3">
-            <div className="p-6 border-2 border-dashed border-primary/30 rounded-lg bg-primary/5 text-center">
-              <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-              </div>
-              <p className="text-sm font-medium text-primary mb-2">Upload Files</p>
-              <p className="text-xs text-muted-foreground mb-4">
-                Drag and drop files here, or click to browse
-              </p>
-              <input
-                {...commonProps}
-                type="file"
-                multiple={field.fileSettings?.multiple}
-                accept={field.fileSettings?.allowedTypes?.join(',')}
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || [])
-                  handleInputChange(field.id, files)
-                }}
-                className="hidden"
-                id={`file-${field.id}`}
-              />
-              <label
-                htmlFor={`file-${field.id}`}
-                className="inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium cursor-pointer hover:bg-primary/90 transition-colors"
-                style={{ backgroundColor: formData.theme.primaryColor }}
-              >
-                Choose Files
-              </label>
-              {formValues[field.id]?.length > 0 && (
-                <div className="mt-3 text-xs text-muted-foreground">
-                  {formValues[field.id].length} file(s) selected
-                </div>
-              )}
-            </div>
-          </div>
-        )
 
       default:
         return (

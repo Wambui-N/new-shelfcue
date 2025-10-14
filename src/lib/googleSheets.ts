@@ -39,7 +39,7 @@ export class GoogleSheetsService {
           range: 'Form Responses!A1',
           valueInputOption: 'RAW',
           requestBody: {
-            values: [['Timestamp', ...headers]],
+            values: [['Submitted at', ...headers]],
           },
         })
       }
@@ -82,8 +82,14 @@ export class GoogleSheetsService {
     try {
       const sheets = this.client.getSheets()
 
-      // Add timestamp as first column
-      const timestamp = new Date().toISOString()
+      // Add timestamp as first column in DD/MM/YYYY format
+      const timestamp = new Date().toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
       const rowData = [timestamp, ...data]
 
       const response = await sheets.spreadsheets.values.append({
@@ -134,7 +140,7 @@ export class GoogleSheetsService {
         range: `${sheetName}!A1`,
         valueInputOption: 'RAW',
         requestBody: {
-          values: [['Timestamp', ...headers]],
+          values: [['Submitted at', ...headers]],
         },
       })
 

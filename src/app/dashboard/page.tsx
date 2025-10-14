@@ -335,7 +335,7 @@ export default function DashboardPage() {
                   <h3 className="text-2xl font-bold text-foreground">Your Forms</h3>
                   <p className="text-muted-foreground mt-1">Manage and track your form performance</p>
                 </div>
-                <Link href="/dashboard/forms/new">
+                <Link href="/editor/new">
                   <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
                     <Plus className="w-4 h-4 mr-2" />
                     Create New Form
@@ -352,7 +352,7 @@ export default function DashboardPage() {
                   <p className="text-muted-foreground mb-8 max-w-md mx-auto">
                     Create your first form to start collecting data and building your lead generation system.
                   </p>
-                  <Link href="/dashboard/forms/new">
+                  <Link href="/editor/new">
                     <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3 shadow-sm">
                       <Plus className="w-4 h-4 mr-2" />
                       Create Your First Form
@@ -398,7 +398,7 @@ export default function DashboardPage() {
                       {/* Quick Actions */}
                       <div className="hidden sm:flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <Button variant="ghost" size="sm" className="h-10 w-10 p-0 hover:bg-accent">
-                          <Link href={`/dashboard/forms/${form.id}/edit`}>
+                          <Link href={`/editor/${form.id}`}>
                             <Edit className="w-4 h-4" />
                           </Link>
                         </Button>

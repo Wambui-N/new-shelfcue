@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getGoogleClient } from '@/lib/google';
 import { GoogleSheetsService } from '@/lib/googleSheets';
-import { GoogleDriveService } from '@/lib/googleDrive';
 import { getSupabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
@@ -111,11 +110,9 @@ export async function POST(request: NextRequest) {
     }
 
     const sheetsService = new GoogleSheetsService(googleClient);
-    const driveService = new GoogleDriveService(googleClient);
 
-    // Check if form has meeting or file fields
+    // Check if form has meeting fields
     const hasMeetingField = form.fields.some((field: any) => field.type === 'meeting');
-    const hasFileField = form.fields.some((field: any) => field.type === 'file');
 
     // Check if user has enabled meeting booking in form settings
     const meetingBookingEnabled = form.settings?.meetingBookingEnabled || false;
@@ -126,7 +123,7 @@ export async function POST(request: NextRequest) {
     if (!form.default_sheet_connection_id) {
       try {
         console.log('Creating Google Sheet for form submissions...');
-        const headers = ['Timestamp', ...form.fields.map((f: any) => f.label)];
+        const headers = form.fields.map((f: any) => f.label);
         const newSheet = await sheetsService.createSheet(`${form.title} - Responses`, headers);
 
         if (newSheet.spreadsheetId && newSheet.spreadsheetUrl) {
@@ -175,36 +172,8 @@ export async function POST(request: NextRequest) {
       console.log('ℹ️ Sheet already connected to form');
     }
 
-    // 2. Create Google Drive folder ONLY if form has file upload fields AND Google is available
-    if (hasFileField && !form.drive_folder_id && driveService) {
-      try {
-        const folder = await driveService.createFolder(`${form.title} - Files`);
 
-        if (folder.id) {
-          await supabaseAdmin
-            .from('forms')
-            .update({ drive_folder_id: folder.id })
-            .eq('id', formId);
-
-          results.drive = {
-            id: folder.id,
-            url: folder.webViewLink,
-            created: true
-          };
-          console.log('✓ Google Drive folder created');
-          console.log('✓ Google Drive folder created for file uploads');
-        }
-      } catch (error) {
-        console.error('Error creating Drive folder:', error);
-        results.drive = { error: 'Failed to create folder' };
-      }
-    } else if (hasFileField && form.drive_folder_id) {
-      results.drive = { connected: true };
-    } else {
-      console.log('ℹ️ No file upload fields found - skipping Drive folder creation');
-    }
-
-    // 3. Enable meeting booking if meeting field exists
+    // 2. Enable meeting booking if meeting field exists
     if (hasMeetingField) {
       const meetingSettings = {
         enabled: true,

@@ -1,6 +1,6 @@
 export interface FormField {
   id: string;
-  type: 'text' | 'email' | 'textarea' | 'select' | 'radio' | 'checkbox' | 'number' | 'date' | 'phone' | 'url' | 'meeting' | 'file' | 'email_field' | 'phone_field' | 'country';
+  type: 'text' | 'email' | 'textarea' | 'select' | 'radio' | 'checkbox' | 'number' | 'date' | 'phone' | 'url' | 'meeting' | 'email_field' | 'phone_field' | 'country';
   label: string;
   placeholder?: string;
   required: boolean;
@@ -17,12 +17,6 @@ export interface FormField {
     duration?: number; // minutes
     timeSlots?: string[]; // available time slots
     bufferTime?: number; // minutes between meetings
-  };
-  // File upload specific
-  fileSettings?: {
-    allowedTypes?: string[]; // e.g., ['image/*', 'application/pdf']
-    maxSize?: number; // MB
-    multiple?: boolean;
   };
   // Country field specific
   countrySettings?: {

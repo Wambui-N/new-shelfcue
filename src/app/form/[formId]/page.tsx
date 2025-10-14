@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { FormPreview } from '@/components/builder/FormPreview'
 import { FontLoader } from '@/components/FontLoader'
-import { supabase } from '@/lib/supabase'
 import { FormData } from '@/types/form'
 import { motion } from 'framer-motion'
 import { AlertCircle, Loader2 } from 'lucide-react'
@@ -32,19 +31,17 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
     const fetchForm = async () => {
       setLoading(true)
       try {
-        const { data, error } = await supabase
-          .from('forms')
-          .select('*')
-          .eq('id', formId)
-          .eq('status', 'published')
-          .single()
-
-        if (error) {
-          console.error('Supabase error:', error)
-          throw error
+        // Fetch public form data via API to bypass RLS
+        const response = await fetch(`/api/forms/${formId}`)
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Form not found')
         }
 
-        if (!data) {
+        const data = await response.json()
+
+        if (!data || data.status !== 'published') {
           setError('Form not found or not published.')
           return
         }

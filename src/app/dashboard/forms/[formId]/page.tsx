@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { FormData } from '@/types/form'
 import { motion } from 'framer-motion'
+import { FormViewSkeleton } from '@/components/skeletons/DashboardSkeleton'
 import {
   ArrowLeft,
   ExternalLink,
@@ -152,14 +153,7 @@ function FormViewPage({ params }: FormViewPageProps) {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading form...</p>
-        </div>
-      </div>
-    )
+    return <FormViewSkeleton />
   }
 
   if (error) {
@@ -257,7 +251,7 @@ function FormViewPage({ params }: FormViewPageProps) {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={() => router.push(`/dashboard/forms/${formId}/edit`)}
+              onClick={() => router.push(`/editor/${formId}`)}
               className="flex items-center gap-2"
             >
               <Edit className="w-4 h-4" />

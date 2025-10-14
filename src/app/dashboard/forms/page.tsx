@@ -274,7 +274,7 @@ export default function FormsPage() {
           <h1 className="text-3xl font-bold text-foreground">Forms</h1>
           <p className="text-muted-foreground mt-1">Manage all your forms and view performance</p>
         </div>
-        <Link href="/dashboard/forms/new">
+        <Link href="/editor/new">
           <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
             <Plus className="w-4 h-4 mr-2" />
             Create New Form
@@ -417,7 +417,7 @@ export default function FormsPage() {
                 Clear search
               </Button>
             ) : (
-              <Link href="/dashboard/forms/new">
+              <Link href="/editor/new">
                 <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
                   <Plus className="w-5 h-5 mr-2" />
                   Create Your First Form
@@ -468,7 +468,7 @@ export default function FormsPage() {
                           {/* Form Name & Status */}
                           <div className="flex items-start justify-between mb-2">
                             <Link
-                              href={`/dashboard/forms/${form.id}/edit`}
+                              href={`/editor/${form.id}`}
                               className="text-lg font-semibold text-foreground hover:text-primary transition-colors truncate flex-1"
                             >
                               {form.title}
@@ -496,7 +496,7 @@ export default function FormsPage() {
                           <div className="flex items-center justify-between pt-4 mt-4 border-t border-border">
                             <div className="flex gap-1">
                               <Button variant="ghost" size="sm" className="h-10 w-10 p-0 opacity-0 group-hover:opacity-100 transition-opacity" asChild>
-                                <Link href={`/dashboard/forms/${form.id}/edit`}>
+                                <Link href={`/editor/${form.id}`}>
                                   <Edit className="w-4 h-4" />
                                 </Link>
                               </Button>
@@ -515,7 +515,7 @@ export default function FormsPage() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem asChild>
-                                  <Link href={`/dashboard/forms/${form.id}/edit`}>
+                                  <Link href={`/editor/${form.id}`}>
                                     <Edit className="w-4 h-4 mr-2" />
                                     Edit
                                   </Link>
@@ -642,7 +642,7 @@ export default function FormsPage() {
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-1">
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0" asChild>
-                              <Link href={`/dashboard/forms/${form.id}/edit`}>
+                              <Link href={`/editor/${form.id}`}>
                                 <Edit className="w-4 h-4" />
                               </Link>
                             </Button>
@@ -655,7 +655,7 @@ export default function FormsPage() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem asChild>
-                                  <Link href={`/dashboard/forms/${form.id}/edit`}>
+                                  <Link href={`/editor/${form.id}`}>
                                     <Edit className="w-4 h-4 mr-2" />
                                     Edit
                                   </Link>

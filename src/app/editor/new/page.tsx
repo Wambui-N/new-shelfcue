@@ -4,9 +4,10 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useFormStore } from '@/store/formStore'
 import { FormBuilder } from '@/components/builder/FormBuilder'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
 
-export default function NewFormPage() {
+export default function NewFormEditorPage() {
   const router = useRouter()
   const { user } = useAuth()
   const { resetForm, loadForm } = useFormStore()
@@ -42,15 +43,17 @@ export default function NewFormPage() {
       },
       lastSaved: null
     })
-  }, [user, router, resetForm, loadForm])
+  }, [user, resetForm, loadForm])
 
   const handleBack = () => {
     router.push('/dashboard/forms')
   }
 
   return (
-    <div className="fixed inset-0 z-[100] bg-background">
-      <FormBuilder onBack={handleBack} />
-    </div>
+    <ProtectedRoute>
+      <div className="fixed inset-0 bg-background">
+        <FormBuilder onBack={handleBack} />
+      </div>
+    </ProtectedRoute>
   )
 }

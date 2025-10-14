@@ -144,7 +144,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <img src="/sc-logo.png" alt="ShelfCue" className="w-5 h-5 object-contain" />
+                  <img src="/1.png" alt="ShelfCue" className="w-5 h-5 object-contain" />
                 </motion.div>
                 <AnimatePresence>
                   {!sidebarCollapsed && (

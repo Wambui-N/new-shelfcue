@@ -4,9 +4,12 @@ import { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CheckCircle, Loader2, Sparkles, Sheet, FolderOpen, Calendar } from 'lucide-react'
+import { CheckCircle, Loader2, Sparkles, Sheet, Calendar } from 'lucide-react'
 
 interface PublishProgressDialogProps {
   open: boolean
@@ -14,7 +17,6 @@ interface PublishProgressDialogProps {
   steps: {
     saving?: 'pending' | 'loading' | 'completed' | 'error'
     sheet?: 'pending' | 'loading' | 'completed' | 'error'
-    drive?: 'pending' | 'loading' | 'completed' | 'error'
     meeting?: 'pending' | 'loading' | 'completed' | 'error'
   }
 }
@@ -46,12 +48,6 @@ export function PublishProgressDialog({
       label: 'Creating Google Sheet',
       description: 'Setting up automatic data sync...'
     },
-    ...(steps.drive ? [{
-      key: 'drive',
-      icon: <FolderOpen className="w-5 h-5" />,
-      label: 'Creating Drive Folder',
-      description: 'Preparing file storage...'
-    }] : []),
     ...(steps.meeting ? [{
       key: 'meeting',
       icon: <Calendar className="w-5 h-5" />,
@@ -86,8 +82,25 @@ export function PublishProgressDialog({
     .every(config => steps[config.key as keyof typeof steps] === 'completed')
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] overflow-hidden" hideClose>
+    <Dialog open={open} onOpenChange={(open) => {
+      // Prevent closing the dialog while publishing is in progress
+      const isPublishing = Object.values(steps).some(status => status === 'loading')
+      if (!isPublishing) {
+        onOpenChange(open)
+      }
+    }}>
+      <DialogContent className="sm:max-w-[500px] overflow-hidden" showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle className="sr-only">
+            {allCompleted ? 'Publishing Complete' : 'Publishing Form'}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {allCompleted 
+              ? 'Your form has been published successfully' 
+              : 'Please wait while we publish your form and set up integrations'
+            }
+          </DialogDescription>
+        </DialogHeader>
         <div className="py-6">
           {/* Header */}
           <div className="text-center mb-8">

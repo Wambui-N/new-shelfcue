@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 import { getGoogleClient } from '@/lib/google'
 import { GoogleSheetsService } from '@/lib/googleSheets'
 import { createCalendarEventFromSubmission } from '@/lib/googleCalendar'
@@ -15,8 +15,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Use admin client to bypass RLS for public form access
+    const supabaseAdmin = getSupabaseAdmin()
+
     // Verify the form exists and is published
-    const { data: form, error: formError } = await supabase
+    const { data: form, error: formError } = await supabaseAdmin
       .from('forms')
       .select(`
         id, 
@@ -48,7 +51,7 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
     // Save the submission
-    const { data: submission, error: submissionError } = await supabase
+    const { data: submission, error: submissionError } = await supabaseAdmin
       .from('submissions')
       .insert({
         form_id: formId,
@@ -67,15 +70,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Handle file uploads if any
-    const fileFields = form.fields.filter((field: any) => field.type === 'file')
-    const uploadedFiles = []
-    
-    if (fileFields.length > 0) {
-      // Note: In a real implementation, files would be uploaded via multipart form data
-      // For now, we'll assume files are already uploaded and we have file IDs
-      console.log('Form has file fields:', fileFields.map(f => f.label))
-    }
 
     // Background tasks (don't block response)
     Promise.all([
@@ -93,9 +87,34 @@ export async function POST(request: NextRequest) {
                 const sheetsService = new GoogleSheetsService(googleClient)
                 
                 // Convert submission data to array based on form fields order
-                const rowData = form.fields.map((field: any) => 
-                  data[field.id] || ''
-                )
+                // Leave blank fields truly empty in the sheet
+                const rowData = form.fields.map((field: any) => {
+                  const value = data[field.id]
+                  
+                  // Handle different field types
+                  if (field.type === 'checkbox') {
+                    return value ? 'Yes' : 'No'
+                  }
+                  
+                  if (field.type === 'meeting' && value) {
+                    // Format meeting datetime to DD/MM/YYYY HH:MM
+                    try {
+                      const date = new Date(value)
+                      return date.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })
+                    } catch {
+                      return value
+                    }
+                  }
+                  
+                  // For other fields, return the value or leave blank
+                  return value || ''
+                })
                 
                 await sheetsService.append(sheetConnection.sheet_id, rowData)
                 console.log('✓ Synced to Google Sheets')

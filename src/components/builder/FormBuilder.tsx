@@ -49,7 +49,6 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   const [publishProgress, setPublishProgress] = useState<{
     saving?: 'pending' | 'loading' | 'completed' | 'error'
     sheet?: 'pending' | 'loading' | 'completed' | 'error'
-    drive?: 'pending' | 'loading' | 'completed' | 'error'
     meeting?: 'pending' | 'loading' | 'completed' | 'error'
   }>({})
   const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -163,7 +162,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         console.log('✅ Draft created with ID:', savedForm.id)
         
         // Update the URL to reflect the new draft ID
-        router.replace(`/dashboard/forms/${savedForm.id}/edit`)
+        router.replace(`/editor/${savedForm.id}`)
       }
 
       console.log('✅ Form saved successfully as', savedForm.status)
@@ -213,8 +212,10 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     if (hasMeetingWithoutCalendar) {
       // Show meeting config dialog first
       console.log('📅 Showing meeting config dialog...')
+      console.log('📅 Setting state - pendingPublish: true, showMeetingConfigDialog: true')
       setPendingPublish(true)
       setShowMeetingConfigDialog(true)
+      console.log('📅 State set, dialog should appear now')
       return
     }
 
@@ -224,6 +225,8 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   }
 
   const handleMeetingCalendarSelected = (calendarId: string) => {
+    console.log('📅 Calendar selected:', calendarId)
+    
     // Update all meeting fields with the selected calendar
     const updatedFields = formData.fields.map(field => {
       if (field.type === 'meeting') {
@@ -238,13 +241,20 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       return field
     })
     
+    console.log('📅 Updating form fields with calendar...')
     updateForm({ fields: updatedFields })
     
     // Now proceed with publish
     if (pendingPublish) {
+      console.log('📅 Pending publish is true, will execute publish...')
       setPendingPublish(false)
       // Execute publish after a short delay to ensure state is updated
-      setTimeout(() => executePublish(), 100)
+      setTimeout(() => {
+        console.log('📅 Executing publish after calendar selection...')
+        executePublish()
+      }, 100)
+    } else {
+      console.log('⚠️ Pending publish is false, not executing')
     }
   }
 
@@ -256,13 +266,11 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
     // Determine which steps will be needed
     const hasMeetingFields = formData.fields.some(f => f.type === 'meeting')
-    const hasFileFields = formData.fields.some(f => f.type === 'file')
 
     // Initialize progress state
     const initialProgress: typeof publishProgress = {
       saving: 'pending',
       sheet: 'pending',
-      ...(hasFileFields && { drive: 'pending' }),
       ...(hasMeetingFields && { meeting: 'pending' })
     }
     setPublishProgress(initialProgress)
@@ -328,8 +336,14 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         const errorData = await publishResponse.json()
         console.error('❌ Publish API error:', errorData)
         
+        // Mark sheet creation as error
+        setPublishProgress(prev => ({ ...prev, sheet: 'error' }))
+        
         // Handle Google not connected
         if (errorData.code === 'GOOGLE_NOT_CONNECTED') {
+          // Close progress dialog
+          setShowPublishProgress(false)
+          
           const connectGoogle = confirm(
             '🔗 Connect Google Sheets\n\n' +
             'To publish your form, you need to connect Google Sheets.\n' +
@@ -360,10 +374,6 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       // Mark sheet creation as completed
       setPublishProgress(prev => ({ ...prev, sheet: 'completed' }))
 
-      // Mark drive creation as completed if it was done
-      if (publishResult.results?.drive?.created) {
-        setPublishProgress(prev => ({ ...prev, drive: 'completed' }))
-      }
 
       // Mark meeting configuration as completed if it exists
       const hasMeetingFields = formToPublish.fields.some(f => f.type === 'meeting')
@@ -510,7 +520,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 onClick={handlePublish}
                 disabled={isSaving || formData.fields.length === 0}
                 size="sm"
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/80"
               >
                 {formData.status === 'published' ? 'Published' : 'Publish'}
               </Button>
@@ -642,6 +652,12 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         onOpenChange={setShowMeetingConfigDialog}
         onConfirm={handleMeetingCalendarSelected}
         userId={user?.id || ''}
+      />
+
+      <PublishProgressDialog
+        open={showPublishProgress}
+        onOpenChange={setShowPublishProgress}
+        steps={publishProgress}
       />
     </div>
   )

@@ -36,7 +36,6 @@ import {
   ArrowDown,
   Link,
   Clock,
-  Upload,
   Star,
   Globe,
   User
@@ -55,7 +54,6 @@ const fieldTypes = [
   { type: 'date', label: 'Date', icon: <Calendar className="w-4 h-4" /> },
   { type: 'url', label: 'URL', icon: <Link className="w-4 h-4" /> },
   { type: 'meeting', label: 'Book Meeting', icon: <Clock className="w-4 h-4" /> },
-  { type: 'file', label: 'File Upload', icon: <Upload className="w-4 h-4" /> }
 ] as const
 
 export function FieldEditor() {
@@ -269,12 +267,6 @@ export function FieldEditor() {
                           </p>
                         </div>
                       </div>
-                    ) : field.type === 'file' ? (
-                      <Input
-                        placeholder={field.placeholder || 'Upload files...'}
-                        onChange={(e) => updateField(field.id, { placeholder: e.target.value })}
-                        className="text-sm"
-                      />
                     ) : field.type === 'email_field' ? (
                       <Input
                         placeholder={field.placeholder || 'Enter email address...'}

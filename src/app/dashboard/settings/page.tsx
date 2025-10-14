@@ -1,12 +1,26 @@
 "use client"
 
+import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Settings, Bell, Mail, Moon, Zap } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { SettingsSkeleton } from '@/components/skeletons/DashboardSkeleton'
 
 export default function SettingsPage() {
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Simulate loading
+    const timer = setTimeout(() => setLoading(false), 500)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (loading) {
+    return <SettingsSkeleton />
+  }
+
   return (
     <div className="space-y-8 max-w-4xl">
       {/* Page Header */}

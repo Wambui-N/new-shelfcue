@@ -40,19 +40,24 @@ export function MeetingConfigDialog({
 
   useEffect(() => {
     if (open && userId) {
+      console.log('📅 MeetingConfigDialog opened, fetching calendars for user:', userId)
       fetchCalendars()
     }
   }, [open, userId])
 
   const fetchCalendars = async () => {
+    console.log('📅 Fetching calendars...')
     setLoading(true)
     setError(null)
     try {
       const response = await fetch(`/api/google/calendars?userId=${userId}`)
+      console.log('📅 Calendar fetch response:', response.status)
+      
       if (!response.ok) {
         throw new Error('Failed to fetch calendars')
       }
       const data = await response.json()
+      console.log('📅 Calendars fetched:', data.calendars?.length || 0)
       setCalendars(data.calendars || [])
       
       // Auto-select primary calendar if available
@@ -68,12 +73,17 @@ export function MeetingConfigDialog({
   }
 
   const handleConfirm = () => {
+    console.log('📅 Confirming calendar selection:', selectedCalendar)
     if (selectedCalendar) {
       onConfirm(selectedCalendar)
       onOpenChange(false)
+    } else {
+      console.log('⚠️ No calendar selected')
     }
   }
 
+  console.log('📅 MeetingConfigDialog render - open:', open, 'userId:', userId)
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
