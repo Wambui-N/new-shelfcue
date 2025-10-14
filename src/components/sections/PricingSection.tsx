@@ -69,7 +69,6 @@ export function PricingSection() {
       scale: 1,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
       },
     },
   };
@@ -90,7 +89,6 @@ export function PricingSection() {
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: "easeInOut",
           }}
         />
         <motion.div
@@ -102,7 +100,6 @@ export function PricingSection() {
           transition={{
             duration: 10,
             repeat: Infinity,
-            ease: "easeInOut",
           }}
         />
       </div>
@@ -151,7 +148,7 @@ export function PricingSection() {
               whileHover={{
                 y: plan.popular ? -12 : -8,
                 scale: plan.popular ? 1.05 : 1.02,
-                transition: { duration: 0.3, ease: "easeOut" },
+                transition: { duration: 0.3 },
               }}
               className={`relative group ${plan.popular ? "z-10" : ""}`}
             >

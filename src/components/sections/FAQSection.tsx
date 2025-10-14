@@ -111,7 +111,6 @@ export function FAQSection() {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
       },
     },
   };
@@ -132,7 +131,6 @@ export function FAQSection() {
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: "easeInOut",
           }}
         />
       </div>
@@ -197,7 +195,6 @@ export function FAQSection() {
                   transition={{
                     duration: 4,
                     repeat: Infinity,
-                    ease: "easeInOut",
                   }}
                 >
                   {category.icon}
@@ -254,7 +251,7 @@ export function FAQSection() {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            transition={{ duration: 0.3 }}
                             className="overflow-hidden"
                           >
                             <div className="px-6 pb-6 pt-2">

@@ -257,7 +257,6 @@ export function DemoSection() {
                     transition={{
                       duration: 2,
                       repeat: Infinity,
-                      ease: "easeInOut",
                     }}
                   >
                     <motion.div
@@ -265,9 +264,8 @@ export function DemoSection() {
                         scale: [1, 1.2, 1],
                       }}
                       transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeInOut",
+                      duration: 1.5,
+                      repeat: Infinity,
                       }}
                     >
                       {(demoSteps[currentStep] as any).icon || "📝"}
@@ -298,7 +296,6 @@ export function DemoSection() {
                     transition={{
                       duration: 2,
                       repeat: Infinity,
-                      ease: "easeInOut",
                     }}
                   >
                     <div className="text-left space-y-3">

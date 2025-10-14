@@ -77,7 +77,6 @@ export function Footer() {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
       },
     },
   };
@@ -95,7 +94,6 @@ export function Footer() {
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: "easeInOut",
           }}
         />
       </div>
@@ -130,7 +128,6 @@ export function Footer() {
                   transition={{
                     duration: 2,
                     repeat: Infinity,
-                    ease: "easeInOut",
                   }}
                 />
               </motion.div>
@@ -271,7 +268,6 @@ export function Footer() {
               transition={{
                 duration: 2,
                 repeat: Infinity,
-                ease: "easeInOut",
               }}
             >
               <Heart className="w-4 h-4 text-red-500 fill-current" />

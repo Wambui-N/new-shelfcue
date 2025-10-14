@@ -24,7 +24,6 @@ export function HeroSection() {
       y: 0,
       transition: {
         duration: 0.8,
-        ease: "easeOut",
       },
     },
   };
@@ -36,7 +35,6 @@ export function HeroSection() {
       transition: {
         duration: 6,
         repeat: Infinity,
-        ease: "easeInOut",
       },
     },
   };
@@ -54,7 +52,6 @@ export function HeroSection() {
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: "easeInOut",
           }}
         />
         <motion.div
@@ -66,7 +63,6 @@ export function HeroSection() {
           transition={{
             duration: 10,
             repeat: Infinity,
-            ease: "easeInOut",
           }}
         />
       </div>
@@ -214,7 +210,6 @@ export function HeroSection() {
         transition={{
           duration: 2,
           repeat: Infinity,
-          ease: "easeInOut",
         }}
       >
         <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center">
@@ -226,7 +221,6 @@ export function HeroSection() {
             transition={{
               duration: 2,
               repeat: Infinity,
-              ease: "easeInOut",
             }}
           />
         </div>

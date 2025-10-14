@@ -142,7 +142,6 @@ export function ComparisonSection() {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
       },
     },
   };
@@ -196,7 +195,6 @@ export function ComparisonSection() {
                   transition={{
                     duration: 4,
                     repeat: Infinity,
-                    ease: "easeInOut",
                   }}
                 >
                   {categoryIndex === 0 && (
@@ -261,7 +259,6 @@ export function ComparisonSection() {
                           transition={{
                             duration: feature.shelfcue ? 2 : 1,
                             repeat: feature.shelfcue ? Infinity : 0,
-                            ease: "easeInOut",
                           }}
                           className={`w-6 h-6 rounded-full flex items-center justify-center ${
                             feature.shelfcue

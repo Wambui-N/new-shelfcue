@@ -82,7 +82,6 @@ export function FeaturesSection() {
       scale: 1,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
       },
     },
   };
@@ -93,7 +92,6 @@ export function FeaturesSection() {
       rotate: 5,
       transition: {
         duration: 0.3,
-        ease: "easeInOut",
       },
     },
   };
@@ -156,7 +154,7 @@ export function FeaturesSection() {
               variants={cardVariants}
               whileHover={{
                 y: -8,
-                transition: { duration: 0.3, ease: "easeOut" },
+                transition: { duration: 0.3 },
               }}
               className="group"
             >
