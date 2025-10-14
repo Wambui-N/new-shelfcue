@@ -153,7 +153,7 @@ export class GoogleCalendarService {
 }
 
 /**
- * Helper function to create calendar event from submission
+ * Helper function to create calendar event from submission with meeting field
  */
 export async function createCalendarEventFromSubmission(
   userId: string,
@@ -169,10 +169,10 @@ export async function createCalendarEventFromSubmission(
       throw new Error("Google client not available");
     }
 
-    // Get form's default calendar ID
+    // Get form's default calendar ID and fields
     const { data: form } = await supabase
       .from("forms")
-      .select("default_calendar_id, calendar_settings")
+      .select("default_calendar_id, fields, title, meeting_settings")
       .eq("id", formId)
       .single();
 
@@ -181,12 +181,63 @@ export async function createCalendarEventFromSubmission(
       return null;
     }
 
-    const calendarService = new GoogleCalendarService(googleClient);
-    return await calendarService.createCalendarEventFromSubmission(
-      formId,
-      submissionData,
-      form.default_calendar_id,
+    // Find meeting field in submission
+    const meetingField = (form.fields as any[])?.find((f: any) => f.type === "meeting");
+    
+    if (!meetingField) {
+      console.log("No meeting field found in form");
+      return null;
+    }
+
+    const meetingDateTime = submissionData[meetingField.id];
+    
+    if (!meetingDateTime) {
+      console.log("No meeting time selected in submission");
+      return null;
+    }
+
+    // Get meeting duration from field settings or form settings (default 60 minutes)
+    const duration = meetingField.meetingSettings?.duration || 
+                    (form.meeting_settings as any)?.duration || 
+                    60;
+
+    // Calculate end time
+    const startDate = new Date(meetingDateTime);
+    const endDate = new Date(startDate.getTime() + duration * 60000);
+
+    // Get attendee email from submission (look for email fields)
+    const emailField = (form.fields as any[])?.find(
+      (f: any) => f.type === "email" || f.type === "email_field"
     );
+    const attendeeEmail = emailField ? submissionData[emailField.id] : null;
+
+    // Create event title from form title and attendee info
+    const attendeeName = attendeeEmail ? ` with ${attendeeEmail}` : "";
+    const eventTitle = `${form.title}${attendeeName}`;
+
+    // Create the event
+    const calendar = googleClient.getCalendar();
+    const event: CalendarEvent = {
+      summary: eventTitle,
+      description: `Form submission for: ${form.title}`,
+      start: {
+        dateTime: startDate.toISOString(),
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+      end: {
+        dateTime: endDate.toISOString(),
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+      attendees: attendeeEmail ? [{ email: attendeeEmail }] : [],
+    };
+
+    const response = await calendar.events.insert({
+      calendarId: form.default_calendar_id,
+      requestBody: event,
+    });
+
+    console.log("✓ Calendar event created:", response.data.id);
+    return response.data;
   } catch (error) {
     console.error("Error in createCalendarEventFromSubmission:", error);
     throw error;

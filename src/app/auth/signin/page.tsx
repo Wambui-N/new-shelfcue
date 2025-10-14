@@ -1,14 +1,14 @@
 "use client";
 
 import { Eye, EyeOff } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function SignInPage() {
+function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +16,6 @@ export default function SignInPage() {
   const [error, setError] = useState("");
 
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { signIn, signInWithGoogle } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -143,7 +142,7 @@ export default function SignInPage() {
         onClick={handleGoogleSignIn}
         disabled={isLoading}
       >
-        <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" aria-label="Google logo">
           <path
             fill="currentColor"
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -164,5 +163,13 @@ export default function SignInPage() {
         Single sign-on (SSO)
       </Button>
     </form>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="text-center">Loading...</div>}>
+      <SignInForm />
+    </Suspense>
   );
 }
