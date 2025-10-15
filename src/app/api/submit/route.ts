@@ -94,15 +94,15 @@ export async function POST(request: NextRequest) {
       (async () => {
         try {
           // Get form owner email
-          const { data: profile } = await supabaseAdmin
+          const { data: profile } = await (supabaseAdmin as any)
             .from("profiles")
             .select("email, full_name")
             .eq("id", (form as any).user_id)
             .single();
 
-          if (profile?.email) {
+          if ((profile as any)?.email) {
             await EmailService.sendFormSubmissionNotification(
-              profile.email,
+              (profile as any).email,
               {
                 formName: (form as any).title || "Untitled Form",
                 formId: formId,

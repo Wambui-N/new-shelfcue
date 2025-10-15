@@ -346,17 +346,17 @@ export default function BillingPage() {
 								</Button>
 							)}
 
-							{isActive && subscription?.paystack_email_token && (
-								<div className="mt-6 p-4 bg-muted rounded-lg">
-									<p className="text-sm text-muted-foreground mb-3">
-										Manage your subscription and payment method:
-									</p>
-									<Button variant="outline" asChild className="w-full">
-										<a
-											href={`https://paystack.com/subscription/manage/${subscription.paystack_email_token}`}
-											target="_blank"
-											rel="noopener noreferrer"
-										>
+						{isActive && (subscription as any)?.paystack_email_token && (
+							<div className="mt-6 p-4 bg-muted rounded-lg">
+								<p className="text-sm text-muted-foreground mb-3">
+									Manage your subscription and payment method:
+								</p>
+								<Button variant="outline" asChild className="w-full">
+									<a
+										href={`https://paystack.com/subscription/manage/${(subscription as any).paystack_email_token}`}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
 											Manage Subscription
 										</a>
 									</Button>

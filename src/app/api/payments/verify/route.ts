@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     if (!verification.status || verification.data.status !== "success") {
       // Update transaction as failed
-      await supabase
+      await (supabase as any)
         .from("payment_transactions")
         .update({
           status: "failed",
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     const txData = verification.data;
 
     // Get transaction metadata
-    const { data: transaction } = await supabase
+    const { data: transaction } = await (supabase as any)
       .from("payment_transactions")
       .select("*")
       .eq("paystack_reference", reference)
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
     }
 
 		// Update transaction record
-		await supabase
+		await (supabase as any)
 			.from("payment_transactions")
 			.update({
 				status: "success",
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
 			.eq("paystack_reference", reference);
 
 		// Store authorization details
-		await supabase.from("payment_authorizations").upsert(
+		await (supabase as any).from("payment_authorizations").upsert(
 			{
 				user_id: user.id,
 				paystack_authorization_code: txData.authorization.authorization_code,
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
 		);
 
 		// Get professional plan
-		const { data: plan } = await supabase
+		const { data: plan } = await (supabase as any)
 			.from("subscription_plans")
 			.select("*")
 			.eq("name", "professional")
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
 		const periodEnd = new Date(now);
 		periodEnd.setMonth(periodEnd.getMonth() + 1);
 
-		await supabase
+		await (supabase as any)
 			.from("user_subscriptions")
 			.upsert({
 				user_id: user.id,
@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
 
 		// Create invoice
 		const invoiceNumber = `INV-${Date.now()}-${user.id.substring(0, 8)}`;
-		await supabase.from("invoices").insert({
+		await (supabase as any).from("invoices").insert({
 			user_id: user.id,
 			invoice_number: invoiceNumber,
 			amount: txData.amount / 100, // Convert from cents to dollars
@@ -156,16 +156,16 @@ export async function GET(request: NextRequest) {
 		} as any);
 
 		// Update transaction with subscription ID
-		const { data: newSubscription } = await supabase
+		const { data: newSubscription } = await (supabase as any)
 			.from("user_subscriptions")
 			.select("id")
 			.eq("user_id", user.id)
 			.single();
 
 		if (newSubscription) {
-			await supabase
+			await (supabase as any)
 				.from("payment_transactions")
-				.update({ subscription_id: newSubscription.id })
+				.update({ subscription_id: (newSubscription as any).id })
 				.eq("paystack_reference", reference);
 		}
 

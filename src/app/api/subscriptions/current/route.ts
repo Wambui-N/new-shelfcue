@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get usage statistics for current period
-    const { data: usage } = await supabase
+    const { data: usage } = await (supabase as any)
       .from("usage_tracking")
       .select("*")
       .eq("user_id", user.id)
@@ -56,10 +56,10 @@ export async function GET(request: NextRequest) {
       subscription,
       usage: {
         forms_count: formsCount || 0,
-        submissions_count: usage?.submissions_count || 0,
-        storage_used_mb: usage?.storage_used_mb || 0,
-        period_start: usage?.period_start,
-        period_end: usage?.period_end,
+        submissions_count: (usage as any)?.submissions_count || 0,
+        storage_used_mb: (usage as any)?.storage_used_mb || 0,
+        period_start: (usage as any)?.period_start,
+        period_end: (usage as any)?.period_end,
       },
     });
   } catch (error) {

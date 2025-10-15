@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 			
 			// Find user by email
 			const { data: users } = await supabase.auth.admin.listUsers();
-			const user = users?.find(u => u.email === data.customer.email);
+			const user = (users as any)?.users?.find((u: any) => u.email === data.customer.email);
 
 			if (!user) {
 				console.error("User not found for email:", data.customer.email);
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 			}
 
 			// Get professional plan
-			const { data: plan } = await supabase
+			const { data: plan } = await (supabase as any)
 				.from("subscription_plans")
 				.select("*")
 				.eq("name", "professional")
@@ -63,11 +63,11 @@ export async function POST(request: NextRequest) {
 			const periodEnd = new Date(now);
 			periodEnd.setMonth(periodEnd.getMonth() + 1);
 
-			await supabase
+			await (supabase as any)
 				.from("user_subscriptions")
 				.upsert({
 					user_id: user.id,
-					plan_id: plan.id,
+					plan_id: (plan as any).id,
 					paystack_customer_code: data.customer.customer_code,
 					paystack_subscription_code: data.subscription_code,
 					paystack_email_token: data.email_token,
@@ -88,11 +88,11 @@ export async function POST(request: NextRequest) {
 			
 			// Find user by email
 			const { data: users } = await supabase.auth.admin.listUsers();
-			const user = users?.find(u => u.email === data.customer.email);
+			const user = (users as any)?.users?.find((u: any) => u.email === data.customer.email);
 
 			if (user) {
 				// Create transaction record
-				await supabase.from("payment_transactions").insert({
+				await (supabase as any).from("payment_transactions").insert({
 					user_id: user.id,
 					paystack_reference: data.reference,
 					amount: data.amount / 100, // Convert from kobo to naira
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
 				// Store authorization if reusable
 				if (data.authorization?.reusable) {
-					await supabase.from("payment_authorizations").upsert({
+					await (supabase as any).from("payment_authorizations").upsert({
 						user_id: user.id,
 						paystack_authorization_code: data.authorization.authorization_code,
 						paystack_customer_code: data.customer.customer_code,
