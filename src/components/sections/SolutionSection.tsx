@@ -9,14 +9,14 @@ export function SolutionSection() {
       icon: Wand2,
       title: "Create",
       description: "Build your perfect form in seconds",
-      color: "bg-dark-gray",
+      color: "bg-black",
       delay: 0,
     },
     {
       icon: Palette,
       title: "Customize",
       description: "Add your branding with one click",
-      color: "bg-light-gray",
+      color: "bg-black",
       delay: 0.2,
     },
     {
@@ -43,15 +43,15 @@ export function SolutionSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
-            Meet Your{" "}
-            <span className="text-dark-gray">
-              Unbreakable Lead Pipeline
-            </span>
-          </h2>
-          <p className="text-base md:text-lg text-foreground-muted max-w-2xl mx-auto">
-            3-Step Magic
-          </p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
+                Beautiful Forms That{" "}
+                <span className="text-dark-gray">
+                  Connect to Google Sheets
+                </span>
+              </h2>
+              <p className="text-base md:text-lg text-foreground-muted max-w-2xl mx-auto">
+                No Zapier. No coding. No hassle.
+              </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6">

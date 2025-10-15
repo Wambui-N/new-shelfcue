@@ -18,9 +18,21 @@ export default function WelcomePage() {
       return;
     }
 
-    // Check if Google is already connected
-    const checkGoogleConnection = async () => {
+    // Send welcome email and check Google connection
+    const initializeUser = async () => {
       try {
+        // Send welcome email (fire and forget - don't block user flow)
+        fetch("/api/auth/welcome-email", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: user.id }),
+        }).catch((error) => {
+          console.error("Failed to send welcome email:", error);
+        });
+
+        // Check if Google is already connected
         const { data } = await supabase
           .from("user_google_tokens")
           .select("id")
@@ -38,7 +50,7 @@ export default function WelcomePage() {
       }
     };
 
-    checkGoogleConnection();
+    initializeUser();
   }, [user, router]);
 
   const handleConnect = () => {

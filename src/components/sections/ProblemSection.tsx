@@ -5,11 +5,11 @@ import { X } from "lucide-react";
 
 export function ProblemSection() {
   const problems = [
-    "Complex setup that takes hours",
-    "Lost leads from form failures",
-    "Manual data entry wasting time",
-    "Mobile-unfriendly experiences",
-    "Forms that don't convert",
+    "Google Forms look unprofessional and hurt your brand",
+    "No way to make Google Forms match your website design",
+    "Can't embed Google Forms without ugly iframe borders",
+    "Google Forms don't work well on mobile devices",
+    "Manual data export from Google Forms wastes hours every week",
   ];
 
   const containerVariants = {
@@ -50,12 +50,12 @@ export function ProblemSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
-            Tired of Lead Capture{" "}
-            <span className="text-dark-gray">
-              Headaches?
-            </span>
-          </h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
+                Sick of Ugly{" "}
+                <span className="text-dark-gray">
+                  Google Forms?
+                </span>
+              </h2>
         </motion.div>
 
         <motion.div

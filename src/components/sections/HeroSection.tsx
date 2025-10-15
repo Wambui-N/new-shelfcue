@@ -24,43 +24,30 @@ export function HeroSection() {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as const,
       },
     },
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-background via-background to-background/50 pt-20">
-      {/* Subtle Background Elements */}
-      <div className="absolute inset-0 overflow-hidden opacity-40">
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"
-          animate={{
-            scale: [1.1, 1, 1.1],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-20">
+      {/* Background Video */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/bg.webm" type="video/webm" />
+        </video>
+        {/* Smooth gradient transition at bottom */}
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background via-background/80 to-transparent" />
       </div>
 
       <motion.div
-        className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 py-16 max-w-4xl"
+        className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 py-12 sm:py-16 max-w-4xl"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -68,57 +55,56 @@ export function HeroSection() {
         {/* Main Heading */}
         <motion.h1
           variants={itemVariants}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 leading-tight"
+          className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight mb-3 sm:mb-4 leading-tight px-2"
         >
-          <span className="block text-foreground">Never Lose</span>
+          <span className="block text-foreground">The Beautiful Form Builder</span>
           <span className="block text-dark-gray">
-            Another Lead
+            That Automatically Fills Your Google Sheets
           </span>
         </motion.h1>
 
         {/* Subtitle */}
         <motion.p
           variants={itemVariants}
-          className="text-base sm:text-lg md:text-xl text-foreground-muted mb-8 max-w-2xl mx-auto leading-relaxed"
+          className="text-sm sm:text-base md:text-lg lg:text-xl text-foreground-muted mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4"
         >
-          The effortless lead capture system that syncs to Google Sheets in 60
-          seconds.{" "}
+          Create branded, responsive forms that write directly into your Google Sheets.{" "}
           <span className="text-foreground font-medium">
-            No complex setup. No technical skills needed.
+            No Zapier. No hassle. No coding required.
           </span>
         </motion.p>
 
         {/* CTA Buttons */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8"
+          className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-6 sm:mb-8 px-4"
         >
           <Link href="/auth/signup">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                size="default"
-                className="group bg-black text-white hover:bg-dark-gray shadow-md hover:shadow-lg transition-all duration-300 text-sm px-6 py-3 rounded-lg font-medium"
-              >
-                <span className="mr-2">Start Your 14-Day Free Trial</span>
-                <motion.div
-                  className="inline-block"
-                  whileHover={{ x: 2 }}
-                  transition={{ duration: 0.2 }}
+                <Button
+                    size="default"
+                    className="group bg-black text-white hover:bg-dark-gray shadow-md hover:shadow-lg transition-all duration-300 text-sm sm:text-base px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-medium w-full sm:w-auto"
                 >
+                    <span className="mr-2">Build Your First Form in Minutes</span>
+              <motion.div
+                className="inline-block"
+                  whileHover={{ x: 2 }}
+                transition={{ duration: 0.2 }}
+              >
                   <ArrowRight className="w-4 h-4" />
-                </motion.div>
-              </Button>
+              </motion.div>
+            </Button>
             </motion.div>
           </Link>
-          <motion.button
-            onClick={() => {
-              const demoSection = document.querySelector("#demo");
-              demoSection?.scrollIntoView({ behavior: "smooth" });
-            }}
-            className="inline-flex items-center gap-2 text-foreground-muted hover:text-foreground transition-colors duration-300 text-sm font-medium group px-4 py-2"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
+              <motion.button
+                onClick={() => {
+                  const demoSection = document.querySelector("#demo");
+                  demoSection?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="inline-flex items-center gap-2 text-foreground-muted hover:text-foreground transition-colors duration-300 text-sm font-medium group px-4 py-2 w-full sm:w-auto justify-center sm:justify-start"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
             <motion.div
               className="w-8 h-8 rounded-full bg-light-gray/50 flex items-center justify-center group-hover:bg-light-gray transition-colors"
               whileHover={{ scale: 1.1 }}
@@ -129,46 +115,21 @@ export function HeroSection() {
           </motion.button>
         </motion.div>
 
-        {/* Social Proof */}
-        <motion.p
-          variants={itemVariants}
-          className="text-xs sm:text-sm text-foreground-muted max-w-xl mx-auto"
-        >
-          Trusted by{" "}
-          <span className="font-semibold text-foreground">
-            1,000+ founders, coaches, and consultants
-          </span>{" "}
-          to capture{" "}
-          <span className="font-semibold text-foreground">50,000+ leads</span>
-        </motion.p>
+            {/* Social Proof */}
+            <motion.p
+              variants={itemVariants}
+              className="text-xs sm:text-sm text-foreground-muted max-w-xl mx-auto px-4"
+            >
+              The perfect{" "}
+              <span className="font-semibold text-foreground">
+                Google Forms alternative
+              </span>{" "}
+              for{" "}
+              <span className="font-semibold text-foreground">small businesses</span>{" "}
+              who want beautiful, branded forms
+            </motion.p>
       </motion.div>
 
-      {/* Scroll Indicator */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-        animate={{
-          y: [0, 8, 0],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      >
-        <div className="w-6 h-10 border-2 border-foreground-light rounded-full flex justify-center">
-          <motion.div
-            className="w-1 h-3 bg-foreground-light rounded-full mt-2"
-            animate={{
-              y: [0, 12, 0],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        </div>
-      </motion.div>
     </section>
   );
 }

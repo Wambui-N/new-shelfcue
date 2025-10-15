@@ -1,22 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  Monitor,
-  Pause,
-  Play,
-  RotateCcw,
-  Smartphone,
-  Tablet,
-} from "lucide-react";
+import { Pause, Play, RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function DemoSection() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const [deviceType, setDeviceType] = useState<"mobile" | "tablet" | "desktop">(
-    "desktop",
-  );
 
   const demoSteps = [
     {
@@ -50,33 +40,28 @@ export function DemoSection() {
     }
   }, [isPlaying]);
 
-  const deviceSizes = {
-    mobile: { width: 375, height: 667, icon: Smartphone },
-    tablet: { width: 768, height: 1024, icon: Tablet },
-    desktop: { width: 1200, height: 800, icon: Monitor },
-  };
-
   return (
-    <section id="demo" className="py-20 px-4 sm:px-6 lg:px-8 bg-background">
+    <section id="demo" className="py-16 px-4 sm:px-6 lg:px-8 bg-background">
       <div className="container mx-auto max-w-7xl">
+        {/* Section Intro */}
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-12 lg:hidden"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
           <motion.h2
-            className="text-3xl md:text-5xl font-bold text-foreground mb-6"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            See It In Action
+            See It In <span className="text-dark-gray">Action</span>
           </motion.h2>
           <motion.p
-            className="text-xl text-muted-foreground max-w-3xl mx-auto"
+            className="text-base md:text-lg text-foreground-muted max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -87,62 +72,161 @@ export function DemoSection() {
           </motion.p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Demo Controls */}
+        <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-center min-h-[60vh] lg:min-h-[80vh]">
+          {/* Left Side - Demo Preview (Takes up more than half width) */}
           <motion.div
-            className="space-y-8"
+            className="lg:col-span-7 relative lg:sticky lg:top-0 lg:h-screen lg:flex lg:items-center lg:justify-center mb-8 lg:mb-0"
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            {/* Device Selector */}
-            <div className="flex justify-center gap-4">
-              {Object.entries(deviceSizes).map(([key, device]) => {
-                const Icon = device.icon;
-                return (
-                  <motion.button
-                    key={key}
-                    onClick={() => setDeviceType(key as any)}
-                    className={`p-3 rounded-xl border-2 transition-all duration-300 ${
-                      deviceType === key
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon className="w-6 h-6" />
-                  </motion.button>
-                );
-              })}
-            </div>
+            {/* Laptop Frame */}
+            <motion.div
+              className="relative mx-auto bg-dark-gray rounded-xl lg:rounded-2xl p-2 lg:p-3 shadow-2xl border-2 border-light-gray w-full max-w-4xl"
+            >
+              {/* Browser Header */}
+              <div className="flex items-center gap-2 mb-2 lg:mb-3 pb-2 border-b border-light-gray/50">
+                <div className="flex gap-1.5">
+                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-light-gray"></div>
+                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-light-gray"></div>
+                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-light-gray"></div>
+                </div>
+                <div className="flex-1 bg-background rounded-md px-2 lg:px-3 py-1 lg:py-1.5 text-xs text-foreground-muted">
+                  shelfcue.com/demo
+                </div>
+              </div>
 
-            {/* Demo Steps */}
-            <div className="space-y-4">
+              {/* Demo Content */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentStep}
+                  className="h-[300px] sm:h-[400px] lg:h-[600px] flex flex-col items-center justify-center text-center p-4 sm:p-6 lg:p-8 bg-background/95"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <motion.div
+                    className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-light-gray/30 rounded-xl lg:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 lg:mb-8 text-black"
+                    animate={{
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                    }}
+                  >
+                    <span className="text-2xl sm:text-3xl lg:text-4xl">
+                      {currentStep === 0 && "📝"}
+                      {currentStep === 1 && "📋"}
+                      {currentStep === 2 && "🎨"}
+                      {currentStep === 3 && "🚀"}
+                    </span>
+                  </motion.div>
+
+                  <motion.h3
+                    className="text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground mb-2 sm:mb-3 lg:mb-4"
+                    animate={{ opacity: [0.8, 1, 0.8] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {demoSteps[currentStep].title}
+                  </motion.h3>
+
+                  <motion.p className="text-foreground-muted text-sm sm:text-base leading-relaxed mb-4 sm:mb-6 lg:mb-8 max-w-lg px-4">
+                    {demoSteps[currentStep].description}
+                  </motion.p>
+
+                  <motion.div
+                    className="w-full max-w-lg bg-white rounded-lg p-4 sm:p-6 lg:p-8 border border-light-gray shadow-sm mx-4"
+                    animate={{
+                      boxShadow: [
+                        "0 2px 8px rgba(0,0,0,0.05)",
+                        "0 4px 16px rgba(0,0,0,0.1)",
+                        "0 2px 8px rgba(0,0,0,0.05)",
+                      ],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                    }}
+                  >
+                    <div className="text-left space-y-4">
+                      <div className="h-3 bg-light-gray rounded animate-pulse"></div>
+                      <div className="h-3 bg-light-gray rounded w-3/4 animate-pulse"></div>
+                      <div className="h-12 bg-light-gray/50 rounded"></div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              </AnimatePresence>
+            </motion.div>
+            </motion.div>
+
+          {/* Right Side - Descriptions & Controls */}
+          <motion.div
+            className="lg:col-span-5 space-y-8 lg:pl-8"
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            {/* Section Intro - Desktop Only */}
+            <motion.div
+              className="hidden lg:block"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <motion.h2
+                className="text-2xl sm:text-3xl font-bold text-foreground mb-4"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
+                See It In <span className="text-dark-gray">Action</span>
+              </motion.h2>
+              <motion.p
+                className="text-sm text-foreground-muted"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              >
+                Watch how easy it is to create professional lead capture forms that
+                convert.
+              </motion.p>
+            </motion.div>
+
+            {/* Demo Steps - Descriptive Areas */}
+            <motion.div
+              className="space-y-3"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
               {demoSteps.map((step, index) => (
                 <motion.div
                   key={index}
-                  className={`p-6 rounded-2xl border-2 transition-all duration-500 ${
+                  className={`p-3 rounded-lg border-2 transition-all duration-500 ${
                     currentStep === index
-                      ? "border-primary bg-primary/5 shadow-lg"
-                      : "border-border hover:border-primary/30"
+                      ? "border-black bg-light-gray/20 shadow-md"
+                      : "border-light-gray hover:border-dark-gray"
                   }`}
-                  animate={{
+              animate={{
                     scale: currentStep === index ? 1.02 : 1,
-                    backgroundColor:
-                      currentStep === index
-                        ? "rgba(20, 20, 25, 0.05)"
-                        : "transparent",
                   }}
                   transition={{ duration: 0.3 }}
+                  whileHover={{ x: 4 }}
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3">
                     <motion.div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                      className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                         currentStep === index
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground"
+                          ? "bg-black text-white"
+                          : "bg-light-gray text-dark-gray"
                       }`}
                       animate={{
                         backgroundColor:
@@ -154,189 +238,56 @@ export function DemoSection() {
                     </motion.div>
                     <div className="flex-1">
                       <h3
-                        className={`font-semibold mb-2 transition-colors duration-300 ${
+                        className={`font-semibold mb-1 text-xs transition-colors duration-300 ${
                           currentStep === index
                             ? "text-foreground"
-                            : "text-muted-foreground"
+                            : "text-foreground-muted"
                         }`}
                       >
                         {step.title}
                       </h3>
-                      <p className="text-muted-foreground text-sm leading-relaxed">
+                      <p className="text-foreground-muted text-xs leading-relaxed">
                         {step.description}
                       </p>
                     </div>
                   </div>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
 
-            {/* Controls */}
-            <div className="flex justify-center gap-4">
-              <motion.button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {isPlaying ? (
-                  <Pause className="w-4 h-4" />
-                ) : (
-                  <Play className="w-4 h-4" />
-                )}
-                {isPlaying ? "Pause" : "Play Demo"}
-              </motion.button>
-              <motion.button
-                onClick={() => {
-                  setCurrentStep(0);
-                  setIsPlaying(false);
-                }}
-                className="flex items-center gap-2 px-6 py-3 border border-border text-muted-foreground rounded-full hover:bg-accent hover:text-accent-foreground transition-all duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <RotateCcw className="w-4 h-4" />
-                Reset
-              </motion.button>
-            </div>
-          </motion.div>
-
-          {/* Demo Preview */}
-          <motion.div
-            className="relative"
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            {/* Device Frame */}
-            <motion.div
-              className={`relative mx-auto bg-muted rounded-3xl p-4 shadow-2xl border border-border`}
-              style={{
-                width: deviceSizes[deviceType].width,
-                height: deviceSizes[deviceType].height,
-              }}
-              animate={{
-                scale:
-                  deviceType === "desktop"
-                    ? 0.8
-                    : deviceType === "tablet"
-                      ? 0.9
-                      : 1,
-              }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Browser Header */}
-              <div className="flex items-center gap-2 mb-4 pb-2 border-b border-border">
-                <div className="flex gap-1">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                </div>
-                <div className="flex-1 bg-background rounded-md px-3 py-1 text-xs text-muted-foreground">
-                  shelfcue.com/demo
-                </div>
-              </div>
-
-              {/* Demo Content */}
-              <AnimatePresence mode="wait">
+                {/* Controls */}
                 <motion.div
-                  key={currentStep}
-                  className="h-full flex flex-col items-center justify-center text-center p-6"
+                  className="flex flex-col sm:flex-row justify-center lg:justify-start gap-2"
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
                 >
-                  <motion.div
-                    className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-6 text-primary"
-                    animate={{
-                      scale: [1, 1.1, 1],
-                      rotate: [0, 5, -5, 0],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                    }}
+                  <motion.button
+                    onClick={() => setIsPlaying(!isPlaying)}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-dark-gray transition-colors duration-300 text-xs sm:text-sm font-medium w-full sm:w-auto"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    <motion.div
-                      animate={{
-                        scale: [1, 1.2, 1],
-                      }}
-                      transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      }}
-                    >
-                      {(demoSteps[currentStep] as any).icon || "📝"}
-                    </motion.div>
-                  </motion.div>
-
-                  <motion.h3
-                    className="text-xl font-semibold text-foreground mb-3"
-                    animate={{ opacity: [0.7, 1, 0.7] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    {demoSteps[currentStep].title}
-                  </motion.h3>
-
-                  <motion.p className="text-muted-foreground text-sm leading-relaxed mb-6">
-                    {demoSteps[currentStep].description}
-                  </motion.p>
-
-                  <motion.div
-                    className="w-full max-w-sm bg-background rounded-xl p-4 border border-border shadow-sm"
-                    animate={{
-                      boxShadow: [
-                        "0 2px 8px rgba(0,0,0,0.1)",
-                        "0 4px 16px rgba(0,0,0,0.15)",
-                        "0 2px 8px rgba(0,0,0,0.1)",
-                      ],
+                    {isPlaying ? (
+                      <Pause className="w-3 h-3 sm:w-4 sm:h-4" />
+                    ) : (
+                      <Play className="w-3 h-3 sm:w-4 sm:h-4" />
+                    )}
+                    {isPlaying ? "Pause" : "Play Demo"}
+                  </motion.button>
+                  <motion.button
+                    onClick={() => {
+                      setCurrentStep(0);
+                      setIsPlaying(false);
                     }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                    }}
+                    className="flex items-center justify-center gap-2 px-4 py-2 border border-light-gray text-foreground-muted rounded-lg hover:bg-light-gray/30 transition-all duration-300 text-xs sm:text-sm font-medium w-full sm:w-auto"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    <div className="text-left space-y-3">
-                      <div className="h-3 bg-muted rounded animate-pulse"></div>
-                      <div className="h-3 bg-muted rounded w-3/4 animate-pulse"></div>
-                      <div className="h-10 bg-primary/20 rounded"></div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              </AnimatePresence>
-            </motion.div>
-
-            {/* Floating Elements */}
-            <motion.div
-              className="absolute -top-4 -right-4 w-8 h-8 bg-accent rounded-full flex items-center justify-center"
-              animate={{
-                y: [0, -10, 0],
-                rotate: [0, 180, 360],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            >
-              <span className="text-xs">✨</span>
-            </motion.div>
-
-            <motion.div
-              className="absolute -bottom-4 -left-4 w-6 h-6 bg-primary rounded-full flex items-center justify-center"
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.5, 1, 0.5],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            >
-              <span className="text-xs text-primary-foreground">⚡</span>
+                    <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
+                    Reset
+                  </motion.button>
             </motion.div>
           </motion.div>
         </div>

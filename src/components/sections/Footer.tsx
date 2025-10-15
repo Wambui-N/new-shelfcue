@@ -12,45 +12,16 @@ export function Footer() {
       { name: "Pricing", href: "#pricing" },
       { name: "FAQ", href: "#faq" },
     ],
-    company: [
-      { name: "About", href: "/about" },
-      { name: "Blog", href: "/blog" },
-      { name: "Careers", href: "/careers" },
-      { name: "Contact", href: "/contact" },
-    ],
-    resources: [
-      { name: "Documentation", href: "/docs" },
-      { name: "Help Center", href: "/help" },
-      { name: "Community", href: "/community" },
-      { name: "Status", href: "/status" },
-    ],
     legal: [
       { name: "Privacy Policy", href: "/privacy" },
       { name: "Terms of Service", href: "/terms" },
-      { name: "Cookie Policy", href: "/cookies" },
-      { name: "Security", href: "/security" },
     ],
   };
 
   const socialLinks = [
     {
-      name: "Twitter",
-      href: "https://twitter.com/shelfcue",
-      icon: <Twitter className="w-5 h-5" />,
-    },
-    {
-      name: "LinkedIn",
-      href: "https://linkedin.com/company/shelfcue",
-      icon: <Linkedin className="w-5 h-5" />,
-    },
-    {
-      name: "GitHub",
-      href: "https://github.com/shelfcue",
-      icon: <Github className="w-5 h-5" />,
-    },
-    {
       name: "Email",
-      href: "mailto:hello@shelfcue.com",
+      href: "mailto:wambui@mewithmake.com",
       icon: <Mail className="w-5 h-5" />,
     },
   ];
@@ -105,7 +76,7 @@ export function Footer() {
         whileInView="visible"
         viewport={{ once: true }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Company Info */}
           <motion.div className="lg:col-span-2" variants={itemVariants}>
             <motion.div
@@ -183,51 +154,6 @@ export function Footer() {
             </ul>
           </motion.div>
 
-          {/* Company Links */}
-          <motion.div variants={itemVariants}>
-            <h3 className="font-semibold text-foreground mb-4">Company</h3>
-            <ul className="space-y-3">
-              {footerLinks.company.map((link, index) => (
-                <motion.li
-                  key={link.name}
-                  initial={{ opacity: 0, x: -10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.3 }}
-                >
-                  <Link
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors duration-300 text-sm"
-                  >
-                    {link.name}
-                  </Link>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Resources Links */}
-          <motion.div variants={itemVariants}>
-            <h3 className="font-semibold text-foreground mb-4">Resources</h3>
-            <ul className="space-y-3">
-              {footerLinks.resources.map((link, index) => (
-                <motion.li
-                  key={link.name}
-                  initial={{ opacity: 0, x: -10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.3 }}
-                >
-                  <Link
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors duration-300 text-sm"
-                  >
-                    {link.name}
-                  </Link>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
 
           {/* Legal Links */}
           <motion.div variants={itemVariants}>
@@ -259,20 +185,17 @@ export function Footer() {
           variants={itemVariants}
         >
           <div className="flex items-center gap-2 text-muted-foreground text-sm mb-4 md:mb-0">
-            <span>© 2024 ShelfCue. Made with</span>
-            <motion.div
-              animate={{
-                scale: [1, 1.3, 1],
-                rotate: [0, 10, -10, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-              }}
+            <span>© 2025 ShelfCue. Made by</span>
+            <motion.a
+              href="https://www.madewithmake.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <Heart className="w-4 h-4 text-red-500 fill-current" />
-            </motion.div>
-            <span>in San Francisco</span>
+              Made with Make
+            </motion.a>
           </div>
 
           <motion.button

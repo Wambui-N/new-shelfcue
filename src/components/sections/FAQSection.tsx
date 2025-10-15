@@ -18,41 +18,51 @@ export function FAQSection() {
     {
       category: "Setup & Getting Started",
       icon: <Zap className="w-6 h-6" />,
-      color: "text-yellow-500",
+      color: "text-black",
       questions: [
         {
-          question: "How long does setup really take?",
+          question: "How is this different from Google Forms?",
           answer:
-            "Most users have their first form live in under 2 minutes. Our intuitive builder and streamlined process means you can start capturing leads almost instantly—no complex configuration needed.",
+            "ShelfCue creates beautiful, branded forms that match your website design. Unlike Google Forms, you can customize colors, add your logo, and embed forms without ugly borders. Plus, data flows directly into Google Sheets without any setup.",
         },
         {
-          question: "Do I need a website?",
+          question: "Do I need Zapier or coding skills?",
           answer:
-            "No! Every form gets a beautiful standalone page and QR code. You can share your form link anywhere—social media, email, or print the QR code. No website required.",
+            "No! ShelfCue connects directly to Google Sheets with one click. No Zapier needed. No coding required. Everything works automatically once you connect your Google account.",
         },
       ],
     },
     {
-      category: "Reliability & Support",
+      category: "Google Sheets Integration",
       icon: <Shield className="w-6 h-6" />,
-      color: "text-blue-500",
+      color: "text-dark-gray",
       questions: [
         {
-          question: "What if the Google Sheets sync breaks?",
+          question: "How does the Google Sheets connection work?",
           answer:
-            "That's what our \"Never Lose a Lead\" guarantee is for! We temporarily store all submissions as backup. If the sync fails for any reason, your leads are safe and will be synced automatically once the connection is restored.",
+            "Simply connect your Google account once. Every form submission automatically appears in your Google Sheets spreadsheet. You can choose which sheet and columns to use. It's that simple.",
+        },
+        {
+          question: "Can I use existing Google Sheets?",
+          answer:
+            "Yes! You can connect to any existing Google Sheets spreadsheet. Choose which columns to use, and form data will flow right into your existing workflow.",
         },
       ],
     },
     {
-      category: "Billing & Cancellation",
+      category: "Form Building & Customization",
       icon: <CreditCard className="w-6 h-6" />,
-      color: "text-green-500",
+      color: "text-black",
       questions: [
         {
-          question: "Can I cancel anytime?",
+          question: "Can I make forms that match my brand?",
           answer:
-            "Yes, no lock-in. You can cancel anytime with one click. You'll still have access until the end of your billing period, and you can export all your data instantly.",
+            "Absolutely! Add your logo, choose your brand colors, and customize fonts. Make forms that look like they belong on your website, not generic Google Forms.",
+        },
+        {
+          question: "Do the forms work on mobile devices?",
+          answer:
+            "Yes! All ShelfCue forms are mobile-responsive and work perfectly on phones, tablets, and computers. Your forms will look great and work smoothly on any device.",
         },
       ],
     },
@@ -91,10 +101,31 @@ export function FAQSection() {
   };
 
   return (
-    <section
-      id="faq"
-      className="py-16 px-4 sm:px-6 lg:px-8 bg-background-secondary relative overflow-hidden"
-    >
+    <>
+      {/* FAQ Schema Markup */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": faqs.flatMap(category => 
+              category.questions.map(faq => ({
+                "@type": "Question",
+                "name": faq.question,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": faq.answer
+                }
+              }))
+            )
+          })
+        }}
+      />
+      <section
+        id="faq"
+        className="py-16 px-4 sm:px-6 lg:px-8 bg-background-secondary relative overflow-hidden"
+      >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <motion.div
@@ -125,7 +156,7 @@ export function FAQSection() {
           transition={{ duration: 0.8 }}
         >
           <motion.div
-            className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium mb-6 border border-primary/20"
+            className="inline-flex items-center gap-2 px-3 py-1 bg-light-gray/30 text-black rounded-full text-xs font-medium mb-6 border border-light-gray"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.2 }}
           >
@@ -135,12 +166,12 @@ export function FAQSection() {
 
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
             Questions?{" "}
-            <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+            <span className="text-dark-gray">
               We Have Answers.
             </span>
           </h2>
 
-          <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-foreground-muted max-w-3xl mx-auto leading-relaxed">
             Everything you need to know about Shelfcue.
           </p>
         </motion.div>
@@ -158,7 +189,7 @@ export function FAQSection() {
                 transition={{ duration: 0.2 }}
               >
                 <motion.div
-                  className={`p-2 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 ${category.color}`}
+                  className={`p-2 rounded-lg bg-light-gray/30 ${category.color}`}
                   animate={{
                     rotate: [0, 3, -3, 0],
                     scale: [1, 1.02, 1],
@@ -256,7 +287,7 @@ export function FAQSection() {
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           <motion.div
-            className="inline-flex flex-col sm:flex-row items-center gap-3 px-6 py-3 bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20"
+            className="inline-flex flex-col sm:flex-row items-center gap-3 px-6 py-3 bg-light-gray/30 rounded-xl border border-light-gray"
             whileHover={{ scale: 1.02, y: -1 }}
             transition={{ duration: 0.2 }}
           >
@@ -264,12 +295,12 @@ export function FAQSection() {
               <p className="text-foreground font-medium text-sm mb-1">
                 Still have questions?
               </p>
-              <p className="text-muted-foreground text-xs">
+              <p className="text-foreground-muted text-xs">
                 Our support team is here to help
               </p>
             </div>
             <motion.button
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors duration-300"
+              className="px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-dark-gray transition-colors duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -278,6 +309,7 @@ export function FAQSection() {
           </motion.div>
         </motion.div>
       </motion.div>
-    </section>
+        </section>
+    </>
   );
 }

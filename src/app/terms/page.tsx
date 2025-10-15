@@ -35,7 +35,7 @@ export default function TermsAndConditions() {
             <h2 className="text-2xl font-bold text-foreground mb-6">3. Service Description</h2>
             <p className="text-foreground-muted mb-4">Shelfcue provides lead capture forms that sync to Google Sheets. We offer:</p>
             <ul className="list-disc pl-6 text-foreground-muted space-y-2">
-              <li>14-day free trial (no credit card required)</li>
+              <li>14-day free trial</li>
               <li>Subscription plans after trial period</li>
               <li>"Unbreakable Pipeline" guarantee (best-effort lead backup)</li>
             </ul>

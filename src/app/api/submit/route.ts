@@ -4,6 +4,7 @@ import { createCalendarEventFromSubmission } from "@/lib/googleCalendar";
 import { GoogleSheetsService } from "@/lib/googleSheets";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { incrementUsage, canPerformAction } from "@/lib/subscriptionLimits";
+import { EmailService } from "@/lib/resend";
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
       .from("forms")
       .select(`
         id, 
+        title,
         status, 
         user_id, 
         fields,
@@ -88,6 +90,35 @@ export async function POST(request: NextRequest) {
 
     // Background tasks (don't block response)
     Promise.all([
+      // Send email notification to form owner
+      (async () => {
+        try {
+          // Get form owner email
+          const { data: profile } = await supabaseAdmin
+            .from("profiles")
+            .select("email, full_name")
+            .eq("id", (form as any).user_id)
+            .single();
+
+          if (profile?.email) {
+            await EmailService.sendFormSubmissionNotification(
+              profile.email,
+              {
+                formName: (form as any).title || "Untitled Form",
+                formId: formId,
+                submissionId: (submission as any).id,
+                submittedAt: (submission as any).created_at,
+                submitterData: data,
+              },
+            );
+            console.log("✓ Sent email notification to form owner");
+          }
+        } catch (error) {
+          console.error("Error sending email notification:", error);
+          // Don't fail the submission if email fails
+        }
+      })(),
+
       // Sync to Google Sheets
       (async () => {
         try {

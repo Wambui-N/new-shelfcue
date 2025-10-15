@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 
 export function FinalCTASection() {
   const benefits = [
-    "No credit card required",
     "Cancel anytime",
     "5-minute setup",
   ];
@@ -53,7 +52,7 @@ export function FinalCTASection() {
 
           {/* Sub-headline */}
           <motion.p
-            className="text-base md:text-lg text-foreground-muted mb-8 max-w-2xl mx-auto leading-relaxed"
+            className="text-sm sm:text-base md:text-lg text-foreground-muted mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -66,7 +65,7 @@ export function FinalCTASection() {
 
           {/* CTA Button */}
           <motion.div
-            className="mb-8"
+            className="mb-6 sm:mb-8 px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -76,7 +75,7 @@ export function FinalCTASection() {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   size="default"
-                  className="group bg-black text-white hover:bg-dark-gray hover:shadow-xl transition-all duration-300 text-base px-8 py-4 rounded-lg font-semibold"
+                  className="group bg-black text-white hover:bg-dark-gray hover:shadow-xl transition-all duration-300 text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold w-full sm:w-auto"
                 >
                   <span className="mr-2">Start My 14-Day Free Trial</span>
                   <motion.div
@@ -122,34 +121,35 @@ export function FinalCTASection() {
           </motion.div>
         </motion.div>
 
-        {/* Stats Banner */}
+        {/* Key Benefits */}
         <motion.div
-          className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto"
+          className="mt-12 flex flex-wrap items-center justify-center gap-6 text-center"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.7 }}
         >
-          {[
-            { value: "1,000+", label: "Happy Founders" },
-            { value: "50,000+", label: "Leads Captured" },
-            { value: "< 2min", label: "Average Setup" },
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              className="text-center p-4 rounded-lg bg-card/50 backdrop-blur-sm border border-border hover:border-primary/30 transition-all duration-300"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
-              whileHover={{ y: -2, scale: 1.02 }}
-            >
-              <p className="text-2xl font-bold text-foreground mb-1">
-                {stat.value}
-              </p>
-              <p className="text-xs text-foreground-muted">{stat.label}</p>
-            </motion.div>
-          ))}
+          <motion.div
+            className="flex items-center gap-2 px-4 py-2 bg-light-gray/20 rounded-lg border border-light-gray"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="w-2 h-2 bg-black rounded-full"></div>
+            <span className="text-sm font-semibold text-foreground">
+              Setup in under 2 minutes
+            </span>
+          </motion.div>
+          
+          <motion.div
+            className="flex items-center gap-2 px-4 py-2 bg-light-gray/20 rounded-lg border border-light-gray"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="w-2 h-2 bg-black rounded-full"></div>
+            <span className="text-sm font-semibold text-foreground">
+              Works automatically in the background
+            </span>
+          </motion.div>
         </motion.div>
       </motion.div>
     </section>

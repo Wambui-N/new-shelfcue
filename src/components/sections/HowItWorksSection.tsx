@@ -12,7 +12,7 @@ export function HowItWorksSection() {
       title: "Create Your Form",
       description:
         "Drag and drop fields to build exactly what you need. Start from scratch or use our intuitive builder.",
-      color: "from-blue-600 to-cyan-600",
+      color: "bg-black",
     },
     {
       number: "02",
@@ -20,7 +20,7 @@ export function HowItWorksSection() {
       title: "Customize Your Style",
       description:
         "Add your logo, choose colors, and make it yours. No design experience required.",
-      color: "from-purple-600 to-pink-600",
+      color: "bg-black",
     },
     {
       number: "03",
@@ -28,7 +28,7 @@ export function HowItWorksSection() {
       title: "Share & Capture",
       description:
         "Get your unique link, QR code, or embed code. Start capturing leads immediately.",
-      color: "from-orange-600 to-red-600",
+      color: "bg-black",
     },
   ];
 
@@ -49,7 +49,7 @@ export function HowItWorksSection() {
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
             Simple Form Building,{" "}
-            <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+            <span className="text-dark-gray">
               Powerful Results
             </span>
           </h2>
@@ -57,7 +57,7 @@ export function HowItWorksSection() {
 
         <div className="relative">
           {/* Connection Line */}
-          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/20 to-transparent transform -translate-y-1/2" />
+          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-light-gray/30 transform -translate-y-1/2" />
 
           <div className="grid md:grid-cols-3 gap-6 relative">
             {steps.map((step, index) => (
@@ -74,12 +74,12 @@ export function HowItWorksSection() {
                 whileHover={{ y: -8 }}
                 className="relative"
               >
-                <Card className="relative p-6 h-full border-2 border-border hover:border-primary/50 transition-all duration-500 group hover:shadow-xl bg-card/50 backdrop-blur-sm">
+                <Card className="relative p-6 h-full border-2 border-border hover:border-light-gray transition-all duration-500 group hover:shadow-xl bg-card/50 backdrop-blur-sm">
                   {/* Step Number Background */}
                   <motion.div
-                    className={`absolute -top-4 left-6 text-6xl font-bold bg-gradient-to-br ${step.color} bg-clip-text text-transparent opacity-10 select-none`}
+                    className="absolute -top-4 left-6 text-6xl font-bold text-light-gray/20 select-none"
                     initial={{ scale: 0.8, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 0.1 }}
+                    whileInView={{ scale: 1, opacity: 0.2 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: index * 0.2 + 0.2 }}
                   >
@@ -89,7 +89,7 @@ export function HowItWorksSection() {
                   <div className="relative z-10">
                     {/* Icon */}
                     <motion.div
-                      className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-4 shadow-md group-hover:scale-105 transition-transform duration-500`}
+                      className={`w-12 h-12 rounded-xl ${step.color} flex items-center justify-center mb-4 shadow-md group-hover:scale-105 transition-transform duration-500`}
                       whileHover={{
                         rotate: [0, -5, 5, -5, 0],
                         scale: 1.1,
@@ -101,26 +101,26 @@ export function HowItWorksSection() {
 
                     {/* Step Number Label */}
                     <motion.div
-                      className="inline-block px-2 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full mb-3"
+                      className="inline-block px-2 py-1 bg-light-gray/30 text-black text-xs font-semibold rounded-full mb-3"
                       whileHover={{ scale: 1.05 }}
                     >
                       Step {index + 1}
                     </motion.div>
 
                     {/* Title */}
-                    <h3 className="text-lg font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-300">
+                    <h3 className="text-lg font-bold text-foreground mb-3 group-hover:text-dark-gray transition-colors duration-300">
                       {step.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-sm text-muted-foreground leading-relaxed group-hover:text-foreground/80 transition-colors duration-300">
+                    <p className="text-sm text-foreground-muted leading-relaxed group-hover:text-foreground/80 transition-colors duration-300">
                       {step.description}
                     </p>
                   </div>
 
                   {/* Decorative Corner */}
                   <motion.div
-                    className={`absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl ${step.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-tl-full`}
+                    className="absolute bottom-0 right-0 w-16 h-16 bg-light-gray/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-tl-full"
                     initial={false}
                   />
                 </Card>
@@ -134,9 +134,9 @@ export function HowItWorksSection() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: index * 0.2 + 0.4 }}
                   >
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center backdrop-blur-sm">
+                    <div className="w-8 h-8 rounded-full bg-light-gray/50 flex items-center justify-center backdrop-blur-sm">
                       <svg
-                        className="w-4 h-4 text-primary"
+                        className="w-4 h-4 text-black"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"

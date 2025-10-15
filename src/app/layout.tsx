@@ -61,9 +61,66 @@ const satoshi = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "ShelfCue - Effortless Lead Capture",
+  title: "ShelfCue - Beautiful Google Sheets Form Builder | The Best Google Forms Alternative",
   description:
-    "The effortless lead capture system for founders who hate complex tech. Built for scale, designed for simplicity.",
+    "Create branded, responsive forms that connect directly to Google Sheets. No Zapier needed. The perfect Google Forms alternative for small businesses. Custom form builder with file uploads, mobile-first design, and automatic Google Sheets sync.",
+  keywords: [
+    "google forms alternative",
+    "form builder for google sheets", 
+    "customizable form builder",
+    "embed google form on website",
+    "contact form for small business",
+    "no-code form builder",
+    "responsive form builder",
+    "file upload form google drive",
+    "form to google sheets",
+    "custom google forms"
+  ],
+  authors: [{ name: "ShelfCue Team" }],
+  creator: "ShelfCue",
+  publisher: "ShelfCue",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://shelfcue.com'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: "ShelfCue - Beautiful Google Sheets Form Builder",
+    description: "Create branded, responsive forms that connect directly to Google Sheets. No Zapier needed. The perfect Google Forms alternative for small businesses.",
+    url: 'https://shelfcue.com',
+    siteName: 'ShelfCue',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'ShelfCue - Beautiful Google Sheets Form Builder',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ShelfCue - Beautiful Google Sheets Form Builder',
+    description: 'Create branded, responsive forms that connect directly to Google Sheets. No Zapier needed.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -80,6 +137,44 @@ export default function RootLayout({
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
+        />
+        {/* Favicon and app icons */}
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+        
+        {/* Schema.org structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": "ShelfCue",
+              "description": "Beautiful Google Sheets form builder. Create branded, responsive forms that connect directly to Google Sheets without Zapier.",
+              "url": "https://shelfcue.com",
+              "applicationCategory": "BusinessApplication",
+              "operatingSystem": "Web",
+              "offers": {
+                "@type": "Offer",
+                "price": "29",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock"
+              },
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.9",
+                "ratingCount": "1000"
+              },
+              "creator": {
+                "@type": "Organization",
+                "name": "Made with Make",
+                "url": "https://madewithmake.com"
+              }
+            })
+          }}
         />
       </head>
       <body

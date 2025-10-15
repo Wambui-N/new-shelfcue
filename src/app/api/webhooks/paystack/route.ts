@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyWebhookSignature } from "@/lib/paystack";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { EmailService } from "@/lib/resend";
 
 /**
  * Paystack Webhook Handler
@@ -117,6 +118,29 @@ export async function POST(request: NextRequest) {
           })
           .eq("user_id", userId);
 
+        // Send confirmation email
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("email, full_name")
+          .eq("id", userId)
+          .single();
+
+        const { data: subscription } = await supabase
+          .from("user_subscriptions")
+          .select("plan:subscription_plans(*)")
+          .eq("user_id", userId)
+          .single();
+
+        if (profile?.email && subscription) {
+          const plan = (subscription as any).plan;
+          await EmailService.sendSubscriptionConfirmation(profile.email, {
+            userName: profile.full_name || "there",
+            planName: plan?.name || "Premium",
+            amount: `₦${(data.amount / 100).toLocaleString()}`,
+            billingCycle: plan?.billing_interval || "monthly",
+          });
+        }
+
         console.log(`✅ Subscription created for user ${userId}`);
         break;
       }
@@ -125,6 +149,18 @@ export async function POST(request: NextRequest) {
         // Subscription disabled/cancelled
         const data = event.data;
 
+        // Get subscription details before updating
+        const { data: subscriptionData } = await supabase
+          .from("user_subscriptions")
+          .select(`
+            user_id,
+            current_period_end,
+            profiles!user_subscriptions_user_id_fkey(email, full_name),
+            plan:subscription_plans(name)
+          `)
+          .eq("paystack_subscription_code", data.subscription_code)
+          .single();
+
         await supabase
           .from("user_subscriptions")
           .update({
@@ -132,6 +168,23 @@ export async function POST(request: NextRequest) {
             cancelled_at: new Date().toISOString(),
           })
           .eq("paystack_subscription_code", data.subscription_code);
+
+        // Send cancellation email
+        if (subscriptionData) {
+          const profile = (subscriptionData as any).profiles;
+          const plan = (subscriptionData as any).plan;
+          
+          if (profile?.email) {
+            await EmailService.sendSubscriptionCancelledNotification(
+              profile.email,
+              {
+                userName: profile.full_name || "there",
+                planName: plan?.name || "Premium",
+                endDate: (subscriptionData as any).current_period_end,
+              },
+            );
+          }
+        }
 
         console.log(`🚫 Subscription disabled: ${data.subscription_code}`);
         break;
@@ -174,17 +227,34 @@ export async function POST(request: NextRequest) {
           .single();
 
         // Create invoice record
+        const invoiceNumber = `INV-${data.id}`;
         await supabase.from("invoices").insert({
           user_id: userId,
           subscription_id: subscription?.id,
           paystack_invoice_code: data.invoice_code,
-          invoice_number: `INV-${data.id}`,
+          invoice_number: invoiceNumber,
           amount: data.amount / 100, // Convert from kobo to naira
           currency: data.currency,
           status: "pending",
           description: data.description,
           due_date: data.due_date,
         });
+
+        // Send invoice email
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("email, full_name")
+          .eq("id", userId)
+          .single();
+
+        if (profile?.email) {
+          await EmailService.sendInvoiceNotification(profile.email, {
+            userName: profile.full_name || "there",
+            invoiceNumber,
+            amount: `₦${(data.amount / 100).toLocaleString()}`,
+            dueDate: data.due_date,
+          });
+        }
 
         console.log(`📄 Invoice created for user ${userId}`);
         break;
@@ -210,6 +280,17 @@ export async function POST(request: NextRequest) {
         // Invoice payment failed
         const data = event.data;
 
+        // Get invoice details
+        const { data: invoice } = await supabase
+          .from("invoices")
+          .select(`
+            user_id,
+            amount,
+            profiles!invoices_user_id_fkey(email, full_name)
+          `)
+          .eq("paystack_invoice_code", data.invoice_code)
+          .single();
+
         // Update invoice status
         await supabase
           .from("invoices")
@@ -229,6 +310,18 @@ export async function POST(request: NextRequest) {
               "paystack_subscription_code",
               data.subscription.subscription_code,
             );
+        }
+
+        // Send payment failed email
+        if (invoice) {
+          const profile = (invoice as any).profiles;
+          if (profile?.email) {
+            await EmailService.sendPaymentFailedNotification(profile.email, {
+              userName: profile.full_name || "there",
+              amount: `₦${((invoice as any).amount).toLocaleString()}`,
+              reason: data.gateway_response,
+            });
+          }
         }
 
         console.log(`❌ Invoice payment failed: ${data.invoice_code}`);

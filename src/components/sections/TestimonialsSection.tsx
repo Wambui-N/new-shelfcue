@@ -30,11 +30,11 @@ export function TestimonialsSection() {
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 leading-tight">
             Join{" "}
-            <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+            <span className="text-dark-gray">
               1,000+ Founders
             </span>
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground">
+          <p className="text-base md:text-lg text-foreground-muted">
             Who Stopped Losing Leads
           </p>
         </motion.div>
@@ -47,7 +47,7 @@ export function TestimonialsSection() {
           whileHover={{ y: -8 }}
           className="relative"
         >
-          <Card className="relative p-6 border-2 border-primary/20 hover:border-primary/40 transition-all duration-500 group hover:shadow-xl bg-card/80 backdrop-blur-sm overflow-hidden">
+          <Card className="relative p-6 border-2 border-light-gray hover:border-dark-gray transition-all duration-500 group hover:shadow-xl bg-card/80 backdrop-blur-sm overflow-hidden">
             {/* Decorative Background */}
             <motion.div
               className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-primary/5 to-blue-500/5 rounded-full blur-3xl"
@@ -64,7 +64,7 @@ export function TestimonialsSection() {
 
             {/* Quote Icon */}
             <motion.div
-              className="absolute -top-3 -left-3 w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-xl flex items-center justify-center shadow-lg opacity-90"
+              className="absolute -top-3 -left-3 w-12 h-12 bg-black rounded-xl flex items-center justify-center shadow-lg opacity-90"
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ duration: 0.3 }}
             >
@@ -94,7 +94,7 @@ export function TestimonialsSection() {
                     whileHover={{ scale: 1.2, rotate: 15 }}
                   >
                     <Star
-                      className="w-4 h-4 text-yellow-500 fill-yellow-500"
+                      className="w-4 h-4 text-dark-gray fill-dark-gray"
                       fill="currentColor"
                     />
                   </motion.div>
@@ -133,7 +133,7 @@ export function TestimonialsSection() {
 
             {/* Decorative Corner */}
             <motion.div
-              className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-primary/10 to-transparent rounded-tl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              className="absolute bottom-0 right-0 w-24 h-24 bg-light-gray/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-tl-full"
               initial={false}
             />
           </Card>
@@ -148,23 +148,23 @@ export function TestimonialsSection() {
           transition={{ duration: 0.6, delay: 0.8 }}
         >
           <motion.div
-            className="inline-flex items-center gap-6 px-6 py-3 bg-primary/5 border border-primary/20 rounded-xl backdrop-blur-sm"
+            className="inline-flex items-center gap-6 px-6 py-3 bg-light-gray/30 border border-light-gray rounded-xl backdrop-blur-sm"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.3 }}
           >
             <div>
               <p className="text-2xl font-bold text-foreground">1,000+</p>
-              <p className="text-xs text-muted-foreground">Happy Users</p>
+              <p className="text-xs text-foreground-muted">Happy Users</p>
             </div>
-            <div className="w-px h-8 bg-border" />
+            <div className="w-px h-8 bg-light-gray" />
             <div>
               <p className="text-2xl font-bold text-foreground">50,000+</p>
-              <p className="text-xs text-muted-foreground">Leads Captured</p>
+              <p className="text-xs text-foreground-muted">Leads Captured</p>
             </div>
-            <div className="w-px h-8 bg-border" />
+            <div className="w-px h-8 bg-light-gray" />
             <div>
               <p className="text-2xl font-bold text-foreground">47%</p>
-              <p className="text-xs text-muted-foreground">More Conversions</p>
+              <p className="text-xs text-foreground-muted">More Conversions</p>
             </div>
           </motion.div>
         </motion.div>
