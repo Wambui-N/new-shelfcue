@@ -71,6 +71,12 @@ function AuthCallbackContent() {
           // Try to get tokens from URL parameters (fallback)
           const urlParams = new URLSearchParams(window.location.search);
           const code = urlParams.get('code');
+          console.log('🔍 URL parameters:', {
+            hasCode: !!code,
+            codeLength: code?.length || 0,
+            allParams: Object.fromEntries(urlParams.entries())
+          });
+          
           if (code) {
             console.log('🔍 Found authorization code, exchanging for tokens...');
             try {
@@ -79,14 +85,17 @@ function AuthCallbackContent() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: data.session.user.id, code })
               });
+              const result = await response.json();
               if (response.ok) {
                 console.log('✅ Tokens exchanged and stored successfully');
               } else {
-                console.error('❌ Failed to exchange code for tokens');
+                console.error('❌ Failed to exchange code for tokens:', result);
               }
             } catch (error) {
               console.error('❌ Error exchanging code for tokens:', error);
             }
+          } else {
+            console.log('❌ No authorization code found in URL');
           }
         }
 
