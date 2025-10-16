@@ -121,8 +121,13 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
+		// Check if this is a trial signup
+		const isTrial = transaction.metadata?.is_trial === true;
+
 		// Activate subscription
 		const now = new Date();
+		const trialEnd = new Date(now);
+		trialEnd.setDate(trialEnd.getDate() + 14); // 14 days trial
 		const periodEnd = new Date(now);
 		periodEnd.setMonth(periodEnd.getMonth() + 1);
 
@@ -132,17 +137,19 @@ export async function GET(request: NextRequest) {
 				user_id: user.id,
 				plan_id: plan.id,
 				paystack_customer_code: txData.customer.customer_code,
-				status: "active",
+				status: isTrial ? "trial" : "active",
 				billing_cycle: "monthly",
+				trial_start: isTrial ? now.toISOString() : null,
+				trial_end: isTrial ? trialEnd.toISOString() : null,
 				current_period_start: now.toISOString(),
-				current_period_end: periodEnd.toISOString(),
+				current_period_end: isTrial ? trialEnd.toISOString() : periodEnd.toISOString(),
 				cancel_at_period_end: false,
 				cancelled_at: null,
 			} as any, {
 				onConflict: "user_id"
 			});
 
-		console.log("✅ Subscription activated for user:", user.email);
+		console.log(`✅ Subscription ${isTrial ? 'trial started' : 'activated'} for user:`, user.email);
 
 		// Create invoice
 		const invoiceNumber = `INV-${Date.now()}-${user.id.substring(0, 8)}`;
@@ -171,11 +178,12 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Payment verified successfully",
+      message: isTrial ? "Trial started successfully" : "Payment verified successfully",
       subscription: {
-        status: "active",
+        status: isTrial ? "trial" : "active",
         billing_cycle: "monthly",
-        current_period_end: periodEnd.toISOString(),
+        trial_end: isTrial ? trialEnd.toISOString() : null,
+        current_period_end: isTrial ? trialEnd.toISOString() : periodEnd.toISOString(),
       },
     });
   } catch (error) {

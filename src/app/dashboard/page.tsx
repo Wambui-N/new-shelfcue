@@ -11,7 +11,6 @@ import {
   Eye,
   FileText,
   MessageSquare,
-  MoreVertical,
   Plus,
   Users,
 } from "lucide-react";
@@ -150,20 +149,6 @@ export default function DashboardPage() {
     return date.toLocaleDateString();
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word) => word.charAt(0))
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const getSubmitterName = (submission: SubmissionRecord) => {
-    const data = submission.data;
-    return data.name || data.full_name || data.email || "Anonymous";
-  };
-
   const getTrendPercentage = () => {
     const currentWeek = dashboardStats.leadsThisWeek;
     const lastWeek = historicalStats.submissionsLastWeek;
@@ -274,7 +259,7 @@ export default function DashboardPage() {
                 </div>
                 <ArrowRight className="w-5 h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
               </div>
-              <div className="text-2xl font-bold mb-2">
+              <div className="text-4xl font-bold mb-2">
                 {dashboardStats.lastLeadTime
                   ? formatTimeAgo(dashboardStats.lastLeadTime)
                   : "No leads yet"}
@@ -331,12 +316,12 @@ export default function DashboardPage() {
                       whileHover={{ x: 4 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground text-sm font-semibold flex-shrink-0">
-                        {getInitials(getSubmitterName(submission))}
+                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground flex-shrink-0">
+                        <FileText className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm text-foreground truncate">
-                          {getSubmitterName(submission)}
+                          New submission
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
                           via{" "}
@@ -465,13 +450,6 @@ export default function DashboardPage() {
                           <Link href={`/dashboard/forms/${form.id}`}>
                             <Eye className="w-4 h-4" />
                           </Link>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-10 w-10 p-0 hover:bg-accent"
-                        >
-                          <MoreVertical className="w-4 h-4" />
                         </Button>
                       </div>
                     </motion.div>

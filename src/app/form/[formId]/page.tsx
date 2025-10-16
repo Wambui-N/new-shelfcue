@@ -63,6 +63,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
           successMessage: "Thank you for your submission!",
           collectEmail: false,
           allowMultipleSubmissions: true,
+          showWatermark: true,
         };
 
         setFormData({

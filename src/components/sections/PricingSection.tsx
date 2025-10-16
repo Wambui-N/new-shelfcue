@@ -16,7 +16,7 @@ export function PricingSection() {
       "Unlimited forms & submissions",
       "All features included",
         "Priority support",
-      "14-day free trial, no credit card",
+      "14-day free trial",
     ],
     cta: "Start Your 14-Day Free Trial",
     color: "text-black",

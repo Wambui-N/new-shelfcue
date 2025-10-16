@@ -600,6 +600,36 @@ export function FormPreview({ formData, onSubmit }: FormPreviewProps) {
             </motion.div>
           )}
         </form>
+
+        {/* Watermark */}
+        {(formData.settings.showWatermark === undefined || formData.settings.showWatermark === true) && (
+          <div className="flex items-center justify-center gap-2 mt-6 pt-6 border-t opacity-60 transition-opacity">
+            <a
+              href="https://shelfcue.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 group"
+              style={{ fontFamily: 'Satoshi, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}
+            >
+              <span className="text-xs" style={{ color: formData.theme.textColor }}>
+                Powered by
+              </span>
+              <div className="flex items-center gap-1.5">
+                <img
+                  src="/1.png"
+                  alt="ShelfCue"
+                  className="w-4 h-4 object-contain"
+                />
+                <span
+                  className="text-xs font-bold group-hover:underline"
+                  style={{ color: formData.theme.textColor }}
+                >
+                  ShelfCue
+                </span>
+              </div>
+            </a>
+          </div>
+        )}
       </div>
     </motion.div>
   );

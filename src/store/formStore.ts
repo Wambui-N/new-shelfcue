@@ -37,6 +37,7 @@ const defaultForm: FormData = {
     successMessage: "Thank you for your submission!",
     collectEmail: false,
     allowMultipleSubmissions: true,
+    showWatermark: true,
   },
 };
 

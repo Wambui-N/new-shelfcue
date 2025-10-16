@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { FormBuilder } from "@/components/builder/FormBuilder";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { SubscriptionGuard } from "@/components/SubscriptionGuard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFormStore } from "@/store/formStore";
 
@@ -51,9 +52,11 @@ export default function NewFormEditorPage() {
 
   return (
     <ProtectedRoute>
-      <div className="fixed inset-0 bg-background">
-        <FormBuilder onBack={handleBack} />
-      </div>
+      <SubscriptionGuard feature="form creation">
+        <div className="fixed inset-0 bg-background">
+          <FormBuilder onBack={handleBack} />
+        </div>
+      </SubscriptionGuard>
     </ProtectedRoute>
   );
 }

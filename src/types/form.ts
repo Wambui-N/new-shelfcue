@@ -61,6 +61,7 @@ export interface FormData {
     redirectUrl?: string;
     collectEmail: boolean;
     allowMultipleSubmissions: boolean;
+    showWatermark?: boolean;
   };
   default_calendar_id?: string;
   lastSaved?: Date;

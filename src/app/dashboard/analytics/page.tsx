@@ -435,7 +435,7 @@ export default function AnalyticsPage() {
             We're working on advanced charts, detailed reports, and custom date
             ranges.
           </p>
-          <Badge variant="secondary">Expected: Q2 2025</Badge>
+          <Badge variant="secondary">Expected: Q2 2026</Badge>
         </div>
       </Card>
     </div>

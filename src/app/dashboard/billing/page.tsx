@@ -50,8 +50,13 @@ export default function BillingPage() {
 	const [usage, setUsage] = useState<any>(null);
 	const [paymentLoading, setPaymentLoading] = useState(false);
 	const [trialDaysRemaining, setTrialDaysRemaining] = useState(0);
+	const [isTrialOnboarding, setIsTrialOnboarding] = useState(false);
 
 	useEffect(() => {
+		// Check if this is trial onboarding from query params
+		const params = new URLSearchParams(window.location.search);
+		setIsTrialOnboarding(params.get('trial') === 'true');
+		
 		fetchData();
 	}, []);
 
@@ -117,6 +122,9 @@ export default function BillingPage() {
 				return;
 			}
 
+			// Determine if this is a trial signup
+			const isTrial = !subscription; // If no subscription exists, it's a trial signup
+			
 			// Initialize payment using official Paystack flow
 			const response = await fetch("/api/payments/initialize", {
 				method: "POST",
@@ -126,7 +134,8 @@ export default function BillingPage() {
 				},
 				body: JSON.stringify({ 
 					email: session.user.email,
-					amount: 2900 // $29.00 in cents
+					amount: 2900, // $29.00 in cents
+					is_trial: isTrial // Pass trial flag
 				}),
 			});
 
@@ -162,11 +171,47 @@ export default function BillingPage() {
 
 	return (
 		<div className="space-y-8 max-w-6xl">
+			{/* Trial Onboarding Banner */}
+			{isTrialOnboarding && !subscription && (
+				<Card className="p-6 shadow-lg border-2 border-primary bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10">
+					<div className="flex items-start gap-4">
+						<div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center flex-shrink-0">
+							<Zap className="w-6 h-6 text-white" />
+						</div>
+						<div className="flex-1">
+							<h2 className="text-2xl font-bold text-foreground mb-2">
+								Welcome to ShelfCue! 🎉
+							</h2>
+							<p className="text-muted-foreground mb-4">
+								You're one step away from starting your <span className="font-semibold text-foreground">14-day free trial</span>. Add your payment details below to unlock unlimited forms and submissions.
+							</p>
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+								<div className="flex items-center gap-2">
+									<CheckCircle className="w-4 h-4 text-primary" />
+									<span>No charge today</span>
+								</div>
+								<div className="flex items-center gap-2">
+									<CheckCircle className="w-4 h-4 text-primary" />
+									<span>Cancel anytime</span>
+								</div>
+								<div className="flex items-center gap-2">
+									<CheckCircle className="w-4 h-4 text-primary" />
+									<span>Full feature access</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</Card>
+			)}
+
 			{/* Page Header */}
 			<div>
 				<h1 className="text-3xl font-bold text-foreground">Billing & Subscription</h1>
 				<p className="text-muted-foreground mt-1">
-					Manage your subscription and billing information
+					{isTrialOnboarding && !subscription 
+						? "Add payment details to start your free trial"
+						: "Manage your subscription and billing information"
+					}
 				</p>
 			</div>
 
@@ -298,10 +343,12 @@ export default function BillingPage() {
 					>
 						<Card className="p-8 border-2 border-primary shadow-sm">
 							<div className="flex justify-end mb-4">
-								<Badge className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
-									<Zap className="w-3 h-3 mr-1" />
-									14-Day Free Trial
-								</Badge>
+								{!subscription && (
+									<Badge className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
+										<Zap className="w-3 h-3 mr-1" />
+										14-Day Free Trial
+									</Badge>
+								)}
 							</div>
 
 							<div className="text-center mb-6">
@@ -309,10 +356,24 @@ export default function BillingPage() {
 									{plan.display_name}
 								</h3>
 								<div className="mb-4">
-									<span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-										${plan.price_monthly.toLocaleString()}
-									</span>
-									<span className="text-muted-foreground ml-2">/month</span>
+									{!subscription ? (
+										<>
+											<span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+												$0.50
+											</span>
+											<span className="text-muted-foreground ml-2">authorization</span>
+											<p className="text-sm text-muted-foreground mt-2">
+												Then ${plan.price_monthly}/month after 14 days
+											</p>
+										</>
+									) : (
+										<>
+											<span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+												${plan.price_monthly.toLocaleString()}
+											</span>
+											<span className="text-muted-foreground ml-2">/month</span>
+										</>
+									)}
 								</div>
 								<p className="text-muted-foreground">{plan.description}</p>
 							</div>
@@ -327,23 +388,30 @@ export default function BillingPage() {
 							</ul>
 
 							{!isActive && (
-								<Button
-									className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg"
-									disabled={paymentLoading}
-									onClick={() => handleSubscribe()}
-								>
-									{paymentLoading ? (
-										<>
-											<Loader2 className="w-4 h-4 mr-2 animate-spin" />
-											Processing...
-										</>
-									) : (
-										<>
-											<Zap className="w-4 h-4 mr-2" />
-											{isOnTrial && trialDaysRemaining > 0 ? "Subscribe Now" : "Start 14-Day Free Trial"}
-										</>
+								<div>
+									<Button
+										className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg"
+										disabled={paymentLoading}
+										onClick={() => handleSubscribe()}
+									>
+										{paymentLoading ? (
+											<>
+												<Loader2 className="w-4 h-4 mr-2 animate-spin" />
+												Processing...
+											</>
+										) : (
+											<>
+												<Zap className="w-4 h-4 mr-2" />
+												{isOnTrial && trialDaysRemaining > 0 ? "Subscribe Now" : "Start 14-Day Free Trial"}
+											</>
+										)}
+									</Button>
+									{!subscription && (
+										<p className="text-xs text-center text-muted-foreground mt-3">
+											We'll charge $0.50 to authorize your card. You'll only be charged ${plan.price_monthly}/month after your trial ends.
+										</p>
 									)}
-								</Button>
+								</div>
 							)}
 
 						{isActive && (subscription as any)?.paystack_email_token && (

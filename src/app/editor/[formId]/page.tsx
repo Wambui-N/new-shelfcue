@@ -39,7 +39,7 @@ function EditorPage({ params }: EditorPageProps) {
           .from("forms")
           .select("*")
           .eq("id", formId)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error("Supabase error:", error);
@@ -47,7 +47,10 @@ function EditorPage({ params }: EditorPageProps) {
         }
 
         if (!data) {
-          throw new Error("Form not found");
+          console.error("Form not found or has been deleted");
+          alert("Form not found. It may have been deleted.");
+          router.push("/dashboard/forms");
+          return;
         }
 
         // Check if user owns this form
@@ -85,6 +88,7 @@ function EditorPage({ params }: EditorPageProps) {
           successMessage: "Thank you for your submission!",
           collectEmail: false,
           allowMultipleSubmissions: true,
+          showWatermark: true,
         };
 
         // Load form data with proper structure

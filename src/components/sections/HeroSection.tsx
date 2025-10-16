@@ -68,9 +68,9 @@ export function HeroSection() {
           variants={itemVariants}
           className="text-sm sm:text-base md:text-lg lg:text-xl text-foreground-muted mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4"
         >
-          Create branded, responsive forms that write directly into your Google Sheets.{" "}
+          Finally, a form builder that does the work for you.{" "}
           <span className="text-foreground font-medium">
-            No Zapier. No hassle. No coding required.
+          Beautiful forms that capture leads while automatically organizing them in Google Sheets.
           </span>
         </motion.p>
 

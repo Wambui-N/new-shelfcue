@@ -13,7 +13,7 @@ export async function GET(
       .from("forms")
       .select("*")
       .eq("id", formId)
-      .single();
+      .maybeSingle();
 
     if (error || !data) {
       return NextResponse.json({ error: "Form not found" }, { status: 404 });

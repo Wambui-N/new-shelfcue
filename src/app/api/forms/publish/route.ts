@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         .select("*")
         .eq("id", formId)
         .eq("user_id", userId)
-        .single();
+        .maybeSingle();
 
       form = result.data;
       formError = result.error;

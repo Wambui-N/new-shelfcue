@@ -193,6 +193,27 @@ export function FormSettings() {
               }
             />
           </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="show-watermark">Show ShelfCue Watermark</Label>
+              <p className="text-sm text-muted-foreground">
+                Display "Powered by ShelfCue" at the bottom of the form
+              </p>
+            </div>
+            <Switch
+              id="show-watermark"
+              checked={formData.settings.showWatermark !== false}
+              onCheckedChange={(checked) =>
+                updateForm({
+                  settings: {
+                    ...formData.settings,
+                    showWatermark: checked,
+                  },
+                })
+              }
+            />
+          </div>
         </div>
       </Card>
 

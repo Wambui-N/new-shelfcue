@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     console.log("📝 Request body:", body);
-    const { email, amount = 2900 } = body; // Default to $29.00 in cents
+    const { email, amount = 2900, is_trial = false } = body; // Default to $29.00 in cents
 
     if (!email) {
       console.log("❌ No email provided");
@@ -46,14 +46,18 @@ export async function POST(request: NextRequest) {
     const paystack = getPaystackService();
 
     // Initialize transaction (following official Paystack docs)
+    // For trial, we charge $0.50 (50 cents) just to authorize the card
+    const chargeAmount = is_trial ? 50 : amount;
+    
     const initResponse = await paystack.initializeTransaction({
       email: user.email || "",
-      amount: amount, // Amount in cents
+      amount: chargeAmount, // Amount in cents ($0.50 for trial, regular for subscription)
       reference,
       callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing/verify`,
       metadata: {
         user_id: user.id,
         subscription_type: "professional",
+        is_trial: is_trial,
         custom_fields: [
           {
             display_name: "User ID",
@@ -63,7 +67,7 @@ export async function POST(request: NextRequest) {
           {
             display_name: "Subscription",
             variable_name: "subscription",
-            value: "Professional Plan",
+            value: is_trial ? "14-Day Free Trial" : "Professional Plan",
           },
         ],
       },
@@ -83,11 +87,12 @@ export async function POST(request: NextRequest) {
     await supabase.from("payment_transactions").insert({
       user_id: user.id,
       paystack_reference: reference,
-      amount: amount / 100, // Convert from cents to dollars for storage
+      amount: chargeAmount / 100, // Convert from cents to dollars for storage
       currency: "USD",
       status: "pending",
       metadata: {
         subscription_type: "professional",
+        is_trial: is_trial,
       },
     } as any);
 

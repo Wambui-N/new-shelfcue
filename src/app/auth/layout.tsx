@@ -28,8 +28,15 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <div className="w-full max-w-md mx-auto">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-            <div className="w-6 h-6 bg-background rounded-full"></div>
+          <div className="flex items-center gap-2">
+            <img
+              src="/1.png"
+              alt="ShelfCue Logo"
+              className="w-10 h-10 object-contain"
+            />
+            <span className="text-2xl font-bold text-foreground">
+              ShelfCue
+            </span>
           </div>
         </div>
 

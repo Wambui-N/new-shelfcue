@@ -11,7 +11,7 @@ export function HowItWorksSection() {
       icon: Edit3,
       title: "Create Your Form",
       description:
-        "Drag and drop fields to build exactly what you need. Start from scratch or use our intuitive builder.",
+        "Select fields to build exactly what you need. Add as many as you want.",
       color: "bg-black",
     },
     {
@@ -27,7 +27,7 @@ export function HowItWorksSection() {
       icon: Share2,
       title: "Share & Capture",
       description:
-        "Get your unique link, QR code, or embed code. Start capturing leads immediately.",
+        "Get your unique link, or embed code. Start capturing leads immediately.",
       color: "bg-black",
     },
   ];

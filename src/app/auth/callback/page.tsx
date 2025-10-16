@@ -1,18 +1,38 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      const { data, error } = await supabase.auth.getSession();
-
+      // Check for OAuth errors in URL params
+      const error = searchParams.get('error');
+      const errorDescription = searchParams.get('error_description');
+      
       if (error) {
-        console.error("Error getting session:", error);
+        console.error("OAuth error:", error, errorDescription);
+        const message = errorDescription 
+          ? decodeURIComponent(errorDescription.replace(/\+/g, ' '))
+          : 'Authentication failed';
+        setErrorMessage(message);
+        
+        // Redirect to signin with error after 3 seconds
+        setTimeout(() => {
+          router.push(`/auth/signin?error=${encodeURIComponent(message)}`);
+        }, 3000);
+        return;
+      }
+
+      const { data, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        console.error("Error getting session:", sessionError);
         router.push("/auth/signin?error=auth_callback_error");
         return;
       }
@@ -28,21 +48,63 @@ export default function AuthCallbackPage() {
           });
         }
 
-        router.push("/dashboard");
+        // Check if user has a subscription
+        const { data: subscription } = await supabase
+          .from("user_subscriptions")
+          .select("id, status")
+          .eq("user_id", data.session.user.id)
+          .maybeSingle();
+
+        // If no subscription, redirect to billing to set up trial
+        if (!subscription) {
+          router.push("/dashboard/billing?trial=true&new=true");
+        } else {
+          router.push("/dashboard");
+        }
       } else {
         router.push("/auth/signin?error=no_session");
       }
     };
 
     handleAuthCallback();
-  }, [router]);
+  }, [router, searchParams]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-foreground text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-        <p>Completing sign in...</p>
+      <div className="text-foreground text-center max-w-md px-4">
+        {errorMessage ? (
+          <>
+            <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-destructive mb-2">Authentication Error</h2>
+            <p className="text-muted-foreground mb-4">{errorMessage}</p>
+            <p className="text-sm text-muted-foreground">Redirecting to sign in...</p>
+          </>
+        ) : (
+          <>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p>Completing sign in...</p>
+          </>
+        )}
       </div>
     </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    }>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }

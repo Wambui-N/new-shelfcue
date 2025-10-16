@@ -58,7 +58,7 @@ function FormViewPage({ params }: FormViewPageProps) {
           .from("forms")
           .select("*")
           .eq("id", formId)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error("Supabase error:", error);
@@ -66,7 +66,8 @@ function FormViewPage({ params }: FormViewPageProps) {
         }
 
         if (!data) {
-          throw new Error("Form not found");
+          setError("Form not found. It may have been deleted.");
+          return;
         }
 
         console.log("Fetched form:", data);
@@ -92,6 +93,7 @@ function FormViewPage({ params }: FormViewPageProps) {
           successMessage: "Thank you for your submission!",
           collectEmail: false,
           allowMultipleSubmissions: true,
+          showWatermark: true,
         };
 
         setFormData({
@@ -294,17 +296,18 @@ function FormViewPage({ params }: FormViewPageProps) {
         </div>
 
         {/* Form Preview */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <Card className="p-6">
-            <div className="max-w-2xl mx-auto">
+        <div className="flex justify-center items-start min-h-[calc(100vh-200px)]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="w-full max-w-2xl"
+          >
+            <Card className="p-6">
               <FormPreview formData={formData} onSubmit={handleSubmit} />
-            </div>
-          </Card>
-        </motion.div>
+            </Card>
+          </motion.div>
+        </div>
 
         {/* Share Dialog */}
         <ShareDialog
