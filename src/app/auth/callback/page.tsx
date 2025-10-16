@@ -55,28 +55,31 @@ function AuthCallbackContent() {
         });
         
         // Check if we have Google tokens in the session
-        if (data.session.provider_token) {
-          console.log('💾 Storing Google tokens for user:', data.session.user.id);
-          
-          // Import the token storage system
-          const { tokenStorage } = await import('@/lib/token-storage');
-          
-          // Store expiry as seconds since epoch
-          const expiresAtSeconds = Math.floor(Date.now() / 1000) + (data.session.expires_in || 3600);
-          
-          const storeResult = await tokenStorage.storeTokens(data.session.user.id, {
-            access_token: data.session.provider_token,
-            refresh_token: data.session.provider_refresh_token || "",
-            expires_at: expiresAtSeconds,
+        if (data.session?.provider_token) {
+          console.log(
+            "💾 Storing Google tokens for user:",
+            data.session.user.id,
+          );
+
+          // Securely send the session to our server-side API route to store tokens.
+          // This avoids using the admin client on the browser.
+          const response = await fetch("/api/auth/store-tokens", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session: data.session }),
           });
-          
-          if (storeResult.success) {
-            console.log('✅ Google tokens stored successfully');
+
+          if (response.ok) {
+            console.log("✅ Google tokens stored successfully via API");
           } else {
-            console.error('❌ Error storing Google tokens:', storeResult.error);
+            const result = await response.json();
+            console.error(
+              "❌ Error storing Google tokens via API:",
+              result.error,
+            );
           }
         } else {
-          console.log('❌ No provider token available in session');
+          console.log('❌ No provider token available in session to store.');
           console.log('🔍 Full session object:', JSON.stringify(data.session, null, 2));
           
           // Try to get tokens from URL parameters (fallback)
