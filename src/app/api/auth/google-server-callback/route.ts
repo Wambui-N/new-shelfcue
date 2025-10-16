@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { tokenStorage } from "@/lib/token-storage";
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,36 +44,32 @@ export async function GET(request: NextRequest) {
       expiresIn: tokens.expiry_date
     });
 
-    // If we have a state (user ID), store the tokens
+    // If we have a state (user ID), store the tokens using our robust system
     if (state) {
       console.log('💾 Storing tokens for user:', state);
-      try {
-        const supabaseAdmin = getSupabaseAdmin();
-        const expiresAtSeconds = Math.floor((tokens.expiry_date || Date.now() + 3600000) / 1000);
-        
-        console.log('🔍 Token data:', {
-          user_id: state,
-          hasAccessToken: !!tokens.access_token,
-          hasRefreshToken: !!tokens.refresh_token,
-          expiresAtSeconds
-        });
-        
-        const { error: tokenError } = await (supabaseAdmin as any)
-          .from("user_google_tokens")
-          .upsert({
-            user_id: state,
-            access_token: tokens.access_token!,
-            refresh_token: tokens.refresh_token || "",
-            expires_at: expiresAtSeconds,
-          });
+      
+      const expiresAtSeconds = Math.floor((tokens.expiry_date || Date.now() + 3600000) / 1000);
+      
+      console.log('🔍 Token data:', {
+        user_id: state,
+        hasAccessToken: !!tokens.access_token,
+        hasRefreshToken: !!tokens.refresh_token,
+        expiresAtSeconds,
+        expiresAtDate: new Date(expiresAtSeconds * 1000).toISOString()
+      });
+      
+      const storeResult = await tokenStorage.storeTokens(state, {
+        access_token: tokens.access_token!,
+        refresh_token: tokens.refresh_token || "",
+        expires_at: expiresAtSeconds,
+        scope: tokens.scope
+      });
 
-        if (tokenError) {
-          console.error('❌ Error storing tokens:', tokenError);
-        } else {
-          console.log('✅ Tokens stored successfully for user:', state);
-        }
-      } catch (storageError) {
-        console.error('❌ Exception storing tokens:', storageError);
+      if (storeResult.success) {
+        console.log('✅ Tokens stored successfully for user:', state);
+      } else {
+        console.error('❌ Error storing tokens:', storeResult.error);
+        // Don't fail the entire flow, just log the error
       }
     } else {
       console.log('❌ No state (user ID) provided, cannot store tokens');

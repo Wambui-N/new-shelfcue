@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { tokenStorage } from "@/lib/token-storage";
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,22 +29,19 @@ export async function POST(request: NextRequest) {
       expiresIn: tokens.expiry_date
     });
 
-    // Store tokens in database
-    const supabaseAdmin = getSupabaseAdmin();
+    // Store tokens using the new token storage system
     const expiresAtSeconds = Math.floor((tokens.expiry_date || Date.now() + 3600000) / 1000);
     
-    const { error: tokenError } = await (supabaseAdmin as any)
-      .from("user_google_tokens")
-      .upsert({
-        user_id: userId,
-        access_token: tokens.access_token!,
-        refresh_token: tokens.refresh_token || "",
-        expires_at: expiresAtSeconds,
-      });
+    const storeResult = await tokenStorage.storeTokens(userId, {
+      access_token: tokens.access_token!,
+      refresh_token: tokens.refresh_token || "",
+      expires_at: expiresAtSeconds,
+      scope: tokens.scope
+    });
 
-    if (tokenError) {
-      console.error('❌ Error storing tokens:', tokenError);
-      return NextResponse.json({ error: "Failed to store tokens" }, { status: 500 });
+    if (!storeResult.success) {
+      console.error('❌ Error storing tokens:', storeResult.error);
+      return NextResponse.json({ error: "Failed to store tokens: " + storeResult.error }, { status: 500 });
     }
 
     console.log('✅ Tokens stored successfully for user:', userId);

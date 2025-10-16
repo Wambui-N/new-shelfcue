@@ -51,18 +51,23 @@ function AuthCallbackContent() {
         // Check if we have Google tokens in the session
         if (data.session.provider_token) {
           console.log('💾 Storing Google tokens for user:', data.session.user.id);
-          // Store expiry as seconds since epoch to match server utilities
+          
+          // Import the token storage system
+          const { tokenStorage } = await import('@/lib/token-storage');
+          
+          // Store expiry as seconds since epoch
           const expiresAtSeconds = Math.floor(Date.now() / 1000) + (data.session.expires_in || 3600);
-          const { error: tokenError } = await (supabase as any).from("user_google_tokens").upsert({
-            user_id: data.session.user.id,
+          
+          const storeResult = await tokenStorage.storeTokens(data.session.user.id, {
             access_token: data.session.provider_token,
             refresh_token: data.session.provider_refresh_token || "",
             expires_at: expiresAtSeconds,
           });
-          if (tokenError) {
-            console.error('❌ Error storing Google tokens:', tokenError);
-          } else {
+          
+          if (storeResult.success) {
             console.log('✅ Google tokens stored successfully');
+          } else {
+            console.error('❌ Error storing Google tokens:', storeResult.error);
           }
         } else {
           console.log('❌ No provider token available in session');

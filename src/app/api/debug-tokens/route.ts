@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { tokenStorage } from "@/lib/token-storage";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,21 +13,43 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 Debug: Checking tokens for user:', userId);
     
-    const supabaseAdmin = getSupabaseAdmin();
-    
-    const { data, error } = await (supabaseAdmin as any)
-      .from("user_google_tokens")
-      .select("*")
-      .eq("user_id", userId);
+    // Use the new token storage system for debugging
+    const tokenResult = await tokenStorage.getTokens(userId);
 
-    console.log('🔍 Debug: Token query result:', { data, error });
+    console.log('🔍 Debug: Token result:', { 
+      success: tokenResult.success, 
+      error: tokenResult.error,
+      hasTokens: !!tokenResult.tokens 
+    });
+
+    if (!tokenResult.success) {
+      return NextResponse.json({
+        userId,
+        hasTokens: false,
+        tokenCount: 0,
+        tokens: [],
+        error: tokenResult.error
+      });
+    }
+
+    const hasTokens = !!tokenResult.tokens;
+    const tokenCount = hasTokens ? 1 : 0;
+    const tokens = hasTokens ? [{
+      user_id: userId,
+      hasAccessToken: !!tokenResult.tokens!.access_token,
+      hasRefreshToken: !!tokenResult.tokens!.refresh_token,
+      expires_at: tokenResult.tokens!.expires_at,
+      expires_at_date: new Date(tokenResult.tokens!.expires_at * 1000).toISOString(),
+      is_expired: tokenResult.tokens!.expires_at < Math.floor(Date.now() / 1000),
+      scope: tokenResult.tokens!.scope
+    }] : [];
 
     return NextResponse.json({
       userId,
-      hasTokens: !!data && data.length > 0,
-      tokenCount: data?.length || 0,
-      tokens: data || [],
-      error: error?.message || null
+      hasTokens,
+      tokenCount,
+      tokens,
+      error: null
     });
   } catch (error: any) {
     console.error("Debug tokens error:", error);
