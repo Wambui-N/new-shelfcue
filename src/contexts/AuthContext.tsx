@@ -70,38 +70,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    console.log('=== OAuth Debug Info ===');
-    console.log('Current hostname:', window.location.hostname);
-    console.log('NEXT_PUBLIC_APP_URL:', process.env.NEXT_PUBLIC_APP_URL);
-    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-    console.log('========================');
-    
-    // Supabase's OAuth with proper redirect URL
-    const redirectTo = process.env.NEXT_PUBLIC_APP_URL 
-      ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
-      : `${window.location.origin}/auth/callback`;
-    
-    console.log('Redirect URL:', redirectTo);
-    
-    // Let Supabase handle the OAuth with explicit redirect
+    // This simplified version is based on the successful /auth/test page.
+    // It relies on Supabase's standard OAuth flow, which we've confirmed is working correctly.
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: redirectTo,
-        scopes: 'openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+        scopes:
+          "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets",
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
         queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
+          access_type: "offline",
+          prompt: "consent",
         },
       },
     });
-    
+
     if (error) {
-      console.error('❌ OAuth Error:', error);
-    } else {
-      console.log('✅ OAuth initiated successfully');
+      console.error("❌ OAuth Error:", error);
     }
-    
+
     return { error };
   };
 
