@@ -41,11 +41,13 @@ function AuthCallbackContent() {
         // Store Google tokens if available
         if (data.session.provider_token) {
           console.log('Storing Google tokens for user:', data.session.user.id);
+          // Store expiry as seconds since epoch to match server utilities
+          const expiresAtSeconds = Math.floor(Date.now() / 1000) + (data.session.expires_in || 3600);
           const { error: tokenError } = await supabase.from("user_google_tokens").upsert({
             user_id: data.session.user.id,
             access_token: data.session.provider_token,
             refresh_token: data.session.provider_refresh_token || "",
-            expires_at: Date.now() + (data.session.expires_in || 3600) * 1000,
+            expires_at: expiresAtSeconds,
           });
           if (tokenError) {
             console.error('Error storing Google tokens:', tokenError);
