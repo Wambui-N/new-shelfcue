@@ -14,14 +14,19 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    console.log('🔍 Checking Google tokens for user:', userId);
+    
     // Get Google client
     const googleClient = await getGoogleClient(userId);
     if (!googleClient) {
+      console.log('❌ No Google client found for user:', userId);
       return NextResponse.json(
-        { error: "Google authentication required" },
+        { error: "Google authentication required. Please sign in with Google again." },
         { status: 401 },
       );
     }
+    
+    console.log('✅ Google client found for user:', userId);
 
     // Get user's calendars
     const calendarService = new GoogleCalendarService(googleClient);

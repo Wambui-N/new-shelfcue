@@ -39,8 +39,15 @@ function AuthCallbackContent() {
 
       if (data.session) {
         // Store Google tokens if available
+        console.log('🔍 Session data:', {
+          hasProviderToken: !!data.session.provider_token,
+          hasRefreshToken: !!data.session.provider_refresh_token,
+          expiresIn: data.session.expires_in,
+          userId: data.session.user.id
+        });
+        
         if (data.session.provider_token) {
-          console.log('Storing Google tokens for user:', data.session.user.id);
+          console.log('💾 Storing Google tokens for user:', data.session.user.id);
           // Store expiry as seconds since epoch to match server utilities
           const expiresAtSeconds = Math.floor(Date.now() / 1000) + (data.session.expires_in || 3600);
           const { error: tokenError } = await supabase.from("user_google_tokens").upsert({
@@ -50,12 +57,12 @@ function AuthCallbackContent() {
             expires_at: expiresAtSeconds,
           });
           if (tokenError) {
-            console.error('Error storing Google tokens:', tokenError);
+            console.error('❌ Error storing Google tokens:', tokenError);
           } else {
-            console.log('Google tokens stored successfully');
+            console.log('✅ Google tokens stored successfully');
           }
         } else {
-          console.log('No provider token available');
+          console.log('❌ No provider token available in session');
         }
 
         // Check if user has a subscription

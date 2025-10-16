@@ -49,6 +49,8 @@ export async function getGoogleClient(
   userId: string,
 ): Promise<GoogleAPIClient | null> {
   try {
+    console.log('🔍 Looking for Google tokens for user:', userId);
+    
     // Use admin client to bypass RLS
     const supabaseAdmin = getSupabaseAdmin();
 
@@ -59,9 +61,11 @@ export async function getGoogleClient(
       .single();
 
     if (error || !data) {
-      console.error("No Google tokens found for user:", userId);
+      console.error("❌ No Google tokens found for user:", userId, "Error:", error);
       return null;
     }
+    
+    console.log('✅ Found Google tokens for user:', userId);
 
     // Check if token is expired (expires_at is stored as Unix timestamp in seconds)
     const now = Math.floor(Date.now() / 1000); // Convert to seconds
