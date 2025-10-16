@@ -18,7 +18,9 @@ import { BillingSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { createClient } from "@/lib/supabase/client";
 
 type Plan = {
 	id: string;
@@ -44,6 +46,8 @@ type Subscription = {
 };
 
 export default function BillingPage() {
+	const { user } = useAuth();
+	const router = useRouter();
 	const [loading, setLoading] = useState(true);
 	const [subscription, setSubscription] = useState<Subscription | null>(null);
 	const [plan, setPlan] = useState<Plan | null>(null);
@@ -51,6 +55,9 @@ export default function BillingPage() {
 	const [paymentLoading, setPaymentLoading] = useState(false);
 	const [trialDaysRemaining, setTrialDaysRemaining] = useState(0);
 	const [isTrialOnboarding, setIsTrialOnboarding] = useState(false);
+
+	// Create a client-side Supabase instance
+	const supabase = createClient();
 
 	useEffect(() => {
 		// Check if this is trial onboarding from query params
@@ -62,12 +69,7 @@ export default function BillingPage() {
 
 	async function fetchData() {
 		try {
-			const supabase = createClient();
-			const {
-				data: { session },
-			} = await supabase.auth.getSession();
-
-			if (!session) {
+			if (!user) {
 				setLoading(false);
 				return;
 			}
@@ -75,7 +77,7 @@ export default function BillingPage() {
 			// Fetch current subscription
 			const subResponse = await fetch("/api/subscriptions/current", {
 				headers: {
-					Authorization: `Bearer ${session.access_token}`,
+					Authorization: `Bearer ${user.access_token}`,
 				},
 			});
 
@@ -111,13 +113,8 @@ export default function BillingPage() {
 		try {
 			setPaymentLoading(true);
 			
-			// Get user session
-			const supabase = createClient();
-			const {
-				data: { session },
-			} = await supabase.auth.getSession();
-
-			if (!session?.user?.email) {
+			// The user object is now from the AuthContext, which is more reliable
+			if (!user?.email) {
 				alert("Please sign in to subscribe");
 				return;
 			}
@@ -130,10 +127,9 @@ export default function BillingPage() {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${session.access_token}`,
 				},
 				body: JSON.stringify({ 
-					email: session.user.email,
+					email: user.email,
 					amount: 2900, // $29.00 in cents
 					is_trial: isTrial // Pass trial flag
 				}),

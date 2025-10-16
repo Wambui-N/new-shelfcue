@@ -1,77 +1,51 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { getSupabaseAdmin } from "@/lib/supabase";
+import { createServerClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-  try {
-    const supabase = getSupabaseAdmin();
+export async function GET() {
+  const supabase = createServerClient();
 
-    // Get authenticated user
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Get user's current subscription with plan details
-    const { data: subscription, error: subError } = await supabase
-      .from("user_subscriptions")
-      .select(
-        `
-        *,
-        plan:subscription_plans(*)
-      `,
-      )
-      .eq("user_id", user.id)
-      .single();
-
-    if (subError) {
-      // No subscription found, return null
-      return NextResponse.json({ subscription: null });
-    }
-
-    // Get usage statistics for current period
-    const { data: usage } = await (supabase as any)
-      .from("usage_tracking")
-      .select("*")
-      .eq("user_id", user.id)
-      .gte("period_end", new Date().toISOString())
-      .single();
-
-    // Get total forms count
-    const { count: formsCount } = await supabase
-      .from("forms")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id);
-
-    return NextResponse.json({
-      subscription,
-      usage: {
-        forms_count: formsCount || 0,
-        submissions_count: (usage as any)?.submissions_count || 0,
-        storage_used_mb: (usage as any)?.storage_used_mb || 0,
-        period_start: (usage as any)?.period_start,
-        period_end: (usage as any)?.period_end,
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching subscription:", error);
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch subscription",
-      },
-      { status: 500 },
-    );
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Get user's current subscription with plan details
+  const { data: subscription, error } = await supabase
+    .from("user_subscriptions")
+    .select(
+      `
+        *,
+        plan:plans(*)
+      `,
+    )
+    .eq("user_id", user.id)
+    .in("status", ["trialing", "active"])
+    .single();
+
+  if (error && error.code !== "PGRST116") {
+    // PGRST116 means no rows found, which is not an error here.
+    console.error("Error fetching subscription:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Get total forms count
+  const { count: formsCount, error: formsError } = await supabase
+    .from("forms")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
+  if (formsError) {
+    console.error("Error fetching forms count:", formsError);
+    return NextResponse.json({ error: formsError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    subscription: subscription || null,
+    usage: {
+      forms_count: formsCount || 0,
+    },
+  });
 }
