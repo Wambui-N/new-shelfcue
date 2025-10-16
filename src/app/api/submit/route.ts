@@ -178,16 +178,29 @@ export async function POST(request: NextRequest) {
       // Create Calendar Event
       (async () => {
         try {
+          console.log("📅 Checking calendar configuration...");
+          console.log("  - default_calendar_id:", (form as any).default_calendar_id);
+          console.log("  - user_id:", (form as any).user_id);
+          console.log("  - submission data:", data);
+          
           if ((form as any).default_calendar_id && (form as any).user_id) {
-            await createCalendarEventFromSubmission(
+            console.log("📅 Creating calendar event...");
+            const calendarEvent = await createCalendarEventFromSubmission(
               (form as any).user_id,
               formId,
               data,
             );
-            console.log("✓ Created calendar event");
+            console.log("✓ Created calendar event:", calendarEvent?.id);
+          } else {
+            console.log("⚠️ Calendar not configured:", {
+              hasCalendarId: !!(form as any).default_calendar_id,
+              hasUserId: !!(form as any).user_id,
+            });
           }
         } catch (error) {
-          console.error("Error creating calendar event:", error);
+          console.error("❌ Error creating calendar event:", error);
+          console.error("Error details:", error instanceof Error ? error.message : error);
+          console.error("Error stack:", error instanceof Error ? error.stack : "");
           // Don't fail the submission if calendar creation fails
         }
       })(),

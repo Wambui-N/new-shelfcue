@@ -238,7 +238,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     await executePublish();
   };
 
-  const handleMeetingCalendarSelected = (calendarId: string) => {
+  const handleMeetingCalendarSelected = async (calendarId: string) => {
     console.log("📅 Calendar selected:", calendarId);
 
     // Update all meeting fields with the selected calendar
@@ -257,6 +257,28 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
     console.log("📅 Updating form fields with calendar...");
     updateForm({ fields: updatedFields });
+
+    // IMPORTANT: Save the calendar ID to the form's default_calendar_id
+    console.log("📅 Saving default_calendar_id to form...");
+    if (formData.id && user) {
+      try {
+        const { error } = await supabase
+          .from("forms")
+          .update({ default_calendar_id: calendarId })
+          .eq("id", formData.id)
+          .eq("user_id", user.id);
+
+        if (error) {
+          console.error("❌ Error saving calendar ID:", error);
+        } else {
+          console.log("✓ Calendar ID saved to form");
+          // Update local state to reflect the change
+          updateForm({ default_calendar_id: calendarId });
+        }
+      } catch (error) {
+        console.error("❌ Exception saving calendar ID:", error);
+      }
+    }
 
     // Now proceed with publish
     if (pendingPublish) {

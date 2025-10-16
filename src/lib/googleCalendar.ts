@@ -1,5 +1,5 @@
 import type { GoogleAPIClient } from "./google";
-import { supabase } from "./supabase";
+import { getSupabaseAdmin } from "./supabase";
 
 interface CalendarEvent {
   summary: string;
@@ -71,7 +71,8 @@ export class GoogleCalendarService {
   ) {
     try {
       // Get form calendar settings
-      const { data: form, error } = await supabase
+      const supabase = getSupabaseAdmin();
+      const { data: form, error } = await (supabase as any)
         .from("forms")
         .select("calendar_settings")
         .eq("id", formId)
@@ -161,38 +162,60 @@ export async function createCalendarEventFromSubmission(
   submissionData: Record<string, any>,
 ) {
   try {
+    console.log("📅 [Calendar] Starting calendar event creation...");
+    console.log("📅 [Calendar] User ID:", userId);
+    console.log("📅 [Calendar] Form ID:", formId);
+    
     // Get Google client
     const { getGoogleClient } = await import("./google");
     const googleClient = await getGoogleClient(userId);
 
     if (!googleClient) {
+      console.error("❌ [Calendar] Google client not available for user:", userId);
       throw new Error("Google client not available");
     }
+    
+    console.log("✓ [Calendar] Google client obtained");
 
-    // Get form's default calendar ID and fields
-    const { data: form } = await supabase
+    // Get form's default calendar ID and fields using admin client
+    const supabase = getSupabaseAdmin();
+    const { data: form } = await (supabase as any)
       .from("forms")
       .select("default_calendar_id, fields, title, meeting_settings")
       .eq("id", formId)
       .single();
 
+    console.log("📅 [Calendar] Form data:", {
+      hasForm: !!form,
+      calendarId: form?.default_calendar_id,
+      title: form?.title,
+      fieldsCount: (form?.fields as any[])?.length,
+    });
+
     if (!form || !form.default_calendar_id) {
-      console.log("No calendar configured for this form");
+      console.log("⚠️ [Calendar] No calendar configured for this form");
       return null;
     }
 
     // Find meeting field in submission
     const meetingField = (form.fields as any[])?.find((f: any) => f.type === "meeting");
     
+    console.log("📅 [Calendar] Meeting field:", meetingField);
+    
     if (!meetingField) {
-      console.log("No meeting field found in form");
+      console.log("⚠️ [Calendar] No meeting field found in form");
       return null;
     }
 
     const meetingDateTime = submissionData[meetingField.id];
     
+    console.log("📅 [Calendar] Meeting time from submission:", {
+      fieldId: meetingField.id,
+      value: meetingDateTime,
+    });
+    
     if (!meetingDateTime) {
-      console.log("No meeting time selected in submission");
+      console.log("⚠️ [Calendar] No meeting time selected in submission");
       return null;
     }
 
@@ -231,15 +254,31 @@ export async function createCalendarEventFromSubmission(
       attendees: attendeeEmail ? [{ email: attendeeEmail }] : [],
     };
 
+    console.log("📅 [Calendar] Creating event:", {
+      calendarId: form.default_calendar_id,
+      summary: event.summary,
+      start: event.start.dateTime,
+      end: event.end.dateTime,
+      attendees: event.attendees,
+    });
+
     const response = await calendar.events.insert({
       calendarId: form.default_calendar_id,
       requestBody: event,
     });
 
-    console.log("✓ Calendar event created:", response.data.id);
+    console.log("✓ [Calendar] Event created successfully:", {
+      eventId: response.data.id,
+      htmlLink: response.data.htmlLink,
+    });
+    
     return response.data;
   } catch (error) {
-    console.error("Error in createCalendarEventFromSubmission:", error);
+    console.error("❌ [Calendar] Error in createCalendarEventFromSubmission:", error);
+    console.error("❌ [Calendar] Error details:", error instanceof Error ? error.message : error);
+    if (error instanceof Error && 'response' in error) {
+      console.error("❌ [Calendar] API Response:", (error as any).response?.data);
+    }
     throw error;
   }
 }
