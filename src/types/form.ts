@@ -62,6 +62,7 @@ export interface FormData {
     collectEmail: boolean;
     allowMultipleSubmissions: boolean;
   };
+  default_calendar_id?: string;
   lastSaved?: Date;
 }
 
