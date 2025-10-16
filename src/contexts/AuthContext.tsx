@@ -76,10 +76,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
     console.log('========================');
     
-    // Let Supabase handle the redirect automatically
+    // Supabase's OAuth with proper redirect URL
+    const redirectTo = process.env.NEXT_PUBLIC_APP_URL 
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+      : `${window.location.origin}/auth/callback`;
+    
+    console.log('Redirect URL:', redirectTo);
+    
+    // Let Supabase handle the OAuth with explicit redirect
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
+        redirectTo: redirectTo,
         scopes: 'openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
         queryParams: {
           access_type: 'offline',
@@ -89,7 +97,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     
     if (error) {
-      console.error('OAuth Error:', error);
+      console.error('❌ OAuth Error:', error);
+    } else {
+      console.log('✅ OAuth initiated successfully');
     }
     
     return { error };

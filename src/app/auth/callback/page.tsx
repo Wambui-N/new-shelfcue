@@ -11,15 +11,21 @@ function AuthCallbackContent() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
+      console.log('🔍 Auth Callback - Full URL:', window.location.href);
+      console.log('🔍 Search Params:', Object.fromEntries(searchParams.entries()));
+      
       // Check for OAuth errors in URL params
       const error = searchParams.get('error');
       const errorDescription = searchParams.get('error_description');
+      const errorCode = searchParams.get('error_code');
       
       if (error) {
-        console.error("OAuth error:", error, errorDescription);
+        console.error("❌ OAuth error:", { error, errorDescription, errorCode });
         const message = errorDescription 
           ? decodeURIComponent(errorDescription.replace(/\+/g, ' '))
-          : 'Authentication failed';
+          : error === 'oauth_error' 
+            ? 'OAuth authentication failed. Please try again.'
+            : 'Authentication failed';
         setErrorMessage(message);
         
         // Redirect to signin with error after 3 seconds
