@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getGoogleClient } from "@/lib/google";
 import { GoogleCalendarService } from "@/lib/googleCalendar";
+import { getSupabaseAdmin } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,8 +21,26 @@ export async function GET(request: NextRequest) {
     const googleClient = await getGoogleClient(userId);
     if (!googleClient) {
       console.log('❌ No Google client found for user:', userId);
+      
+      // Check if tokens exist in database
+      const supabaseAdmin = getSupabaseAdmin();
+      const { data: tokens } = await supabaseAdmin
+        .from("user_google_tokens")
+        .select("*")
+        .eq("user_id", userId);
+      
+      console.log('🔍 Tokens in database:', tokens);
+      
       return NextResponse.json(
-        { error: "Google authentication required. Please sign in with Google again." },
+        { 
+          error: "Google authentication required. Please sign in with Google again.",
+          debug: {
+            userId,
+            hasTokens: !!tokens && tokens.length > 0,
+            tokenCount: tokens?.length || 0,
+            tokens: tokens || []
+          }
+        },
         { status: 401 },
       );
     }
