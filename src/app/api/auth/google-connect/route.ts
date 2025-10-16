@@ -11,10 +11,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Create OAuth2 client with proper scopes
+    const redirectUri = process.env.NODE_ENV === 'production' 
+      ? 'https://www.shelfcue.com/api/auth/google-server-callback'
+      : 'http://localhost:3000/api/auth/google-server-callback';
+    
     const oauth2Client = new google.auth.OAuth2(
       process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/auth/google-server-callback`
+      redirectUri
     );
 
     // Generate auth URL with required scopes
@@ -30,7 +34,7 @@ export async function GET(request: NextRequest) {
       ],
       state: userId, // Pass user ID in state
       prompt: 'consent', // Force consent screen
-      redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/auth/google-server-callback`
+      redirect_uri: redirectUri
     });
 
     return NextResponse.json({ authUrl });
