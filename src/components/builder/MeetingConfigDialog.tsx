@@ -37,7 +37,6 @@ export function MeetingConfigDialog({
   const [selectedCalendar, setSelectedCalendar] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [connectingGoogle, setConnectingGoogle] = useState(false);
 
   useEffect(() => {
     if (open && userId) {
@@ -78,24 +77,6 @@ export function MeetingConfigDialog({
     }
   };
 
-  const connectGoogle = async () => {
-    setConnectingGoogle(true);
-    try {
-      const response = await fetch(`/api/auth/google-connect?userId=${userId}`);
-      const data = await response.json();
-      if (data.authUrl) {
-        window.location.href = data.authUrl;
-      } else {
-        setError("Failed to get Google auth URL");
-      }
-    } catch (err) {
-      setError("Failed to connect to Google");
-      console.error("Google connect error:", err);
-    } finally {
-      setConnectingGoogle(false);
-    }
-  };
-
   const handleConfirm = () => {
     console.log("📅 Confirming calendar selection:", selectedCalendar);
     if (selectedCalendar) {
@@ -133,22 +114,14 @@ export function MeetingConfigDialog({
           ) : error ? (
             <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
               <p className="text-sm text-destructive">{error}</p>
-              <div className="flex gap-2 mt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={fetchCalendars}
-                >
-                  Retry
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={connectGoogle}
-                  disabled={connectingGoogle}
-                >
-                  {connectingGoogle ? "Connecting..." : "Connect Google"}
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchCalendars}
+                className="mt-2"
+              >
+                Retry
+              </Button>
             </div>
           ) : calendars.length === 0 ? (
             <div className="p-4 bg-muted rounded-lg">
