@@ -43,7 +43,9 @@ function AuthCallbackContent() {
           hasProviderToken: !!data.session.provider_token,
           hasRefreshToken: !!data.session.provider_refresh_token,
           expiresIn: data.session.expires_in,
-          userId: data.session.user.id
+          userId: data.session.user.id,
+          provider: data.session.user.app_metadata?.provider,
+          providers: data.session.user.app_metadata?.providers
         });
         
         if (data.session.provider_token) {
@@ -63,6 +65,7 @@ function AuthCallbackContent() {
           }
         } else {
           console.log('❌ No provider token available in session');
+          console.log('🔍 Full session object:', JSON.stringify(data.session, null, 2));
         }
 
         // Check if user has a subscription
