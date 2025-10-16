@@ -62,6 +62,25 @@ export async function getGoogleClient(
 
     if (error || !data) {
       console.error("❌ No Google tokens found for user:", userId, "Error:", error);
+      
+      // Try to get tokens from Supabase's built-in token storage
+      console.log('🔍 Trying to get tokens from Supabase session...');
+      const { data: sessionData } = await supabaseAdmin.auth.admin.getUserById(userId);
+      if (sessionData?.user?.app_metadata?.provider_token) {
+        console.log('✅ Found provider token in Supabase metadata');
+        // Store the token for future use
+        await supabaseAdmin.from("user_google_tokens").upsert({
+          user_id: userId,
+          access_token: sessionData.user.app_metadata.provider_token,
+          refresh_token: sessionData.user.app_metadata.provider_refresh_token || "",
+          expires_at: Math.floor(Date.now() / 1000) + 3600,
+        });
+        return new GoogleAPIClient(
+          sessionData.user.app_metadata.provider_token,
+          sessionData.user.app_metadata.provider_refresh_token || ""
+        );
+      }
+      
       return null;
     }
     
