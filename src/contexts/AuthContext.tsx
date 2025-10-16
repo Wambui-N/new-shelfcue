@@ -71,19 +71,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     // Use production URL if available, fallback to window.location.origin
-    // Force production URL for now to test
-    const redirectUrl = 'https://www.shelfcue.com/auth/callback';
+    const redirectUrl = process.env.NEXT_PUBLIC_APP_URL 
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+      : (window.location.hostname === 'shelfcue.com' || window.location.hostname === 'www.shelfcue.com')
+        ? 'https://www.shelfcue.com/auth/callback'
+        : `${window.location.origin}/auth/callback`;
     
+    console.log('=== OAuth Debug Info ===');
     console.log('OAuth redirect URL:', redirectUrl);
     console.log('Current hostname:', window.location.hostname);
     console.log('NEXT_PUBLIC_APP_URL:', process.env.NEXT_PUBLIC_APP_URL);
+    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log('========================');
     
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: redirectUrl,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
       },
     });
+    
+    if (error) {
+      console.error('OAuth Error:', error);
+    }
+    
     return { error };
   };
 

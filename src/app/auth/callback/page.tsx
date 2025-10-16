@@ -57,8 +57,10 @@ function AuthCallbackContent() {
 
         // If no subscription, redirect to billing to set up trial
         if (!subscription) {
+          console.log('No subscription found, redirecting to billing for trial setup');
           router.push("/dashboard/billing?trial=true&new=true");
         } else {
+          console.log('Subscription found, redirecting to dashboard');
           router.push("/dashboard");
         }
       } else {
