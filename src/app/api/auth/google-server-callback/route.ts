@@ -61,8 +61,7 @@ export async function GET(request: NextRequest) {
       const storeResult = await tokenStorage.storeTokens(state, {
         access_token: tokens.access_token!,
         refresh_token: tokens.refresh_token || "",
-        expires_at: expiresAtSeconds,
-        scope: tokens.scope
+        expires_at: expiresAtSeconds
       });
 
       if (storeResult.success) {

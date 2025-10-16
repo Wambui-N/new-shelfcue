@@ -4,7 +4,6 @@ export interface GoogleTokens {
   access_token: string;
   refresh_token?: string;
   expires_at: number; // Unix timestamp in seconds
-  scope?: string;
 }
 
 export interface TokenStorageResult {
@@ -39,11 +38,8 @@ export class TokenStorage {
       const tokenData = {
         user_id: userId,
         access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token || null,
+        refresh_token: tokens.refresh_token || "",
         expires_at: expiresAt,
-        scope: tokens.scope || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
       };
 
       console.log('🔍 Token data to store:', {
@@ -80,8 +76,7 @@ export class TokenStorage {
         tokens: {
           access_token: data.access_token,
           refresh_token: data.refresh_token,
-          expires_at: data.expires_at,
-          scope: data.scope
+          expires_at: data.expires_at
         }
       };
 
@@ -130,8 +125,7 @@ export class TokenStorage {
         tokens: {
           access_token: data.access_token,
           refresh_token: data.refresh_token,
-          expires_at: data.expires_at,
-          scope: data.scope
+          expires_at: data.expires_at
         }
       };
 
@@ -225,8 +219,7 @@ export class TokenStorage {
         tokens: data ? {
           access_token: data.access_token,
           refresh_token: data.refresh_token,
-          expires_at: data.expires_at,
-          scope: data.scope
+          expires_at: data.expires_at
         } : undefined
       };
 

@@ -40,8 +40,7 @@ export async function GET(request: NextRequest) {
       hasRefreshToken: !!tokenResult.tokens!.refresh_token,
       expires_at: tokenResult.tokens!.expires_at,
       expires_at_date: new Date(tokenResult.tokens!.expires_at * 1000).toISOString(),
-      is_expired: tokenResult.tokens!.expires_at < Math.floor(Date.now() / 1000),
-      scope: tokenResult.tokens!.scope
+      is_expired: tokenResult.tokens!.expires_at < Math.floor(Date.now() / 1000)
     }] : [];
 
     return NextResponse.json({

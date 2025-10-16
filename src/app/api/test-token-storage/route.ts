@@ -19,8 +19,7 @@ export async function GET(request: NextRequest) {
         const testTokens = {
           access_token: "test_access_token_" + Date.now(),
           refresh_token: "test_refresh_token_" + Date.now(),
-          expires_at: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
-          scope: "test_scope"
+          expires_at: Math.floor(Date.now() / 1000) + 3600 // 1 hour from now
         };
 
         const storeResult = await tokenStorage.storeTokens(userId, testTokens);
