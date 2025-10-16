@@ -81,11 +81,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       provider: "google",
       options: {
         redirectTo: redirectUrl,
-        scopes: 'openid email profile https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file',
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
       },
     });
     return { error };
