@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const oauth2Client = new google.auth.OAuth2(
       process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/auth/google-callback`
+      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/auth/google-server-callback`
     );
 
     // Generate auth URL with required scopes
@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
         'profile'
       ],
       state: userId, // Pass user ID in state
-      prompt: 'consent' // Force consent screen
+      prompt: 'consent', // Force consent screen
+      redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/auth/google-server-callback`
     });
 
     return NextResponse.json({ authUrl });

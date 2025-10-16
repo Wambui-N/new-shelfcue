@@ -57,7 +57,18 @@ export function MeetingConfigDialog({
       console.log("📅 Calendar fetch response:", response.status);
 
       if (!response.ok) {
-        throw new Error("Failed to fetch calendars");
+        const errorData = await response.json();
+        if (response.status === 401) {
+          // No tokens - redirect to Google OAuth
+          console.log("📅 No Google tokens found, redirecting to OAuth...");
+          const connectResponse = await fetch(`/api/auth/google-connect?userId=${userId}`);
+          const connectData = await connectResponse.json();
+          if (connectData.authUrl) {
+            window.location.href = connectData.authUrl;
+            return;
+          }
+        }
+        throw new Error(errorData.error || "Failed to fetch calendars");
       }
       const data = await response.json();
       console.log("📅 Calendars fetched:", data.calendars?.length || 0);
