@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     
     const supabaseAdmin = getSupabaseAdmin();
     
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await (supabaseAdmin as any)
       .from("user_google_tokens")
       .select("*")
       .eq("user_id", userId);

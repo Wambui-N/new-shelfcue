@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       
       // Check if tokens exist in database
       const supabaseAdmin = getSupabaseAdmin();
-      const { data: tokens } = await supabaseAdmin
+      const { data: tokens } = await (supabaseAdmin as any)
         .from("user_google_tokens")
         .select("*")
         .eq("user_id", userId);

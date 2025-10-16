@@ -69,7 +69,7 @@ export async function getGoogleClient(
       if (sessionData?.user?.app_metadata?.provider_token) {
         console.log('✅ Found provider token in Supabase metadata');
         // Store the token for future use
-        await supabaseAdmin.from("user_google_tokens").upsert({
+        await (supabaseAdmin as any).from("user_google_tokens").upsert({
           user_id: userId,
           access_token: sessionData.user.app_metadata.provider_token,
           refresh_token: sessionData.user.app_metadata.provider_refresh_token || "",

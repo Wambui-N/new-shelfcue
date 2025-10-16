@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin();
     const expiresAtSeconds = Math.floor((tokens.expiry_date || Date.now() + 3600000) / 1000);
     
-    const { error: tokenError } = await supabaseAdmin
+    const { error: tokenError } = await (supabaseAdmin as any)
       .from("user_google_tokens")
       .upsert({
         user_id: state,
