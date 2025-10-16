@@ -48,6 +48,7 @@ function AuthCallbackContent() {
           providers: data.session.user.app_metadata?.providers
         });
         
+        // Check if we have Google tokens in the session
         if (data.session.provider_token) {
           console.log('💾 Storing Google tokens for user:', data.session.user.id);
           // Store expiry as seconds since epoch to match server utilities
@@ -66,6 +67,27 @@ function AuthCallbackContent() {
         } else {
           console.log('❌ No provider token available in session');
           console.log('🔍 Full session object:', JSON.stringify(data.session, null, 2));
+          
+          // Try to get tokens from URL parameters (fallback)
+          const urlParams = new URLSearchParams(window.location.search);
+          const code = urlParams.get('code');
+          if (code) {
+            console.log('🔍 Found authorization code, exchanging for tokens...');
+            try {
+              const response = await fetch('/api/auth/google-tokens', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: data.session.user.id, code })
+              });
+              if (response.ok) {
+                console.log('✅ Tokens exchanged and stored successfully');
+              } else {
+                console.error('❌ Failed to exchange code for tokens');
+              }
+            } catch (error) {
+              console.error('❌ Error exchanging code for tokens:', error);
+            }
+          }
         }
 
         // Check if user has a subscription
