@@ -73,7 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Use production URL if available, fallback to window.location.origin
     const redirectUrl = process.env.NEXT_PUBLIC_APP_URL 
       ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
-      : `${window.location.origin}/auth/callback`;
+      : window.location.hostname === 'shelfcue.com' 
+        ? 'https://shelfcue.com/auth/callback'
+        : `${window.location.origin}/auth/callback`;
     
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
