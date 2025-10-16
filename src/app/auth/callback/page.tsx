@@ -40,12 +40,20 @@ function AuthCallbackContent() {
       if (data.session) {
         // Store Google tokens if available
         if (data.session.provider_token) {
-          await supabase.from("user_google_tokens").upsert({
+          console.log('Storing Google tokens for user:', data.session.user.id);
+          const { error: tokenError } = await supabase.from("user_google_tokens").upsert({
             user_id: data.session.user.id,
             access_token: data.session.provider_token,
             refresh_token: data.session.provider_refresh_token || "",
             expires_at: Date.now() + (data.session.expires_in || 3600) * 1000,
           });
+          if (tokenError) {
+            console.error('Error storing Google tokens:', tokenError);
+          } else {
+            console.log('Google tokens stored successfully');
+          }
+        } else {
+          console.log('No provider token available');
         }
 
         // Check if user has a subscription
