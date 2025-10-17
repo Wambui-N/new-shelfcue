@@ -1,8 +1,8 @@
-import { supabase } from "./supabase";
+import { supabaseAdmin } from "./supabase/admin";
 
 export async function trackFormView(formId: string) {
   try {
-    await supabase.from("form_views").insert({
+    await supabaseAdmin.from("form_views").insert({
       form_id: formId,
       viewed_at: new Date().toISOString(),
     });

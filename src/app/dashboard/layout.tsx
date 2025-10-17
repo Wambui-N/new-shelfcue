@@ -25,9 +25,9 @@ import { TrialBanner } from "@/components/subscriptions/TrialBanner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 
-interface DashboardLayoutProps {
+interface DashboardLayoutProps{
   children: React.ReactNode;
 }
 
@@ -35,6 +35,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const supabase = createClient();
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);

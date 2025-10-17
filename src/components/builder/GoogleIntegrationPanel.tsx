@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 
 interface GoogleIntegrationPanelProps {
   formId: string;
@@ -37,6 +37,7 @@ export function GoogleIntegrationPanel({
   formFields,
 }: GoogleIntegrationPanelProps) {
   const { user } = useAuth();
+  const supabase = createClient();
   const [isGoogleConnected, setIsGoogleConnected] = useState(false);
   const [connectedSheet, setConnectedSheet] = useState<any>(null);
   const [connectedCalendar, setConnectedCalendar] = useState<any>(null);

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getPaystackService } from "@/lib/paystack";
-import { getSupabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function GET(request: NextRequest) {
 	try {

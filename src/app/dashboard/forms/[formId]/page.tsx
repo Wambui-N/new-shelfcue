@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import type { FormData } from "@/types/form";
 
 interface FormViewPageProps {
@@ -32,6 +32,7 @@ interface FormViewPageProps {
 function FormViewPage({ params }: FormViewPageProps) {
   const router = useRouter();
   const { user } = useAuth();
+  const supabase = createClient();
   const [formData, setFormData] = useState<FormData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

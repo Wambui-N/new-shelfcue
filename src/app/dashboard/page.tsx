@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 
 interface FormRecord {
   id: string;
@@ -44,6 +44,7 @@ interface SubmissionRecord {
 export default function DashboardPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const supabase = createClient();
 
   const [forms, setForms] = useState<FormRecord[]>([]);
   const [recentSubmissions, setRecentSubmissions] = useState<

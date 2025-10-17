@@ -1,13 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { canPerformAction } from "@/lib/subscriptionLimits";
-import { createClient } from "@/lib/supabase";
+import { createServerClient } from "@/lib/supabase/server";
 
 /**
  * API endpoint to check if user can create a new form
  */
 export async function GET(_request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createServerClient();
 
     const {
       data: { user },

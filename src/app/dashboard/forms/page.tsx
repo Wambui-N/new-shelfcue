@@ -49,7 +49,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 
 interface FormRecord {
   id: string;
@@ -64,6 +64,7 @@ interface FormRecord {
 
 export default function FormsPage() {
   const { user } = useAuth();
+  const supabase = createClient();
   const [forms, setForms] = useState<FormRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedForms, setSelectedForms] = useState<Set<string>>(new Set());

@@ -3,7 +3,7 @@
  * Utilities to check and enforce subscription limits
  */
 
-import { getSupabaseAdmin } from "./supabase";
+import { getSupabaseAdmin } from "./supabase/admin";
 
 type LimitType = "forms" | "submissions_per_month" | "storage_mb" | "api_calls";
 

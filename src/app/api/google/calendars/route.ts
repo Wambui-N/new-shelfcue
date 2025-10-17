@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getGoogleClient } from "@/lib/google";
 import { GoogleCalendarService } from "@/lib/googleCalendar";
-import { getSupabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { tokenStorage } from "@/lib/token-storage";
 
 export async function GET(request: NextRequest) {

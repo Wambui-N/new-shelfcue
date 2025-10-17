@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getGoogleClient } from "@/lib/google";
 import { createCalendarEventFromSubmission } from "@/lib/googleCalendar";
 import { GoogleSheetsService } from "@/lib/googleSheets";
-import { getSupabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { incrementUsage, canPerformAction } from "@/lib/subscriptionLimits";
 import { EmailService } from "@/lib/resend";
 

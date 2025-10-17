@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from "./supabase";
+import { supabaseAdmin } from "./supabase/admin";
 
 export interface GoogleTokens {
   access_token: string;
@@ -16,7 +16,6 @@ export interface TokenStorageResult {
  * Robust token storage with validation and error handling
  */
 export class TokenStorage {
-  private supabaseAdmin = getSupabaseAdmin();
 
   /**
    * Store Google tokens for a user with validation
@@ -51,7 +50,7 @@ export class TokenStorage {
       });
 
       // Use upsert to handle both insert and update cases
-      const { data, error } = await (this.supabaseAdmin as any)
+      const { data, error } = await supabaseAdmin
         .from("user_google_tokens")
         .upsert(tokenData, { 
           onConflict: 'user_id',
@@ -96,7 +95,7 @@ export class TokenStorage {
     try {
       console.log('🔍 Retrieving tokens for user:', userId);
 
-      const { data, error } = await (this.supabaseAdmin as any)
+      const { data, error } = await supabaseAdmin
         .from("user_google_tokens")
         .select("*")
         .eq("user_id", userId)
@@ -162,7 +161,7 @@ export class TokenStorage {
     try {
       console.log('🗑️ Deleting tokens for user:', userId);
 
-      const { error } = await (this.supabaseAdmin as any)
+      const { error } = await supabaseAdmin
         .from("user_google_tokens")
         .delete()
         .eq("user_id", userId);
@@ -196,7 +195,7 @@ export class TokenStorage {
         updated_at: new Date().toISOString(),
       };
 
-      const { data, error } = await (this.supabaseAdmin as any)
+      const { data, error } = await supabaseAdmin
         .from("user_google_tokens")
         .update(updateData)
         .eq("user_id", userId)

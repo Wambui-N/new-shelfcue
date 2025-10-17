@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 
 type Submission = {
   id: string;
@@ -52,6 +52,7 @@ type FormSummary = { id: string; title: string };
 
 export default function SubmissionsPage() {
   const { user } = useAuth();
+  const supabase = createClient();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [forms, setForms] = useState<FormSummary[]>([]);
   const [loading, setLoading] = useState(true);

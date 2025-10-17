@@ -16,10 +16,11 @@ import { AnalyticsSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AnalyticsPage() {
   const { user } = useAuth();
+  const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [analyticsData, setAnalyticsData] = useState({
     totalForms: 0,

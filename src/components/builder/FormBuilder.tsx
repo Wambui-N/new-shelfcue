@@ -21,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { useFormStore } from "@/store/formStore";
 import { FieldEditor } from "./FieldEditor";
 import { FormPreview } from "./FormPreview";
@@ -38,6 +38,7 @@ interface FormBuilderProps {
 export function FormBuilder({ onBack }: FormBuilderProps) {
   const router = useRouter();
   const { user } = useAuth();
+  const supabase = createClient();
   const { formData, isDirty, isSaving, updateForm, setDirty, setSaving } =
     useFormStore();
   const [activeTab, setActiveTab] = useState("fields");

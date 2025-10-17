@@ -1,5 +1,5 @@
 import { google } from "googleapis";
-import { getSupabaseAdmin } from "./supabase";
+import { getSupabaseAdmin } from "./supabase/admin";
 import { tokenStorage, GoogleTokens } from "./token-storage";
 
 export class GoogleAPIClient {

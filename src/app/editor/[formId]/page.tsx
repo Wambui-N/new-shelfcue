@@ -6,17 +6,18 @@ import { FormBuilder } from "@/components/builder/FormBuilder";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { FormEditSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { useFormStore } from "@/store/formStore";
 import type { FormData } from "@/types/form";
 
-interface EditorPageProps {
+interface EditorPageProps{
   params: Promise<{ formId: string }>;
 }
 
 function EditorPage({ params }: EditorPageProps) {
   const router = useRouter();
   const { user } = useAuth();
+  const supabase = createClient();
   const { loadForm } = useFormStore();
   const [loading, setLoading] = useState(true);
   const [formId, setFormId] = useState<string>("");

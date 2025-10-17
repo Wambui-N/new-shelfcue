@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getGoogleClient } from "@/lib/google";
 import { GoogleSheetsService } from "@/lib/googleSheets";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Save sheet connection to database
-    const { data: connection, error: dbError } = await supabase
+    const { data: connection, error: dbError } = await supabaseAdmin
       .from("sheet_connections")
       .insert({
         user_id: userId,
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     // If formId provided, link the sheet to the form
     if (formId && connection) {
-      await supabase
+      await supabaseAdmin
         .from("forms")
         .update({ default_sheet_connection_id: connection.id })
         .eq("id", formId)

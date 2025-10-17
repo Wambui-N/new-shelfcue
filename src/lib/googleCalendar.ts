@@ -1,5 +1,5 @@
 import type { GoogleAPIClient } from "./google";
-import { getSupabaseAdmin } from "./supabase";
+import { getSupabaseAdmin } from "./supabase/admin";
 
 interface CalendarEvent {
   summary: string;

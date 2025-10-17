@@ -4,11 +4,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { GoogleConnectPrompt } from "@/components/GoogleConnectPrompt";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 
 export default function WelcomePage() {
   const router = useRouter();
   const { user } = useAuth();
+  const supabase = createClient();
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
