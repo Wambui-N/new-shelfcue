@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     const reference = generatePaymentReference(user.id);
     const paystack = getPaystackService();
-    const chargeAmount = is_trial ? 50 : amount;
+    const chargeAmount = is_trial ? 0 : amount;
 
     const initResponse = await paystack.initializeTransaction({
       email: user.email!,
@@ -43,8 +43,27 @@ export async function POST(request: Request) {
       );
     }
 
-    // Since this is initialization, we don't store a transaction record yet.
-    // We wait for the webhook or verification callback.
+    // Create a pending transaction record
+    const { error: transactionError } = await supabase
+      .from("payment_transactions")
+      .insert({
+        user_id: user.id,
+        paystack_reference: reference,
+        amount: chargeAmount / 100, // Convert from cents to dollars
+        currency: "USD",
+        status: "pending",
+        payment_method: "card",
+        metadata: {
+          user_id: user.id,
+          subscription_type: "professional",
+          is_trial,
+        },
+      } as any);
+
+    if (transactionError) {
+      console.error("Error creating transaction record:", transactionError);
+      // Don't fail the initialization, just log the error
+    }
 
     return NextResponse.json({
       authorization_url: initResponse.data.authorization_url,

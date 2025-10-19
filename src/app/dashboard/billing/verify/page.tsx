@@ -47,12 +47,20 @@ function VerifyContent() {
 
 			const data = await response.json();
 
+			console.log("🔍 Verification response:", {
+				status: response.status,
+				ok: response.ok,
+				data: data
+			});
+
 			if (response.ok && data.success) {
 				setStatus("success");
 				setMessage("Payment verified successfully! Your subscription is now active.");
 			} else {
 				setStatus("error");
-				setMessage(data.error || "Payment verification failed");
+				const errorMessage = data.details || data.error || "Payment verification failed";
+				setMessage(errorMessage);
+				console.error("❌ Payment verification failed:", data);
 			}
 		} catch (error) {
 			setStatus("error");

@@ -41,18 +41,31 @@ export async function GET(request: NextRequest) {
     const paystack = getPaystackService();
     const verification = await paystack.verifyTransaction(reference);
 
+    console.log("🔍 Paystack verification response:", {
+      status: verification.status,
+      dataStatus: verification.data?.status,
+      message: verification.message,
+    });
+
     if (!verification.status || verification.data.status !== "success") {
+      console.log("❌ Payment verification failed:", verification);
+      
       // Update transaction as failed
       await (supabase as any)
         .from("payment_transactions")
         .update({
           status: "failed",
-          gateway_response: verification.data.status,
+          gateway_response: verification.data?.status || "unknown",
         })
         .eq("paystack_reference", reference);
 
       return NextResponse.json(
-        { error: "Payment verification failed", data: verification.data },
+        { 
+          error: "Payment verification failed", 
+          details: verification.message,
+          paystackStatus: verification.data?.status,
+          data: verification.data 
+        },
         { status: 400 },
       );
     }
