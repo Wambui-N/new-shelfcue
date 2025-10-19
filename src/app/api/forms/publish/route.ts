@@ -207,12 +207,36 @@ export async function POST(request: NextRequest) {
         } else {
           throw new Error("Failed to create Google Sheet");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("❌ Error creating Google Sheet:", error);
+        
+        // Log more details about the error
+        if (error.response) {
+          console.error("Google API Error Response:", {
+            status: error.response.status,
+            statusText: error.response.statusText,
+            data: error.response.data,
+          });
+        }
+        
+        // Check if it's an authentication error
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          return NextResponse.json(
+            {
+              error: "Google authentication failed",
+              code: "GOOGLE_AUTH_FAILED",
+              details: "Your Google authentication is invalid or expired. Please reconnect your Google account.",
+              action: "reconnect_google",
+            },
+            { status: 403 },
+          );
+        }
+        
         return NextResponse.json(
           {
             error: "Failed to create Google Sheet",
             details: error instanceof Error ? error.message : "Unknown error",
+            errorDetails: error.response?.data || error.message || "No additional details",
           },
           { status: 500 },
         );

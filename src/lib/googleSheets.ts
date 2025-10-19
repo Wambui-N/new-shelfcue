@@ -12,9 +12,15 @@ export class GoogleSheetsService {
    */
   async createSheet(title: string, headers?: string[]) {
     try {
+      console.log("🔵 Starting Google Sheet creation...");
+      console.log("📝 Sheet title:", title);
+      console.log("📊 Headers:", headers);
+      
       const sheets = this.client.getSheets();
+      console.log("✅ Google Sheets API client initialized");
 
       // Create a new spreadsheet
+      console.log("🚀 Creating spreadsheet...");
       const response = await sheets.spreadsheets.create({
         requestBody: {
           properties: {
@@ -30,10 +36,12 @@ export class GoogleSheetsService {
         },
       });
 
+      console.log("✅ Spreadsheet created:", response.data.spreadsheetId);
       const spreadsheetId = response.data.spreadsheetId;
 
       // If headers provided, add them as the first row
       if (headers && headers.length > 0 && spreadsheetId) {
+        console.log("📝 Adding headers to sheet...");
         await sheets.spreadsheets.values.update({
           spreadsheetId,
           range: "Form Responses!A1",
@@ -42,14 +50,30 @@ export class GoogleSheetsService {
             values: [["Submitted at", ...headers]],
           },
         });
+        console.log("✅ Headers added successfully");
       }
 
+      console.log("✅ Google Sheet creation complete");
       return {
         spreadsheetId: spreadsheetId!,
         spreadsheetUrl: response.data.spreadsheetUrl!,
       };
-    } catch (error) {
-      console.error("Error creating Google Sheet:", error);
+    } catch (error: any) {
+      console.error("❌ Error creating Google Sheet:", error);
+      
+      // Log detailed error information
+      if (error.response) {
+        console.error("Google API Error:", {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+        });
+      }
+      
+      if (error.message) {
+        console.error("Error message:", error.message);
+      }
+      
       throw error;
     }
   }

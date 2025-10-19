@@ -339,14 +339,14 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         // Mark sheet creation as error
         setPublishProgress((prev) => ({ ...prev, sheet: "error" }));
 
-        // Handle Google not connected or tokens missing
-        if (errorData.code === "GOOGLE_NOT_CONNECTED" || errorData.code === "GOOGLE_TOKENS_MISSING" || errorData.action === "reconnect_google") {
+        // Handle Google not connected, tokens missing, or auth failed
+        if (errorData.code === "GOOGLE_NOT_CONNECTED" || errorData.code === "GOOGLE_TOKENS_MISSING" || errorData.code === "GOOGLE_AUTH_FAILED" || errorData.action === "reconnect_google") {
           // Close progress dialog
           setShowPublishProgress(false);
 
-          const message = errorData.code === "GOOGLE_TOKENS_MISSING" 
+          const message = (errorData.code === "GOOGLE_TOKENS_MISSING" || errorData.code === "GOOGLE_AUTH_FAILED")
             ? "🔄 Reconnect Google Account\n\n" +
-              "Your Google authentication has expired.\n" +
+              "Your Google authentication has expired or is invalid.\n" +
               "Please reconnect your Google account to continue publishing forms.\n\n" +
               "Click OK to reconnect Google now."
             : "🔗 Connect Google Sheets\n\n" +
@@ -358,12 +358,13 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
           if (connectGoogle) {
             // Redirect to Google auth with consent prompt to force new tokens
-            const authUrl = errorData.code === "GOOGLE_TOKENS_MISSING"
+            const needsReconnect = errorData.code === "GOOGLE_TOKENS_MISSING" || errorData.code === "GOOGLE_AUTH_FAILED";
+            const authUrl = needsReconnect
               ? "/api/auth/reconnect-google"
               : "/api/auth/google";
             
             // For reconnect, we need to fetch the URL first
-            if (errorData.code === "GOOGLE_TOKENS_MISSING") {
+            if (needsReconnect) {
               try {
                 const response = await fetch("/api/auth/reconnect-google", {
                   method: "POST",
