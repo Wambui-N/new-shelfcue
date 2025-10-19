@@ -18,7 +18,7 @@ export async function GET() {
     .select(
       `
         *,
-        plan:plans(*)
+        plan:subscription_plans(*)
       `,
     )
     .eq("user_id", user.id)
