@@ -72,13 +72,13 @@ export async function GET(request: NextRequest) {
 
     const txData = verification.data;
 
-    // Get transaction metadata
-    console.log("🔍 Looking for transaction with reference:", reference);
+    // Get transaction metadata using the correct column name
+    console.log("🔍 Looking for transaction with paystack_reference:", reference);
     
     const { data: transaction, error: txQueryError } = await (supabase as any)
       .from("payment_transactions")
       .select("*")
-      .eq("reference", reference)
+      .eq("paystack_reference", reference)
       .single();
 
     if (txQueryError) {
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!transaction) {
-      console.error("❌ Transaction not found in database for reference:", reference);
+      console.error("❌ Transaction not found in database for paystack_reference:", reference);
       
       // Create the transaction record if it doesn't exist (payment was successful on Paystack)
       console.log("🔄 Creating transaction record from Paystack data...");
@@ -100,11 +100,20 @@ export async function GET(request: NextRequest) {
         .from("payment_transactions")
         .insert({
           user_id: user.id,
-          customer_id: txData.customer.customer_code,
-          reference: reference,
+          paystack_reference: reference,
+          paystack_transaction_id: txData.id,
           amount: txData.amount / 100, // Convert from kobo to dollars
           currency: txData.currency,
           status: "success",
+          payment_method: txData.channel,
+          authorization_code: txData.authorization.authorization_code,
+          paid_at: txData.paid_at,
+          gateway_response: txData.status,
+          metadata: {
+            user_id: user.id,
+            subscription_type: "professional",
+            is_trial: txData.metadata?.is_trial === true,
+          },
         })
         .select()
         .single();
@@ -121,14 +130,18 @@ export async function GET(request: NextRequest) {
       // Continue with the newly created transaction
     }
 
-		// Update transaction record to success and update customer_id with Paystack customer code
+		// Update transaction record to success with Paystack details
 		await (supabase as any)
 			.from("payment_transactions")
 			.update({
 				status: "success",
-				customer_id: txData.customer.customer_code, // Update with actual Paystack customer code
+				paystack_transaction_id: txData.id,
+				payment_method: txData.channel,
+				authorization_code: txData.authorization.authorization_code,
+				paid_at: txData.paid_at,
+				gateway_response: txData.status,
 			})
-			.eq("reference", reference);
+			.eq("paystack_reference", reference);
 
 		// Store authorization details
 		await (supabase as any).from("payment_authorizations").upsert(

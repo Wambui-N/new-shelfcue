@@ -62,13 +62,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create a pending transaction record
-    // Note: Using a placeholder customer_id since it's required by the schema
-    // This will be updated after payment verification with the actual Paystack customer code
+    // Create a pending transaction record using the actual database schema
     console.log("💾 Creating transaction record...");
     console.log("📝 Transaction details:", {
       user_id: user.id,
-      reference: reference,
+      paystack_reference: reference,
       amount: chargeAmount / 100,
       currency: "USD",
       status: "pending"
@@ -78,11 +76,15 @@ export async function POST(request: Request) {
       .from("payment_transactions")
       .insert({
         user_id: user.id,
-        customer_id: user.id, // Temporary, will be updated with Paystack customer code later
-        reference: reference,
+        paystack_reference: reference,
         amount: chargeAmount / 100, // Convert from cents to dollars
         currency: "USD",
         status: "pending",
+        metadata: {
+          user_id: user.id,
+          subscription_type: "professional",
+          is_trial,
+        },
       })
       .select()
       .single();
