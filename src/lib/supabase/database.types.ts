@@ -216,35 +216,56 @@ export type Database = {
       payment_transactions: {
         Row: {
           amount: number
-          created_at: string
-          currency: string
-          customer_id: string
+          authorization_code: string | null
+          created_at: string | null
+          currency: string | null
+          gateway_response: string | null
           id: string
-          reference: string
+          invoice_id: string | null
+          metadata: Json | null
+          paid_at: string | null
+          paystack_reference: string
+          paystack_transaction_id: number | null
+          payment_method: string | null
           status: string
-          updated_at: string
+          subscription_id: string | null
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           amount: number
-          created_at?: string
-          currency: string
-          customer_id: string
+          authorization_code?: string | null
+          created_at?: string | null
+          currency?: string | null
+          gateway_response?: string | null
           id?: string
-          reference: string
+          invoice_id?: string | null
+          metadata?: Json | null
+          paid_at?: string | null
+          paystack_reference: string
+          paystack_transaction_id?: number | null
+          payment_method?: string | null
           status: string
-          updated_at?: string
+          subscription_id?: string | null
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           amount?: number
-          created_at?: string
-          currency?: string
-          customer_id?: string
+          authorization_code?: string | null
+          created_at?: string | null
+          currency?: string | null
+          gateway_response?: string | null
           id?: string
-          reference?: string
+          invoice_id?: string | null
+          metadata?: Json | null
+          paid_at?: string | null
+          paystack_reference?: string
+          paystack_transaction_id?: number | null
+          payment_method?: string | null
           status?: string
-          updated_at?: string
+          subscription_id?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [

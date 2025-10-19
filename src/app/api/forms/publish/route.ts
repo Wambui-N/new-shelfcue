@@ -102,9 +102,11 @@ export async function POST(request: NextRequest) {
     console.log("✓ Form found:", (form as any).title);
 
     // Get Google client - REQUIRED for publishing
+    console.log("🔍 Getting Google client for user:", userId);
     let googleClient;
     try {
       googleClient = await getGoogleClient(userId);
+      console.log("🔍 Google client result:", !!googleClient);
     } catch (error) {
       console.log("❌ Google not connected - exception:", error);
       return NextResponse.json(
@@ -133,21 +135,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Additional validation: try a simple API call to verify tokens work
-    try {
-      // The googleClient will be used later, so this is just a connectivity check
-      console.log("✅ Google client obtained successfully");
-    } catch (testError) {
-      return NextResponse.json(
-        {
-          error: "Google Sheets connection required",
-          code: "GOOGLE_NOT_CONNECTED",
-          details: "Please connect your Google account to publish forms.",
-          action: "connect_google",
-        },
-        { status: 403 },
-      );
-    }
+    console.log("✅ Google client obtained successfully");
 
     const sheetsService = new GoogleSheetsService(googleClient);
 
@@ -165,15 +153,24 @@ export async function POST(request: NextRequest) {
     // 1. Create Google Sheet (REQUIRED - core feature)
     if (!(form as any).default_sheet_connection_id) {
       try {
-        console.log("Creating Google Sheet for form submissions...");
+        console.log("🔵 Creating Google Sheet for form submissions...");
+        console.log("📊 Form fields:", (form as any).fields);
+        
         const headers = (form as any).fields.map((f: any) => f.label);
+        console.log("📋 Headers to create:", headers);
+        
         if (hasMeetingField) {
           headers.push("Meeting Link");
+          console.log("📅 Added Meeting Link header");
         }
+        
+        console.log("🚀 Calling sheetsService.createSheet...");
         const newSheet = await sheetsService.createSheet(
           `${(form as any).title} - Responses`,
           headers,
         );
+        
+        console.log("✅ Google Sheet created:", newSheet);
 
         if (newSheet.spreadsheetId && newSheet.spreadsheetUrl) {
           const { data: connection, error: connectionError } = await (
