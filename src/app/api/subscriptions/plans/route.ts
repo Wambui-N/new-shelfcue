@@ -6,7 +6,7 @@ export async function GET(_request: NextRequest) {
     const supabase = getSupabaseAdmin();
 
     // Get all active plans
-    const { data: plans, error } = await supabase
+    const { data: plans, error } = await (supabase as any)
       .from("subscription_plans")
       .select("*")
       .eq("is_active", true)

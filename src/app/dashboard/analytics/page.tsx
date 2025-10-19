@@ -40,8 +40,8 @@ export default function AnalyticsPage() {
         setLoading(true);
 
         // Fetch forms
-        const { data: forms, error: formsError } = await supabase
-          .from("forms")
+      const { data: forms, error: formsError } = await (supabase as any)
+        .from("forms")
           .select("id, title, status")
           .eq("user_id", user.id);
 
@@ -53,8 +53,8 @@ export default function AnalyticsPage() {
         }
 
         // Fetch submissions
-        const { data: submissions, error: submissionsError } = await supabase
-          .from("submissions")
+      const { data: submissions, error: submissionsError } = await (supabase as any)
+        .from("submissions")
           .select("id, form_id, created_at")
           .in("form_id", forms?.map((f) => f.id) || []);
 

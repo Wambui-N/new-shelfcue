@@ -85,10 +85,10 @@ function VerifyContent() {
 						</h2>
 						<p className="text-muted-foreground mb-6">{message}</p>
 						<Button
-							onClick={() => router.push("/dashboard/billing")}
+							onClick={() => router.push("/dashboard")}
 							className="w-full"
 						>
-							Go to Billing
+							Go to Dashboard
 						</Button>
 					</>
 				)}

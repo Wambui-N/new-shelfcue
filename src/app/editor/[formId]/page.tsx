@@ -36,8 +36,8 @@ function EditorPage({ params }: EditorPageProps) {
     const fetchForm = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("forms")
+      const { data, error } = await (supabase as any)
+        .from("forms")
           .select("*")
           .eq("id", formId)
           .maybeSingle();

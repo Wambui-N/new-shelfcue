@@ -91,8 +91,8 @@ export default function SubmissionsPage() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("submissions")
+    const { data, error } = await (supabase as any)
+      .from("submissions")
         .select(`
           id, form_id, data, created_at,
           forms!inner (

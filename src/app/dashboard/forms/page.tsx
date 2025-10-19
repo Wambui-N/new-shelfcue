@@ -92,7 +92,7 @@ export default function FormsPage() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("forms")
         .select("id, title, description, created_at, status")
         .eq("user_id", user.id)
@@ -181,7 +181,7 @@ export default function FormsPage() {
     const newStatus = currentStatus === "published" ? "draft" : "published";
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("forms")
         .update({ status: newStatus })
         .eq("id", formId)
@@ -226,7 +226,7 @@ export default function FormsPage() {
     const formIds = Array.from(selectedForms);
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("forms")
         .update({ status: "published" })
         .in("id", formIds)
@@ -251,7 +251,7 @@ export default function FormsPage() {
     const formIds = Array.from(selectedForms);
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("forms")
         .update({ status: "draft" })
         .in("id", formIds)

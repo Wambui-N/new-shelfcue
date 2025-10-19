@@ -77,7 +77,7 @@ export default function BillingPage() {
 			// Fetch current subscription
 			const subResponse = await fetch("/api/subscriptions/current", {
 				headers: {
-					Authorization: `Bearer ${user.access_token}`,
+    Authorization: `Bearer ${(user as any).access_token}`,
 				},
 			});
 

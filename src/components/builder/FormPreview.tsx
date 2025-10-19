@@ -611,7 +611,7 @@ export function FormPreview({ formData, onSubmit }: FormPreviewProps) {
               className="flex items-center gap-1.5 group"
               style={{ fontFamily: 'Satoshi, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}
             >
-              <span className="text-xs" style={{ color: formData.theme.textColor }}>
+              <span className="text-xs text-foreground-muted">
                 Powered by
               </span>
               <div className="flex items-center gap-1.5">

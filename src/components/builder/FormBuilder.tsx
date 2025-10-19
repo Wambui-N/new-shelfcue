@@ -58,6 +58,25 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedDataRef = useRef<string>("");
 
+  // Ensure email field exists if a meeting field is present
+  useEffect(() => {
+    const hasMeetingField = formData.fields.some((f) => f.type === "meeting");
+    const hasEmailField = formData.fields.some((f) => f.type === "email_field");
+
+    if (hasMeetingField && !hasEmailField) {
+      // This is a failsafe. The main logic is in formStore.ts.
+      // This handles loading existing forms that might be in an invalid state.
+      console.warn("Form has meeting field but no email field. Adding one.");
+      useFormStore.getState().addField({
+        id: `field_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        type: "email_field",
+        label: "Email Address",
+        required: true,
+        placeholder: "Enter your email address...",
+      });
+    }
+  }, [formData.fields]);
+
   // Autosave functionality
   useEffect(() => {
     if (!user || !isDirty) return;
@@ -124,8 +143,8 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       // Only include theme and settings if they exist in the database schema
       // Check if form exists first
       if (formData.id) {
-        const { data: existingForm } = await supabase
-          .from("forms")
+      const { data: existingForm } = await (supabase as any)
+        .from("forms")
           .select("theme, settings")
           .eq("id", formData.id)
           .single();
@@ -149,8 +168,8 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       }
 
       console.log("📤 Upserting to Supabase...");
-      const { data: savedForm, error } = await supabase
-        .from("forms")
+    const { data: savedForm, error } = await (supabase as any)
+      .from("forms")
         .upsert(saveData)
         .select()
         .single();
@@ -263,9 +282,9 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     console.log("📅 Saving default_calendar_id to form...");
     if (formData.id && user) {
       try {
-        const { error } = await supabase
-          .from("forms")
-          .update({ default_calendar_id: calendarId })
+      const { error } = await (supabase as any)
+        .from("forms")
+        .update({ default_calendar_id: calendarId })
           .eq("id", formData.id)
           .eq("user_id", user.id);
 

@@ -62,7 +62,7 @@ export function GoogleIntegrationPanel({
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("user_google_tokens")
         .select("id")
         .eq("user_id", user.id)
@@ -80,7 +80,7 @@ export function GoogleIntegrationPanel({
     if (!user || !formId) return;
 
     try {
-      const { data: form } = await supabase
+      const { data: form } = await (supabase as any)
         .from("forms")
         .select(`
           default_sheet_connection_id,
@@ -183,7 +183,7 @@ export function GoogleIntegrationPanel({
     if (!user || !formId) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("forms")
         .update({ default_calendar_id: calendarId })
         .eq("id", formId)

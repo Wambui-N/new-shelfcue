@@ -149,6 +149,9 @@ export async function POST(request: NextRequest) {
       try {
         console.log("Creating Google Sheet for form submissions...");
         const headers = (form as any).fields.map((f: any) => f.label);
+        if (hasMeetingField) {
+          headers.push("Meeting Link");
+        }
         const newSheet = await sheetsService.createSheet(
           `${(form as any).title} - Responses`,
           headers,

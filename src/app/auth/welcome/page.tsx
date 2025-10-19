@@ -34,8 +34,8 @@ export default function WelcomePage() {
         });
 
         // Check if Google is already connected
-        const { data } = await supabase
-          .from("user_google_tokens")
+      const { data } = await (supabase as any)
+        .from("user_google_tokens")
           .select("id")
           .eq("user_id", user.id)
           .single();

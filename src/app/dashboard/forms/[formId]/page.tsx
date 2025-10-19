@@ -55,8 +55,8 @@ function FormViewPage({ params }: FormViewPageProps) {
     const fetchForm = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("forms")
+      const { data, error } = await (supabase as any)
+        .from("forms")
           .select("*")
           .eq("id", formId)
           .maybeSingle();

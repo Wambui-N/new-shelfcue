@@ -54,13 +54,34 @@ export const useFormStore = create<FormStore>((set, get) => ({
   },
 
   addField: (field) => {
-    set((state) => ({
-      formData: {
-        ...state.formData,
-        fields: [...state.formData.fields, field],
-      },
-      isDirty: true,
-    }));
+    set((state) => {
+      const newFields = [...state.formData.fields, field];
+
+      // If a meeting field is added, ensure there's a required email field.
+      if (field.type === "meeting") {
+        const hasEmailField = newFields.some(
+          (f) => f.type === "email_field",
+        );
+        if (!hasEmailField) {
+          const emailField: FormField = {
+            id: `field_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            type: "email_field",
+            label: "Email Address",
+            required: true,
+            placeholder: "Enter your email address...",
+          };
+          newFields.push(emailField);
+        }
+      }
+
+      return {
+        formData: {
+          ...state.formData,
+          fields: newFields,
+        },
+        isDirty: true,
+      };
+    });
   },
 
   updateField: (fieldId, updates) => {
