@@ -66,7 +66,15 @@ export async function POST(request: Request) {
     // Note: Using a placeholder customer_id since it's required by the schema
     // This will be updated after payment verification with the actual Paystack customer code
     console.log("💾 Creating transaction record...");
-    const { error: transactionError } = await (supabase as any)
+    console.log("📝 Transaction details:", {
+      user_id: user.id,
+      reference: reference,
+      amount: chargeAmount / 100,
+      currency: "USD",
+      status: "pending"
+    });
+    
+    const { data: transactionData, error: transactionError } = await (supabase as any)
       .from("payment_transactions")
       .insert({
         user_id: user.id,
@@ -75,13 +83,22 @@ export async function POST(request: Request) {
         amount: chargeAmount / 100, // Convert from cents to dollars
         currency: "USD",
         status: "pending",
-      });
+      })
+      .select()
+      .single();
 
     if (transactionError) {
       console.error("❌ Error creating transaction record:", transactionError);
+      console.error("Transaction error details:", {
+        message: transactionError.message,
+        details: transactionError.details,
+        hint: transactionError.hint,
+        code: transactionError.code
+      });
       // Don't fail the initialization, just log the error
+      // We'll continue with Paystack initialization even if DB insert fails
     } else {
-      console.log("✅ Transaction record created successfully");
+      console.log("✅ Transaction record created successfully:", transactionData);
     }
 
     return NextResponse.json({

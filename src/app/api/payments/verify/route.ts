@@ -73,17 +73,52 @@ export async function GET(request: NextRequest) {
     const txData = verification.data;
 
     // Get transaction metadata
-    const { data: transaction } = await (supabase as any)
+    console.log("🔍 Looking for transaction with reference:", reference);
+    
+    const { data: transaction, error: txQueryError } = await (supabase as any)
       .from("payment_transactions")
       .select("*")
       .eq("reference", reference)
       .single();
 
+    if (txQueryError) {
+      console.error("❌ Error querying transaction:", txQueryError);
+    }
+
+    console.log("📊 Transaction query result:", {
+      found: !!transaction,
+      transaction: transaction,
+      error: txQueryError
+    });
+
     if (!transaction) {
-      return NextResponse.json(
-        { error: "Transaction not found" },
-        { status: 404 },
-      );
+      console.error("❌ Transaction not found in database for reference:", reference);
+      
+      // Create the transaction record if it doesn't exist (payment was successful on Paystack)
+      console.log("🔄 Creating transaction record from Paystack data...");
+      const { data: newTransaction, error: createError } = await (supabase as any)
+        .from("payment_transactions")
+        .insert({
+          user_id: user.id,
+          customer_id: txData.customer.customer_code,
+          reference: reference,
+          amount: txData.amount / 100, // Convert from kobo to dollars
+          currency: txData.currency,
+          status: "success",
+        })
+        .select()
+        .single();
+      
+      if (createError) {
+        console.error("❌ Error creating transaction record:", createError);
+        return NextResponse.json(
+          { error: "Transaction not found and could not be created", details: createError.message },
+          { status: 404 },
+        );
+      }
+      
+      console.log("✅ Transaction record created from Paystack data:", newTransaction);
+      // Continue with the newly created transaction
     }
 
 		// Update transaction record to success and update customer_id with Paystack customer code
