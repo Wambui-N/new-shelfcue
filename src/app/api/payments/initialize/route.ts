@@ -30,9 +30,10 @@ export async function POST(request: Request) {
     console.log("📝 Generated reference:", reference);
     
     const paystack = getPaystackService();
-    const chargeAmount = is_trial ? 0 : amount;
+    // Paystack requires a minimum amount, so charge $0.50 for trials
+    const chargeAmount = is_trial ? 50 : amount;
     
-    console.log("💳 Charge amount:", chargeAmount);
+    console.log("💳 Charge amount:", chargeAmount, is_trial ? "(trial)" : "(full)");
 
     console.log("🚀 Initializing Paystack transaction...");
     const initResponse = await paystack.initializeTransaction({

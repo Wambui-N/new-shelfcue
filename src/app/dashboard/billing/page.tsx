@@ -354,13 +354,13 @@ export default function BillingPage() {
 								<div className="mb-4">
 									{!subscription ? (
 										<>
-											<span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-												$0.00
-											</span>
-											<span className="text-muted-foreground ml-2">authorization</span>
-											<p className="text-sm text-muted-foreground mt-2">
-												Then ${plan.price_monthly}/month after 14 days
-											</p>
+							<span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+								$0.50
+							</span>
+							<span className="text-muted-foreground ml-2">authorization</span>
+							<p className="text-sm text-muted-foreground mt-2">
+								Then ${plan.price_monthly}/month after 14 days
+							</p>
 										</>
 									) : (
 										<>
@@ -403,9 +403,9 @@ export default function BillingPage() {
 										)}
 									</Button>
 									{!subscription && (
-										<p className="text-xs text-center text-muted-foreground mt-3">
-											We'll charge $0.00 to authorize your card. You'll only be charged ${plan.price_monthly}/month after your trial ends.
-										</p>
+								<p className="text-xs text-center text-muted-foreground mt-3">
+									We'll charge $0.50 to authorize your card. You'll only be charged ${plan.price_monthly}/month after your trial ends.
+								</p>
 									)}
 								</div>
 							)}
