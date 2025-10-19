@@ -165,7 +165,6 @@ export async function POST(request: NextRequest) {
             .insert({
               user_id: userId,
               sheet_id: newSheet.spreadsheetId,
-              sheet_url: newSheet.spreadsheetUrl,
               sheet_name: `${(form as any).title} - Responses`,
             })
             .select()

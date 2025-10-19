@@ -44,67 +44,60 @@ export type Database = {
       }
       forms: {
         Row: {
+          calendar_settings: Json | null
           created_at: string
           default_calendar_id: string | null
-          fields: Json | null
+          default_sheet_connection_id: string | null
+          description: string | null
+          drive_folder_id: string | null
+          fields: Json
+          file_settings: Json | null
           id: string
-          is_paid: boolean
-          is_trial: boolean
-          name: string
-          project_id: string
-          published_fields: Json | null
-          settings: Json | null
+          meeting_settings: Json | null
+          settings: Json
           status: string
-          submissions_count: number
           theme: Json | null
+          title: string
           updated_at: string
           user_id: string
-          views: number
         }
         Insert: {
+          calendar_settings?: Json | null
           created_at?: string
           default_calendar_id?: string | null
-          fields?: Json | null
+          default_sheet_connection_id?: string | null
+          description?: string | null
+          drive_folder_id?: string | null
+          fields: Json
+          file_settings?: Json | null
           id?: string
-          is_paid?: boolean
-          is_trial?: boolean
-          name: string
-          project_id: string
-          published_fields?: Json | null
-          settings?: Json | null
-          status?: string
-          submissions_count?: number
+          meeting_settings?: Json | null
+          settings: Json
+          status: string
           theme?: Json | null
+          title: string
           updated_at?: string
           user_id: string
-          views?: number
         }
         Update: {
+          calendar_settings?: Json | null
           created_at?: string
           default_calendar_id?: string | null
-          fields?: Json | null
+          default_sheet_connection_id?: string | null
+          description?: string | null
+          drive_folder_id?: string | null
+          fields?: Json
+          file_settings?: Json | null
           id?: string
-          is_paid?: boolean
-          is_trial?: boolean
-          name?: string
-          project_id?: string
-          published_fields?: Json | null
-          settings?: Json | null
+          meeting_settings?: Json | null
+          settings?: Json
           status?: string
-          submissions_count?: number
           theme?: Json | null
+          title?: string
           updated_at?: string
           user_id?: string
-          views?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "forms_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "forms_user_id_fkey"
             columns: ["user_id"]

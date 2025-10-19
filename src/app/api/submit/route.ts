@@ -164,28 +164,28 @@ export async function POST(request: NextRequest) {
     // Background tasks (don't block response) - Now only for email
     (async () => {
       // Send email notification to form owner
-      try {
-        const { data: profile } = await (supabaseAdmin as any)
-          .from("profiles")
-          .select("email, full_name")
-          .eq("id", (form as any).user_id)
-          .single();
+        try {
+          const { data: profile } = await (supabaseAdmin as any)
+            .from("profiles")
+            .select("email, full_name")
+            .eq("id", (form as any).user_id)
+            .single();
 
-        if ((profile as any)?.email) {
-          await EmailService.sendFormSubmissionNotification(
-            (profile as any).email,
-            {
-              formName: (form as any).title || "Untitled Form",
-              formId: formId,
-              submissionId: (submission as any).id,
-              submittedAt: (submission as any).created_at,
-              submitterData: data,
-            },
-          );
-          console.log("✓ Sent email notification to form owner");
-        }
-      } catch (error) {
-        console.error("Error sending email notification:", error);
+          if ((profile as any)?.email) {
+            await EmailService.sendFormSubmissionNotification(
+              (profile as any).email,
+              {
+                formName: (form as any).title || "Untitled Form",
+                formId: formId,
+                submissionId: (submission as any).id,
+                submittedAt: (submission as any).created_at,
+                submitterData: data,
+              },
+            );
+            console.log("✓ Sent email notification to form owner");
+          }
+        } catch (error) {
+          console.error("Error sending email notification:", error);
       }
     })().catch((error) => {
       console.error("Error in background email task:", error);

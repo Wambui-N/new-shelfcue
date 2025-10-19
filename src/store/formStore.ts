@@ -41,7 +41,7 @@ const defaultForm: FormData = {
   },
 };
 
-export const useFormStore = create<FormStore>((set, get) => ({
+export const useFormStore = create<FormStore>((set) => ({
   formData: defaultForm,
   isDirty: false,
   isSaving: false,

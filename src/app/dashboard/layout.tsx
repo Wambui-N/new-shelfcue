@@ -78,7 +78,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
         .from("submissions")
           .select("id")
           .gte("created_at", sevenDaysAgo.toISOString())
-          .in("form_id", forms?.map((form) => form.id) || []);
+          .in("form_id", forms?.map((form: { id: string }) => form.id) || []);
 
         if (!submissionsError) {
           setNewSubmissionsCount(submissions?.length || 0);

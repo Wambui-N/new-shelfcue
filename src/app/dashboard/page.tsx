@@ -79,7 +79,7 @@ export default function DashboardPage() {
         if (!formsError) {
           setForms(formsData as FormRecord[]);
           const publishedCount =
-            formsData?.filter((form) => form.status === "published").length ||
+            formsData?.filter((form: FormRecord) => form.status === "published").length ||
             0;
           setDashboardStats((prev) => ({
             ...prev,
@@ -110,7 +110,7 @@ export default function DashboardPage() {
           oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
           const leadsThisWeek =
             submissionsData?.filter(
-              (sub) => new Date(sub.created_at) >= oneWeekAgo,
+              (sub: SubmissionRecord) => new Date(sub.created_at) >= oneWeekAgo,
             ).length || 0;
 
           // Get last lead time

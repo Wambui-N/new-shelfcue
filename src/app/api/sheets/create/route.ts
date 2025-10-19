@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: userId,
         sheet_id: spreadsheetId,
-        sheet_url: spreadsheetUrl,
         sheet_name: title,
+        form_id: "", // Placeholder - this will be updated when linked to a form
       })
       .select()
       .single();
@@ -65,10 +65,11 @@ export async function POST(request: NextRequest) {
       spreadsheetUrl,
       connectionId: connection.id,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in create sheet API:", error);
+    const message = (error as { message?: string })?.message || "Failed to create Google Sheet";
     return NextResponse.json(
-      { error: error.message || "Failed to create Google Sheet" },
+      { error: message },
       { status: 500 },
     );
   }

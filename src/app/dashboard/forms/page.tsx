@@ -202,14 +202,14 @@ export default function FormsPage() {
   };
 
   const handleDeleteForm = async () => {
-    if (!formToDelete || deleteConfirmation !== "DELETE") return;
+    if (!formToDelete || deleteConfirmation !== "DELETE" || !user?.id) return;
 
     try {
       const { error } = await supabase
         .from("forms")
         .delete()
         .eq("id", formToDelete.id)
-        .eq("user_id", user?.id);
+        .eq("user_id", user.id);
 
       if (!error) {
         setForms(forms.filter((form) => form.id !== formToDelete.id));

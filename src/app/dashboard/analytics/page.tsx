@@ -17,19 +17,40 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import type { Database } from "@/lib/supabase/database.types";
+
+type Form = Database["public"]["Tables"]["forms"]["Row"];
+type Submission = Database["public"]["Tables"]["submissions"]["Row"];
+
+interface FormAnalytics {
+  form_title: string;
+  total_submissions: number;
+  total_views: number;
+  conversion_rate: number;
+}
+
+interface AnalyticsData {
+  totalForms: number;
+  totalSubmissions: number;
+  totalViews: number;
+  conversionRate: number;
+  formsThisMonth: number;
+  submissionsThisMonth: number;
+  formAnalytics: FormAnalytics[];
+}
 
 export default function AnalyticsPage() {
   const { user } = useAuth();
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
-  const [analyticsData, setAnalyticsData] = useState({
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
     totalForms: 0,
     totalSubmissions: 0,
     totalViews: 0,
     conversionRate: 0,
     formsThisMonth: 0,
     submissionsThisMonth: 0,
-    formAnalytics: [] as any[],
+    formAnalytics: [] as FormAnalytics[],
   });
 
   useEffect(() => {
@@ -40,7 +61,7 @@ export default function AnalyticsPage() {
         setLoading(true);
 
         // Fetch forms
-      const { data: forms, error: formsError } = await (supabase as any)
+      const { data: forms, error: formsError } = await supabase
         .from("forms")
           .select("id, title, status")
           .eq("user_id", user.id);
@@ -53,10 +74,10 @@ export default function AnalyticsPage() {
         }
 
         // Fetch submissions
-      const { data: submissions, error: submissionsError } = await (supabase as any)
+      const { data: submissions, error: submissionsError } = await supabase
         .from("submissions")
           .select("id, form_id, created_at")
-          .in("form_id", forms?.map((f) => f.id) || []);
+          .in("form_id", forms?.map((f: { id: string }) => f.id) || []);
 
         if (!submissionsError) {
           // Calculate metrics
@@ -73,12 +94,12 @@ export default function AnalyticsPage() {
 
           const formsThisMonth =
             forms?.filter(
-              (form) => new Date((form as any).created_at) >= firstDayOfMonth,
+              (form: { created_at: string }) => new Date(form.created_at) >= firstDayOfMonth,
             ).length || 0;
 
           const submissionsThisMonth =
             submissions?.filter(
-              (sub) => new Date(sub.created_at) >= firstDayOfMonth,
+              (sub: { created_at: string }) => new Date(sub.created_at) >= firstDayOfMonth,
             ).length || 0;
 
           const conversionRate =
@@ -97,9 +118,9 @@ export default function AnalyticsPage() {
 
           // Calculate per-form analytics
           const formAnalytics =
-            forms?.map((form) => {
+            forms?.map((form: { id: string; title: string }) => {
               const formSubmissions =
-                submissions?.filter((sub) => sub.form_id === form.id) || [];
+                submissions?.filter((sub: { form_id: string }) => sub.form_id === form.id) || [];
               const formViews = formSubmissions.length * 10;
               const formConversion =
                 formViews > 0
@@ -176,12 +197,12 @@ export default function AnalyticsPage() {
     },
   ];
 
-  const recentActivity = analyticsData.formAnalytics.map((form) => ({
+  const recentActivity = analyticsData.formAnalytics.map((form: FormAnalytics) => ({
     form: form.form_title || "Untitled Form",
-    submissions: parseInt(form.total_submissions) || 0,
-    views: parseInt(form.total_views) || 0,
-    conversion: parseFloat(form.conversion_rate) || 0,
-    trend: parseFloat(form.conversion_rate) >= 15 ? "up" : "down",
+    submissions: form.total_submissions,
+    views: form.total_views,
+    conversion: form.conversion_rate,
+    trend: form.conversion_rate >= 15 ? "up" : "down",
   }));
 
   if (loading) {

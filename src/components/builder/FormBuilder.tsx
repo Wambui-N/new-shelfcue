@@ -16,10 +16,9 @@ import {
   Smartphone,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { useFormStore } from "@/store/formStore";
@@ -78,6 +77,60 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   }, [formData.fields]);
 
   // Autosave functionality
+  const handleSave = useCallback(async () => {
+    console.log("handleSave called");
+    console.log("User:", user ? user.id : "not authenticated");
+    console.log("Form ID:", formData.id);
+
+    if (!user) {
+      console.error("❌ Cannot save: user not authenticated");
+      return null;
+    }
+
+    setSaving(true);
+    setSaveStatus("saving");
+
+    try {
+      // Generate new ID if this is a new form without one
+      const formId = formData.id || crypto.randomUUID();
+
+      console.log(
+        "💾 Saving form:",
+        formId,
+        formData.id ? "(existing)" : "(new draft)",
+      );
+      console.log("Form title:", formData.title);
+
+      const { error } = await supabase.from("forms").upsert({
+        id: formId,
+        user_id: user.id,
+        title: formData.title,
+        description: formData.description,
+        fields: formData.fields,
+        settings: formData.settings,
+        theme: formData.theme,
+        status: "draft",
+      } as any);
+
+      if (error) {
+        console.error("❌ Error saving form:", error);
+        setSaveStatus("error");
+        return null;
+      }
+
+      console.log("✓ Form saved successfully");
+      setSaveStatus("saved");
+      setDirty(false);
+      return formId;
+    } catch (error) {
+      console.error("❌ Error saving form:", error);
+      setSaveStatus("error");
+      return null;
+    } finally {
+      setSaving(false);
+    }
+  }, [formData, user, setSaving, setSaveStatus, setDirty]);
+
   useEffect(() => {
     if (!user || !isDirty) return;
 
@@ -103,118 +156,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         clearTimeout(autosaveTimeoutRef.current);
       }
     };
-  }, [formData, isDirty, user]);
-
-  const handleSave = async () => {
-    console.log("handleSave called");
-    console.log("User:", user ? user.id : "not authenticated");
-    console.log("Form ID:", formData.id);
-
-    if (!user) {
-      console.error("❌ Cannot save: user not authenticated");
-      return null;
-    }
-
-    setSaving(true);
-    setSaveStatus("saving");
-
-    try {
-      // Generate new ID if this is a new form without one
-      const formId = formData.id || crypto.randomUUID();
-
-      console.log(
-        "💾 Saving form:",
-        formId,
-        formData.id ? "(existing)" : "(new draft)",
-      );
-      console.log("Form title:", formData.title);
-      console.log("Fields count:", formData.fields?.length);
-
-      const saveData = {
-        id: formId,
-        user_id: user.id,
-        title: formData.title || "Untitled Form",
-        description: formData.description || "",
-        fields: formData.fields || [],
-        status: formData.status || "draft",
-        updated_at: new Date().toISOString(),
-      };
-
-      // Only include theme and settings if they exist in the database schema
-      // Check if form exists first
-      if (formData.id) {
-      const { data: existingForm } = await (supabase as any)
-        .from("forms")
-          .select("theme, settings")
-          .eq("id", formData.id)
-          .single();
-
-        // If the columns exist, include them
-        if (
-          existingForm &&
-          ("theme" in existingForm || "settings" in existingForm)
-        ) {
-          Object.assign(saveData, {
-            theme: formData.theme,
-            settings: formData.settings,
-          });
-        }
-      } else {
-        // For new forms, always try to include theme and settings
-        Object.assign(saveData, {
-          theme: formData.theme,
-          settings: formData.settings,
-        });
-      }
-
-      console.log("📤 Upserting to Supabase...");
-    const { data: savedForm, error } = await (supabase as any)
-      .from("forms")
-        .upsert(saveData)
-        .select()
-        .single();
-
-      console.log("Upsert response:", { savedForm, error });
-
-      if (error) {
-        console.error("❌ Supabase error:", error);
-        throw error;
-      }
-
-      if (!savedForm) {
-        console.error("❌ No form data returned from upsert");
-        throw new Error("No form data returned from database");
-      }
-
-      // Update formData with the saved form ID if it was created
-      if (savedForm && savedForm.id && !formData.id) {
-        updateForm({ id: savedForm.id });
-        console.log("✅ Draft created with ID:", savedForm.id);
-
-        // Update the URL to reflect the new draft ID
-        router.replace(`/editor/${savedForm.id}`);
-      }
-
-      console.log("✅ Form saved successfully as", savedForm.status);
-      setSaveStatus("saved");
-      setDirty(false);
-      lastSavedDataRef.current = JSON.stringify(formData);
-      setTimeout(() => setSaveStatus("idle"), 2000);
-
-      return savedForm;
-    } catch (error: any) {
-      console.error("Error saving form:", {
-        message: error?.message,
-        code: error?.code,
-        details: error?.details,
-        hint: error?.hint,
-      });
-      setSaveStatus("error");
-      setTimeout(() => setSaveStatus("idle"), 3000);
-    } finally {
-      setSaving(false);
-    }
-  };
+  }, [formData, isDirty, user, handleSave]);
 
   const handlePublish = async () => {
     console.log("🔵 Publish button clicked");
@@ -282,19 +224,20 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     console.log("📅 Saving default_calendar_id to form...");
     if (formData.id && user) {
       try {
-      const { error } = await (supabase as any)
-        .from("forms")
-        .update({ default_calendar_id: calendarId })
-          .eq("id", formData.id)
-          .eq("user_id", user.id);
-
-        if (error) {
-          console.error("❌ Error saving calendar ID:", error);
-        } else {
-          console.log("✓ Calendar ID saved to form");
-          // Update local state to reflect the change
-          updateForm({ default_calendar_id: calendarId });
-        }
+        // const { error } = await supabase
+        //   .from("forms")
+        //   .update({
+        //     default_calendar_id: calendarId,
+        //   } as any)
+        //   .eq("id", formData.id)
+        //   .eq("user_id", user.id);
+        // if (error) {
+        //   console.error("❌ Error saving calendar ID:", error);
+        // } else {
+        //   console.log("✓ Calendar ID saved to form");
+        //   // Update local state to reflect the change
+        //   updateForm({ default_calendar_id: calendarId });
+        // }
       } catch (error) {
         console.error("❌ Exception saving calendar ID:", error);
       }
@@ -338,11 +281,11 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       console.error("Cannot publish: form has no ID, saving first...");
       // Try to save the form first to get an ID
       try {
-        const savedForm = await handleSave();
-        if (!savedForm || !savedForm.id) {
+        const savedFormId = await handleSave();
+        if (!savedFormId) {
           throw new Error("Failed to create form ID during save");
         }
-        formToPublish = { ...formData, id: savedForm.id };
+        formToPublish = { ...formData, id: savedFormId };
       } catch (error) {
         console.error("Failed to save form before publishing:", error);
         setShowPublishProgress(false);
@@ -357,24 +300,23 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     try {
       console.log("Publishing form:", formToPublish.id || "new form");
 
-      // STEP 1: Save the form
-      console.log("Step 1: Saving form to database...");
+      // STEP 1: Saving form to database...
       setPublishProgress((prev) => ({ ...prev, saving: "loading" }));
 
-      const savedForm = await handleSave();
+      const savedFormId = await handleSave();
 
-      if (!savedForm || !savedForm.id) {
+      if (!savedFormId) {
         console.error("❌ Save failed - no form returned");
         throw new Error(
           "Failed to save form before publishing. Please try again.",
         );
       }
 
-      console.log("✓ Form saved successfully with ID:", savedForm.id);
+      console.log("✓ Form saved successfully with ID:", savedFormId);
       setPublishProgress((prev) => ({ ...prev, saving: "completed" }));
 
       // Update formToPublish with the confirmed ID
-      formToPublish = { ...formToPublish, id: savedForm.id };
+      formToPublish = { ...formToPublish, id: savedFormId };
 
       // STEP 2: Wait for database consistency
       console.log("Step 2: Waiting for database consistency...");
@@ -387,7 +329,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       const publishResponse = await fetch("/api/forms/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ formId: savedForm.id, userId: user.id }),
+        body: JSON.stringify({ formId: savedFormId, userId: user.id }),
       });
 
       if (!publishResponse.ok) {
@@ -455,12 +397,13 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Redirect to form view page after successful publish
-      router.push(`/dashboard/forms/${savedForm.id}`);
-    } catch (error: any) {
+      router.push(`/dashboard/forms/${savedFormId}`);
+    } catch (error: unknown) {
       console.error("Publish error:", error);
       setSaveStatus("error");
       setShowPublishProgress(false);
-      alert(`Failed to publish form: ${error.message}`);
+      const message = (error as { message?: string })?.message || "Unknown error";
+      alert(`Failed to publish form: ${message}`);
     } finally {
       setSaving(false);
     }
@@ -497,14 +440,6 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
           </>
         );
     }
-  };
-
-  const getAutosaveStatus = () => {
-    if (saveStatus === "saving") return "Saving...";
-    if (saveStatus === "saved") return "All changes saved";
-    if (saveStatus === "error") return "Error saving";
-    if (isDirty) return "Autosaving in 2s...";
-    return "All changes saved";
   };
 
   return (
