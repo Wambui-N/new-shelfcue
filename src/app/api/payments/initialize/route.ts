@@ -62,22 +62,19 @@ export async function POST(request: Request) {
     }
 
     // Create a pending transaction record
+    // Note: Using a placeholder customer_id since it's required by the schema
+    // This will be updated after payment verification with the actual Paystack customer code
     console.log("💾 Creating transaction record...");
-    const { error: transactionError } = await supabase
+    const { error: transactionError } = await (supabase as any)
       .from("payment_transactions")
       .insert({
         user_id: user.id,
-        paystack_reference: reference,
+        customer_id: user.id, // Temporary, will be updated with Paystack customer code later
+        reference: reference,
         amount: chargeAmount / 100, // Convert from cents to dollars
         currency: "USD",
         status: "pending",
-        payment_method: "card",
-        metadata: {
-          user_id: user.id,
-          subscription_type: "professional",
-          is_trial,
-        },
-      } as any);
+      });
 
     if (transactionError) {
       console.error("❌ Error creating transaction record:", transactionError);

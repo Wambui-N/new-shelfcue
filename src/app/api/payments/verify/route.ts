@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
           status: "failed",
           gateway_response: verification.data?.status || "unknown",
         })
-        .eq("paystack_reference", reference);
+        .eq("reference", reference);
 
       return NextResponse.json(
         { 
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     const { data: transaction } = await (supabase as any)
       .from("payment_transactions")
       .select("*")
-      .eq("paystack_reference", reference)
+      .eq("reference", reference)
       .single();
 
     if (!transaction) {
@@ -86,18 +86,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-		// Update transaction record
+		// Update transaction record to success and update customer_id with Paystack customer code
 		await (supabase as any)
 			.from("payment_transactions")
 			.update({
 				status: "success",
-				paystack_transaction_id: txData.id,
-				authorization_code: txData.authorization.authorization_code,
-				payment_method: txData.channel,
-				paid_at: txData.paid_at,
-				gateway_response: txData.status,
+				customer_id: txData.customer.customer_code, // Update with actual Paystack customer code
 			})
-			.eq("paystack_reference", reference);
+			.eq("reference", reference);
 
 		// Store authorization details
 		await (supabase as any).from("payment_authorizations").upsert(
@@ -134,8 +130,8 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
-		// Check if this is a trial signup
-		const isTrial = transaction.metadata?.is_trial === true;
+		// Check if this is a trial signup from Paystack metadata
+		const isTrial = txData.metadata?.is_trial === true;
 
 		// Activate subscription
 		const now = new Date();
