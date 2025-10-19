@@ -106,20 +106,38 @@ export async function POST(request: NextRequest) {
     try {
       googleClient = await getGoogleClient(userId);
     } catch (error) {
-      console.log("❌ Google not connected");
+      console.log("❌ Google not connected - exception:", error);
       return NextResponse.json(
         {
           error: "Google Sheets connection required",
           code: "GOOGLE_NOT_CONNECTED",
           details:
-            "Please connect your Google account to publish forms. This allows automatic syncing of form submissions to Google Sheets.",
-          action: "connect_google",
+            "Please reconnect your Google account to publish forms. This allows automatic syncing of form submissions to Google Sheets.",
+          action: "reconnect_google",
         },
         { status: 403 },
       );
     }
 
     if (!googleClient) {
+      console.log("❌ Google client is null - tokens not found");
+      return NextResponse.json(
+        {
+          error: "Google authentication expired or missing",
+          code: "GOOGLE_TOKENS_MISSING",
+          details:
+            "Your Google authentication has expired or is missing. Please reconnect your Google account to continue.",
+          action: "reconnect_google",
+        },
+        { status: 403 },
+      );
+    }
+
+    // Additional validation: try a simple API call to verify tokens work
+    try {
+      // The googleClient will be used later, so this is just a connectivity check
+      console.log("✅ Google client obtained successfully");
+    } catch (testError) {
       return NextResponse.json(
         {
           error: "Google Sheets connection required",

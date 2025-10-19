@@ -339,21 +339,48 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         // Mark sheet creation as error
         setPublishProgress((prev) => ({ ...prev, sheet: "error" }));
 
-        // Handle Google not connected
-        if (errorData.code === "GOOGLE_NOT_CONNECTED") {
+        // Handle Google not connected or tokens missing
+        if (errorData.code === "GOOGLE_NOT_CONNECTED" || errorData.code === "GOOGLE_TOKENS_MISSING" || errorData.action === "reconnect_google") {
           // Close progress dialog
           setShowPublishProgress(false);
 
-          const connectGoogle = confirm(
-            "🔗 Connect Google Sheets\n\n" +
+          const message = errorData.code === "GOOGLE_TOKENS_MISSING" 
+            ? "🔄 Reconnect Google Account\n\n" +
+              "Your Google authentication has expired.\n" +
+              "Please reconnect your Google account to continue publishing forms.\n\n" +
+              "Click OK to reconnect Google now."
+            : "🔗 Connect Google Sheets\n\n" +
               "To publish your form, you need to connect Google Sheets.\n" +
               "All form submissions will automatically sync to your Google Sheets.\n\n" +
-              "Click OK to connect Google now.",
-          );
+              "Click OK to connect Google now.";
+
+          const connectGoogle = confirm(message);
 
           if (connectGoogle) {
-            // Redirect to Google auth
-            window.location.href = "/api/auth/google";
+            // Redirect to Google auth with consent prompt to force new tokens
+            const authUrl = errorData.code === "GOOGLE_TOKENS_MISSING"
+              ? "/api/auth/reconnect-google"
+              : "/api/auth/google";
+            
+            // For reconnect, we need to fetch the URL first
+            if (errorData.code === "GOOGLE_TOKENS_MISSING") {
+              try {
+                const response = await fetch("/api/auth/reconnect-google", {
+                  method: "POST",
+                });
+                const data = await response.json();
+                if (data.url) {
+                  window.location.href = data.url;
+                } else {
+                  throw new Error("Failed to get reconnection URL");
+                }
+              } catch (error) {
+                console.error("Error initiating reconnection:", error);
+                alert("Failed to initiate Google reconnection. Please try again.");
+              }
+            } else {
+              window.location.href = authUrl;
+            }
             return;
           } else {
             throw new Error(

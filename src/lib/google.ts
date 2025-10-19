@@ -51,82 +51,106 @@ export async function getGoogleClient(
 ): Promise<GoogleAPIClient | null> {
   try {
     console.log('🔍 Looking for Google tokens for user:', userId);
+    const supabaseAdmin = getSupabaseAdmin();
     
-    // Use the new token storage system
+    // Strategy 1: Check our custom token storage first
     const tokenResult = await tokenStorage.getTokens(userId);
     
-    if (!tokenResult.success || !tokenResult.tokens) {
-      console.error("❌ No Google tokens found for user:", userId, "Error:", tokenResult.error);
+    if (tokenResult.success && tokenResult.tokens) {
+      console.log('✅ Found tokens in custom storage');
+      const tokens = tokenResult.tokens;
       
-      // Try to get tokens from Supabase's built-in token storage as fallback
-      console.log('🔍 Trying to get tokens from Supabase session...');
-      const supabaseAdmin = getSupabaseAdmin();
-      const { data: sessionData } = await supabaseAdmin.auth.admin.getUserById(userId);
-      
-      if (sessionData?.user?.app_metadata?.provider_token) {
-        console.log('✅ Found provider token in Supabase metadata');
+      // Check if token is expired
+      if (tokens.expires_at < Math.floor(Date.now() / 1000)) {
+        console.log('🔄 Token expired, attempting to refresh...');
         
-        // Store the token using our new system
+        try {
+          const client = new GoogleAPIClient(
+            tokens.access_token,
+            tokens.refresh_token || "",
+          );
+          
+          const newCredentials = await client.refreshAccessToken();
+          
+          // Update tokens in database
+          const updateResult = await tokenStorage.updateTokens(userId, {
+            access_token: newCredentials.access_token!,
+            refresh_token: newCredentials.refresh_token || tokens.refresh_token,
+            expires_at: Math.floor(Date.now() / 1000) + (newCredentials.expires_in || 3600),
+          });
+          
+          if (updateResult.success) {
+            console.log('✅ Tokens refreshed successfully');
+            return new GoogleAPIClient(
+              newCredentials.access_token!,
+              newCredentials.refresh_token || tokens.refresh_token || "",
+            );
+          }
+        } catch (refreshError) {
+          console.error('❌ Failed to refresh token:', refreshError);
+          // Token refresh failed, try to get fresh tokens from Supabase
+        }
+      } else {
+        // Token is still valid
+        return new GoogleAPIClient(
+          tokens.access_token,
+          tokens.refresh_token || "",
+        );
+      }
+    }
+    
+    // Strategy 2: Try to get tokens from Supabase user data
+    console.log('🔍 Trying to get tokens from Supabase user data...');
+    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
+    
+    if (userError) {
+      console.error('❌ Error fetching user data:', userError);
+      return null;
+    }
+    
+    // Check if user has Google identity linked
+    const googleIdentity = userData?.user?.identities?.find(
+      (identity: any) => identity.provider === 'google'
+    );
+    
+    if (googleIdentity) {
+      console.log('✅ Found Google identity for user');
+      
+      // Try to extract tokens from identity_data
+      const identityData = googleIdentity.identity_data as any;
+      
+      // Supabase stores tokens in different places depending on the setup
+      // Try multiple possible locations
+      const possibleAccessToken = identityData?.provider_token || 
+                                   identityData?.access_token ||
+                                   userData.user?.app_metadata?.provider_token;
+      
+      const possibleRefreshToken = identityData?.provider_refresh_token ||
+                                    identityData?.refresh_token ||
+                                    userData.user?.app_metadata?.provider_refresh_token;
+      
+      if (possibleAccessToken) {
+        console.log('✅ Found access token in Supabase data');
+        
+        // Store these tokens in our custom table for future use
         const storeResult = await tokenStorage.storeTokens(userId, {
-          access_token: sessionData.user.app_metadata.provider_token,
-          refresh_token: sessionData.user.app_metadata.provider_refresh_token || "",
-          expires_at: Math.floor(Date.now() / 1000) + 3600,
+          access_token: possibleAccessToken,
+          refresh_token: possibleRefreshToken || "",
+          expires_at: Math.floor(Date.now() / 1000) + 3600, // Default 1 hour
         });
         
         if (storeResult.success) {
           return new GoogleAPIClient(
-            sessionData.user.app_metadata.provider_token,
-            sessionData.user.app_metadata.provider_refresh_token || ""
+            possibleAccessToken,
+            possibleRefreshToken || ""
           );
         }
       }
-      
-      return null;
     }
     
-    console.log('✅ Found Google tokens for user:', userId);
-    const tokens = tokenResult.tokens;
-
-    // Check if token is expired
-    if (!tokenStorage.isTokenValid(tokens)) {
-      console.log('🔄 Token expired, attempting to refresh...');
-      
-      try {
-        // Token expired, need to refresh
-        const client = new GoogleAPIClient(
-          tokens.access_token,
-          tokens.refresh_token || "",
-        );
-        
-        const newCredentials = await client.refreshAccessToken();
-        
-        // Update tokens in database using our new system
-        const updateResult = await tokenStorage.updateTokens(userId, {
-          access_token: newCredentials.access_token!,
-          refresh_token: newCredentials.refresh_token || tokens.refresh_token,
-          expires_at: Math.floor(Date.now() / 1000) + (newCredentials.expires_in || 3600),
-        });
-        
-        if (updateResult.success) {
-          console.log('✅ Tokens refreshed successfully');
-          return new GoogleAPIClient(
-            newCredentials.access_token!,
-            newCredentials.refresh_token || tokens.refresh_token || "",
-          );
-        } else {
-          console.error('❌ Failed to update refreshed tokens:', updateResult.error);
-        }
-        
-      } catch (refreshError) {
-        console.error('❌ Failed to refresh token:', refreshError);
-        // Return the expired client anyway - it might still work for some requests
-      }
-    }
-
-    return new GoogleAPIClient(
-      tokens.access_token,
-      tokens.refresh_token || "",
-    );
+    console.error("❌ Could not find valid Google tokens for user:", userId);
+    console.log("💡 User may need to reconnect their Google account");
+    return null;
   } catch (error) {
     console.error("Error getting Google client:", error);
     return null;
