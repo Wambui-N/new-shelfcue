@@ -18,6 +18,7 @@ interface AuthContextType {
     password: string,
   ) => Promise<{ error: AuthError | null }>;
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
+  signUpWithGoogle: () => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -71,8 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    // This simplified version is based on the successful /auth/test page.
-    // It relies on Supabase's standard OAuth flow, which we've confirmed is working correctly.
+    // For sign-in, we don't need to force consent if user already granted permissions
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -81,7 +81,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
         queryParams: {
           access_type: "offline",
-          prompt: "consent",
+          prompt: "select_account", // Only ask to select account, not re-consent
+        },
+      },
+    });
+
+    if (error) {
+      console.error("❌ OAuth Error:", error);
+    }
+
+    return { error };
+  };
+
+  const signUpWithGoogle = async () => {
+    // For sign-up, we need to force consent to get all required permissions
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        scopes:
+          "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets",
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: "offline",
+          prompt: "consent", // Force consent for new users
         },
       },
     });
@@ -104,6 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signUp,
     signInWithGoogle,
+    signUpWithGoogle,
     signOut,
   };
 

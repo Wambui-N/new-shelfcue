@@ -11,7 +11,7 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
 
   const router = useRouter();
-  const { signInWithGoogle } = useAuth();
+  const { signUpWithGoogle } = useAuth();
 
   // Check for error in URL params
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function SignUpPage() {
     setIsLoading(true);
     setError("");
 
-    const { error } = await signInWithGoogle();
+    const { error } = await signUpWithGoogle();
 
     if (error) {
       setError(error.message);
