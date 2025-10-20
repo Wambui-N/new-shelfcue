@@ -72,16 +72,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    // For sign-in, we don't need to force consent if user already granted permissions
+    // Check if user exists in database to determine OAuth prompt
+    const checkUserExists = async (email: string) => {
+      try {
+        const { data, error } = await supabase
+          .from("users")
+          .select("id")
+          .eq("email", email)
+          .single();
+        
+        if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+          console.error("Error checking user existence:", error);
+          return false;
+        }
+        
+        return !!data;
+      } catch (error) {
+        console.error("Error checking user existence:", error);
+        return false;
+      }
+    };
+
+    // For sign-in, we need to check if user exists first
+    // This is a bit tricky since we don't have the email yet
+    // We'll use a different approach - check the callback URL parameter
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         scopes:
           "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets",
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback?mode=signin`,
         queryParams: {
           access_type: "offline",
-          prompt: "select_account", // Only ask to select account, not re-consent
+          prompt: "select_account", // Default to select_account, will be overridden in callback if needed
         },
       },
     });

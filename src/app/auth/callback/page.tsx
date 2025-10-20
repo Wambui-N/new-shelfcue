@@ -45,6 +45,41 @@ function AuthCallbackContent() {
       }
 
       if (data.session) {
+        // Check if this is a sign-in attempt and if user exists in database
+        const mode = searchParams.get('mode');
+        const isSignIn = mode === 'signin';
+        
+        if (isSignIn) {
+          // Check if user exists in our database
+          if (!data.session.user.email) {
+            console.error("No email found in session");
+            router.push("/auth/signin?error=no_email");
+            return;
+          }
+          
+          const { data: existingUser, error: userError } = await supabase
+            .from("users")
+            .select("id")
+            .eq("email", data.session.user.email)
+            .single();
+          
+          if (userError && userError.code !== 'PGRST116') {
+            console.error("Error checking user existence:", userError);
+            router.push("/auth/signin?error=user_check_failed");
+            return;
+          }
+          
+          // If user doesn't exist in database, redirect to signup with consent
+          if (!existingUser) {
+            console.log('User not found in database, redirecting to signup with consent');
+            // Sign out the current session
+            await supabase.auth.signOut();
+            // Redirect to signup with consent prompt
+            router.push("/auth/signup?consent=true");
+            return;
+          }
+        }
+        
         // Store Google tokens if available
         console.log('🔍 Session data:', {
           hasProviderToken: !!data.session.provider_token,
