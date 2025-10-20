@@ -122,6 +122,15 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         console.log("✓ Form saved successfully");
         setSaveStatus("saved");
         setDirty(false);
+
+        // If this was a new form (no ID before), redirect to the editor with the new ID
+        if (!formData.id && formId) {
+          console.log("📍 Redirecting to /editor/" + formId);
+          router.push(`/editor/${formId}`);
+          // Update the form store with the new ID
+          updateForm({ id: formId });
+        }
+
         return formId;
       } catch (error) {
         console.error("❌ Error saving form:", error);
@@ -227,20 +236,18 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     console.log("📅 Saving default_calendar_id to form...");
     if (formData.id && user) {
       try {
-        // const { error } = await supabase
-        //   .from("forms")
-        //   .update({
-        //     default_calendar_id: calendarId,
-        //   } as any)
-        //   .eq("id", formData.id)
-        //   .eq("user_id", user.id);
-        // if (error) {
-        //   console.error("❌ Error saving calendar ID:", error);
-        // } else {
-        //   console.log("✓ Calendar ID saved to form");
-        //   // Update local state to reflect the change
-        //   updateForm({ default_calendar_id: calendarId });
-        // }
+        const { error } = await (supabase as any)
+          .from("forms")
+          .update({
+            default_calendar_id: calendarId,
+          })
+          .eq("id", formData.id)
+          .eq("user_id", user.id);
+        if (error) {
+          console.error("❌ Error saving calendar ID:", error);
+        } else {
+          console.log("✓ Calendar ID saved to form");
+        }
       } catch (error) {
         console.error("❌ Exception saving calendar ID:", error);
       }
