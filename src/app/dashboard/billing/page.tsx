@@ -153,7 +153,7 @@ export default function BillingPage() {
 					is_trial: isTrial
 				}),
 			});
-
+			
 			if (!response.ok) {
 				const errorData = await response.json();
 				throw new Error(errorData.error || "Failed to initialize payment");
@@ -340,17 +340,17 @@ export default function BillingPage() {
 						{/* Actions */}
 						<div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
 							{isOnTrial ? (
-								<Button
+						<Button
 									onClick={handleSubscribe}
-									disabled={paymentLoading}
+							disabled={paymentLoading}
 									className="flex-1 bg-primary hover:bg-primary/90"
-								>
-									{paymentLoading ? (
-										<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
-									) : (
-										<><Zap className="w-4 h-4 mr-2" />Subscribe Now</>
-									)}
-								</Button>
+						>
+							{paymentLoading ? (
+								<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
+							) : (
+								<><Zap className="w-4 h-4 mr-2" />Subscribe Now</>
+							)}
+						</Button>
 							) : isActive ? (
 								<>
 									<Button variant="outline" className="flex-1">
@@ -374,52 +374,52 @@ export default function BillingPage() {
 						<div className="text-center py-8">
 							<div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
 								<CreditCard className="w-8 h-8 text-muted-foreground" />
-							</div>
+				</div>
 							<h3 className="text-xl font-bold mb-2">No Active Subscription</h3>
 							<p className="text-muted-foreground mb-6">
 								Start your 14-day free trial to access all features
 							</p>
 						</div>
 
-						{plan && (
+			{plan && (
 							<div className="border rounded-lg p-6 space-y-4">
 								<div className="text-center">
 									<h3 className="text-xl font-bold mb-1">{plan.display_name}</h3>
 									<div className="mb-4">
 										<span className="text-3xl font-bold">${plan.price_monthly}</span>
 										<span className="text-muted-foreground">/month</span>
-									</div>
+							</div>
 									<p className="text-sm text-muted-foreground">{plan.description}</p>
-								</div>
+							</div>
 
 								<ul className="space-y-2 py-4">
-									{plan.features.map((feature, index) => (
+								{plan.features.map((feature, index) => (
 										<li key={index} className="flex items-start gap-2 text-sm">
 											<CheckCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
 											<span>{feature}</span>
-										</li>
-									))}
-								</ul>
+									</li>
+								))}
+							</ul>
 
-								<Button
+									<Button
 									onClick={handleSubscribe}
-									disabled={paymentLoading}
+										disabled={paymentLoading}
 									className="w-full"
-								>
-									{paymentLoading ? (
+									>
+										{paymentLoading ? (
 										<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
-									) : (
+										) : (
 										<><Zap className="w-4 h-4 mr-2" />Start Free Trial</>
-									)}
-								</Button>
+										)}
+									</Button>
 
 								<p className="text-xs text-center text-muted-foreground">
 									$0.50 authorization charge • Cancel anytime during trial
 								</p>
 							</div>
-						)}
-					</div>
-				)}
+									)}
+								</div>
+							)}
 			</Card>
 
 			{/* Cancellation Dialog */}
@@ -483,7 +483,7 @@ export default function BillingPage() {
 							className="flex-1"
 						>
 							Keep Subscription
-						</Button>
+									</Button>
 						<Button
 							variant="destructive"
 							onClick={handleCancelSubscription}
@@ -496,7 +496,7 @@ export default function BillingPage() {
 								"Cancel Subscription"
 							)}
 						</Button>
-					</div>
+				</div>
 
 					<p className="text-xs text-center text-muted-foreground">
 						Your subscription will remain active until the end of your billing period.

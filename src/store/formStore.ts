@@ -92,11 +92,11 @@ export const useFormStore = create<FormStore>((set) => ({
       }
 
       return {
-        formData: {
-          ...state.formData,
+      formData: {
+        ...state.formData,
           fields: newFields,
-        },
-        isDirty: true,
+      },
+      isDirty: true,
       };
     });
   },

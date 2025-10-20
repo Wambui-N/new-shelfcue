@@ -44,10 +44,7 @@ export function FinalCTASection() {
         >
           {/* Headline */}
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
-            Ready to Stop{" "}
-            <span className="text-dark-gray">
-              Losing Leads?
-            </span>
+            Start Free. Build Fast. Stay in Control.
           </h2>
 
           {/* Sub-headline */}
@@ -58,9 +55,7 @@ export function FinalCTASection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Join founders who capture{" "}
-            <span className="font-semibold text-foreground">47% more leads</span>{" "}
-            with beautiful, effortless forms.
+            Try Shelfcue free for 14 days. Build a form, connect your Google Sheet, and see how effortless it can be to manage leads, bookings, and submissions all in one place.
           </motion.p>
 
           {/* CTA Button */}

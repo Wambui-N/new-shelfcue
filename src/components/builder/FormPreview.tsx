@@ -40,7 +40,7 @@ export function FormPreview({
   const handleSubmit = async (data: Record<string, any>) => {
     if (propOnSubmit) {
       await propOnSubmit(data);
-    } else {
+                    } else {
       console.log("Form submitted:", data);
       // In a real implementation, this would submit to your API
     }
@@ -59,6 +59,6 @@ export function FormPreview({
         onSubmit={handleSubmit}
         isSubmitting={false}
       />
-    </div>
+      </div>
   );
 }

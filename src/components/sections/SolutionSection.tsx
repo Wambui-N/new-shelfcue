@@ -15,14 +15,14 @@ export function SolutionSection() {
     {
       icon: Palette,
       title: "Customize",
-      description: "Add your branding with one click",
+      description: "Add your branding and make it yours",
       color: "bg-black",
       delay: 0.2,
     },
     {
       icon: Share2,
       title: "Capture",
-      description: "Share your link and get leads instantly",
+      description: "Share your link and get submissions instantly",
       color: "bg-black",
       delay: 0.4,
     },
@@ -43,15 +43,17 @@ export function SolutionSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
-                Beautiful Forms That{" "}
-                <span className="text-dark-gray">
-                  Connect to Google Sheets
-                </span>
-              </h2>
-              <p className="text-base md:text-lg text-foreground-muted max-w-2xl mx-auto">
-                No Zapier. No coding. No hassle.
-              </p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
+            The Simpler Way to Collect and Manage Data
+          </h2>
+          <p className="text-base md:text-lg text-foreground-muted pb-2 max-w-2xl mx-auto">
+            Meet <strong>Shelfcue</strong>, the modern form builder that connects <strong>design</strong>,
+            <strong> automation</strong>, and <strong>control</strong>. 
+            Whether you're capturing leads, collecting feedback, or scheduling
+            client calls, every submission goes directly into your Google Sheet, 
+            your single source of truth. No complex setup. No middle layers. No
+            lost entries.
+          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -114,4 +116,3 @@ export function SolutionSection() {
     </section>
   );
 }
-

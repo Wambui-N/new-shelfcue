@@ -58,36 +58,36 @@ export async function getGoogleClient(
     
     if (tokenResult.success && tokenResult.tokens) {
       console.log('✅ Found tokens in custom storage');
-      const tokens = tokenResult.tokens;
-      
-      // Check if token is expired
+    const tokens = tokenResult.tokens;
+
+    // Check if token is expired
       if (tokens.expires_at < Math.floor(Date.now() / 1000)) {
-        console.log('🔄 Token expired, attempting to refresh...');
+      console.log('🔄 Token expired, attempting to refresh...');
+      
+      try {
+        const client = new GoogleAPIClient(
+          tokens.access_token,
+          tokens.refresh_token || "",
+        );
         
-        try {
-          const client = new GoogleAPIClient(
-            tokens.access_token,
-            tokens.refresh_token || "",
-          );
-          
-          const newCredentials = await client.refreshAccessToken();
-          
+        const newCredentials = await client.refreshAccessToken();
+        
           // Update tokens in database
-          const updateResult = await tokenStorage.updateTokens(userId, {
-            access_token: newCredentials.access_token!,
-            refresh_token: newCredentials.refresh_token || tokens.refresh_token,
-            expires_at: Math.floor(Date.now() / 1000) + (newCredentials.expires_in || 3600),
-          });
-          
-          if (updateResult.success) {
-            console.log('✅ Tokens refreshed successfully');
-            return new GoogleAPIClient(
-              newCredentials.access_token!,
-              newCredentials.refresh_token || tokens.refresh_token || "",
-            );
-          }
-        } catch (refreshError) {
-          console.error('❌ Failed to refresh token:', refreshError);
+        const updateResult = await tokenStorage.updateTokens(userId, {
+          access_token: newCredentials.access_token!,
+          refresh_token: newCredentials.refresh_token || tokens.refresh_token,
+          expires_at: Math.floor(Date.now() / 1000) + (newCredentials.expires_in || 3600),
+        });
+        
+        if (updateResult.success) {
+          console.log('✅ Tokens refreshed successfully');
+          return new GoogleAPIClient(
+            newCredentials.access_token!,
+            newCredentials.refresh_token || tokens.refresh_token || "",
+          );
+        }
+      } catch (refreshError) {
+        console.error('❌ Failed to refresh token:', refreshError);
           // Token refresh failed, try to get fresh tokens from Supabase
         }
       } else {

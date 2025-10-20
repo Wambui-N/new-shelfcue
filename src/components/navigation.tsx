@@ -97,11 +97,18 @@ export function Navigation() {
                 </Button>
               </Link>
             ) : (
-              <Link href="/auth/signin">
-                <Button className="bg-black text-white hover:bg-dark-gray transition-colors duration-300 text-sm px-4 py-2">
-                  Sign In
-                </Button>
-              </Link>
+              <>
+                <Link href="/auth/signin">
+                  <Button className="bg-black text-white hover:bg-dark-gray transition-colors duration-300 text-sm px-4 py-2">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/auth/signup">
+                  <Button className="ml-2 bg-primary text-white hover:bg-primary-dark transition-colors duration-300 text-sm px-4 py-2">
+                    Create a Form
+                  </Button>
+                </Link>
+              </>
             )}
           </div>
 
@@ -158,14 +165,24 @@ export function Navigation() {
                       </Button>
                     </Link>
                   ) : (
-                    <Link
-                      href="/auth/signin"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Button className="w-full bg-black text-white hover:bg-dark-gray transition-colors duration-300">
-                        Sign In
-                      </Button>
-                    </Link>
+                    <>
+                      <Link
+                        href="/auth/signin"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Button className="w-full bg-black text-white hover:bg-dark-gray transition-colors duration-300">
+                          Sign In
+                        </Button>
+                      </Link>
+                      <Link
+                        href="/auth/signup"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Button className="w-full mt-1 bg-primary text-white hover:bg-primary-dark transition-colors duration-300">
+                          Create a Form
+                        </Button>
+                      </Link>
+                    </>
                   )}
                 </div>
               </div>

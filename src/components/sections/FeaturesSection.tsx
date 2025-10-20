@@ -1,60 +1,51 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  BarChart3,
-  Clock,
-  Sheet,
-  Shield,
-  Sparkles,
-  Target,
-  Users,
-  Zap,
-} from "lucide-react";
+import { BarChart3, Clock, Sheet, Sparkles, Wand2, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 export function FeaturesSection() {
   const features = [
     {
-      icon: <Zap className="w-8 h-8" />,
-      title: "Form Builder for Google Sheets",
-      description:
-        "Connect directly to your Google Sheets. No Zapier needed. Data flows automatically into your spreadsheet.",
-      gradient: "bg-black",
-    },
-    {
-      icon: <Target className="w-8 h-8" />,
-      title: "Customizable Form Builder",
-      description:
-        "Make Google Forms match your brand. Add logos, colors, and custom styling. Stand out from basic forms.",
-      gradient: "bg-black",
-    },
-    {
       icon: <Sheet className="w-8 h-8" />,
-      title: "Embed Google Form on Website",
+      title: "Google Sheets Integration, Built In",
       description:
-        "Beautiful, responsive forms that embed anywhere. Works on all devices. No coding required.",
+        "Connect once, and every form submission updates your Google Sheet instantly. Use Sheets as your live database: filter, track, and analyze data your way.",
       gradient: "bg-black",
     },
     {
-      icon: <Shield className="w-8 h-8" />,
-      title: "File Uploads That Work",
+      icon: <Wand2 className="w-8 h-8" />,
+      title: "Smart Form Builder",
       description:
-        "Accept files, images, documents. Everything saves to Google Drive. Never lose important attachments.",
+        "Design responsive, on-brand forms with an intuitive drag-and-drop builder. Add custom fields, conditional logic, and layouts without touching code.",
+      gradient: "bg-black",
+    },
+    {
+      icon: <Clock className="w-8 h-8" />,
+      title: "Integrated Calendar & Booking",
+      description:
+        "Let clients book meetings directly from your forms. Sync seamlessly with Google Calendar or other scheduling tools.",
       gradient: "bg-black",
     },
     {
       icon: <Sparkles className="w-8 h-8" />,
-      title: "Contact Form for Small Business",
+      title: "Brand-Level Customization",
       description:
-        "Perfect for lead capture, job applications, customer feedback. Everything small businesses need.",
+        "Customize fonts, colors, layouts, and buttons. Responsive by default, so every form looks perfect on mobile, tablet, or desktop.",
+      gradient: "bg-black",
+    },
+    {
+      icon: <Zap className="w-8 h-8" />,
+      title: "Multi-Channel Sharing",
+      description:
+        "Share forms anywhere: Embed directly on your site, send a link, or add a QR code to print materials. All synced to your Google Sheet.",
       gradient: "bg-black",
     },
     {
       icon: <BarChart3 className="w-8 h-8" />,
-      title: "No-Code Form Builder",
+      title: "Centralized Dashboard",
       description:
-        "Drag and drop. Click and connect. Build professional forms in minutes, not hours.",
+        "View, search, and manage submissions in one place. Connect to other tools via integrations or APIs.",
       gradient: "bg-black",
     },
   ];
@@ -127,22 +118,18 @@ export function FeaturesSection() {
             transition={{ duration: 0.2 }}
           >
             <Sparkles className="w-3 h-3" />
-            <span>Why Choose ShelfCue</span>
+            <span>Why Businesses Choose Shelfcue</span>
           </motion.div>
 
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
-                The Best{" "}
-                <span className="text-dark-gray">
-                  Google Forms Alternative
-                </span>
-              </h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
+            Everything You Need in One Platform
+          </h2>
 
-              <p className="text-base md:text-lg text-foreground-muted max-w-3xl mx-auto leading-relaxed">
-                Stop settling for ugly Google Forms. Build{" "}
-                <span className="text-foreground font-medium">
-                  beautiful, branded forms that work
-                </span>
-              </p>
+          <p className="text-base md:text-lg text-foreground-muted max-w-3xl mx-auto leading-relaxed">
+            Build beautiful forms, collect data in Google Sheets, and manage
+            everything from one intuitive dashboard. No technical skills
+            required.
+          </p>
         </motion.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -157,7 +144,6 @@ export function FeaturesSection() {
               className="group"
             >
               <Card className="relative p-4 sm:p-6 h-full border-0 shadow-sm bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-500 group-hover:bg-card">
-
                 <div className="relative z-10 flex flex-col items-center">
                   <motion.div
                     className={`w-10 h-10 sm:w-12 sm:h-12 ${feature.gradient} rounded-xl flex items-center justify-center mb-3 sm:mb-4 text-white shadow-md`}
@@ -200,7 +186,7 @@ export function FeaturesSection() {
             whileHover={{ scale: 1.05, y: -1 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Target className="w-4 h-4" />
+            <Sparkles className="w-4 h-4" />
             <span>Ready to get started?</span>
           </motion.div>
         </motion.div>
