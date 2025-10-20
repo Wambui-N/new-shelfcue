@@ -36,25 +36,21 @@ export function SolutionSection() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
       >
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
+        <div className="text-center mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
             The Simpler Way to Collect and Manage Data
           </h2>
-          <p className="text-base md:text-lg text-foreground-muted pb-2 max-w-2xl mx-auto">
-            Meet <strong>Shelfcue</strong>, the modern form builder that connects <strong>design</strong>,
-            <strong> automation</strong>, and <strong>control</strong>. 
-            Whether you're capturing leads, collecting feedback, or scheduling
-            client calls, every submission goes directly into your Google Sheet, 
+          <p className="text-base md:text-lg text-foreground-muted max-w-2xl mx-auto mb-1">
+            Meet <span className="font-bold text-black">Shelfcue</span>, the modern form builder that connects design,
+            automation, and control.
+          </p>
+          <p className="text-base md:text-lg text-foreground-muted max-w-2xl mx-auto">
+            Whether you’re capturing leads, collecting feedback, or scheduling
+            client calls, every submission goes directly into your Google Sheet—
             your single source of truth. No complex setup. No middle layers. No
             lost entries.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid md:grid-cols-3 gap-6">
           {steps.map((step, index) => (

@@ -8,11 +8,6 @@ interface FormStore {
   isDirty: boolean;
   isSaving: boolean;
   
-  // Display settings
-  displayMode: FormDisplayMode;
-  layout: FormLayout;
-  displayTheme: FormTheme;
-
   // Actions
   updateForm: (updates: Partial<FormData>) => void;
   addField: (field: FormField) => void;
@@ -23,11 +18,6 @@ interface FormStore {
   resetForm: () => void;
   setDirty: (dirty: boolean) => void;
   setSaving: (saving: boolean) => void;
-  
-  // Display actions
-  setDisplayMode: (mode: FormDisplayMode) => void;
-  setLayout: (layout: FormLayout) => void;
-  setDisplayTheme: (theme: FormTheme) => void;
 }
 
 const defaultForm: FormData = {
@@ -50,6 +40,8 @@ const defaultForm: FormData = {
     collectEmail: false,
     allowMultipleSubmissions: true,
     showWatermark: true,
+    mode: "standalone",
+    layout: "simple",
   },
 };
 
@@ -58,11 +50,6 @@ export const useFormStore = create<FormStore>((set) => ({
   isDirty: false,
   isSaving: false,
   
-  // Display settings
-  displayMode: "standalone",
-  layout: "simple",
-  displayTheme: displayDefaultTheme,
-
   updateForm: (updates) => {
     set((state) => ({
       formData: { ...state.formData, ...updates },
@@ -160,18 +147,5 @@ export const useFormStore = create<FormStore>((set) => ({
 
   setSaving: (saving) => {
     set({ isSaving: saving });
-  },
-  
-  // Display actions
-  setDisplayMode: (mode) => {
-    set({ displayMode: mode, isDirty: true });
-  },
-  
-  setLayout: (layout) => {
-    set({ layout, isDirty: true });
-  },
-  
-  setDisplayTheme: (theme) => {
-    set({ displayTheme: theme, isDirty: true });
   },
 }));

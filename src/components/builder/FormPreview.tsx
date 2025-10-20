@@ -27,8 +27,8 @@ export function FormPreview({
 
   // Use prop data if provided, otherwise use store data
   const formData = propFormData || storeFormData;
-  const displayModeToUse: FormDisplayMode = propFormData ? "standalone" : displayMode;
-  const layoutToUse: FormLayout = propFormData ? "simple" : layout;
+  const displayModeToUse: FormDisplayMode = propFormData ? "standalone" : formData.settings.mode || "standalone";
+  const layoutToUse: FormLayout = propFormData ? "simple" : formData.settings.layout || "simple";
   
   // Theme comes directly from the form's theme so editor changes reflect instantly
   const themeToUse: FormTheme = propFormData 

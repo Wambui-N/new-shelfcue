@@ -15,10 +15,6 @@ export function DisplayEditor() {
   const {
     formData,
     updateForm,
-    displayMode,
-    layout,
-    setDisplayMode,
-    setLayout,
   } = useFormStore();
 
   const [customCSS, setCustomCSS] = useState("");
@@ -27,6 +23,15 @@ export function DisplayEditor() {
     updateForm({
       theme: {
         ...formData.theme,
+        [key]: value,
+      },
+    });
+  };
+
+  const handleSettingsChange = (key: string, value: string) => {
+    updateForm({
+      settings: {
+        ...formData.settings,
         [key]: value,
       },
     });
@@ -263,16 +268,16 @@ export function DisplayEditor() {
             <div>
               <Label htmlFor="standalone-mode">Standalone Mode</Label>
               <p className="text-xs text-muted-foreground mt-1">
-                {displayMode === "standalone"
+                {formData.settings.mode === "standalone"
                   ? "Full form with header (for links/QR codes)"
                   : "Clean, minimal form (for embedding on a website)"}
               </p>
             </div>
             <Switch
               id="standalone-mode"
-              checked={displayMode === "standalone"}
+              checked={formData.settings.mode === "standalone"}
               onCheckedChange={(checked) =>
-                setDisplayMode(checked ? "standalone" : "embed")
+                handleSettingsChange("mode", checked ? "standalone" : "embed")
               }
             />
           </div>

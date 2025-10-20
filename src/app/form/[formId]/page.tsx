@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, CheckCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FormDisplay } from "@/components/forms/FormDisplay";
 import { FontLoader } from "@/components/FontLoader";
@@ -18,6 +18,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formId, setFormId] = useState<string>("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [displayMode, setDisplayMode] = useState<FormDisplayMode>("standalone");
   const [layout, setLayout] = useState<FormLayout>("simple");
   const [displayTheme, setDisplayTheme] = useState<FormTheme | null>(null);
@@ -123,6 +124,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
 
       // Dispatch event to refresh dashboard counts
       window.dispatchEvent(new CustomEvent("submissionReceived"));
+      setIsSubmitted(true);
     } catch (err: any) {
       console.error("Error submitting form:", err);
       throw err;
@@ -151,6 +153,24 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
             Form Not Available
           </h2>
           <p className="text-muted-foreground">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-8 h-8 text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">
+            Submission Received!
+          </h2>
+          <p className="text-muted-foreground">
+            {formData?.settings?.successMessage || "Thank you for your submission."}
+          </p>
         </div>
       </div>
     );

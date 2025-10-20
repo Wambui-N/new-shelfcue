@@ -63,6 +63,8 @@ export interface FormData {
     collectEmail: boolean;
     allowMultipleSubmissions: boolean;
     showWatermark?: boolean;
+    mode?: "standalone" | "embed";
+    layout?: "simple" | "compact" | "conversational" | "hero";
   };
   default_calendar_id?: string;
   lastSaved?: Date;
