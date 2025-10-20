@@ -195,7 +195,7 @@ function AuthCallbackContent() {
   ]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
+    <div className="bg-background flex items-center justify-center">
       <div className="text-foreground text-center max-w-md px-4">
         {errorMessage ? (
           <>
