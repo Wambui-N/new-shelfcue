@@ -1,10 +1,17 @@
 import { create } from "zustand";
 import type { FormData, FormField } from "@/types/form";
+import type { FormDisplayMode, FormLayout, FormTheme } from "@/types/form-display";
+import { defaultTheme as displayDefaultTheme } from "@/types/form-display";
 
 interface FormStore {
   formData: FormData;
   isDirty: boolean;
   isSaving: boolean;
+  
+  // Display settings
+  displayMode: FormDisplayMode;
+  layout: FormLayout;
+  displayTheme: FormTheme;
 
   // Actions
   updateForm: (updates: Partial<FormData>) => void;
@@ -16,6 +23,11 @@ interface FormStore {
   resetForm: () => void;
   setDirty: (dirty: boolean) => void;
   setSaving: (saving: boolean) => void;
+  
+  // Display actions
+  setDisplayMode: (mode: FormDisplayMode) => void;
+  setLayout: (layout: FormLayout) => void;
+  setDisplayTheme: (theme: FormTheme) => void;
 }
 
 const defaultForm: FormData = {
@@ -45,6 +57,11 @@ export const useFormStore = create<FormStore>((set) => ({
   formData: defaultForm,
   isDirty: false,
   isSaving: false,
+  
+  // Display settings
+  displayMode: "standalone",
+  layout: "simple",
+  displayTheme: displayDefaultTheme,
 
   updateForm: (updates) => {
     set((state) => ({
@@ -143,5 +160,18 @@ export const useFormStore = create<FormStore>((set) => ({
 
   setSaving: (saving) => {
     set({ isSaving: saving });
+  },
+  
+  // Display actions
+  setDisplayMode: (mode) => {
+    set({ displayMode: mode, isDirty: true });
+  },
+  
+  setLayout: (layout) => {
+    set({ layout, isDirty: true });
+  },
+  
+  setDisplayTheme: (theme) => {
+    set({ displayTheme: theme, isDirty: true });
   },
 }));

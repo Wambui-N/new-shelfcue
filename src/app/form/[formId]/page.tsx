@@ -3,9 +3,11 @@
 import { motion } from "framer-motion";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { FormPreview } from "@/components/builder/FormPreview";
+import { FormDisplay } from "@/components/forms/FormDisplay";
 import { FontLoader } from "@/components/FontLoader";
+import { createThemeFromBrand } from "@/lib/theme-generator";
 import type { FormData } from "@/types/form";
+import type { FormDisplayMode, FormLayout, FormTheme } from "@/types/form-display";
 
 interface PublicFormPageProps {
   params: Promise<{ formId: string }>;
@@ -16,6 +18,9 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formId, setFormId] = useState<string>("");
+  const [displayMode, setDisplayMode] = useState<FormDisplayMode>("standalone");
+  const [layout, setLayout] = useState<FormLayout>("simple");
+  const [displayTheme, setDisplayTheme] = useState<FormTheme | null>(null);
 
   useEffect(() => {
     const getFormId = async () => {
@@ -66,17 +71,26 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
           showWatermark: true,
         };
 
+        // Create display theme from form theme
+        const theme = data.theme ? { ...defaultTheme, ...data.theme } : defaultTheme;
+        const newDisplayTheme = createThemeFromBrand(theme.primaryColor, theme.fontFamily);
+
         setFormData({
           id: formId,
           title: data.title || "Form",
           description: data.description || "",
           status: data.status || "published",
           fields: data.fields || [],
-          theme: data.theme ? { ...defaultTheme, ...data.theme } : defaultTheme,
+          theme: theme,
           settings: data.settings
             ? { ...defaultSettings, ...data.settings }
             : defaultSettings,
         } as FormData);
+
+        // Set display settings
+        setDisplayMode(data.displayMode || "standalone");
+        setLayout(data.layout || "simple");
+        setDisplayTheme(newDisplayTheme);
       } catch (error: any) {
         console.error("Error fetching form:", {
           message: error?.message,
@@ -142,26 +156,21 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
     );
   }
 
-  if (formData) {
+  if (formData && displayTheme) {
     return (
       <>
-        <FontLoader fontFamily={formData.theme.fontFamily} />
-        <div
-          className="min-h-screen py-8"
-          style={{
-            backgroundColor: formData.theme.backgroundColor,
-            fontFamily: formData.theme.fontFamily,
-          }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="max-w-2xl mx-auto px-4"
-          >
-            <FormPreview formData={formData} onSubmit={handleSubmit} />
-          </motion.div>
-        </div>
+        <FontLoader fontFamily={displayTheme.fontFamily} />
+        <FormDisplay
+          formId={formData.id || "public-form"}
+          title={formData.title}
+          description={formData.description}
+          fields={formData.fields}
+          mode={displayMode}
+          layout={layout}
+          theme={displayTheme}
+          onSubmit={handleSubmit}
+          isSubmitting={false}
+        />
       </>
     );
   }
