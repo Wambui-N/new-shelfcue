@@ -123,6 +123,12 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         setSaveStatus("saved");
         setDirty(false);
 
+        // Update the form store with the new status if it was provided
+        if (status && status !== formData.status) {
+          console.log(`📝 Updating form status to: ${status}`);
+          updateForm({ status });
+        }
+
         // If this was a new form (no ID before), redirect to the editor with the new ID
         if (!formData.id && formId) {
           console.log("📍 Redirecting to /editor/" + formId);
