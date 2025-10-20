@@ -52,6 +52,7 @@ export interface FormData {
     textColor: string;
     borderRadius: number;
     fontFamily: string;
+    logoUrl?: string;
   };
   settings: {
     showTitle: boolean;

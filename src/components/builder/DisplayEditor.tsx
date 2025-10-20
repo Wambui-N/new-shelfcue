@@ -164,7 +164,7 @@ export function DisplayEditor() {
             <Input
               id="logo-url"
               type="url"
-              value={formData.theme.logoUrl}
+              value={formData.theme.logoUrl || ""}
               onChange={(e) => handleThemeChange("logoUrl", e.target.value)}
               placeholder="https://example.com/logo.png"
               className="flex-1"
