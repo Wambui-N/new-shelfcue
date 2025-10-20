@@ -3,7 +3,6 @@
 import React from "react";
 import { useFormStore } from "@/store/formStore";
 import { FormDisplay } from "@/components/forms/FormDisplay";
-import { createThemeFromBrand } from "@/lib/theme-generator";
 import type { FormData } from "@/types/form";
 import type { FormDisplayMode, FormLayout, FormTheme } from "@/types/form-display";
 
@@ -23,8 +22,7 @@ export function FormPreview({
   const { 
     formData: storeFormData, 
     displayMode, 
-    layout, 
-    displayTheme 
+    layout
   } = store;
 
   // Use prop data if provided, otherwise use store data
@@ -32,10 +30,10 @@ export function FormPreview({
   const displayModeToUse: FormDisplayMode = propFormData ? "standalone" : displayMode;
   const layoutToUse: FormLayout = propFormData ? "simple" : layout;
   
-  // Create theme from form data if using prop data
+  // Theme comes directly from the form's theme so editor changes reflect instantly
   const themeToUse: FormTheme = propFormData 
-    ? createThemeFromBrand(formData.theme.primaryColor, formData.theme.fontFamily)
-    : displayTheme;
+    ? (propFormData.theme as FormTheme)
+    : (storeFormData.theme as FormTheme);
 
   const handleSubmit = async (data: Record<string, any>) => {
     if (propOnSubmit) {

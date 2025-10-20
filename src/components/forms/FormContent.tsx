@@ -78,10 +78,10 @@ export function FormContent({
 
       {/* Form Container */}
       <div className={cn(
-        "bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8",
+        "bg-white shadow-lg p-4 sm:p-6 md:p-8",
         layout === "hero" && "max-w-2xl mx-auto",
         layout === "conversational" && "min-h-[300px] sm:min-h-[400px] flex flex-col justify-center"
-      )}>
+      )} style={{ borderRadius: "var(--shelf-radius)" }}>
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Fields Grid */}
           <div className={cn(
@@ -123,11 +123,12 @@ export function FormContent({
                   onClick={handlePrevious}
                   disabled={currentStep === 0}
                   className={cn(
-                    "px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-colors",
+                    "px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors",
                     currentStep === 0
                       ? "text-gray-400 cursor-not-allowed"
                       : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
                   )}
+                  style={{ borderRadius: "var(--shelf-radius)" }}
                 >
                   Previous
                 </button>
@@ -136,10 +137,11 @@ export function FormContent({
                   type="submit"
                   disabled={isSubmitting}
                   className={cn(
-                    "px-6 sm:px-8 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-medium text-white transition-colors",
+                    "px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-medium text-white transition-colors",
                     "bg-[var(--shelf-primary)] hover:opacity-90",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
+                  style={{ borderRadius: "var(--shelf-radius)" }}
                 >
                   {isLastStep ? (isSubmitting ? "Submitting..." : "Submit") : "Next"}
                 </button>
@@ -149,11 +151,12 @@ export function FormContent({
                 type="submit"
                 disabled={isSubmitting}
                 className={cn(
-                  "w-full px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-sm sm:text-base font-medium text-white transition-colors",
+                  "w-full px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-white transition-colors",
                   "bg-[var(--shelf-primary)] hover:opacity-90",
                   "disabled:opacity-50 disabled:cursor-not-allowed",
                   layout === "hero" && "sm:text-lg sm:py-5"
                 )}
+                style={{ borderRadius: "var(--shelf-radius)" }}
               >
                 {isSubmitting ? "Submitting..." : "Submit"}
               </button>

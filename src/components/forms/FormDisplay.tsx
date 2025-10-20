@@ -6,7 +6,6 @@ import { FormDisplayMode, FormLayout, FormTheme } from "@/types/form-display";
 import { StandaloneForm } from "./StandaloneForm";
 import { FormContent } from "./FormContent";
 import { FormHeader } from "./FormHeader";
-import { FormFooter } from "./FormFooter";
 
 interface FormDisplayProps {
   formId: string;
@@ -74,11 +73,6 @@ export function FormDisplay({
         showTitle={true}
       />
       {formContent}
-      <FormFooter
-        theme={theme}
-        showSocialLinks={false}
-        showCompanyInfo={true}
-      />
     </StandaloneForm>
   );
 }
