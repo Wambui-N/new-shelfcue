@@ -56,6 +56,8 @@ export function FormDisplay({
       currentStep={currentStep}
       onStepChange={setCurrentStep}
       isSubmitting={isSubmitting}
+      title={title}
+      description={description}
     />
   );
 
@@ -65,13 +67,24 @@ export function FormDisplay({
 
   return (
     <StandaloneForm theme={theme}>
-      <FormHeader
-        title={title}
-        description={description}
-        theme={theme}
-        showLogo={true}
-        showTitle={true}
-      />
+      {/* Notion-style image header with logo bottom-left */}
+      <div className="w-full relative">
+        {theme.background?.image && (
+          <div
+            className="w-full h-40 sm:h-48 md:h-56 lg:h-64 rounded-t-[var(--shelf-radius)] bg-center bg-cover"
+            style={{ backgroundImage: `url(${theme.background.image})` }}
+          />
+        )}
+        {theme.logoUrl && (
+          <div className="absolute left-4 bottom-2">
+            <img
+              src={theme.logoUrl}
+              alt="Logo"
+              className="h-8 sm:h-10 w-auto rounded"
+            />
+          </div>
+        )}
+      </div>
       {formContent}
     </StandaloneForm>
   );

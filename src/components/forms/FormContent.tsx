@@ -18,6 +18,8 @@ interface FormContentProps {
   currentStep: number;
   onStepChange: (step: number) => void;
   isSubmitting: boolean;
+  title?: string;
+  description?: string;
 }
 
 export function FormContent({
@@ -29,7 +31,9 @@ export function FormContent({
   theme,
   currentStep,
   onStepChange,
-  isSubmitting
+  isSubmitting,
+  title,
+  description
 }: FormContentProps) {
   const layoutConfig = layoutPresets[layout];
   const isConversational = layout === "conversational";
@@ -82,6 +86,22 @@ export function FormContent({
         layout === "hero" && "max-w-2xl mx-auto",
         layout === "conversational" && "min-h-[300px] sm:min-h-[400px] flex flex-col justify-center"
       )} style={{ borderRadius: "var(--shelf-radius)" }}>
+        {/* Title/Description inside the form container */}
+        {(title || description) && (
+          <div className="mb-4 sm:mb-6">
+            {title && (
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900" style={{ fontFamily: theme.fontFamily }}>
+                {title}
+              </h2>
+            )}
+            {description && (
+              <p className="mt-1 text-sm sm:text-base text-gray-600" style={{ fontFamily: theme.fontFamily }}>
+                {description}
+              </p>
+            )}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Fields Grid */}
           <div className={cn(
