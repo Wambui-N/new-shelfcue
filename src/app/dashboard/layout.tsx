@@ -9,6 +9,7 @@ import {
   CreditCard,
   FileText,
   Home,
+  ListChecks,
   LogOut,
   Mail,
   Menu,
@@ -124,6 +125,12 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
       href: "/dashboard/analytics",
       label: "Analytics",
       icon: BarChart3,
+      badge: null,
+    },
+    {
+      href: "/dashboard/features",
+      label: "Features Hub",
+      icon: ListChecks,
       badge: null,
     },
   ];

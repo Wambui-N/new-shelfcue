@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// Using native select to avoid runtime vendor chunk issues on Windows
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
@@ -155,26 +155,23 @@ export function FormDisplaySettings({
                 
                 <div>
                   <Label htmlFor="font-family">Font Family</Label>
-                  <Select
+                  <select
+                    id="font-family"
                     value={theme.fontFamily}
-                    onValueChange={handleFontFamilyChange}
+                    onChange={(e) => handleFontFamilyChange(e.target.value)}
+                    className="mt-1 w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Inter, system-ui, sans-serif">Inter</SelectItem>
-                      <SelectItem value="Poppins, system-ui, sans-serif">Poppins</SelectItem>
-                      <SelectItem value="Lato, system-ui, sans-serif">Lato</SelectItem>
-                      <SelectItem value="Montserrat, system-ui, sans-serif">Montserrat</SelectItem>
-                      <SelectItem value="Manrope, system-ui, sans-serif">Manrope</SelectItem>
-                      <SelectItem value="Merriweather, serif">Merriweather</SelectItem>
-                      <SelectItem value="'Playfair Display', serif">Playfair Display</SelectItem>
-                      <SelectItem value="Rubik, system-ui, sans-serif">Rubik</SelectItem>
-                      <SelectItem value="Raleway, system-ui, sans-serif">Raleway</SelectItem>
-                      <SelectItem value="Nunito, system-ui, sans-serif">Nunito</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="Inter, system-ui, sans-serif">Inter</option>
+                    <option value="Poppins, system-ui, sans-serif">Poppins</option>
+                    <option value="Lato, system-ui, sans-serif">Lato</option>
+                    <option value="Montserrat, system-ui, sans-serif">Montserrat</option>
+                    <option value="Manrope, system-ui, sans-serif">Manrope</option>
+                    <option value="Merriweather, serif">Merriweather</option>
+                    <option value="'Playfair Display', serif">Playfair Display</option>
+                    <option value="Rubik, system-ui, sans-serif">Rubik</option>
+                    <option value="Raleway, system-ui, sans-serif">Raleway</option>
+                    <option value="Nunito, system-ui, sans-serif">Nunito</option>
+                  </select>
                 </div>
               </div>
               
