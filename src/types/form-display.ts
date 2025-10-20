@@ -7,6 +7,8 @@ export interface FormTheme {
   primaryColor: string;
   fontFamily: string;
   borderRadius: number;
+  // Optional brand assets
+  logoUrl?: string;
   
   // Auto-generated secondary colors
   secondaryColors?: {
