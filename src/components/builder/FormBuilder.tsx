@@ -25,11 +25,10 @@ import { useFormStore } from "@/store/formStore";
 import { FieldEditor } from "./FieldEditor";
 import { FormPreview } from "./FormPreview";
 import { FormSettings } from "./FormSettings";
-import { FormDisplaySettings } from "./FormDisplaySettings";
+import { DisplayEditor } from "./DisplayEditor";
 import { MeetingConfigDialog } from "./MeetingConfigDialog";
 import { PublishProgressDialog } from "./PublishProgressDialog";
 import { ShareDialog } from "./ShareDialog";
-import { ThemeEditor } from "./ThemeEditor";
 
 interface FormBuilderProps {
   onBack: () => void;
@@ -43,15 +42,9 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     formData, 
     isDirty, 
     isSaving, 
-    displayMode,
-    layout,
-    displayTheme,
     updateForm, 
     setDirty, 
-    setSaving,
-    setDisplayMode,
-    setLayout,
-    setDisplayTheme
+    setSaving
   } = useFormStore();
   const [activeTab, setActiveTab] = useState("fields");
   const [deviceView, setDeviceView] = useState<"desktop" | "mobile">("desktop");
@@ -674,7 +667,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         <div className="w-full lg:w-[420px] flex flex-col bg-background border-t lg:border-t-0 lg:border-l border-border">
           {/* Tab Headers */}
           <div className="flex-shrink-0 bg-background border-b border-border">
-            <div className="grid grid-cols-2 sm:grid-cols-4">
+            <div className="grid grid-cols-3">
               <button
                 onClick={() => setActiveTab("fields")}
                 className={`flex items-center justify-center gap-2 h-12 text-sm font-medium transition-colors ${
@@ -698,17 +691,6 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 <span className="hidden sm:inline">Settings</span>
               </button>
               <button
-                onClick={() => setActiveTab("theme")}
-                className={`flex items-center justify-center gap-2 h-12 text-sm font-medium transition-colors ${
-                  activeTab === "theme"
-                    ? "bg-background text-foreground border-b-2 border-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Palette className="w-4 h-4" />
-                <span className="hidden sm:inline">Theme</span>
-              </button>
-              <button
                 onClick={() => setActiveTab("display")}
                 className={`flex items-center justify-center gap-2 h-12 text-sm font-medium transition-colors ${
                   activeTab === "display"
@@ -716,7 +698,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Monitor className="w-4 h-4" />
+                <Palette className="w-4 h-4" />
                 <span className="hidden sm:inline">Display</span>
               </button>
             </div>
@@ -729,17 +711,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
           >
             {activeTab === "fields" && <FieldEditor />}
             {activeTab === "settings" && <FormSettings />}
-            {activeTab === "theme" && <ThemeEditor />}
-            {activeTab === "display" && (
-              <FormDisplaySettings
-                mode={displayMode}
-                layout={layout}
-                theme={displayTheme}
-                onModeChange={setDisplayMode}
-                onLayoutChange={setLayout}
-                onThemeChange={setDisplayTheme}
-              />
-            )}
+            {activeTab === "display" && <DisplayEditor />}
           </div>
         </div>
       </div>
