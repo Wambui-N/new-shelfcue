@@ -4,6 +4,7 @@ import React from "react";
 import { FormField } from "@/types/form";
 import { FormTheme } from "@/types/form-display";
 import { cn } from "@/lib/utils";
+import { MeetingTimePicker } from "@/components/ui/meeting-time-picker";
 
 interface FieldRendererProps {
   field: FormField;
@@ -135,38 +136,13 @@ export function FieldRenderer({
 
       case "meeting":
         return (
-          <div className="space-y-4">
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center space-x-2 text-blue-800">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span className="font-medium">Schedule a Meeting</span>
-              </div>
-              <p className="text-sm text-blue-600 mt-1">
-                Select your preferred time slot below
-              </p>
-            </div>
-            
-            {/* Meeting time picker would go here */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"].map((time) => (
-                <button
-                  key={time}
-                  type="button"
-                  onClick={() => onChange(time)}
-                  className={cn(
-                    "px-4 py-2 text-sm font-medium rounded-lg border transition-colors",
-                    value === time
-                      ? "bg-[var(--shelf-primary)] text-white border-[var(--shelf-primary)]"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  )}
-                >
-                  {time}
-                </button>
-              ))}
-            </div>
-          </div>
+          <MeetingTimePicker
+            value={value}
+            onChange={onChange}
+            duration={field.meetingSettings?.duration}
+            bufferTime={field.meetingSettings?.bufferTime}
+            placeholder={field.placeholder || "Select a date and time"}
+          />
         );
 
       case "phone":

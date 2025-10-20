@@ -83,7 +83,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   }, [formData.fields]);
 
   // Autosave functionality
-  const handleSave = useCallback(async () => {
+  const handleSave = useCallback(async (status?: "draft" | "published") => {
     console.log("handleSave called");
     console.log("User:", user ? user.id : "not authenticated");
     console.log("Form ID:", formData.id);
@@ -115,7 +115,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         fields: formData.fields,
         settings: formData.settings,
         theme: formData.theme,
-        status: "draft",
+        status: status || "draft",
       } as any);
 
       if (error) {
@@ -309,7 +309,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       // STEP 1: Saving form to database...
       setPublishProgress((prev) => ({ ...prev, saving: "loading" }));
 
-      const savedFormId = await handleSave();
+      const savedFormId = await handleSave("published");
 
       if (!savedFormId) {
         console.error("❌ Save failed - no form returned");
