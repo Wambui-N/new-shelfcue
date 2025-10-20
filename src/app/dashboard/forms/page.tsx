@@ -295,13 +295,13 @@ export default function FormsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Forms</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Forms</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Manage all your forms and view performance
           </p>
         </div>
         <Link href="/editor/new">
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
+          <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
             <Plus className="w-4 h-4 mr-2" />
             Create New Form
           </Button>
@@ -309,35 +309,35 @@ export default function FormsPage() {
       </div>
 
       {/* Toolbar */}
-      <Card className="p-6 border-border shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          {/* View Toggle */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground mr-2">
-              View:
-            </span>
-            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-                className="h-8 px-3"
-              >
-                <Grid3x3 className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === "table" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("table")}
-                className="h-8 px-3"
-              >
-                <List className="w-4 h-4" />
-              </Button>
+      <Card className="p-4 sm:p-6 border-border shadow-sm">
+        <div className="flex flex-col gap-4">
+          {/* Top Row - View Toggle and Search */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* View Toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground mr-2">
+                View:
+              </span>
+              <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="h-8 px-3"
+                >
+                  <Grid3x3 className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "table" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("table")}
+                  className="h-8 px-3"
+                >
+                  <List className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
-          </div>
 
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-3">
             {/* Search */}
             <div className="relative flex-1 min-w-0">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -358,8 +358,10 @@ export default function FormsPage() {
                 </Button>
               )}
             </div>
+          </div>
 
-            {/* Status Filter */}
+          {/* Bottom Row - Status Filter */}
+          <div className="flex justify-start">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="h-10 px-3">
@@ -368,7 +370,7 @@ export default function FormsPage() {
                   <ChevronDown className="w-4 h-4 ml-2" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="start" className="w-48">
                 <DropdownMenuItem onClick={() => setStatusFilter("all")}>
                   <div className="flex items-center justify-between w-full">
                     <span>All</span>
@@ -406,8 +408,8 @@ export default function FormsPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
               <span className="text-sm font-medium text-primary">
                 {selectedForms.size} form{selectedForms.size !== 1 ? "s" : ""}{" "}
                 selected
@@ -417,16 +419,18 @@ export default function FormsPage() {
                   variant="outline"
                   size="sm"
                   onClick={handleBulkActivate}
+                  className="text-xs"
                 >
-                  <Play className="w-4 h-4 mr-1" />
+                  <Play className="w-3 h-3 mr-1" />
                   Activate
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleBulkDeactivate}
+                  className="text-xs"
                 >
-                  <Pause className="w-4 h-4 mr-1" />
+                  <Pause className="w-3 h-3 mr-1" />
                   Deactivate
                 </Button>
               </div>
@@ -435,6 +439,7 @@ export default function FormsPage() {
               variant="ghost"
               size="sm"
               onClick={() => setSelectedForms(new Set())}
+              className="w-full sm:w-auto"
             >
               <X className="w-4 h-4 mr-1" />
               Clear
@@ -446,27 +451,27 @@ export default function FormsPage() {
       {/* Forms Content */}
       {filteredAndSortedForms.length === 0 ? (
         <Card className="border-2 border-dashed border-border">
-          <div className="flex flex-col items-center justify-center py-20 px-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mb-6">
-              <FileText className="w-12 h-12 text-primary-foreground" />
+          <div className="flex flex-col items-center justify-center py-12 sm:py-20 px-4 sm:px-6">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mb-4 sm:mb-6">
+              <FileText className="w-8 h-8 sm:w-12 sm:h-12 text-primary-foreground" />
             </div>
-            <h3 className="text-2xl font-bold text-foreground mb-3">
+            <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-3 text-center">
               {searchQuery ? "No forms match your search" : "No forms yet"}
             </h3>
-            <p className="text-muted-foreground text-center mb-8 max-w-md text-lg">
+            <p className="text-muted-foreground text-center mb-6 sm:mb-8 max-w-md text-sm sm:text-lg">
               {searchQuery
                 ? "Try adjusting your search or filters to find what you're looking for."
                 : "Create your first form to start capturing leads and syncing them to Google Sheets automatically."}
             </p>
             {searchQuery ? (
-              <Button onClick={() => setSearchQuery("")} variant="outline">
+              <Button onClick={() => setSearchQuery("")} variant="outline" className="w-full sm:w-auto">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Clear search
               </Button>
             ) : (
               <Link href="/editor/new">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  <Plus className="w-5 h-5 mr-2" />
+                <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Create Your First Form
                 </Button>
               </Link>
@@ -476,7 +481,7 @@ export default function FormsPage() {
       ) : (
         <>
           {/* Select All */}
-          <div className="flex items-center gap-2 px-4">
+          <div className="flex items-center gap-2 px-2 sm:px-4">
             <Checkbox
               id="select-all"
               checked={
@@ -488,7 +493,7 @@ export default function FormsPage() {
             />
             <label
               htmlFor="select-all"
-              className="text-sm text-muted-foreground cursor-pointer"
+              className="text-xs sm:text-sm text-muted-foreground cursor-pointer"
             >
               Select all forms ({filteredAndSortedForms.length})
             </label>
@@ -496,7 +501,7 @@ export default function FormsPage() {
 
           {viewMode === "grid" ? (
             // Grid View
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {filteredAndSortedForms.map((form, index) => (
                 <motion.div
                   key={form.id}
@@ -511,9 +516,9 @@ export default function FormsPage() {
                         : ""
                     }`}
                   >
-                    <div className="p-5 flex flex-col h-full">
+                    <div className="p-4 sm:p-5 flex flex-col h-full">
                       {/* Checkbox and Status Badge Row */}
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <Checkbox
                           checked={selectedForms.has(form.id)}
                           onCheckedChange={() => handleSelectForm(form.id)}
@@ -534,43 +539,43 @@ export default function FormsPage() {
                       {/* Form Name */}
                       <Link
                         href={`/editor/${form.id}`}
-                        className="text-lg font-bold text-foreground hover:text-primary transition-colors line-clamp-2 mb-2"
+                        className="text-base sm:text-lg font-bold text-foreground hover:text-primary transition-colors line-clamp-2 mb-2"
                       >
                         {form.title}
                       </Link>
 
                       {/* Description */}
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-4 min-h-[2.5rem]">
+                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-3 sm:mb-4 min-h-[2rem] sm:min-h-[2.5rem]">
                         {form.description || "No description"}
                       </p>
 
                       {/* Quick Stats */}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                        <Users className="w-4 h-4" />
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
+                        <Users className="w-3 h-3 sm:w-4 sm:h-4" />
                         <span>{form.submissions || 0} submissions</span>
                       </div>
 
                       {/* Quick Actions */}
-                      <div className="flex items-center justify-between pt-4 mt-auto border-t border-border">
+                      <div className="flex items-center justify-between pt-3 sm:pt-4 mt-auto border-t border-border">
                         <div className="flex gap-1">
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-9 w-9 p-0"
+                            className="h-8 w-8 sm:h-9 sm:w-9 p-0"
                             asChild
                           >
                             <Link href={`/editor/${form.id}`}>
-                              <Edit className="w-4 h-4" />
+                              <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
                             </Link>
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-9 w-9 p-0"
+                            className="h-8 w-8 sm:h-9 sm:w-9 p-0"
                             asChild
                           >
                             <Link href={`/dashboard/forms/${form.id}`}>
-                              <Eye className="w-4 h-4" />
+                              <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                             </Link>
                           </Button>
                         </div>
@@ -580,9 +585,9 @@ export default function FormsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-9 w-9 p-0"
+                              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
                             >
-                              <MoreVertical className="w-4 h-4" />
+                              <MoreVertical className="w-3 h-3 sm:w-4 sm:h-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
@@ -628,175 +633,177 @@ export default function FormsPage() {
               ))}
             </div>
           ) : (
-            // Table View
-            <Card className="border-border shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-muted border-b border-border">
-                    <tr>
-                      <th className="w-12 px-4 py-3 text-left">
-                        <Checkbox
-                          checked={
-                            selectedForms.size ===
-                              filteredAndSortedForms.length &&
-                            filteredAndSortedForms.length > 0
-                          }
-                          onCheckedChange={handleSelectAll}
-                          className="border-2 border-foreground/30 data-[state=checked]:border-primary"
-                        />
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
-                        Form Name
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
-                        Status
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
-                        Submissions
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
-                        Created
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {filteredAndSortedForms.map((form) => (
-                      <tr
-                        key={form.id}
-                        className={`hover:bg-accent/50 transition-colors ${
-                          selectedForms.has(form.id) ? "bg-primary/5" : ""
-                        }`}
-                      >
-                        <td className="px-4 py-4">
+            // Table View - Hidden on mobile, show grid instead
+            <div className="hidden lg:block">
+              <Card className="border-border shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-muted border-b border-border">
+                      <tr>
+                        <th className="w-12 px-4 py-3 text-left">
                           <Checkbox
-                            checked={selectedForms.has(form.id)}
-                            onCheckedChange={() => handleSelectForm(form.id)}
+                            checked={
+                              selectedForms.size ===
+                                filteredAndSortedForms.length &&
+                              filteredAndSortedForms.length > 0
+                            }
+                            onCheckedChange={handleSelectAll}
                             className="border-2 border-foreground/30 data-[state=checked]:border-primary"
                           />
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-muted to-muted/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <FileText className="w-5 h-5 text-muted-foreground" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="text-sm font-medium text-foreground truncate">
-                                {form.title}
-                              </div>
-                              {form.description && (
-                                <div className="text-xs text-muted-foreground truncate">
-                                  {form.description}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={form.status === "published"}
-                              onCheckedChange={() =>
-                                handleStatusToggle(form.id, form.status)
-                              }
-                            />
-                            <Badge
-                              variant={
-                                form.status === "published"
-                                  ? "default"
-                                  : "secondary"
-                              }
-                            >
-                              {form.status === "published" ? "Active" : "Draft"}
-                            </Badge>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4">
-                          <span className="text-sm text-foreground">
-                            {form.submissions || 0}
-                          </span>
-                        </td>
-                        <td className="px-4 py-4">
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(form.created_at).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              },
-                            )}
-                          </span>
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              asChild
-                            >
-                              <Link href={`/editor/${form.id}`}>
-                                <Edit className="w-4 h-4" />
-                              </Link>
-                            </Button>
-
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8 w-8 p-0"
-                                >
-                                  <MoreVertical className="w-4 h-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                  <Link href={`/editor/${form.id}`}>
-                                    <Edit className="w-4 h-4 mr-2" />
-                                    Edit
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() =>
-                                    handleStatusToggle(form.id, form.status)
-                                  }
-                                >
-                                  {form.status === "published" ? (
-                                    <>
-                                      <Pause className="w-4 h-4 mr-2" />
-                                      Deactivate
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Play className="w-4 h-4 mr-2" />
-                                      Activate
-                                    </>
-                                  )}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    setFormToDelete(form);
-                                    setDeleteDialogOpen(true);
-                                  }}
-                                  className="text-destructive focus:text-destructive"
-                                >
-                                  <Trash2 className="w-4 h-4 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </td>
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                          Form Name
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                          Status
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                          Submissions
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                          Created
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                          Actions
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {filteredAndSortedForms.map((form) => (
+                        <tr
+                          key={form.id}
+                          className={`hover:bg-accent/50 transition-colors ${
+                            selectedForms.has(form.id) ? "bg-primary/5" : ""
+                          }`}
+                        >
+                          <td className="px-4 py-4">
+                            <Checkbox
+                              checked={selectedForms.has(form.id)}
+                              onCheckedChange={() => handleSelectForm(form.id)}
+                              className="border-2 border-foreground/30 data-[state=checked]:border-primary"
+                            />
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-muted to-muted/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <FileText className="w-5 h-5 text-muted-foreground" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="text-sm font-medium text-foreground truncate">
+                                  {form.title}
+                                </div>
+                                {form.description && (
+                                  <div className="text-xs text-muted-foreground truncate">
+                                    {form.description}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={form.status === "published"}
+                                onCheckedChange={() =>
+                                  handleStatusToggle(form.id, form.status)
+                                }
+                              />
+                              <Badge
+                                variant={
+                                  form.status === "published"
+                                    ? "default"
+                                    : "secondary"
+                                }
+                              >
+                                {form.status === "published" ? "Active" : "Draft"}
+                              </Badge>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <span className="text-sm text-foreground">
+                              {form.submissions || 0}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(form.created_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                },
+                              )}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                asChild
+                              >
+                                <Link href={`/editor/${form.id}`}>
+                                  <Edit className="w-4 h-4" />
+                                </Link>
+                              </Button>
+
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <MoreVertical className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem asChild>
+                                    <Link href={`/editor/${form.id}`}>
+                                      <Edit className="w-4 h-4 mr-2" />
+                                      Edit
+                                    </Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleStatusToggle(form.id, form.status)
+                                    }
+                                  >
+                                    {form.status === "published" ? (
+                                      <>
+                                        <Pause className="w-4 h-4 mr-2" />
+                                        Deactivate
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Play className="w-4 h-4 mr-2" />
+                                        Activate
+                                      </>
+                                    )}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setFormToDelete(form);
+                                      setDeleteDialogOpen(true);
+                                    }}
+                                    className="text-destructive focus:text-destructive"
+                                  >
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
           )}
         </>
       )}

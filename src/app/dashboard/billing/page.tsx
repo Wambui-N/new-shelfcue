@@ -166,32 +166,32 @@ export default function BillingPage() {
 	const isExpired = subscription?.status === 'expired' || (isOnTrial && trialDaysRemaining === 0);
 
 	return (
-		<div className="space-y-8 max-w-6xl">
+		<div className="space-y-6 sm:space-y-8 max-w-6xl">
 			{/* Trial Onboarding Banner */}
 			{isTrialOnboarding && !subscription && (
-				<Card className="p-6 shadow-lg border-2 border-primary bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10">
-					<div className="flex items-start gap-4">
-						<div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center flex-shrink-0">
-							<Zap className="w-6 h-6 text-white" />
+				<Card className="p-4 sm:p-6 shadow-lg border-2 border-primary bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10">
+					<div className="flex flex-col sm:flex-row items-start gap-4">
+						<div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center flex-shrink-0">
+							<Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
 						</div>
 						<div className="flex-1">
-							<h2 className="text-2xl font-bold text-foreground mb-2">
+							<h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
 								Welcome to ShelfCue! 🎉
 							</h2>
-							<p className="text-muted-foreground mb-4">
+							<p className="text-sm sm:text-base text-muted-foreground mb-4">
 								You're one step away from starting your <span className="font-semibold text-foreground">14-day free trial</span>. Add your payment details below to unlock unlimited forms and submissions.
 							</p>
-							<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
 								<div className="flex items-center gap-2">
-									<CheckCircle className="w-4 h-4 text-primary" />
+									<CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
 									<span>No charge today</span>
 								</div>
 								<div className="flex items-center gap-2">
-									<CheckCircle className="w-4 h-4 text-primary" />
+									<CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
 									<span>Cancel anytime</span>
 								</div>
 								<div className="flex items-center gap-2">
-									<CheckCircle className="w-4 h-4 text-primary" />
+									<CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
 									<span>Full feature access</span>
 								</div>
 							</div>
@@ -202,8 +202,8 @@ export default function BillingPage() {
 
 			{/* Page Header */}
 			<div>
-				<h1 className="text-3xl font-bold text-foreground">Billing & Subscription</h1>
-				<p className="text-muted-foreground mt-1">
+				<h1 className="text-2xl sm:text-3xl font-bold text-foreground">Billing & Subscription</h1>
+				<p className="text-sm sm:text-base text-muted-foreground mt-1">
 					{isTrialOnboarding && !subscription 
 						? "Add payment details to start your free trial"
 						: "Manage your subscription and billing information"
@@ -213,28 +213,28 @@ export default function BillingPage() {
 
 			{/* Trial Status Banner */}
 			{isOnTrial && trialDaysRemaining > 0 && (
-				<Card className="p-6 shadow-sm border-2 border-primary bg-gradient-to-r from-primary/10 to-accent/10">
-					<div className="flex items-center gap-4">
-						<div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center flex-shrink-0">
-							<Clock className="w-6 h-6 text-white" />
+				<Card className="p-4 sm:p-6 shadow-sm border-2 border-primary bg-gradient-to-r from-primary/10 to-accent/10">
+					<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+						<div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center flex-shrink-0">
+							<Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
 						</div>
 						<div className="flex-1">
-							<h3 className="text-lg font-semibold text-foreground">
+							<h3 className="text-base sm:text-lg font-semibold text-foreground">
 								Free Trial Active
 							</h3>
-							<p className="text-muted-foreground">
+							<p className="text-sm sm:text-base text-muted-foreground">
 								You have <span className="font-bold text-primary">{trialDaysRemaining} days</span> remaining in your trial. Subscribe now to continue using all features.
 							</p>
 						</div>
 						<Button
 							onClick={() => handleSubscribe()}
 							disabled={paymentLoading}
-							className="bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg"
+							className="w-full sm:w-auto bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg"
 						>
 							{paymentLoading ? (
-								<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
+								<><Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />Processing...</>
 							) : (
-								<><Zap className="w-4 h-4 mr-2" />Subscribe Now</>
+								<><Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />Subscribe Now</>
 							)}
 						</Button>
 					</div>
@@ -243,28 +243,28 @@ export default function BillingPage() {
 
 			{/* Expired Status Banner */}
 			{isExpired && (
-				<Card className="p-6 shadow-sm border-2 border-red-500 bg-red-50 dark:bg-red-950/20">
-					<div className="flex items-center gap-4">
-						<div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
-							<Clock className="w-6 h-6 text-white" />
+				<Card className="p-4 sm:p-6 shadow-sm border-2 border-red-500 bg-red-50 dark:bg-red-950/20">
+					<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+						<div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
+							<Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
 						</div>
 						<div className="flex-1">
-							<h3 className="text-lg font-semibold text-foreground">
+							<h3 className="text-base sm:text-lg font-semibold text-foreground">
 								Trial Expired
 							</h3>
-							<p className="text-muted-foreground">
+							<p className="text-sm sm:text-base text-muted-foreground">
 								Your trial has ended. Subscribe now to regain access to all features.
 							</p>
 						</div>
 						<Button
 							onClick={() => handleSubscribe()}
 							disabled={paymentLoading}
-							className="bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg"
+							className="w-full sm:w-auto bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg"
 						>
 							{paymentLoading ? (
-								<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
+								<><Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />Processing...</>
 							) : (
-								<><Zap className="w-4 h-4 mr-2" />Subscribe Now</>
+								<><Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />Subscribe Now</>
 							)}
 						</Button>
 					</div>
@@ -272,55 +272,55 @@ export default function BillingPage() {
 			)}
 
 			{/* Current Status */}
-			<Card className="p-6 shadow-sm border-primary">
-				<div className="flex items-start justify-between mb-6">
+			<Card className="p-4 sm:p-6 shadow-sm border-primary">
+				<div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-6">
 					<div className="flex items-center gap-3">
-						<div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-							<Crown className="w-6 h-6 text-primary" />
+						<div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+							<Crown className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
 						</div>
 						<div>
-							<h2 className="text-xl font-semibold text-foreground">
+							<h2 className="text-lg sm:text-xl font-semibold text-foreground">
 								Current Status
 							</h2>
-							<p className="text-sm text-muted-foreground">
+							<p className="text-xs sm:text-sm text-muted-foreground">
 								{isOnTrial ? "14-Day Free Trial" : isActive ? "Professional Plan" : "Subscription Required"}
 							</p>
 						</div>
 					</div>
-					<Badge className={isActive ? "bg-green-600" : isOnTrial ? "bg-primary" : "bg-red-600"}>
+					<Badge className={`text-xs ${isActive ? "bg-green-600" : isOnTrial ? "bg-primary" : "bg-red-600"}`}>
 						{isActive ? "Active" : isOnTrial ? "Trial" : "Expired"}
 					</Badge>
 				</div>
 
-				<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-					<div className="p-4 bg-background-secondary rounded-xl">
-						<FileText className="w-5 h-5 text-primary mb-2" />
-						<div className="text-2xl font-bold text-foreground">
+				<div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+					<div className="p-3 sm:p-4 bg-background-secondary rounded-xl">
+						<FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary mb-2" />
+						<div className="text-xl sm:text-2xl font-bold text-foreground">
 							{usage?.forms_count || 0}
 						</div>
 						<div className="text-xs text-muted-foreground">Forms (Unlimited)</div>
 					</div>
-					<div className="p-4 bg-background-secondary rounded-xl">
-						<Users className="w-5 h-5 text-green-600 mb-2" />
-						<div className="text-2xl font-bold text-foreground">
+					<div className="p-3 sm:p-4 bg-background-secondary rounded-xl">
+						<Users className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 mb-2" />
+						<div className="text-xl sm:text-2xl font-bold text-foreground">
 							{usage?.submissions_count || 0}
 						</div>
-						<div className="text-xs text-muted-foreground">Leads This Month (Unlimited)</div>
+						<div className="text-xs text-muted-foreground">Leads (Unlimited)</div>
 					</div>
-					<div className="p-4 bg-background-secondary rounded-xl">
-						<BarChart3 className="w-5 h-5 text-purple-600 mb-2" />
-						<div className="text-2xl font-bold text-foreground">Advanced</div>
+					<div className="p-3 sm:p-4 bg-background-secondary rounded-xl">
+						<BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 mb-2" />
+						<div className="text-xl sm:text-2xl font-bold text-foreground">Advanced</div>
 						<div className="text-xs text-muted-foreground">Analytics</div>
 					</div>
-					<div className="p-4 bg-background-secondary rounded-xl">
-						<Shield className="w-5 h-5 text-orange-600 mb-2" />
-						<div className="text-2xl font-bold text-foreground">Priority</div>
+					<div className="p-3 sm:p-4 bg-background-secondary rounded-xl">
+						<Shield className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 mb-2" />
+						<div className="text-xl sm:text-2xl font-bold text-foreground">Priority</div>
 						<div className="text-xs text-muted-foreground">Support</div>
 					</div>
 				</div>
 
 				{isActive && subscription?.current_period_end && (
-					<div className="text-sm text-muted-foreground">
+					<div className="text-xs sm:text-sm text-muted-foreground">
 						Next billing date: {new Date(subscription.current_period_end).toLocaleDateString()}
 					</div>
 				)}
@@ -329,7 +329,7 @@ export default function BillingPage() {
 			{/* Subscription Plan */}
 			{plan && (
 				<div>
-					<h2 className="text-2xl font-bold text-foreground mb-6">
+					<h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">
 						{isActive ? "Your Plan" : "Subscribe to ShelfCue Professional"}
 					</h2>
 					<motion.div
@@ -337,10 +337,10 @@ export default function BillingPage() {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.4 }}
 					>
-						<Card className="p-8 border-2 border-primary shadow-sm">
+						<Card className="p-4 sm:p-6 lg:p-8 border-2 border-primary shadow-sm">
 							<div className="flex justify-end mb-4">
 								{!subscription && (
-									<Badge className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
+									<Badge className="bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs">
 										<Zap className="w-3 h-3 mr-1" />
 										14-Day Free Trial
 									</Badge>
@@ -348,37 +348,37 @@ export default function BillingPage() {
 							</div>
 
 							<div className="text-center mb-6">
-								<h3 className="text-2xl font-bold text-foreground mb-2">
+								<h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
 									{plan.display_name}
 								</h3>
 								<div className="mb-4">
 									{!subscription ? (
 										<>
-							<span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+							<span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
 								$0.50
 							</span>
-							<span className="text-muted-foreground ml-2">authorization</span>
-							<p className="text-sm text-muted-foreground mt-2">
+							<span className="text-sm sm:text-base text-muted-foreground ml-2">authorization</span>
+							<p className="text-xs sm:text-sm text-muted-foreground mt-2">
 								Then ${plan.price_monthly}/month after 14 days
 							</p>
 										</>
 									) : (
 										<>
-											<span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+											<span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
 												${plan.price_monthly.toLocaleString()}
 											</span>
-											<span className="text-muted-foreground ml-2">/month</span>
+											<span className="text-sm sm:text-base text-muted-foreground ml-2">/month</span>
 										</>
 									)}
 								</div>
-								<p className="text-muted-foreground">{plan.description}</p>
+								<p className="text-sm sm:text-base text-muted-foreground">{plan.description}</p>
 							</div>
 
-							<ul className="space-y-3 mb-6">
+							<ul className="space-y-2 sm:space-y-3 mb-6">
 								{plan.features.map((feature, index) => (
 									<li key={index} className="flex items-start gap-2">
-										<CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-										<span className="text-sm text-muted-foreground">{feature}</span>
+										<CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary mt-0.5 flex-shrink-0" />
+										<span className="text-xs sm:text-sm text-muted-foreground">{feature}</span>
 									</li>
 								))}
 							</ul>
@@ -386,24 +386,24 @@ export default function BillingPage() {
 							{!isActive && (
 								<div>
 									<Button
-										className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg"
+										className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg text-sm sm:text-base"
 										disabled={paymentLoading}
 										onClick={() => handleSubscribe()}
 									>
 										{paymentLoading ? (
 											<>
-												<Loader2 className="w-4 h-4 mr-2 animate-spin" />
+												<Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />
 												Processing...
 											</>
 										) : (
 											<>
-												<Zap className="w-4 h-4 mr-2" />
+												<Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
 												{isOnTrial && trialDaysRemaining > 0 ? "Subscribe Now" : "Start 14-Day Free Trial"}
 											</>
 										)}
 									</Button>
 									{!subscription && (
-								<p className="text-xs text-center text-muted-foreground mt-3">
+								<p className="text-xs sm:text-sm text-center text-muted-foreground mt-3">
 									We'll charge $0.50 to authorize your card. You'll only be charged ${plan.price_monthly}/month after your trial ends.
 								</p>
 									)}
@@ -412,10 +412,10 @@ export default function BillingPage() {
 
 						{isActive && (subscription as any)?.paystack_email_token && (
 							<div className="mt-6 p-4 bg-muted rounded-lg">
-								<p className="text-sm text-muted-foreground mb-3">
+								<p className="text-xs sm:text-sm text-muted-foreground mb-3">
 									Manage your subscription and payment method:
 								</p>
-								<Button variant="outline" asChild className="w-full">
+								<Button variant="outline" asChild className="w-full text-sm">
 									<a
 										href={`https://paystack.com/subscription/manage/${(subscription as any).paystack_email_token}`}
 										target="_blank"

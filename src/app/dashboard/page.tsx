@@ -193,24 +193,24 @@ export default function DashboardPage() {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Active Forms */}
           <Link href="/dashboard/forms">
             <motion.div
-              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20"
+              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20"
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-primary-foreground/20 rounded-xl">
-                  <FileText className="w-6 h-6 text-primary-foreground" />
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className="p-2 sm:p-3 bg-primary-foreground/20 rounded-xl">
+                  <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
                 </div>
-                <ArrowRight className="w-5 h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
               </div>
-              <div className="text-4xl font-bold mb-2">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
                 {dashboardStats.publishedForms}
               </div>
-              <div className="text-primary-foreground/80 text-sm font-medium">
+              <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium">
                 Active Forms
               </div>
             </motion.div>
@@ -219,29 +219,29 @@ export default function DashboardPage() {
           {/* Leads This Week */}
           <Link href="/dashboard/submissions">
             <motion.div
-              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20"
+              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20"
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-primary-foreground/20 rounded-xl">
-                  <Users className="w-6 h-6 text-primary-foreground" />
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className="p-2 sm:p-3 bg-primary-foreground/20 rounded-xl">
+                  <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   {getTrendPercentage() > 0 ? (
-                    <ChevronUp className="w-4 h-4 text-primary-foreground/80" />
+                    <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4 text-primary-foreground/80" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-primary-foreground/80" />
+                    <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-primary-foreground/80" />
                   )}
-                  <span className="text-sm text-primary-foreground/80 font-medium">
+                  <span className="text-xs sm:text-sm text-primary-foreground/80 font-medium">
                     {getTrendPercentage()}%
                   </span>
                 </div>
               </div>
-              <div className="text-4xl font-bold mb-2">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
                 {dashboardStats.leadsThisWeek}
               </div>
-              <div className="text-primary-foreground/80 text-sm font-medium">
+              <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium">
                 Leads This Week
               </div>
             </motion.div>
@@ -250,22 +250,22 @@ export default function DashboardPage() {
           {/* Last Lead */}
           <Link href="/dashboard/submissions">
             <motion.div
-              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20"
+              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20 sm:col-span-2 lg:col-span-1"
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-primary-foreground/20 rounded-xl">
-                  <Clock className="w-6 h-6 text-primary-foreground" />
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className="p-2 sm:p-3 bg-primary-foreground/20 rounded-xl">
+                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
                 </div>
-                <ArrowRight className="w-5 h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
               </div>
-              <div className="text-4xl font-bold mb-2">
+              <div className="text-lg sm:text-2xl lg:text-3xl xl:text-4xl font-bold mb-1 sm:mb-2">
                 {dashboardStats.lastLeadTime
                   ? formatTimeAgo(dashboardStats.lastLeadTime)
                   : "No leads yet"}
               </div>
-              <div className="text-primary-foreground/80 text-sm font-medium">
+              <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium">
                 Last Lead
               </div>
             </motion.div>
@@ -274,7 +274,7 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 lg:gap-8">
         {/* Recent Activity */}
         <motion.div
           className="xl:col-span-1"
@@ -283,28 +283,28 @@ export default function DashboardPage() {
           transition={{ delay: 0.4, duration: 0.6 }}
         >
           <Card className="shadow-sm border-border">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-foreground">
+            <div className="p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground">
                   Recent Activity
                 </h3>
                 <Link
                   href="/dashboard/submissions"
-                  className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
+                  className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium transition-colors"
                 >
                   View All →
                 </Link>
               </div>
 
               {recentSubmissions.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                    <MessageSquare className="w-8 h-8 text-muted-foreground" />
+                <div className="text-center py-8 sm:py-12">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                    <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">
+                  <h3 className="font-semibold text-foreground mb-2 text-sm sm:text-base">
                     No submissions yet
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                     Share your forms to start capturing leads!
                   </p>
                 </div>
@@ -313,15 +313,15 @@ export default function DashboardPage() {
                   {recentSubmissions.slice(0, 5).map((submission) => (
                     <motion.div
                       key={submission.id}
-                      className="flex items-center gap-3 p-4 rounded-xl hover:bg-accent transition-colors group border border-transparent hover:border-border"
+                      className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl hover:bg-accent transition-colors group border border-transparent hover:border-border"
                       whileHover={{ x: 4 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground flex-shrink-0">
-                        <FileText className="w-5 h-5" />
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground flex-shrink-0">
+                        <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm text-foreground truncate">
+                        <p className="font-medium text-xs sm:text-sm text-foreground truncate">
                           New submission
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
@@ -350,18 +350,18 @@ export default function DashboardPage() {
           transition={{ delay: 0.5, duration: 0.6 }}
         >
           <Card className="shadow-sm border-border">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-4">
                 <div>
-                  <h3 className="text-2xl font-bold text-foreground">
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">
                     Your Forms
                   </h3>
-                  <p className="text-muted-foreground mt-1">
+                  <p className="text-muted-foreground mt-1 text-sm sm:text-base">
                     Manage and track your form performance
                   </p>
                 </div>
                 <Link href="/editor/new">
-                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
+                  <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
                     <Plus className="w-4 h-4 mr-2" />
                     Create New Form
                   </Button>
@@ -369,44 +369,44 @@ export default function DashboardPage() {
               </div>
 
               {forms.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <FileText className="w-10 h-10 text-muted-foreground" />
+                <div className="text-center py-12 sm:py-16">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                    <FileText className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-3">
+                  <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3">
                     No forms yet
                   </h3>
-                  <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                  <p className="text-muted-foreground mb-6 sm:mb-8 max-w-md mx-auto text-sm sm:text-base">
                     Create your first form to start collecting data and building
                     your lead generation system.
                   </p>
                   <Link href="/editor/new">
-                    <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3 shadow-sm">
+                    <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 px-6 sm:px-8 py-3 shadow-sm">
                       <Plus className="w-4 h-4 mr-2" />
                       Create Your First Form
                     </Button>
                   </Link>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {forms.slice(0, 6).map((form, index) => (
                     <motion.div
                       key={form.id}
-                      className="flex items-center gap-4 p-6 bg-background border border-border rounded-2xl hover:shadow-lg hover:border-primary/20 transition-all duration-300 group"
+                      className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-background border border-border rounded-2xl hover:shadow-lg hover:border-primary/20 transition-all duration-300 group"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1, duration: 0.4 }}
                       whileHover={{ y: -2 }}
                     >
                       {/* Form Icon */}
-                      <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-8 h-8 text-primary" />
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                       </div>
 
                       {/* Form Info */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold text-foreground truncate text-lg">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                          <h3 className="font-semibold text-foreground truncate text-base sm:text-lg">
                             {form.title}
                           </h3>
                           <Badge
@@ -415,29 +415,52 @@ export default function DashboardPage() {
                                 ? "default"
                                 : "secondary"
                             }
-                            className="text-xs"
+                            className="text-xs w-fit"
                           >
                             {form.status === "published" ? "Active" : "Draft"}
                           </Badge>
                         </div>
-                        <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
+                            <Users className="w-3 h-3 sm:w-4 sm:h-4" />
                             {form.submissions || 0} submissions
                           </span>
                           <span className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
+                            <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                             {formatTimeAgo(form.created_at)}
                           </span>
                         </div>
                       </div>
 
                       {/* Quick Actions */}
+                      <div className="flex sm:hidden items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-accent"
+                          asChild
+                        >
+                          <Link href={`/editor/${form.id}`}>
+                            <Edit className="w-4 h-4" />
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-accent"
+                          asChild
+                        >
+                          <Link href={`/dashboard/forms/${form.id}`}>
+                            <Eye className="w-4 h-4" />
+                          </Link>
+                        </Button>
+                      </div>
                       <div className="hidden sm:flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <Button
                           variant="ghost"
                           size="sm"
                           className="h-10 w-10 p-0 hover:bg-accent"
+                          asChild
                         >
                           <Link href={`/editor/${form.id}`}>
                             <Edit className="w-4 h-4" />
@@ -447,6 +470,7 @@ export default function DashboardPage() {
                           variant="ghost"
                           size="sm"
                           className="h-10 w-10 p-0 hover:bg-accent"
+                          asChild
                         >
                           <Link href={`/dashboard/forms/${form.id}`}>
                             <Eye className="w-4 h-4" />

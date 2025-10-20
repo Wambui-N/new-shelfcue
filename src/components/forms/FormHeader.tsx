@@ -32,12 +32,12 @@ export function FormHeader({
 
   return (
     <header className={cn(
-      "w-full py-8 px-4",
+      "w-full py-4 sm:py-6 md:py-8 px-3 sm:px-4",
       "border-b border-gray-200 bg-white/80 backdrop-blur-sm"
     )}>
       <div className="max-w-4xl mx-auto">
         <div className={cn(
-          "flex flex-col items-center space-y-4",
+          "flex flex-col items-center space-y-3 sm:space-y-4",
           titleAlignment === "left" && "items-start",
           titleAlignment === "right" && "items-end"
         )}>
@@ -49,7 +49,7 @@ export function FormHeader({
                 alt="Logo"
                 width={logoHeight * 2}
                 height={logoHeight}
-                className="object-contain"
+                className="object-contain h-8 sm:h-10 w-auto"
               />
             </div>
           )}
@@ -57,8 +57,8 @@ export function FormHeader({
           {/* Title */}
           {showTitle && (
             <h1 className={cn(
-              "text-3xl font-bold text-gray-900",
-              "sm:text-4xl lg:text-5xl",
+              "text-2xl font-bold text-gray-900",
+              "sm:text-3xl md:text-4xl lg:text-5xl",
               "text-center",
               titleAlignment === "left" && "text-left",
               titleAlignment === "right" && "text-right"
@@ -70,7 +70,7 @@ export function FormHeader({
           {/* Description */}
           {showDescription && description && (
             <p className={cn(
-              "text-lg text-gray-600 max-w-2xl",
+              "text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl",
               "text-center",
               titleAlignment === "left" && "text-left",
               titleAlignment === "right" && "text-right"

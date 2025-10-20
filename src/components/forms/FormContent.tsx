@@ -63,9 +63,9 @@ export function FormContent({
 
   return (
     <div className={cn(
-      "w-full max-w-4xl mx-auto px-4 py-8",
-      layoutConfig.spacing === "tight" && "py-4",
-      layoutConfig.spacing === "loose" && "py-12"
+      "w-full max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-8",
+      layoutConfig.spacing === "tight" && "py-3 sm:py-4",
+      layoutConfig.spacing === "loose" && "py-6 sm:py-12"
     )}>
       {/* Progress Indicator */}
       {layoutConfig.showProgress && (
@@ -78,18 +78,18 @@ export function FormContent({
 
       {/* Form Container */}
       <div className={cn(
-        "bg-white rounded-lg shadow-lg p-8",
+        "bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8",
         layout === "hero" && "max-w-2xl mx-auto",
-        layout === "conversational" && "min-h-[400px] flex flex-col justify-center"
+        layout === "conversational" && "min-h-[300px] sm:min-h-[400px] flex flex-col justify-center"
       )}>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Fields Grid */}
           <div className={cn(
-            "grid gap-6",
+            "grid gap-4 sm:gap-6",
             layoutConfig.columns === 1 && "grid-cols-1",
             layoutConfig.columns === 2 && "grid-cols-1 md:grid-cols-2",
-            layoutConfig.spacing === "tight" && "gap-4",
-            layoutConfig.spacing === "loose" && "gap-8"
+            layoutConfig.spacing === "tight" && "gap-3 sm:gap-4",
+            layoutConfig.spacing === "loose" && "gap-6 sm:gap-8"
           )}>
             {currentFields.map((field) => (
               <div
@@ -113,7 +113,7 @@ export function FormContent({
 
           {/* Action Buttons */}
           <div className={cn(
-            "flex justify-between items-center pt-6",
+            "flex justify-between items-center pt-4 sm:pt-6",
             isConversational && "border-t border-gray-200"
           )}>
             {isConversational ? (
@@ -123,7 +123,7 @@ export function FormContent({
                   onClick={handlePrevious}
                   disabled={currentStep === 0}
                   className={cn(
-                    "px-6 py-3 rounded-lg font-medium transition-colors",
+                    "px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-colors",
                     currentStep === 0
                       ? "text-gray-400 cursor-not-allowed"
                       : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
@@ -136,7 +136,7 @@ export function FormContent({
                   type="submit"
                   disabled={isSubmitting}
                   className={cn(
-                    "px-8 py-3 rounded-lg font-medium text-white transition-colors",
+                    "px-6 sm:px-8 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-medium text-white transition-colors",
                     "bg-[var(--shelf-primary)] hover:opacity-90",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
@@ -149,10 +149,10 @@ export function FormContent({
                 type="submit"
                 disabled={isSubmitting}
                 className={cn(
-                  "w-full px-8 py-4 rounded-lg font-medium text-white transition-colors",
+                  "w-full px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-sm sm:text-base font-medium text-white transition-colors",
                   "bg-[var(--shelf-primary)] hover:opacity-90",
                   "disabled:opacity-50 disabled:cursor-not-allowed",
-                  layout === "hero" && "text-lg py-5"
+                  layout === "hero" && "sm:text-lg sm:py-5"
                 )}
               >
                 {isSubmitting ? "Submitting..." : "Submit"}

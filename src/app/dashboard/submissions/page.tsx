@@ -182,29 +182,29 @@ export default function SubmissionsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Submissions</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Submissions</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             View and manage all form submissions
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="border-border">
-            <Download className="w-4 h-4 mr-2" />
+          <Button variant="outline" className="border-border w-full sm:w-auto text-sm">
+            <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
             Export
           </Button>
         </div>
       </div>
 
       {/* Toolbar */}
-      <Card className="p-6 border-border shadow-sm">
+      <Card className="p-4 sm:p-6 border-border shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           {/* View Toggle */}
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground mr-2">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground mr-2">
               View:
             </span>
             <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
@@ -212,17 +212,17 @@ export default function SubmissionsPage() {
                 variant={viewMode === "card" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("card")}
-                className="h-8 px-3"
+                className="h-7 sm:h-8 px-2 sm:px-3"
               >
-                <LayoutGrid className="w-4 h-4" />
+                <LayoutGrid className="w-3 h-3 sm:w-4 sm:h-4" />
               </Button>
               <Button
                 variant={viewMode === "table" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("table")}
-                className="h-8 px-3"
+                className="h-7 sm:h-8 px-2 sm:px-3"
               >
-                <TableIcon className="w-4 h-4" />
+                <TableIcon className="w-3 h-3 sm:w-4 sm:h-4" />
               </Button>
             </div>
           </div>
@@ -231,21 +231,21 @@ export default function SubmissionsPage() {
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Search */}
             <div className="relative flex-1 min-w-0">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3 h-3 sm:w-4 sm:h-4" />
               <Input
                 placeholder="Search submissions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-10 h-10"
+                className="pl-9 sm:pl-10 pr-10 h-9 sm:h-10 text-sm"
               />
               {searchQuery && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 sm:h-8 w-7 sm:w-8 p-0"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
               )}
             </div>
@@ -253,13 +253,15 @@ export default function SubmissionsPage() {
             {/* Form Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="h-10 px-3">
-                  <Filter className="w-4 h-4 mr-2" />
-                  {selectedFormId
-                    ? forms.find((f) => f.id === selectedFormId)?.title ||
-                      "Form"
-                    : "All Forms"}
-                  <ChevronDown className="w-4 h-4 ml-2" />
+                <Button variant="outline" className="h-9 sm:h-10 px-3 text-xs sm:text-sm">
+                  <Filter className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                  <span className="truncate max-w-[100px] sm:max-w-none">
+                    {selectedFormId
+                      ? forms.find((f) => f.id === selectedFormId)?.title ||
+                        "Form"
+                      : "All Forms"}
+                  </span>
+                  <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">

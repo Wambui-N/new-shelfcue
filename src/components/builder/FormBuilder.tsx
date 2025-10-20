@@ -487,24 +487,24 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       {/* Compact Header with Breadcrumb */}
       <div className="flex-shrink-0 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="px-6 py-3">
-          <div className="flex items-center justify-between">
+        <div className="px-3 sm:px-6 py-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             {/* Breadcrumb Navigation */}
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-2 text-sm min-w-0 flex-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onBack}
-                className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
+                className="flex items-center gap-1 text-muted-foreground hover:text-foreground flex-shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Forms
+                <span className="hidden sm:inline">Forms</span>
               </Button>
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              <span className="font-medium text-foreground">
+              <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              <span className="font-medium text-foreground truncate">
                 {formData.title || "Untitled Form"}
               </span>
-              <div className="flex items-center gap-2 ml-2">
+              <div className="flex items-center gap-2 ml-2 flex-shrink-0">
                 <Badge
                   variant={
                     formData.status === "published" ? "default" : "secondary"
@@ -513,7 +513,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 >
                   {formData.status === "published" ? "Published" : "Draft"}
                 </Badge>
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
                   {saveStatus === "saving" && (
                     <>
                       <Loader2 className="w-3 h-3 animate-spin" />
@@ -548,10 +548,10 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 onClick={() => setShowShareDialog(true)}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2"
+                className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
               >
-                <Share2 className="w-4 h-4" />
-                Share
+                <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Share</span>
               </Button>
 
               <Button
@@ -559,7 +559,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 disabled={isSaving || !isDirty}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2"
+                className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
               >
                 {getSaveButtonContent()}
               </Button>
@@ -568,23 +568,53 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 onClick={handlePublish}
                 disabled={isSaving || formData.fields.length === 0}
                 size="sm"
-                className="bg-primary text-primary-foreground hover:bg-primary/80"
+                className="bg-primary text-primary-foreground hover:bg-primary/80 text-xs sm:text-sm"
               >
                 {formData.status === "published" ? "Published" : "Publish"}
               </Button>
+            </div>
+          </div>
+          
+          {/* Mobile Save Status */}
+          <div className="sm:hidden mt-2">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              {saveStatus === "saving" && (
+                <>
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  <span>Saving...</span>
+                </>
+              )}
+              {saveStatus === "saved" && (
+                <>
+                  <CheckCircle className="w-3 h-3 text-green-600" />
+                  <span className="text-green-600">Saved</span>
+                </>
+              )}
+              {saveStatus === "error" && (
+                <>
+                  <AlertCircle className="w-3 h-3 text-destructive" />
+                  <span className="text-destructive">Error</span>
+                </>
+              )}
+              {saveStatus === "idle" && isDirty && (
+                <>
+                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+                  <span className="text-orange-600">Unsaved</span>
+                </>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         {/* Left Side - Preview (Larger Width) */}
         <div className="flex-1 border-r border-border overflow-y-auto bg-background-secondary/50">
-          <div className="p-6 min-h-full">
+          <div className="p-3 sm:p-6 min-h-full">
             {/* Device Toggle */}
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-foreground">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground">
                 Live Preview
               </h3>
               <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
@@ -592,19 +622,19 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   variant={deviceView === "desktop" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setDeviceView("desktop")}
-                  className="h-8 px-3"
+                  className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm"
                 >
-                  <Monitor className="w-4 h-4 mr-1" />
-                  Desktop
+                  <Monitor className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                  <span className="hidden sm:inline">Desktop</span>
                 </Button>
                 <Button
                   variant={deviceView === "mobile" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setDeviceView("mobile")}
-                  className="h-8 px-3"
+                  className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm"
                 >
-                  <Smartphone className="w-4 h-4 mr-1" />
-                  Mobile
+                  <Smartphone className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                  <span className="hidden sm:inline">Mobile</span>
                 </Button>
               </div>
             </div>
@@ -619,18 +649,18 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
                   className={
-                    deviceView === "mobile" ? "w-[375px]" : "w-full max-w-3xl"
+                    deviceView === "mobile" ? "w-[320px] sm:w-[375px]" : "w-full max-w-3xl"
                   }
                 >
                   {deviceView === "mobile" && (
-                    <div className="w-[375px] bg-background rounded-xl border border-border shadow-lg overflow-hidden">
-                      <div className="p-4">
+                    <div className="w-[320px] sm:w-[375px] bg-background rounded-xl border border-border shadow-lg overflow-hidden">
+                      <div className="p-3 sm:p-4">
                         <FormPreview formData={formData} />
                       </div>
                     </div>
                   )}
                   {deviceView === "desktop" && (
-                    <div className="bg-background rounded-xl border border-border shadow-lg p-4 max-w-full">
+                    <div className="bg-background rounded-xl border border-border shadow-lg p-3 sm:p-4 max-w-full">
                       <FormPreview formData={formData} />
                     </div>
                   )}
@@ -641,10 +671,10 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         </div>
 
         {/* Right Side - Editor Tabs (Smaller Width) */}
-        <div className="w-[420px] flex flex-col bg-background">
+        <div className="w-full lg:w-[420px] flex flex-col bg-background border-t lg:border-t-0 lg:border-l border-border">
           {/* Tab Headers */}
           <div className="flex-shrink-0 bg-background border-b border-border">
-            <div className="grid grid-cols-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4">
               <button
                 onClick={() => setActiveTab("fields")}
                 className={`flex items-center justify-center gap-2 h-12 text-sm font-medium transition-colors ${

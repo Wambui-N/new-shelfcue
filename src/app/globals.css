@@ -139,3 +139,42 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Mobile-specific optimizations */
+@layer utilities {
+  /* Touch-friendly target sizes (minimum 44x44px) */
+  .touch-target {
+    @apply min-h-11 min-w-11;
+  }
+  
+  /* Prevent text selection on interactive elements on mobile */
+  @media (max-width: 640px) {
+    button, a {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+    }
+  }
+  
+  /* Improve scrolling performance on mobile */
+  .smooth-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Safe area insets for devices with notches */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Disable horizontal scroll on mobile */
+  @media (max-width: 640px) {
+    body {
+      overflow-x: hidden;
+    }
+  }
+}
