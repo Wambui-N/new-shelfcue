@@ -173,6 +173,14 @@ export async function POST(request: NextRequest) {
         console.log("✅ Google Sheet created:", newSheet);
 
         if (newSheet.spreadsheetId && newSheet.spreadsheetUrl) {
+          console.log("💾 Saving sheet connection to database...");
+          console.log("📝 Connection data:", {
+            user_id: userId,
+            sheet_id: newSheet.spreadsheetId,
+            sheet_name: `${(form as any).title} - Responses`,
+            sheet_url: newSheet.spreadsheetUrl,
+          });
+          
           const { data: connection, error: connectionError } = await (
             supabaseAdmin as any
           )
@@ -181,19 +189,36 @@ export async function POST(request: NextRequest) {
               user_id: userId,
               sheet_id: newSheet.spreadsheetId,
               sheet_name: `${(form as any).title} - Responses`,
+              sheet_url: newSheet.spreadsheetUrl,
             })
             .select()
             .single();
 
           if (connectionError) {
-            console.error("Failed to save sheet connection:", connectionError);
+            console.error("❌ Failed to save sheet connection:", connectionError);
+            console.error("Connection error details:", {
+              message: connectionError.message,
+              details: connectionError.details,
+              hint: connectionError.hint,
+              code: connectionError.code
+            });
             throw connectionError;
           }
+          
+          console.log("✅ Sheet connection saved:", connection);
 
-          await (supabaseAdmin as any)
+          console.log("📝 Updating form with sheet connection ID...");
+          const { error: formUpdateError } = await (supabaseAdmin as any)
             .from("forms")
             .update({ default_sheet_connection_id: (connection as any).id })
             .eq("id", formId);
+          
+          if (formUpdateError) {
+            console.error("❌ Failed to update form:", formUpdateError);
+            throw formUpdateError;
+          }
+          
+          console.log("✅ Form updated with sheet connection");
 
           results.sheet = {
             id: newSheet.spreadsheetId,
