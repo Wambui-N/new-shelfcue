@@ -53,23 +53,36 @@ export function MeetingConfigDialog({
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/google/calendars?userId=${userId}`);
+      // Add an AbortController timeout so the UI never hangs indefinitely
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      const response = await fetch(`/api/google/calendars?userId=${userId}` , {
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
       console.log("📅 Calendar fetch response:", response.status);
 
       if (!response.ok) {
-        const errorData = await response.json();
+        let errorData: any = {};
+        try {
+          errorData = await response.json();
+        } catch (_) {
+          // ignore body parse errors
+        }
+
         if (response.status === 401) {
-          // No tokens - redirect to Google OAuth
-          console.log("📅 No Google tokens found, redirecting to OAuth...");
-          const connectResponse = await fetch(`/api/auth/google-connect?userId=${userId}`);
-          const connectData = await connectResponse.json();
-          if (connectData.authUrl) {
-            window.location.href = connectData.authUrl;
-            return;
-          }
+          // No tokens - show actionable error and Connect Google button
+          console.log("📅 No Google tokens found.");
+          setError(
+            "Google authentication required. Please connect your Google account to continue."
+          );
+          return;
         }
         throw new Error(errorData.error || "Failed to fetch calendars");
       }
+
       const data = await response.json();
       console.log("📅 Calendars fetched:", data.calendars?.length || 0);
       setCalendars(data.calendars || []);
@@ -82,7 +95,11 @@ export function MeetingConfigDialog({
         setSelectedCalendar(primaryCalendar.id);
       }
     } catch (err: any) {
-      setError(err.message);
+      if (err?.name === "AbortError") {
+        setError("Request timed out. Please try again.");
+      } else {
+        setError(err.message || "Failed to fetch calendars");
+      }
     } finally {
       setLoading(false);
     }
