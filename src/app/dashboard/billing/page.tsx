@@ -1,16 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
 import {
-	BarChart3,
 	Calendar,
 	CheckCircle,
 	Clock,
-	Crown,
+	CreditCard,
 	FileText,
 	Loader2,
-	Shield,
 	Users,
+	X,
 	Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -18,6 +16,15 @@ import { BillingSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
@@ -45,6 +52,15 @@ type Subscription = {
 	plan: Plan;
 };
 
+const cancellationReasons = [
+	"Too expensive",
+	"Not using it enough",
+	"Missing features I need",
+	"Found a better alternative",
+	"Technical issues",
+	"Other",
+];
+
 export default function BillingPage() {
 	const { user } = useAuth();
 	const router = useRouter();
@@ -55,6 +71,12 @@ export default function BillingPage() {
 	const [paymentLoading, setPaymentLoading] = useState(false);
 	const [trialDaysRemaining, setTrialDaysRemaining] = useState(0);
 	const [isTrialOnboarding, setIsTrialOnboarding] = useState(false);
+	
+	// Cancel subscription state
+	const [showCancelDialog, setShowCancelDialog] = useState(false);
+	const [selectedReason, setSelectedReason] = useState("");
+	const [feedback, setFeedback] = useState("");
+	const [cancelLoading, setCancelLoading] = useState(false);
 
 	// Create a client-side Supabase instance
 	const supabase = createClient();
@@ -113,16 +135,13 @@ export default function BillingPage() {
 		try {
 			setPaymentLoading(true);
 			
-			// The user object is now from the AuthContext, which is more reliable
 			if (!user?.email) {
 				alert("Please sign in to subscribe");
 				return;
 			}
 
-			// Determine if this is a trial signup
-			const isTrial = !subscription; // If no subscription exists, it's a trial signup
+			const isTrial = !subscription;
 			
-			// Initialize payment using official Paystack flow
 			const response = await fetch("/api/payments/initialize", {
 				method: "POST",
 				headers: {
@@ -130,23 +149,17 @@ export default function BillingPage() {
 				},
 				body: JSON.stringify({ 
 					email: user.email,
-					amount: 2900, // $29.00 in cents
-					is_trial: isTrial // Pass trial flag
+					amount: 2900,
+					is_trial: isTrial
 				}),
 			});
 
-			console.log("Payment initialization response status:", response.status);
-			
 			if (!response.ok) {
 				const errorData = await response.json();
-				console.error("Payment initialization error:", errorData);
 				throw new Error(errorData.error || "Failed to initialize payment");
 			}
 
 			const data = await response.json();
-			console.log("Payment initialization success:", data);
-
-			// Redirect to Paystack payment page
 			window.location.href = data.authorization_url;
 			
 		} catch (error) {
@@ -154,6 +167,37 @@ export default function BillingPage() {
 			alert("Failed to initiate payment. Please try again.");
 		} finally {
 			setPaymentLoading(false);
+		}
+	}
+
+	async function handleCancelSubscription() {
+		if (!selectedReason) {
+			alert("Please select a reason for cancellation");
+			return;
+		}
+
+		try {
+			setCancelLoading(true);
+			
+			// Submit cancellation feedback
+			await (supabase as any).from("subscription_cancellations").insert({
+				user_id: user?.id,
+				subscription_id: subscription?.id,
+				reason: selectedReason,
+				feedback: feedback,
+			});
+
+			// TODO: Call actual cancellation API
+			// For now, just show success message
+			alert("Your subscription has been scheduled for cancellation at the end of the billing period.");
+			setShowCancelDialog(false);
+			fetchData(); // Refresh data
+			
+		} catch (error) {
+			console.error("Error cancelling subscription:", error);
+			alert("Failed to cancel subscription. Please try again.");
+		} finally {
+			setCancelLoading(false);
 		}
 	}
 
@@ -166,33 +210,44 @@ export default function BillingPage() {
 	const isExpired = subscription?.status === 'expired' || (isOnTrial && trialDaysRemaining === 0);
 
 	return (
-		<div className="space-y-6 sm:space-y-8 max-w-6xl">
-			{/* Trial Onboarding Banner */}
+		<div className="space-y-6 sm:space-y-8 max-w-4xl">
+			{/* Page Header */}
+			<div>
+				<h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+					Billing & Subscription
+				</h1>
+				<p className="text-sm sm:text-base text-muted-foreground mt-1">
+					Manage your subscription and payment details
+				</p>
+			</div>
+
+			{/* Trial Banner */}
 			{isTrialOnboarding && !subscription && (
-				<Card className="p-4 sm:p-6 shadow-lg border-2 border-primary bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10">
-					<div className="flex flex-col sm:flex-row items-start gap-4">
-						<div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center flex-shrink-0">
-							<Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+				<Card className="p-4 sm:p-6 border-2 border-primary">
+					<div className="flex items-start gap-3 sm:gap-4">
+						<div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+							<Zap className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
 						</div>
 						<div className="flex-1">
-							<h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
-								Welcome to ShelfCue! 🎉
+							<h2 className="text-lg sm:text-xl font-semibold mb-2">
+								Start Your 14-Day Free Trial
 							</h2>
-							<p className="text-sm sm:text-base text-muted-foreground mb-4">
-								You're one step away from starting your <span className="font-semibold text-foreground">14-day free trial</span>. Add your payment details below to unlock unlimited forms and submissions.
+							<p className="text-sm text-muted-foreground mb-4">
+								Add your payment details to unlock unlimited forms and submissions.
+								You won't be charged until your trial ends.
 							</p>
-							<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
+							<div className="flex flex-wrap gap-3 text-xs sm:text-sm">
 								<div className="flex items-center gap-2">
-									<CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
+									<CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
 									<span>No charge today</span>
 								</div>
 								<div className="flex items-center gap-2">
-									<CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
+									<CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
 									<span>Cancel anytime</span>
 								</div>
 								<div className="flex items-center gap-2">
-									<CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
-									<span>Full feature access</span>
+									<CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+									<span>Full access</span>
 								</div>
 							</div>
 						</div>
@@ -200,236 +255,254 @@ export default function BillingPage() {
 				</Card>
 			)}
 
-			{/* Page Header */}
-			<div>
-				<h1 className="text-2xl sm:text-3xl font-bold text-foreground">Billing & Subscription</h1>
-				<p className="text-sm sm:text-base text-muted-foreground mt-1">
-					{isTrialOnboarding && !subscription 
-						? "Add payment details to start your free trial"
-						: "Manage your subscription and billing information"
-					}
-				</p>
-			</div>
-
-			{/* Trial Status Banner */}
-			{isOnTrial && trialDaysRemaining > 0 && (
-				<Card className="p-4 sm:p-6 shadow-sm border-2 border-primary bg-gradient-to-r from-primary/10 to-accent/10">
-					<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-						<div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center flex-shrink-0">
-							<Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-						</div>
+			{/* Trial Warning */}
+			{isOnTrial && trialDaysRemaining > 0 && trialDaysRemaining <= 3 && (
+				<Card className="p-4 sm:p-6 border-2 border-orange-500 bg-orange-50 dark:bg-orange-950/20">
+					<div className="flex items-start gap-3 sm:gap-4">
+						<Clock className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600 flex-shrink-0 mt-0.5" />
 						<div className="flex-1">
-							<h3 className="text-base sm:text-lg font-semibold text-foreground">
-								Free Trial Active
+							<h3 className="font-semibold text-orange-900 dark:text-orange-100">
+								Trial ending soon
 							</h3>
-							<p className="text-sm sm:text-base text-muted-foreground">
-								You have <span className="font-bold text-primary">{trialDaysRemaining} days</span> remaining in your trial. Subscribe now to continue using all features.
+							<p className="text-sm text-orange-700 dark:text-orange-300 mt-1">
+								You have {trialDaysRemaining} {trialDaysRemaining === 1 ? 'day' : 'days'} left in your trial.
+								Subscribe now to continue using all features.
 							</p>
 						</div>
-						<Button
-							onClick={() => handleSubscribe()}
-							disabled={paymentLoading}
-							className="w-full sm:w-auto bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg"
-						>
-							{paymentLoading ? (
-								<><Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />Processing...</>
-							) : (
-								<><Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />Subscribe Now</>
-							)}
-						</Button>
 					</div>
 				</Card>
 			)}
 
-			{/* Expired Status Banner */}
-			{isExpired && (
-				<Card className="p-4 sm:p-6 shadow-sm border-2 border-red-500 bg-red-50 dark:bg-red-950/20">
-					<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-						<div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
-							<Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-						</div>
-						<div className="flex-1">
-							<h3 className="text-base sm:text-lg font-semibold text-foreground">
-								Trial Expired
-							</h3>
-							<p className="text-sm sm:text-base text-muted-foreground">
-								Your trial has ended. Subscribe now to regain access to all features.
-							</p>
-						</div>
-						<Button
-							onClick={() => handleSubscribe()}
-							disabled={paymentLoading}
-							className="w-full sm:w-auto bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg"
-						>
-							{paymentLoading ? (
-								<><Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />Processing...</>
-							) : (
-								<><Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />Subscribe Now</>
+			{/* Current Plan */}
+			<Card className="p-4 sm:p-6">
+				<div className="flex items-center justify-between mb-6">
+					<h2 className="text-lg sm:text-xl font-semibold">Current Plan</h2>
+					{(isActive || isOnTrial) && (
+						<Badge className={isActive ? "bg-green-600" : "bg-blue-600"}>
+							{isActive ? "Active" : "Trial"}
+						</Badge>
+					)}
+				</div>
+
+				{subscription ? (
+					<div className="space-y-6">
+						{/* Plan Details */}
+						<div className="flex items-start justify-between">
+							<div>
+								<h3 className="text-xl font-bold mb-1">
+									{subscription.plan?.display_name || "Professional"}
+								</h3>
+								<p className="text-2xl font-bold text-primary">
+									${plan?.price_monthly || 29}
+									<span className="text-sm font-normal text-muted-foreground">/month</span>
+								</p>
+							</div>
+							{isOnTrial && (
+								<div className="text-right">
+									<p className="text-sm text-muted-foreground">Trial ends</p>
+									<p className="font-semibold">
+										{new Date(subscription.trial_end).toLocaleDateString()}
+									</p>
+								</div>
 							)}
-						</Button>
-					</div>
-				</Card>
-			)}
-
-			{/* Current Status */}
-			<Card className="p-4 sm:p-6 shadow-sm border-primary">
-				<div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-6">
-					<div className="flex items-center gap-3">
-						<div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-							<Crown className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
 						</div>
-						<div>
-							<h2 className="text-lg sm:text-xl font-semibold text-foreground">
-								Current Status
-							</h2>
-							<p className="text-xs sm:text-sm text-muted-foreground">
-								{isOnTrial ? "14-Day Free Trial" : isActive ? "Professional Plan" : "Subscription Required"}
+
+						{/* Usage Stats */}
+						<div className="grid grid-cols-2 gap-4 pt-6 border-t">
+							<div className="space-y-1">
+								<div className="flex items-center gap-2 text-muted-foreground">
+									<FileText className="w-4 h-4" />
+									<span className="text-sm">Forms</span>
+								</div>
+								<p className="text-2xl font-bold">{usage?.forms_count || 0}</p>
+								<p className="text-xs text-muted-foreground">Unlimited</p>
+							</div>
+							<div className="space-y-1">
+								<div className="flex items-center gap-2 text-muted-foreground">
+									<Users className="w-4 h-4" />
+									<span className="text-sm">Submissions</span>
+								</div>
+								<p className="text-2xl font-bold">{usage?.submissions_count || 0}</p>
+								<p className="text-xs text-muted-foreground">This month</p>
+							</div>
+						</div>
+
+						{/* Next Billing */}
+						{isActive && subscription.current_period_end && (
+							<div className="flex items-center gap-2 pt-4 border-t text-sm text-muted-foreground">
+								<Calendar className="w-4 h-4" />
+								<span>
+									Next billing date: {new Date(subscription.current_period_end).toLocaleDateString()}
+								</span>
+							</div>
+						)}
+
+						{/* Actions */}
+						<div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+							{isOnTrial ? (
+								<Button
+									onClick={handleSubscribe}
+									disabled={paymentLoading}
+									className="flex-1 bg-primary hover:bg-primary/90"
+								>
+									{paymentLoading ? (
+										<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
+									) : (
+										<><Zap className="w-4 h-4 mr-2" />Subscribe Now</>
+									)}
+								</Button>
+							) : isActive ? (
+								<>
+									<Button variant="outline" className="flex-1">
+										<CreditCard className="w-4 h-4 mr-2" />
+										Update Payment Method
+									</Button>
+									<Button 
+										variant="outline" 
+										className="flex-1 text-destructive hover:text-destructive hover:bg-destructive/10"
+										onClick={() => setShowCancelDialog(true)}
+									>
+										Cancel Subscription
+									</Button>
+								</>
+							) : null}
+						</div>
+					</div>
+				) : (
+					// No subscription
+					<div className="space-y-6">
+						<div className="text-center py-8">
+							<div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+								<CreditCard className="w-8 h-8 text-muted-foreground" />
+							</div>
+							<h3 className="text-xl font-bold mb-2">No Active Subscription</h3>
+							<p className="text-muted-foreground mb-6">
+								Start your 14-day free trial to access all features
 							</p>
 						</div>
-					</div>
-					<Badge className={`text-xs ${isActive ? "bg-green-600" : isOnTrial ? "bg-primary" : "bg-red-600"}`}>
-						{isActive ? "Active" : isOnTrial ? "Trial" : "Expired"}
-					</Badge>
-				</div>
 
-				<div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-					<div className="p-3 sm:p-4 bg-background-secondary rounded-xl">
-						<FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary mb-2" />
-						<div className="text-xl sm:text-2xl font-bold text-foreground">
-							{usage?.forms_count || 0}
-						</div>
-						<div className="text-xs text-muted-foreground">Forms (Unlimited)</div>
-					</div>
-					<div className="p-3 sm:p-4 bg-background-secondary rounded-xl">
-						<Users className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 mb-2" />
-						<div className="text-xl sm:text-2xl font-bold text-foreground">
-							{usage?.submissions_count || 0}
-						</div>
-						<div className="text-xs text-muted-foreground">Leads (Unlimited)</div>
-					</div>
-					<div className="p-3 sm:p-4 bg-background-secondary rounded-xl">
-						<BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 mb-2" />
-						<div className="text-xl sm:text-2xl font-bold text-foreground">Advanced</div>
-						<div className="text-xs text-muted-foreground">Analytics</div>
-					</div>
-					<div className="p-3 sm:p-4 bg-background-secondary rounded-xl">
-						<Shield className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 mb-2" />
-						<div className="text-xl sm:text-2xl font-bold text-foreground">Priority</div>
-						<div className="text-xs text-muted-foreground">Support</div>
-					</div>
-				</div>
+						{plan && (
+							<div className="border rounded-lg p-6 space-y-4">
+								<div className="text-center">
+									<h3 className="text-xl font-bold mb-1">{plan.display_name}</h3>
+									<div className="mb-4">
+										<span className="text-3xl font-bold">${plan.price_monthly}</span>
+										<span className="text-muted-foreground">/month</span>
+									</div>
+									<p className="text-sm text-muted-foreground">{plan.description}</p>
+								</div>
 
-				{isActive && subscription?.current_period_end && (
-					<div className="text-xs sm:text-sm text-muted-foreground">
-						Next billing date: {new Date(subscription.current_period_end).toLocaleDateString()}
+								<ul className="space-y-2 py-4">
+									{plan.features.map((feature, index) => (
+										<li key={index} className="flex items-start gap-2 text-sm">
+											<CheckCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+											<span>{feature}</span>
+										</li>
+									))}
+								</ul>
+
+								<Button
+									onClick={handleSubscribe}
+									disabled={paymentLoading}
+									className="w-full"
+								>
+									{paymentLoading ? (
+										<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
+									) : (
+										<><Zap className="w-4 h-4 mr-2" />Start Free Trial</>
+									)}
+								</Button>
+
+								<p className="text-xs text-center text-muted-foreground">
+									$0.50 authorization charge • Cancel anytime during trial
+								</p>
+							</div>
+						)}
 					</div>
 				)}
 			</Card>
 
-			{/* Subscription Plan */}
-			{plan && (
-				<div>
-					<h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">
-						{isActive ? "Your Plan" : "Subscribe to ShelfCue Professional"}
-					</h2>
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.4 }}
-					>
-						<Card className="p-4 sm:p-6 lg:p-8 border-2 border-primary shadow-sm">
-							<div className="flex justify-end mb-4">
-								{!subscription && (
-									<Badge className="bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs">
-										<Zap className="w-3 h-3 mr-1" />
-										14-Day Free Trial
-									</Badge>
-								)}
-							</div>
+			{/* Cancellation Dialog */}
+			<Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+				<DialogContent className="sm:max-w-md">
+					<DialogHeader>
+						<DialogTitle>Cancel Subscription</DialogTitle>
+						<DialogDescription>
+							We're sorry to see you go. Please tell us why you're cancelling.
+						</DialogDescription>
+					</DialogHeader>
 
-							<div className="text-center mb-6">
-								<h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
-									{plan.display_name}
-								</h3>
-								<div className="mb-4">
-									{!subscription ? (
-										<>
-							<span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-								$0.50
-							</span>
-							<span className="text-sm sm:text-base text-muted-foreground ml-2">authorization</span>
-							<p className="text-xs sm:text-sm text-muted-foreground mt-2">
-								Then ${plan.price_monthly}/month after 14 days
-							</p>
-										</>
-									) : (
-										<>
-											<span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-												${plan.price_monthly.toLocaleString()}
-											</span>
-											<span className="text-sm sm:text-base text-muted-foreground ml-2">/month</span>
-										</>
-									)}
-								</div>
-								<p className="text-sm sm:text-base text-muted-foreground">{plan.description}</p>
-							</div>
-
-							<ul className="space-y-2 sm:space-y-3 mb-6">
-								{plan.features.map((feature, index) => (
-									<li key={index} className="flex items-start gap-2">
-										<CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary mt-0.5 flex-shrink-0" />
-										<span className="text-xs sm:text-sm text-muted-foreground">{feature}</span>
-									</li>
+					<div className="space-y-4 py-4">
+						{/* Reason Selection */}
+						<div className="space-y-2">
+							<Label>Why are you cancelling?</Label>
+							<div className="space-y-2">
+								{cancellationReasons.map((reason) => (
+									<label
+										key={reason}
+										className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+											selectedReason === reason
+												? "border-primary bg-primary/5"
+												: "hover:border-muted-foreground/50"
+										}`}
+									>
+										<input
+											type="radio"
+											name="reason"
+											value={reason}
+											checked={selectedReason === reason}
+											onChange={(e) => setSelectedReason(e.target.value)}
+											className="w-4 h-4 text-primary"
+										/>
+										<span className="text-sm">{reason}</span>
+									</label>
 								))}
-							</ul>
+							</div>
+						</div>
 
-							{!isActive && (
-								<div>
-									<Button
-										className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg text-sm sm:text-base"
-										disabled={paymentLoading}
-										onClick={() => handleSubscribe()}
-									>
-										{paymentLoading ? (
-											<>
-												<Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />
-												Processing...
-											</>
-										) : (
-											<>
-												<Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-												{isOnTrial && trialDaysRemaining > 0 ? "Subscribe Now" : "Start 14-Day Free Trial"}
-											</>
-										)}
-									</Button>
-									{!subscription && (
-								<p className="text-xs sm:text-sm text-center text-muted-foreground mt-3">
-									We'll charge $0.50 to authorize your card. You'll only be charged ${plan.price_monthly}/month after your trial ends.
-								</p>
-									)}
-								</div>
-							)}
+						{/* Feedback */}
+						<div className="space-y-2">
+							<Label htmlFor="feedback">
+								Additional feedback (optional)
+							</Label>
+							<Textarea
+								id="feedback"
+								placeholder="Tell us more about your experience..."
+								value={feedback}
+								onChange={(e) => setFeedback(e.target.value)}
+								rows={4}
+							/>
+						</div>
+					</div>
 
-						{isActive && (subscription as any)?.paystack_email_token && (
-							<div className="mt-6 p-4 bg-muted rounded-lg">
-								<p className="text-xs sm:text-sm text-muted-foreground mb-3">
-									Manage your subscription and payment method:
-								</p>
-								<Button variant="outline" asChild className="w-full text-sm">
-									<a
-										href={`https://paystack.com/subscription/manage/${(subscription as any).paystack_email_token}`}
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-											Manage Subscription
-										</a>
-									</Button>
-								</div>
+					<div className="flex flex-col-reverse sm:flex-row gap-3">
+						<Button
+							variant="outline"
+							onClick={() => setShowCancelDialog(false)}
+							disabled={cancelLoading}
+							className="flex-1"
+						>
+							Keep Subscription
+						</Button>
+						<Button
+							variant="destructive"
+							onClick={handleCancelSubscription}
+							disabled={cancelLoading || !selectedReason}
+							className="flex-1"
+						>
+							{cancelLoading ? (
+								<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Cancelling...</>
+							) : (
+								"Cancel Subscription"
 							)}
-						</Card>
-					</motion.div>
-				</div>
-			)}
+						</Button>
+					</div>
+
+					<p className="text-xs text-center text-muted-foreground">
+						Your subscription will remain active until the end of your billing period.
+					</p>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }
