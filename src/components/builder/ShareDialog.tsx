@@ -5,13 +5,16 @@ import {
   CheckCircle,
   Code,
   Copy,
+  Download,
   ExternalLink,
   Link as LinkIcon,
   Mail,
   MessageSquare,
+  QrCode as QrCodeIcon,
   Share2,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import QRCode from "react-qr-code";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,6 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ShareDialogProps {
@@ -42,6 +46,10 @@ export function ShareDialog({
   formStatus,
 }: ShareDialogProps) {
   const [copied, setCopied] = useState<string | null>(null);
+  const [qrSize, setQrSize] = useState(256);
+  const [qrColor, setQrColor] = useState("#151419");
+  const [qrBgColor, setQrBgColor] = useState("#FFFFFF");
+  const qrRef = useRef<HTMLDivElement>(null);
 
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
   const formUrl = `${baseUrl}/form/${formId}`;
@@ -89,6 +97,47 @@ export function ShareDialog({
     );
   };
 
+  const downloadQRCode = () => {
+    if (!qrRef.current) return;
+
+    const svg = qrRef.current.querySelector("svg");
+    if (!svg) return;
+
+    // Create a canvas to convert SVG to PNG at high resolution
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Set high resolution for printing (300 DPI equivalent)
+    const scaleFactor = 4; // 4x resolution for high quality printing
+    canvas.width = qrSize * scaleFactor;
+    canvas.height = qrSize * scaleFactor;
+
+    // Create an image from the SVG
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const img = new Image();
+    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(svgBlob);
+
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+
+      // Convert to PNG and download
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const downloadUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.download = `${formTitle.replace(/[^a-z0-9]/gi, "_")}_qr_code.png`;
+        link.href = downloadUrl;
+        link.click();
+        URL.revokeObjectURL(downloadUrl);
+      }, "image/png");
+    };
+
+    img.src = url;
+  };
+
   if (formStatus !== "published") {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -127,18 +176,22 @@ export function ShareDialog({
         </DialogHeader>
 
         <Tabs defaultValue="link" className="mt-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="link" className="flex items-center gap-2">
               <LinkIcon className="w-4 h-4" />
-              Link
+              <span className="hidden sm:inline">Link</span>
+            </TabsTrigger>
+            <TabsTrigger value="qr" className="flex items-center gap-2">
+              <QrCodeIcon className="w-4 h-4" />
+              <span className="hidden sm:inline">QR Code</span>
             </TabsTrigger>
             <TabsTrigger value="embed" className="flex items-center gap-2">
               <Code className="w-4 h-4" />
-              Embed
+              <span className="hidden sm:inline">Embed</span>
             </TabsTrigger>
             <TabsTrigger value="social" className="flex items-center gap-2">
               <Share2 className="w-4 h-4" />
-              Social
+              <span className="hidden sm:inline">Social</span>
             </TabsTrigger>
           </TabsList>
 
@@ -208,6 +261,175 @@ export function ShareDialog({
                 </div>
               </div>
             </Card>
+          </TabsContent>
+
+          {/* QR Code Tab */}
+          <TabsContent value="qr" className="space-y-6 mt-4">
+            <div className="space-y-6">
+              {/* QR Code Display */}
+              <div>
+                <Label className="text-base font-semibold mb-3 block">
+                  QR Code Preview
+                </Label>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Scan this code with a mobile device to access your form
+                </p>
+                
+                <div 
+                  ref={qrRef}
+                  className="flex justify-center items-center p-8 bg-white rounded-lg border-2 border-dashed border-border"
+                  style={{ backgroundColor: qrBgColor }}
+                >
+                  <QRCode
+                    value={formUrl}
+                    size={qrSize}
+                    fgColor={qrColor}
+                    bgColor={qrBgColor}
+                    level="H"
+                  />
+                </div>
+              </div>
+
+              {/* Customization Options */}
+              <div className="space-y-4">
+                <Label className="text-base font-semibold block">
+                  Customize
+                </Label>
+                
+                {/* Size Control */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm">Size</Label>
+                    <span className="text-sm text-muted-foreground">{qrSize}px</span>
+                  </div>
+                  <Slider
+                    value={[qrSize]}
+                    onValueChange={(value) => setQrSize(value[0])}
+                    min={128}
+                    max={512}
+                    step={32}
+                    className="w-full"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Larger sizes are better for printing
+                  </p>
+                </div>
+
+                {/* Color Controls */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">QR Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="color"
+                        value={qrColor}
+                        onChange={(e) => setQrColor(e.target.value)}
+                        className="w-16 h-10 p-1 cursor-pointer"
+                      />
+                      <Input
+                        type="text"
+                        value={qrColor}
+                        onChange={(e) => setQrColor(e.target.value)}
+                        className="flex-1 font-mono text-sm"
+                        placeholder="#151419"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-sm">Background</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="color"
+                        value={qrBgColor}
+                        onChange={(e) => setQrBgColor(e.target.value)}
+                        className="w-16 h-10 p-1 cursor-pointer"
+                      />
+                      <Input
+                        type="text"
+                        value={qrBgColor}
+                        onChange={(e) => setQrBgColor(e.target.value)}
+                        className="flex-1 font-mono text-sm"
+                        placeholder="#FFFFFF"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preset Colors */}
+                <div className="space-y-2">
+                  <Label className="text-sm">Brand Presets</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setQrColor("#151419");
+                        setQrBgColor("#FFFFFF");
+                      }}
+                      className="flex-1"
+                    >
+                      Default
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setQrColor("#000000");
+                        setQrBgColor("#FFFFFF");
+                      }}
+                      className="flex-1"
+                    >
+                      Classic
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setQrColor("#FFFFFF");
+                        setQrBgColor("#151419");
+                      }}
+                      className="flex-1"
+                    >
+                      Inverted
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Download Button */}
+              <Button
+                type="button"
+                onClick={downloadQRCode}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download High-Res QR Code
+              </Button>
+
+              {/* Info Card */}
+              <Card className="p-4 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <QrCodeIcon className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-green-900 dark:text-green-100 mb-1">
+                      High-Quality Print Ready
+                    </h4>
+                    <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
+                      <li>• 4x resolution for crystal-clear prints</li>
+                      <li>• Perfect for posters, flyers, and business cards</li>
+                      <li>• High error correction for reliable scanning</li>
+                      <li>• Customize colors to match your brand</li>
+                    </ul>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Embed Tab */}
