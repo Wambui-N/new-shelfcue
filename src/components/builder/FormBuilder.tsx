@@ -548,7 +548,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
               </Button>
 
               <Button
-                onClick={handleSave}
+                onClick={() => handleSave()}
                 disabled={isSaving || !isDirty}
                 variant="outline"
                 size="sm"
