@@ -157,6 +157,22 @@ export function DisplayEditor() {
               />
             </div>
           </div>
+
+          {/* Logo URL */}
+          <div className="space-y-2">
+            <Label htmlFor="logo-url">Logo URL</Label>
+            <Input
+              id="logo-url"
+              type="url"
+              value={formData.theme.logoUrl}
+              onChange={(e) => handleThemeChange("logoUrl", e.target.value)}
+              placeholder="https://example.com/logo.png"
+              className="flex-1"
+            />
+            <p className="text-xs text-muted-foreground">
+              URL for your logo image.
+            </p>
+          </div>
         </div>
       </Card>
 
@@ -217,64 +233,6 @@ export function DisplayEditor() {
         </div>
       </Card>
 
-      {/* Display Mode & Layout */}
-      <Card className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Monitor className="w-5 h-5 text-primary" />
-          <h3 className="text-lg font-semibold text-foreground">
-            Display Mode & Layout
-          </h3>
-        </div>
-        <div className="space-y-4">
-          {/* Display Mode Toggle */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="standalone-mode">Standalone Mode</Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {displayMode === "standalone"
-                    ? "Full form with header and footer (for links/QR codes)"
-                    : "Clean, minimal form (for embedding in websites)"}
-                </p>
-              </div>
-              <Switch
-                id="standalone-mode"
-                checked={displayMode === "standalone"}
-                onCheckedChange={(checked) =>
-                  setDisplayMode(checked ? "standalone" : "embed")
-                }
-              />
-            </div>
-          </div>
-
-          {/* Layout Presets */}
-          <div className="space-y-2">
-            <Label>Layout Preset</Label>
-            <div className="grid grid-cols-2 gap-3">
-              {layoutOptions.map((option) => (
-                <div
-                  key={option.value}
-                  className={cn(
-                    "p-3 border rounded-lg cursor-pointer transition-all",
-                    layout === option.value
-                      ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                      : "border-border hover:border-primary/50 hover:bg-accent",
-                  )}
-                  onClick={() => setLayout(option.value as any)}
-                >
-                  <h4 className="font-medium text-sm text-foreground">
-                    {option.label}
-                  </h4>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {option.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Card>
-
       {/* Info Card */}
       <Card className="p-6 bg-primary/5 border-primary/20">
         <div className="flex items-start gap-3">
@@ -288,6 +246,35 @@ export function DisplayEditor() {
               to the left. Try adjusting colors, fonts, or layout to see instant
               updates.
             </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Display Mode */}
+      <Card className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Monitor className="w-5 h-5 text-primary" />
+          <h3 className="text-lg font-semibold text-foreground">
+            Display Mode
+          </h3>
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="standalone-mode">Standalone Mode</Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                {displayMode === "standalone"
+                  ? "Full form with header (for links/QR codes)"
+                  : "Clean, minimal form (for embedding on a website)"}
+              </p>
+            </div>
+            <Switch
+              id="standalone-mode"
+              checked={displayMode === "standalone"}
+              onCheckedChange={(checked) =>
+                setDisplayMode(checked ? "standalone" : "embed")
+              }
+            />
           </div>
         </div>
       </Card>
