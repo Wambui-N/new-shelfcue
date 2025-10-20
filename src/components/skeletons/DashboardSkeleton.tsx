@@ -2,44 +2,44 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function DashboardSkeleton() {
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-500">
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-primary via-primary to-accent rounded-3xl p-8 shadow-xl">
-        <Skeleton className="h-10 w-80 mb-3 bg-primary-foreground/20" />
-        <Skeleton className="h-5 w-96 bg-primary-foreground/20" />
+      <div className="bg-gradient-to-r from-primary via-primary to-accent rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl">
+        <Skeleton className="h-8 sm:h-10 w-60 sm:w-80 mb-2 sm:mb-3 bg-primary-foreground/20" />
+        <Skeleton className="h-4 sm:h-5 w-72 sm:w-96 bg-primary-foreground/20" />
 
         {/* Stats Cards Inside Banner */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6 sm:mt-8">
         {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-6 border border-primary-foreground/20"
+              className="bg-primary-foreground/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-primary-foreground/20"
             >
-              <Skeleton className="h-6 w-6 rounded-xl mb-4 bg-primary-foreground/30" />
-              <Skeleton className="h-10 w-20 mb-2 bg-primary-foreground/30" />
-              <Skeleton className="h-4 w-28 bg-primary-foreground/20" />
+              <Skeleton className="h-5 w-5 sm:h-6 sm:w-6 rounded-xl mb-3 sm:mb-4 bg-primary-foreground/30" />
+              <Skeleton className="h-8 sm:h-10 w-16 sm:w-20 mb-2 bg-primary-foreground/30" />
+              <Skeleton className="h-3 sm:h-4 w-24 sm:w-28 bg-primary-foreground/20" />
             </div>
           ))}
         </div>
       </div>
 
       {/* Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 sm:gap-8">
         {/* Recent Activity */}
         <div className="xl:col-span-2">
-          <div className="bg-card rounded-2xl p-6 border shadow-sm">
-            <Skeleton className="h-6 w-40 mb-6" />
+          <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border shadow-sm">
+            <Skeleton className="h-5 sm:h-6 w-32 sm:w-40 mb-4 sm:mb-6" />
             <div className="space-y-2">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-4 rounded-xl hover:bg-accent/30 transition-colors"
+                  className="flex items-center gap-3 p-3 sm:p-4 rounded-xl hover:bg-accent/30 transition-colors"
                 >
-                  <Skeleton className="h-12 w-12 rounded-full flex-shrink-0" />
+                  <Skeleton className="h-10 w-10 sm:h-12 sm:w-12 rounded-full flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <Skeleton className="h-4 w-32 mb-2" />
-                    <Skeleton className="h-3 w-48 mb-1" />
-                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="h-3 sm:h-4 w-28 sm:w-32 mb-2" />
+                    <Skeleton className="h-3 w-36 sm:w-48 mb-1" />
+                    <Skeleton className="h-2 sm:h-3 w-20 sm:w-24" />
                   </div>
                 </div>
               ))}
@@ -49,26 +49,26 @@ export function DashboardSkeleton() {
 
         {/* Your Forms */}
         <div className="xl:col-span-3">
-          <div className="bg-card rounded-2xl p-6 border shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-10 w-36 rounded-lg" />
+          <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border shadow-sm">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+              <Skeleton className="h-5 sm:h-6 w-28 sm:w-32" />
+              <Skeleton className="h-9 sm:h-10 w-full sm:w-36 rounded-lg" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
-                  className="flex items-start gap-4 p-4 border rounded-xl hover:shadow-md transition-all"
+                  className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 border rounded-xl hover:shadow-md transition-all"
                 >
-                  <Skeleton className="h-16 w-16 rounded-xl flex-shrink-0" />
+                  <Skeleton className="h-12 w-12 sm:h-16 sm:w-16 rounded-xl flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <Skeleton className="h-5 w-full mb-2" />
+                    <Skeleton className="h-4 sm:h-5 w-full mb-2" />
                     <Skeleton className="h-3 w-3/4 mb-3" />
                     <div className="flex items-center justify-between">
-                      <Skeleton className="h-5 w-16 rounded-full" />
+                      <Skeleton className="h-4 sm:h-5 w-14 sm:w-16 rounded-full" />
                       <div className="flex gap-1">
-                        <Skeleton className="h-8 w-8 rounded-lg" />
-                        <Skeleton className="h-8 w-8 rounded-lg" />
+                        <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg" />
+                        <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg" />
                       </div>
               </div>
               </div>
@@ -84,55 +84,55 @@ export function DashboardSkeleton() {
 
 export function FormsListSkeleton() {
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-500">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <Skeleton className="h-9 w-48 mb-2" />
-          <Skeleton className="h-4 w-96" />
+          <Skeleton className="h-8 sm:h-9 w-40 sm:w-48 mb-2" />
+          <Skeleton className="h-3 sm:h-4 w-72 sm:w-96" />
         </div>
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-10 w-36 rounded-lg" />
-          <Skeleton className="h-10 w-28 rounded-lg" />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Skeleton className="h-9 sm:h-10 w-32 sm:w-36 rounded-lg" />
+          <Skeleton className="h-9 sm:h-10 w-24 sm:w-28 rounded-lg" />
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-        <Skeleton className="h-11 flex-1 max-w-md rounded-xl" />
-        <Skeleton className="h-11 w-32 rounded-xl" />
-        <Skeleton className="h-11 w-36 rounded-xl" />
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+        <Skeleton className="h-10 sm:h-11 flex-1 max-w-md rounded-xl" />
+        <Skeleton className="h-10 sm:h-11 w-28 sm:w-32 rounded-xl" />
+        <Skeleton className="h-10 sm:h-11 w-32 sm:w-36 rounded-xl" />
       </div>
 
       {/* Select All */}
       <div className="flex items-center gap-2">
-        <Skeleton className="h-5 w-5 rounded" />
-        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-4 w-4 sm:h-5 sm:w-5 rounded" />
+        <Skeleton className="h-3 sm:h-4 w-36 sm:w-40" />
       </div>
 
       {/* Forms Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <div
             key={i}
-            className="bg-card rounded-xl p-5 border hover:shadow-xl transition-all h-full flex flex-col"
+            className="bg-card rounded-xl p-4 sm:p-5 border hover:shadow-xl transition-all h-full flex flex-col"
           >
-            <div className="flex items-center justify-between mb-4">
-              <Skeleton className="h-5 w-5 rounded" />
-              <Skeleton className="h-6 w-16 rounded-full" />
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <Skeleton className="h-4 w-4 sm:h-5 sm:w-5 rounded" />
+              <Skeleton className="h-5 sm:h-6 w-14 sm:w-16 rounded-full" />
             </div>
-            <Skeleton className="h-6 w-full mb-2" />
-            <Skeleton className="h-4 w-4/5 mb-4" />
-            <div className="flex items-center gap-2 mb-4">
-              <Skeleton className="h-4 w-4" />
-              <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-5 sm:h-6 w-full mb-2" />
+            <Skeleton className="h-3 sm:h-4 w-4/5 mb-3 sm:mb-4" />
+            <div className="flex items-center gap-2 mb-3 sm:mb-4">
+              <Skeleton className="h-3 w-3 sm:h-4 sm:w-4" />
+              <Skeleton className="h-3 sm:h-4 w-20 sm:w-24" />
             </div>
-            <div className="flex items-center justify-between pt-4 mt-auto border-t">
+            <div className="flex items-center justify-between pt-3 sm:pt-4 mt-auto border-t">
               <div className="flex gap-1">
-                <Skeleton className="h-9 w-9 rounded-lg" />
-                <Skeleton className="h-9 w-9 rounded-lg" />
+                <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg" />
+                <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg" />
               </div>
-              <Skeleton className="h-9 w-9 rounded-lg" />
+              <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg" />
             </div>
           </div>
         ))}
@@ -143,54 +143,50 @@ export function FormsListSkeleton() {
 
 export function SubmissionsSkeleton() {
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-500">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <Skeleton className="h-9 w-48 mb-2" />
-          <Skeleton className="h-4 w-96" />
+          <Skeleton className="h-8 sm:h-9 w-40 sm:w-48 mb-2" />
+          <Skeleton className="h-3 sm:h-4 w-72 sm:w-96" />
         </div>
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-10 w-48 rounded-lg" />
-          <Skeleton className="h-10 w-32 rounded-lg" />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Skeleton className="h-9 sm:h-10 w-full sm:w-auto flex-1 sm:flex-none rounded-lg" />
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="bg-card rounded-xl p-5 border hover:shadow-md transition-shadow"
-          >
-            <Skeleton className="h-5 w-28 mb-3" />
-            <Skeleton className="h-9 w-20 mb-1" />
-            <Skeleton className="h-3 w-24" />
+      {/* Toolbar */}
+      <div className="bg-card rounded-xl border shadow-sm p-4 sm:p-6">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 justify-between">
+          <Skeleton className="h-8 sm:h-10 w-32 rounded-lg" />
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Skeleton className="h-9 sm:h-10 flex-1 sm:w-64 rounded-lg" />
+            <Skeleton className="h-9 sm:h-10 w-full sm:w-32 rounded-lg" />
           </div>
-        ))}
+        </div>
       </div>
 
-      {/* Submissions Table */}
+      {/* Submissions Cards/List */}
       <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
-        <div className="p-5 border-b flex items-center justify-between">
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-10 w-32 rounded-lg" />
+        <div className="p-4 sm:p-5 border-b flex items-center justify-between">
+          <Skeleton className="h-5 sm:h-6 w-32 sm:w-40" />
+          <Skeleton className="h-9 sm:h-10 w-28 sm:w-32 rounded-lg" />
         </div>
         <div className="divide-y">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className="p-5 hover:bg-accent/30 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-5 w-56" />
-                  <div className="flex items-center gap-4">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-4 w-24" />
+            <div key={i} className="p-4 sm:p-5 hover:bg-accent/30 transition-colors">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex-1 space-y-2 w-full">
+                  <Skeleton className="h-4 sm:h-5 w-48 sm:w-56" />
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <Skeleton className="h-3 sm:h-4 w-28 sm:w-32" />
+                    <Skeleton className="h-3 sm:h-4 w-20 sm:w-24" />
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Skeleton className="h-7 w-20 rounded-full" />
-                  <Skeleton className="h-9 w-9 rounded-lg" />
-                  <Skeleton className="h-9 w-9 rounded-lg" />
+                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
+                  <Skeleton className="h-6 sm:h-7 w-16 sm:w-20 rounded-full" />
+                  <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg" />
+                  <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg" />
                 </div>
               </div>
             </div>
@@ -203,32 +199,32 @@ export function SubmissionsSkeleton() {
 
 export function AnalyticsSkeleton() {
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-500">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <Skeleton className="h-9 w-48 mb-2" />
-          <Skeleton className="h-4 w-96" />
+          <Skeleton className="h-8 sm:h-9 w-40 sm:w-48 mb-2" />
+          <Skeleton className="h-3 sm:h-4 w-72 sm:w-96" />
         </div>
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-10 w-36 rounded-lg" />
-          <Skeleton className="h-10 w-28 rounded-lg" />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Skeleton className="h-9 sm:h-10 w-32 sm:w-36 rounded-lg" />
+          <Skeleton className="h-9 sm:h-10 w-24 sm:w-28 rounded-lg" />
         </div>
       </div>
 
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="bg-card rounded-xl p-6 border hover:shadow-md transition-shadow"
+            className="bg-card rounded-xl p-4 sm:p-6 border hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between mb-3">
-              <Skeleton className="h-5 w-28" />
-              <Skeleton className="h-5 w-5 rounded" />
+              <Skeleton className="h-4 sm:h-5 w-24 sm:w-28" />
+              <Skeleton className="h-4 w-4 sm:h-5 sm:w-5 rounded" />
             </div>
-            <Skeleton className="h-10 w-24 mb-2" />
-            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-8 sm:h-10 w-20 sm:w-24 mb-2" />
+            <Skeleton className="h-3 sm:h-4 w-28 sm:w-32" />
           </div>
         ))}
       </div>
@@ -384,38 +380,44 @@ export function AccountSkeleton() {
 
 export function BillingSkeleton() {
   return (
-    <div className="space-y-8 max-w-4xl animate-in fade-in duration-500">
+    <div className="space-y-6 sm:space-y-8 max-w-6xl animate-in fade-in duration-500">
       {/* Header */}
       <div>
-        <Skeleton className="h-9 w-48 mb-2" />
-        <Skeleton className="h-4 w-96" />
+        <Skeleton className="h-8 sm:h-9 w-40 sm:w-48 mb-2" />
+        <Skeleton className="h-3 sm:h-4 w-72 sm:w-96" />
       </div>
 
-      {/* Current Plan */}
-      <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl p-8 border shadow-md">
-        <Skeleton className="h-6 w-36 mb-6" />
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <Skeleton className="h-10 w-32 mb-3" />
-            <Skeleton className="h-5 w-64 mb-2" />
-            <Skeleton className="h-4 w-48" />
+      {/* Current Status */}
+      <div className="bg-card rounded-xl border-primary p-4 sm:p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-6">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 sm:h-12 sm:w-12 rounded-full" />
+            <div>
+              <Skeleton className="h-5 sm:h-6 w-32 mb-2" />
+              <Skeleton className="h-3 sm:h-4 w-24" />
+            </div>
           </div>
-          <Skeleton className="h-11 w-36 rounded-lg" />
+          <Skeleton className="h-5 w-16 rounded-full" />
+        </div>
+        
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-background-secondary rounded-xl p-3 sm:p-4">
+              <Skeleton className="h-4 w-4 sm:h-5 sm:w-5 rounded mb-2" />
+              <Skeleton className="h-6 sm:h-8 w-16 sm:w-20 mb-2" />
+              <Skeleton className="h-3 w-20 sm:w-24" />
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Usage Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="bg-card rounded-xl p-5 border shadow-sm"
-          >
-            <Skeleton className="h-5 w-28 mb-3" />
-            <Skeleton className="h-8 w-20 mb-2" />
-            <Skeleton className="h-3 w-24" />
-          </div>
-        ))}
+      {/* Subscription Plan */}
+      <div className="bg-card rounded-xl p-4 sm:p-6 lg:p-8 border-2 border-primary shadow-sm">
+        <Skeleton className="h-6 sm:h-7 w-48 sm:w-64 mb-4" />
+        <Skeleton className="h-10 sm:h-12 w-32 mb-3" />
+        <Skeleton className="h-4 sm:h-5 w-full max-w-md mb-6" />
+        <Skeleton className="h-11 sm:h-12 w-full rounded-lg" />
       </div>
 
       {/* Billing History */}
