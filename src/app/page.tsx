@@ -9,7 +9,6 @@ import { HowItWorksSection } from "@/components/sections/HowItWorksSection";
 import { PricingSection } from "@/components/sections/PricingSection";
 import { ProblemSection } from "@/components/sections/ProblemSection";
 import { SolutionSection } from "@/components/sections/SolutionSection";
-import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 
 export default function HomePage() {
   return (

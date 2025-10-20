@@ -99,7 +99,7 @@ const getDaysInMonth = (date: Date): Date[] => {
   const year = date.getFullYear();
   const month = date.getMonth();
   const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
+  const _lastDay = new Date(year, month + 1, 0);
   const days: Date[] = [];
 
   // Add days from previous month to fill the first week

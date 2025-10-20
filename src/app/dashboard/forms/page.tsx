@@ -2,17 +2,12 @@
 
 import { motion } from "framer-motion";
 import {
-  ChevronDown as ArrowDown,
-  ChevronUp as ArrowUp,
-  ArrowUpDown,
-  Calendar,
   ChevronDown,
   Edit,
   Eye,
   FileText,
   Filter,
   Grid3x3,
-  Layers,
   List,
   MoreVertical,
   Pause,
@@ -20,7 +15,6 @@ import {
   Plus,
   RefreshCw,
   Search,
-  Share2,
   Trash2,
   Users,
   X,
@@ -73,19 +67,15 @@ export default function FormsPage() {
   const [statusFilter, setStatusFilter] = useState<
     "all" | "published" | "draft"
   >("all");
-  const [sortBy, setSortBy] = useState<"created" | "name" | "submissions">(
+  const [sortBy, _setSortBy] = useState<"created" | "name" | "submissions">(
     "created",
   );
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [sortDirection, _setSortDirection] = useState<"asc" | "desc">("desc");
 
   // Delete dialog state
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [formToDelete, setFormToDelete] = useState<FormRecord | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
-
-  useEffect(() => {
-    fetchForms();
-  }, [user]);
 
   const fetchForms = async () => {
     if (!user) return;
@@ -107,6 +97,10 @@ export default function FormsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchForms();
+  }, [fetchForms]);
 
   const filteredAndSortedForms = useMemo(() => {
     const filtered = forms.filter((form) => {
@@ -272,7 +266,7 @@ export default function FormsPage() {
     }
   };
 
-  const getTimeAgo = (dateString: string) => {
+  const _getTimeAgo = (dateString: string) => {
     const now = new Date();
     const date = new Date(dateString);
     const diffInHours = Math.floor(
@@ -295,7 +289,9 @@ export default function FormsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Forms</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            Forms
+          </h1>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Manage all your forms and view performance
           </p>
@@ -313,30 +309,30 @@ export default function FormsPage() {
         <div className="flex flex-col gap-4">
           {/* Top Row - View Toggle and Search */}
           <div className="flex flex-col sm:flex-row gap-4">
-          {/* View Toggle */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground mr-2">
-              View:
-            </span>
-            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-                className="h-8 px-3"
-              >
-                <Grid3x3 className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === "table" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("table")}
-                className="h-8 px-3"
-              >
-                <List className="w-4 h-4" />
-              </Button>
+            {/* View Toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground mr-2">
+                View:
+              </span>
+              <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="h-8 px-3"
+                >
+                  <Grid3x3 className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "table" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("table")}
+                  className="h-8 px-3"
+                >
+                  <List className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
-          </div>
 
             {/* Search */}
             <div className="relative flex-1 min-w-0">
@@ -358,7 +354,7 @@ export default function FormsPage() {
                 </Button>
               )}
             </div>
-            </div>
+          </div>
 
           {/* Bottom Row - Status Filter */}
           <div className="flex justify-start">
@@ -464,7 +460,11 @@ export default function FormsPage() {
                 : "Create your first form to start capturing leads and syncing them to Google Sheets automatically."}
             </p>
             {searchQuery ? (
-              <Button onClick={() => setSearchQuery("")} variant="outline" className="w-full sm:w-auto">
+              <Button
+                onClick={() => setSearchQuery("")}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Clear search
               </Button>
@@ -635,174 +635,176 @@ export default function FormsPage() {
           ) : (
             // Table View - Hidden on mobile, show grid instead
             <div className="hidden lg:block">
-            <Card className="border-border shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-muted border-b border-border">
-                    <tr>
-                      <th className="w-12 px-4 py-3 text-left">
-                        <Checkbox
-                          checked={
-                            selectedForms.size ===
-                              filteredAndSortedForms.length &&
-                            filteredAndSortedForms.length > 0
-                          }
-                          onCheckedChange={handleSelectAll}
-                          className="border-2 border-foreground/30 data-[state=checked]:border-primary"
-                        />
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
-                        Form Name
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
-                        Status
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
-                        Submissions
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
-                        Created
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {filteredAndSortedForms.map((form) => (
-                      <tr
-                        key={form.id}
-                        className={`hover:bg-accent/50 transition-colors ${
-                          selectedForms.has(form.id) ? "bg-primary/5" : ""
-                        }`}
-                      >
-                        <td className="px-4 py-4">
+              <Card className="border-border shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-muted border-b border-border">
+                      <tr>
+                        <th className="w-12 px-4 py-3 text-left">
                           <Checkbox
-                            checked={selectedForms.has(form.id)}
-                            onCheckedChange={() => handleSelectForm(form.id)}
+                            checked={
+                              selectedForms.size ===
+                                filteredAndSortedForms.length &&
+                              filteredAndSortedForms.length > 0
+                            }
+                            onCheckedChange={handleSelectAll}
                             className="border-2 border-foreground/30 data-[state=checked]:border-primary"
                           />
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-muted to-muted/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <FileText className="w-5 h-5 text-muted-foreground" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="text-sm font-medium text-foreground truncate">
-                                {form.title}
-                              </div>
-                              {form.description && (
-                                <div className="text-xs text-muted-foreground truncate">
-                                  {form.description}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={form.status === "published"}
-                              onCheckedChange={() =>
-                                handleStatusToggle(form.id, form.status)
-                              }
-                            />
-                            <Badge
-                              variant={
-                                form.status === "published"
-                                  ? "default"
-                                  : "secondary"
-                              }
-                            >
-                              {form.status === "published" ? "Active" : "Draft"}
-                            </Badge>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4">
-                          <span className="text-sm text-foreground">
-                            {form.submissions || 0}
-                          </span>
-                        </td>
-                        <td className="px-4 py-4">
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(form.created_at).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              },
-                            )}
-                          </span>
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              asChild
-                            >
-                              <Link href={`/editor/${form.id}`}>
-                                <Edit className="w-4 h-4" />
-                              </Link>
-                            </Button>
-
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8 w-8 p-0"
-                                >
-                                  <MoreVertical className="w-4 h-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                  <Link href={`/editor/${form.id}`}>
-                                    <Edit className="w-4 h-4 mr-2" />
-                                    Edit
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() =>
-                                    handleStatusToggle(form.id, form.status)
-                                  }
-                                >
-                                  {form.status === "published" ? (
-                                    <>
-                                      <Pause className="w-4 h-4 mr-2" />
-                                      Deactivate
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Play className="w-4 h-4 mr-2" />
-                                      Activate
-                                    </>
-                                  )}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    setFormToDelete(form);
-                                    setDeleteDialogOpen(true);
-                                  }}
-                                  className="text-destructive focus:text-destructive"
-                                >
-                                  <Trash2 className="w-4 h-4 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </td>
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                          Form Name
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                          Status
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                          Submissions
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                          Created
+                        </th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                          Actions
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {filteredAndSortedForms.map((form) => (
+                        <tr
+                          key={form.id}
+                          className={`hover:bg-accent/50 transition-colors ${
+                            selectedForms.has(form.id) ? "bg-primary/5" : ""
+                          }`}
+                        >
+                          <td className="px-4 py-4">
+                            <Checkbox
+                              checked={selectedForms.has(form.id)}
+                              onCheckedChange={() => handleSelectForm(form.id)}
+                              className="border-2 border-foreground/30 data-[state=checked]:border-primary"
+                            />
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-muted to-muted/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <FileText className="w-5 h-5 text-muted-foreground" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="text-sm font-medium text-foreground truncate">
+                                  {form.title}
+                                </div>
+                                {form.description && (
+                                  <div className="text-xs text-muted-foreground truncate">
+                                    {form.description}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={form.status === "published"}
+                                onCheckedChange={() =>
+                                  handleStatusToggle(form.id, form.status)
+                                }
+                              />
+                              <Badge
+                                variant={
+                                  form.status === "published"
+                                    ? "default"
+                                    : "secondary"
+                                }
+                              >
+                                {form.status === "published"
+                                  ? "Active"
+                                  : "Draft"}
+                              </Badge>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <span className="text-sm text-foreground">
+                              {form.submissions || 0}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(form.created_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                },
+                              )}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                asChild
+                              >
+                                <Link href={`/editor/${form.id}`}>
+                                  <Edit className="w-4 h-4" />
+                                </Link>
+                              </Button>
+
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <MoreVertical className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem asChild>
+                                    <Link href={`/editor/${form.id}`}>
+                                      <Edit className="w-4 h-4 mr-2" />
+                                      Edit
+                                    </Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleStatusToggle(form.id, form.status)
+                                    }
+                                  >
+                                    {form.status === "published" ? (
+                                      <>
+                                        <Pause className="w-4 h-4 mr-2" />
+                                        Deactivate
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Play className="w-4 h-4 mr-2" />
+                                        Activate
+                                      </>
+                                    )}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setFormToDelete(form);
+                                      setDeleteDialogOpen(true);
+                                    }}
+                                    className="text-destructive focus:text-destructive"
+                                  >
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
             </div>
           )}
         </>

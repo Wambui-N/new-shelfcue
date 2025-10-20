@@ -6,10 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export function FinalCTASection() {
-  const benefits = [
-    "Cancel anytime",
-    "5-minute setup",
-  ];
+  const benefits = ["Cancel anytime", "5-minute setup"];
 
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-background/50 relative overflow-hidden">
@@ -55,7 +52,9 @@ export function FinalCTASection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Try Shelfcue free for 14 days. Build a form, connect your Google Sheet, and see how effortless it can be to manage leads, bookings, and submissions all in one place.
+            Try Shelfcue free for 14 days. Build a form, connect your Google
+            Sheet, and see how effortless it can be to manage leads, bookings,
+            and submissions all in one place.
           </motion.p>
 
           {/* CTA Button */}
@@ -67,7 +66,10 @@ export function FinalCTASection() {
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             <Link href="/auth/signup">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
                 <Button
                   size="default"
                   className="group bg-black text-white hover:bg-dark-gray hover:shadow-xl transition-all duration-300 text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold w-full sm:w-auto"
@@ -134,7 +136,7 @@ export function FinalCTASection() {
               Setup in under 2 minutes
             </span>
           </motion.div>
-          
+
           <motion.div
             className="flex items-center gap-2 px-4 py-2 bg-light-gray/20 rounded-lg border border-light-gray"
             whileHover={{ scale: 1.05 }}
@@ -150,4 +152,3 @@ export function FinalCTASection() {
     </section>
   );
 }
-

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
+import { type NextRequest, NextResponse } from "next/server";
 import { tokenStorage } from "@/lib/token-storage";
 
 export async function POST(request: NextRequest) {
@@ -34,7 +34,8 @@ export async function POST(request: NextRequest) {
 
     console.log("💾 [API] Storing Google tokens for user:", userId);
 
-    const expiresAtSeconds = Math.floor(Date.now() / 1000) + (expiresIn || 3600);
+    const expiresAtSeconds =
+      Math.floor(Date.now() / 1000) + (expiresIn || 3600);
 
     const storeResult = await tokenStorage.storeTokens(userId, {
       access_token: accessToken,
@@ -46,10 +47,7 @@ export async function POST(request: NextRequest) {
       console.log("✅ [API] Google tokens stored successfully");
       return NextResponse.json({ success: true });
     } else {
-      console.error(
-        "❌ [API] Error storing Google tokens:",
-        storeResult.error,
-      );
+      console.error("❌ [API] Error storing Google tokens:", storeResult.error);
       return NextResponse.json(
         { error: "Failed to store tokens", details: storeResult.error },
         { status: 500 },

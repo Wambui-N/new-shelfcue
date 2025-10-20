@@ -1,12 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
 import {
   AlertCircle,
   Calendar,
   CheckCircle,
   ExternalLink,
-  Link as LinkIcon,
   Loader2,
   Plus,
   Sheet,
@@ -53,11 +51,6 @@ export function GoogleIntegrationPanel({
   const [calendars, setCalendars] = useState<any[]>([]);
   const [loadingCalendars, setLoadingCalendars] = useState(false);
 
-  useEffect(() => {
-    checkGoogleConnection();
-    fetchConnectedIntegrations();
-  }, [user, formId]);
-
   const checkGoogleConnection = async () => {
     if (!user) return;
 
@@ -69,7 +62,7 @@ export function GoogleIntegrationPanel({
         .single();
 
       setIsGoogleConnected(!!data && !error);
-    } catch (error) {
+    } catch (_error) {
       setIsGoogleConnected(false);
     } finally {
       setLoading(false);
@@ -111,6 +104,11 @@ export function GoogleIntegrationPanel({
       console.error("Error fetching integrations:", error);
     }
   };
+
+  useEffect(() => {
+    checkGoogleConnection();
+    fetchConnectedIntegrations();
+  }, [checkGoogleConnection, fetchConnectedIntegrations]);
 
   const handleConnectGoogle = () => {
     // Redirect to Google OAuth

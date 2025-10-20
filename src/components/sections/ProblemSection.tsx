@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertCircle, Zap } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 export function ProblemSection() {
   const problems = [
@@ -83,16 +83,16 @@ export function ProblemSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-        
-
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
             The Frustration Behind{" "}
             <span className="text-dark-gray">Every Form</span>
           </h2>
-          
+
           <p className="text-base md:text-lg text-foreground-muted max-w-3xl mx-auto leading-relaxed">
-            Most form tools look outdated, feel rigid, and trap your data behind paywalls or confusing dashboards. 
-            You want something that just works, that looks good on your website, matches your brand, and sends data exactly where you need it.
+            Most form tools look outdated, feel rigid, and trap your data behind
+            paywalls or confusing dashboards. You want something that just
+            works, that looks good on your website, matches your brand, and
+            sends data exactly where you need it.
           </p>
         </motion.div>
 
@@ -105,9 +105,9 @@ export function ProblemSection() {
             <motion.div
               key={index}
               variants={itemVariants}
-              whileHover={{ 
+              whileHover={{
                 y: -8,
-                transition: { duration: 0.3 }
+                transition: { duration: 0.3 },
               }}
               className="group"
             >
@@ -125,7 +125,7 @@ export function ProblemSection() {
                 <h3 className="text-lg font-bold text-foreground mb-3 group-hover:text-dark-gray transition-colors duration-300">
                   {problem.title}
                 </h3>
-                
+
                 <p className="text-sm text-foreground-muted leading-relaxed group-hover:text-foreground/80 transition-colors duration-300">
                   {problem.description}
                 </p>
@@ -148,11 +148,8 @@ export function ProblemSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          
-        </motion.div>
+        ></motion.div>
       </motion.div>
     </section>
   );
 }
-

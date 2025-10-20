@@ -9,7 +9,7 @@ export interface FormTheme {
   borderRadius: number;
   // Optional brand assets
   logoUrl?: string;
-  
+
   // Auto-generated secondary colors
   secondaryColors?: {
     light: string;
@@ -17,10 +17,10 @@ export interface FormTheme {
     dark: string;
     darker: string;
   };
-  
+
   // Advanced Control (Level 2) - CSS variables
   customCSS?: string;
-  
+
   // Background options
   background?: {
     type: "solid" | "gradient" | "image" | "animated";
@@ -29,7 +29,7 @@ export interface FormTheme {
     image?: string;
     overlay?: string;
   };
-  
+
   // Typography
   typography?: {
     headingFont?: string;
@@ -41,7 +41,7 @@ export interface FormTheme {
       xlarge: string;
     };
   };
-  
+
   // Spacing
   spacing?: {
     small: string;
@@ -49,7 +49,7 @@ export interface FormTheme {
     large: string;
     xlarge: string;
   };
-  
+
   // Shadows
   shadows?: {
     small: string;
@@ -101,7 +101,7 @@ export const defaultTheme: FormTheme = {
   borderRadius: 8,
   background: {
     type: "solid",
-    color: "#ffffff"
+    color: "#ffffff",
   },
   typography: {
     headingFont: "Inter, system-ui, sans-serif",
@@ -110,20 +110,20 @@ export const defaultTheme: FormTheme = {
       small: "0.875rem",
       medium: "1rem",
       large: "1.125rem",
-      xlarge: "1.5rem"
-    }
+      xlarge: "1.5rem",
+    },
   },
   spacing: {
     small: "0.5rem",
     medium: "1rem",
     large: "1.5rem",
-    xlarge: "2rem"
+    xlarge: "2rem",
   },
   shadows: {
     small: "0 1px 3px rgba(0, 0, 0, 0.1)",
     medium: "0 4px 12px rgba(0, 0, 0, 0.1)",
-    large: "0 8px 24px rgba(0, 0, 0, 0.15)"
-  }
+    large: "0 8px 24px rgba(0, 0, 0, 0.15)",
+  },
 };
 
 // Layout presets
@@ -134,7 +134,7 @@ export const layoutPresets: Record<FormLayout, LayoutConfig> = {
     spacing: "normal",
     showProgress: false,
     showStepNumbers: false,
-    mobileBreakpoint: 768
+    mobileBreakpoint: 768,
   },
   compact: {
     type: "compact",
@@ -142,7 +142,7 @@ export const layoutPresets: Record<FormLayout, LayoutConfig> = {
     spacing: "tight",
     showProgress: false,
     showStepNumbers: false,
-    mobileBreakpoint: 768
+    mobileBreakpoint: 768,
   },
   conversational: {
     type: "conversational",
@@ -150,7 +150,7 @@ export const layoutPresets: Record<FormLayout, LayoutConfig> = {
     spacing: "loose",
     showProgress: true,
     showStepNumbers: true,
-    mobileBreakpoint: 768
+    mobileBreakpoint: 768,
   },
   hero: {
     type: "hero",
@@ -158,6 +158,6 @@ export const layoutPresets: Record<FormLayout, LayoutConfig> = {
     spacing: "loose",
     showProgress: false,
     showStepNumbers: false,
-    mobileBreakpoint: 1024
-  }
+    mobileBreakpoint: 1024,
+  },
 };

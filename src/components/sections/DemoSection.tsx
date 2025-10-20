@@ -82,9 +82,7 @@ export function DemoSection() {
             transition={{ duration: 0.8 }}
           >
             {/* Laptop Frame */}
-            <motion.div
-              className="relative mx-auto bg-dark-gray rounded-xl lg:rounded-2xl p-2 lg:p-3 shadow-2xl border-2 border-light-gray w-full max-w-4xl"
-            >
+            <motion.div className="relative mx-auto bg-dark-gray rounded-xl lg:rounded-2xl p-2 lg:p-3 shadow-2xl border-2 border-light-gray w-full max-w-4xl">
               {/* Browser Header */}
               <div className="flex items-center gap-2 mb-2 lg:mb-3 pb-2 border-b border-light-gray/50">
                 <div className="flex gap-1.5">
@@ -160,7 +158,7 @@ export function DemoSection() {
                 </motion.div>
               </AnimatePresence>
             </motion.div>
-            </motion.div>
+          </motion.div>
 
           {/* Right Side - Descriptions & Controls */}
           <motion.div
@@ -194,8 +192,8 @@ export function DemoSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                Watch how easy it is to create professional lead capture forms that
-                convert.
+                Watch how easy it is to create professional lead capture forms
+                that convert.
               </motion.p>
             </motion.div>
 
@@ -215,7 +213,7 @@ export function DemoSection() {
                       ? "border-black bg-light-gray/20 shadow-md"
                       : "border-light-gray hover:border-dark-gray"
                   }`}
-              animate={{
+                  animate={{
                     scale: currentStep === index ? 1.02 : 1,
                   }}
                   transition={{ duration: 0.3 }}
@@ -255,39 +253,39 @@ export function DemoSection() {
               ))}
             </motion.div>
 
-                {/* Controls */}
-                <motion.div
-                  className="flex flex-col sm:flex-row justify-center lg:justify-start gap-2"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                >
-                  <motion.button
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-dark-gray transition-colors duration-300 text-xs sm:text-sm font-medium w-full sm:w-auto"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {isPlaying ? (
-                      <Pause className="w-3 h-3 sm:w-4 sm:h-4" />
-                    ) : (
-                      <Play className="w-3 h-3 sm:w-4 sm:h-4" />
-                    )}
-                    {isPlaying ? "Pause" : "Play Demo"}
-                  </motion.button>
-                  <motion.button
-                    onClick={() => {
-                      setCurrentStep(0);
-                      setIsPlaying(false);
-                    }}
-                    className="flex items-center justify-center gap-2 px-4 py-2 border border-light-gray text-foreground-muted rounded-lg hover:bg-light-gray/30 transition-all duration-300 text-xs sm:text-sm font-medium w-full sm:w-auto"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
-                    Reset
-                  </motion.button>
+            {/* Controls */}
+            <motion.div
+              className="flex flex-col sm:flex-row justify-center lg:justify-start gap-2"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <motion.button
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-dark-gray transition-colors duration-300 text-xs sm:text-sm font-medium w-full sm:w-auto"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {isPlaying ? (
+                  <Pause className="w-3 h-3 sm:w-4 sm:h-4" />
+                ) : (
+                  <Play className="w-3 h-3 sm:w-4 sm:h-4" />
+                )}
+                {isPlaying ? "Pause" : "Play Demo"}
+              </motion.button>
+              <motion.button
+                onClick={() => {
+                  setCurrentStep(0);
+                  setIsPlaying(false);
+                }}
+                className="flex items-center justify-center gap-2 px-4 py-2 border border-light-gray text-foreground-muted rounded-lg hover:bg-light-gray/30 transition-all duration-300 text-xs sm:text-sm font-medium w-full sm:w-auto"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
+                Reset
+              </motion.button>
             </motion.div>
           </motion.div>
         </div>

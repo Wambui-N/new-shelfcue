@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -73,19 +73,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     // Check if user exists in database to determine OAuth prompt
-    const checkUserExists = async (email: string) => {
+    const _checkUserExists = async (email: string) => {
       try {
         const { data, error } = await supabase
           .from("users")
           .select("id")
           .eq("email", email)
           .single();
-        
-        if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+
+        if (error && error.code !== "PGRST116") {
+          // PGRST116 = no rows returned
           console.error("Error checking user existence:", error);
           return false;
         }
-        
+
         return !!data;
       } catch (error) {
         console.error("Error checking user existence:", error);

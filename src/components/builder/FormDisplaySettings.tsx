@@ -1,16 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
-import { FormTheme, FormLayout, FormDisplayMode, defaultTheme, layoutPresets } from "@/types/form-display";
-import { createThemeFromBrand, generateCSSVariables } from "@/lib/theme-generator";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 // Using native select to avoid runtime vendor chunk issues on Windows
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Switch } from "@/components/ui/switch";
+import {
+  createThemeFromBrand,
+  generateCSSVariables,
+} from "@/lib/theme-generator";
 import { cn } from "@/lib/utils";
+import type {
+  FormDisplayMode,
+  FormLayout,
+  FormTheme,
+} from "@/types/form-display";
 
 interface FormDisplaySettingsProps {
   mode: FormDisplayMode;
@@ -27,7 +33,7 @@ export function FormDisplaySettings({
   theme,
   onModeChange,
   onLayoutChange,
-  onThemeChange
+  onThemeChange,
 }: FormDisplaySettingsProps) {
   const [customCSS, setCustomCSS] = useState(theme.customCSS || "");
 
@@ -36,7 +42,7 @@ export function FormDisplaySettings({
     onThemeChange({
       ...theme,
       ...newTheme,
-      customCSS
+      customCSS,
     });
   };
 
@@ -47,8 +53,8 @@ export function FormDisplaySettings({
       typography: {
         ...theme.typography,
         headingFont: fontFamily,
-        bodyFont: fontFamily
-      }
+        bodyFont: fontFamily,
+      },
     });
   };
 
@@ -56,15 +62,31 @@ export function FormDisplaySettings({
     setCustomCSS(css);
     onThemeChange({
       ...theme,
-      customCSS: css
+      customCSS: css,
     });
   };
 
   const layoutOptions = [
-    { value: "simple", label: "Simple", description: "One-column layout for contact forms" },
-    { value: "compact", label: "Compact", description: "Two-column layout for applications" },
-    { value: "conversational", label: "Conversational", description: "Typeform-style multi-step" },
-    { value: "hero", label: "Hero", description: "Split-view for high conversion" }
+    {
+      value: "simple",
+      label: "Simple",
+      description: "One-column layout for contact forms",
+    },
+    {
+      value: "compact",
+      label: "Compact",
+      description: "Two-column layout for applications",
+    },
+    {
+      value: "conversational",
+      label: "Conversational",
+      description: "Typeform-style multi-step",
+    },
+    {
+      value: "hero",
+      label: "Hero",
+      description: "Split-view for high conversion",
+    },
   ];
 
   return (
@@ -80,15 +102,16 @@ export function FormDisplaySettings({
               <Switch
                 id="standalone-mode"
                 checked={mode === "standalone"}
-                onCheckedChange={(checked) => onModeChange(checked ? "standalone" : "embed")}
+                onCheckedChange={(checked) =>
+                  onModeChange(checked ? "standalone" : "embed")
+                }
               />
               <Label htmlFor="standalone-mode">Standalone Mode</Label>
             </div>
             <p className="text-sm text-gray-500">
-              {mode === "standalone" 
+              {mode === "standalone"
                 ? "Full form with header and footer (for links/QR codes)"
-                : "Clean, minimal form (for embedding in websites)"
-              }
+                : "Clean, minimal form (for embedding in websites)"}
             </p>
           </div>
         </CardContent>
@@ -108,12 +131,14 @@ export function FormDisplaySettings({
                   "p-4 border rounded-lg cursor-pointer transition-colors",
                   layout === option.value
                     ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    : "border-gray-200 hover:border-gray-300",
                 )}
                 onClick={() => onLayoutChange(option.value as FormLayout)}
               >
                 <h3 className="font-medium text-gray-900">{option.label}</h3>
-                <p className="text-sm text-gray-500 mt-1">{option.description}</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {option.description}
+                </p>
               </div>
             ))}
           </div>
@@ -131,7 +156,7 @@ export function FormDisplaySettings({
               <TabsTrigger value="quick">Quick Branding</TabsTrigger>
               <TabsTrigger value="advanced">Advanced Control</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="quick" className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -152,7 +177,7 @@ export function FormDisplaySettings({
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <Label htmlFor="font-family">Font Family</Label>
                   <select
@@ -162,19 +187,31 @@ export function FormDisplaySettings({
                     className="mt-1 w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     <option value="Inter, system-ui, sans-serif">Inter</option>
-                    <option value="Poppins, system-ui, sans-serif">Poppins</option>
+                    <option value="Poppins, system-ui, sans-serif">
+                      Poppins
+                    </option>
                     <option value="Lato, system-ui, sans-serif">Lato</option>
-                    <option value="Montserrat, system-ui, sans-serif">Montserrat</option>
-                    <option value="Manrope, system-ui, sans-serif">Manrope</option>
+                    <option value="Montserrat, system-ui, sans-serif">
+                      Montserrat
+                    </option>
+                    <option value="Manrope, system-ui, sans-serif">
+                      Manrope
+                    </option>
                     <option value="Merriweather, serif">Merriweather</option>
-                    <option value="'Playfair Display', serif">Playfair Display</option>
+                    <option value="'Playfair Display', serif">
+                      Playfair Display
+                    </option>
                     <option value="Rubik, system-ui, sans-serif">Rubik</option>
-                    <option value="Raleway, system-ui, sans-serif">Raleway</option>
-                    <option value="Nunito, system-ui, sans-serif">Nunito</option>
+                    <option value="Raleway, system-ui, sans-serif">
+                      Raleway
+                    </option>
+                    <option value="Nunito, system-ui, sans-serif">
+                      Nunito
+                    </option>
                   </select>
                 </div>
               </div>
-              
+
               <div>
                 <Label htmlFor="border-radius">Border Radius</Label>
                 <Input
@@ -183,15 +220,17 @@ export function FormDisplaySettings({
                   min="0"
                   max="50"
                   value={theme.borderRadius}
-                  onChange={(e) => onThemeChange({
-                    ...theme,
-                    borderRadius: parseInt(e.target.value) || 0
-                  })}
+                  onChange={(e) =>
+                    onThemeChange({
+                      ...theme,
+                      borderRadius: parseInt(e.target.value, 10) || 0,
+                    })
+                  }
                   className="mt-1"
                 />
               </div>
             </TabsContent>
-            
+
             <TabsContent value="advanced" className="space-y-4">
               <div>
                 <Label htmlFor="custom-css">Custom CSS Variables</Label>
@@ -206,7 +245,7 @@ export function FormDisplaySettings({
                   Use CSS variables like --shelf-primary, --shelf-radius, etc.
                 </p>
               </div>
-              
+
               <div>
                 <Label>Generated CSS Variables</Label>
                 <pre className="bg-gray-100 p-3 rounded-lg text-xs overflow-x-auto mt-1">
@@ -226,14 +265,14 @@ export function FormDisplaySettings({
         <CardContent>
           <div className="border rounded-lg p-4 bg-gray-50">
             <div className="text-sm text-gray-600 mb-2">
-              Mode: <span className="font-medium">{mode}</span> | 
-              Layout: <span className="font-medium">{layout}</span>
+              Mode: <span className="font-medium">{mode}</span> | Layout:{" "}
+              <span className="font-medium">{layout}</span>
             </div>
-            <div 
+            <div
               className="w-full h-32 rounded border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-500"
               style={{
-                backgroundColor: theme.background?.color || '#ffffff',
-                borderRadius: `${theme.borderRadius}px`
+                backgroundColor: theme.background?.color || "#ffffff",
+                borderRadius: `${theme.borderRadius}px`,
               }}
             >
               Form Preview

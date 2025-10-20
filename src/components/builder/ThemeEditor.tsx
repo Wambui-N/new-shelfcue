@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { availableFonts, getFontFamily } from "@/lib/fonts";
+import { availableFonts } from "@/lib/fonts";
 import { useFormStore } from "@/store/formStore";
 
 export function ThemeEditor() {
@@ -126,7 +126,10 @@ export function ThemeEditor() {
               max="50"
               value={formData.theme.borderRadius}
               onChange={(e) =>
-                handleThemeChange("borderRadius", parseInt(e.target.value) || 0)
+                handleThemeChange(
+                  "borderRadius",
+                  parseInt(e.target.value, 10) || 0,
+                )
               }
               placeholder="8"
             />

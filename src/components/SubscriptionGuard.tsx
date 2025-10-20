@@ -2,7 +2,6 @@
 
 import { AlertCircle, CreditCard, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -73,8 +72,8 @@ export function SubscriptionGuard({
               <div className="flex items-start gap-3">
                 <Sparkles className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-left">
-                  <span className="font-semibold">Full access</span> -
-                  Unlimited forms and submissions during trial
+                  <span className="font-semibold">Full access</span> - Unlimited
+                  forms and submissions during trial
                 </p>
               </div>
             </div>
@@ -148,4 +147,3 @@ export function SubscriptionGuard({
   // User has active access - render children
   return <>{children}</>;
 }
-

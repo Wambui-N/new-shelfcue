@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
-import {
-  generatePaymentReference,
-  getPaystackService,
-} from "@/lib/paystack";
+import { generatePaymentReference, getPaystackService } from "@/lib/paystack";
 import { createServerClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   console.log("🔵 Payment initialization started");
-  
+
   const supabase = createServerClient();
   const {
     data: { user },
@@ -28,12 +25,16 @@ export async function POST(request: Request) {
 
     const reference = generatePaymentReference(user.id);
     console.log("📝 Generated reference:", reference);
-    
+
     const paystack = getPaystackService();
     // Paystack requires a minimum amount, so charge $0.50 for trials
     const chargeAmount = is_trial ? 50 : amount;
-    
-    console.log("💳 Charge amount:", chargeAmount, is_trial ? "(trial)" : "(full)");
+
+    console.log(
+      "💳 Charge amount:",
+      chargeAmount,
+      is_trial ? "(trial)" : "(full)",
+    );
 
     console.log("🚀 Initializing Paystack transaction...");
     const initResponse = await paystack.initializeTransaction({
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
     console.log("📡 Paystack response:", {
       status: initResponse.status,
       message: initResponse.message,
-      hasData: !!initResponse.data
+      hasData: !!initResponse.data,
     });
 
     if (!initResponse.status || !initResponse.data) {
@@ -69,10 +70,12 @@ export async function POST(request: Request) {
       paystack_reference: reference,
       amount: chargeAmount / 100,
       currency: "USD",
-      status: "pending"
+      status: "pending",
     });
-    
-    const { data: transactionData, error: transactionError } = await (supabase as any)
+
+    const { data: transactionData, error: transactionError } = await (
+      supabase as any
+    )
       .from("payment_transactions")
       .insert({
         user_id: user.id,
@@ -95,12 +98,15 @@ export async function POST(request: Request) {
         message: transactionError.message,
         details: transactionError.details,
         hint: transactionError.hint,
-        code: transactionError.code
+        code: transactionError.code,
       });
       // Don't fail the initialization, just log the error
       // We'll continue with Paystack initialization even if DB insert fails
     } else {
-      console.log("✅ Transaction record created successfully:", transactionData);
+      console.log(
+        "✅ Transaction record created successfully:",
+        transactionData,
+      );
     }
 
     return NextResponse.json({
@@ -111,9 +117,9 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("❌ Payment initialization error:", error);
     return NextResponse.json(
-      { 
+      {
         error: "Failed to initialize payment",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 },
     );

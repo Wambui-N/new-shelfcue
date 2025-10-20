@@ -67,10 +67,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("Error in create sheet API:", error);
-    const message = (error as { message?: string })?.message || "Failed to create Google Sheet";
-    return NextResponse.json(
-      { error: message },
-      { status: 500 },
-    );
+    const message =
+      (error as { message?: string })?.message ||
+      "Failed to create Google Sheet";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

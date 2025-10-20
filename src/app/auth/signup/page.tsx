@@ -10,22 +10,24 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const router = useRouter();
+  const _router = useRouter();
   const { signUpWithGoogle } = useAuth();
 
   // Check for error and consent in URL params
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      const urlError = params.get('error');
-      const needsConsent = params.get('consent') === 'true';
-      
+      const urlError = params.get("error");
+      const needsConsent = params.get("consent") === "true";
+
       if (urlError) {
         setError(decodeURIComponent(urlError));
       }
-      
+
       if (needsConsent) {
-        setError("Please complete the signup process to grant permissions for Google Calendar and Sheets integration.");
+        setError(
+          "Please complete the signup process to grant permissions for Google Calendar and Sheets integration.",
+        );
       }
     }
   }, []);

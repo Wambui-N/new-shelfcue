@@ -35,7 +35,7 @@ export class EmailService {
         from: DEFAULT_FROM_EMAIL,
         to: recipientEmail,
         subject: `New Form Submission: ${formName}`,
-        html: this.getFormSubmissionEmailHtml({
+        html: EmailService.getFormSubmissionEmailHtml({
           formName,
           formId,
           submissionId,
@@ -60,16 +60,13 @@ export class EmailService {
   /**
    * Send welcome email to new user
    */
-  static async sendWelcomeEmail(
-    recipientEmail: string,
-    userName: string,
-  ) {
+  static async sendWelcomeEmail(recipientEmail: string, userName: string) {
     try {
       const { data, error } = await resend.emails.send({
         from: DEFAULT_FROM_EMAIL,
         to: recipientEmail,
         subject: "Welcome to ShelfCue! 🎉",
-        html: this.getWelcomeEmailHtml(userName),
+        html: EmailService.getWelcomeEmailHtml(userName),
       });
 
       if (error) {
@@ -107,7 +104,7 @@ export class EmailService {
         from: DEFAULT_FROM_EMAIL,
         to: recipientEmail,
         subject: `Subscription Confirmed: ${planName} Plan`,
-        html: this.getSubscriptionConfirmationHtml({
+        html: EmailService.getSubscriptionConfirmationHtml({
           userName,
           planName,
           amount,
@@ -148,7 +145,7 @@ export class EmailService {
         from: DEFAULT_FROM_EMAIL,
         to: recipientEmail,
         subject: "Payment Failed - Action Required",
-        html: this.getPaymentFailedHtml({ userName, amount, reason }),
+        html: EmailService.getPaymentFailedHtml({ userName, amount, reason }),
       });
 
       if (error) {
@@ -188,7 +185,7 @@ export class EmailService {
         from: DEFAULT_FROM_EMAIL,
         to: recipientEmail,
         subject: `New Invoice: ${invoiceNumber}`,
-        html: this.getInvoiceHtml({
+        html: EmailService.getInvoiceHtml({
           userName,
           invoiceNumber,
           amount,
@@ -230,7 +227,7 @@ export class EmailService {
         from: DEFAULT_FROM_EMAIL,
         to: recipientEmail,
         subject: "Subscription Cancelled",
-        html: this.getSubscriptionCancelledHtml({
+        html: EmailService.getSubscriptionCancelledHtml({
           userName,
           planName,
           endDate,
@@ -357,8 +354,7 @@ export class EmailService {
     submittedAt: string;
     submitterData: Record<string, any>;
   }) {
-    const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const submissionUrl = `${appUrl}/dashboard/submissions?formId=${formId}`;
 
     const dataRows = Object.entries(submitterData)
@@ -376,7 +372,7 @@ export class EmailService {
       <!DOCTYPE html>
       <html>
         <head>
-          ${this.getBaseEmailStyle()}
+          ${EmailService.getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -411,15 +407,14 @@ export class EmailService {
   }
 
   private static getWelcomeEmailHtml(userName: string) {
-    const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const dashboardUrl = `${appUrl}/dashboard`;
 
     return `
       <!DOCTYPE html>
       <html>
         <head>
-          ${this.getBaseEmailStyle()}
+          ${EmailService.getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -470,15 +465,14 @@ export class EmailService {
     amount: string;
     billingCycle: string;
   }) {
-    const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const billingUrl = `${appUrl}/dashboard/billing`;
 
     return `
       <!DOCTYPE html>
       <html>
         <head>
-          ${this.getBaseEmailStyle()}
+          ${EmailService.getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -532,15 +526,14 @@ export class EmailService {
     amount: string;
     reason?: string;
   }) {
-    const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const billingUrl = `${appUrl}/dashboard/billing`;
 
     return `
       <!DOCTYPE html>
       <html>
         <head>
-          ${this.getBaseEmailStyle()}
+          ${EmailService.getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -589,7 +582,7 @@ export class EmailService {
       <!DOCTYPE html>
       <html>
         <head>
-          ${this.getBaseEmailStyle()}
+          ${EmailService.getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -642,15 +635,14 @@ export class EmailService {
     planName: string;
     endDate: string;
   }) {
-    const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const billingUrl = `${appUrl}/dashboard/billing`;
 
     return `
       <!DOCTYPE html>
       <html>
         <head>
-          ${this.getBaseEmailStyle()}
+          ${EmailService.getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -683,4 +675,3 @@ export class EmailService {
     `;
   }
 }
-

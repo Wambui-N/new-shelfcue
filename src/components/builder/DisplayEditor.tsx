@@ -1,23 +1,18 @@
 "use client";
 
+import { Monitor, Palette, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { availableFonts } from "@/lib/fonts";
 import { useFormStore } from "@/store/formStore";
-import { cn } from "@/lib/utils";
-import { Palette, Monitor, Sparkles } from "lucide-react";
 
 export function DisplayEditor() {
-  const {
-    formData,
-    updateForm,
-  } = useFormStore();
+  const { formData, updateForm } = useFormStore();
 
-  const [customCSS, setCustomCSS] = useState("");
+  const [_customCSS, _setCustomCSS] = useState("");
 
   const handleThemeChange = (key: string, value: string | number) => {
     updateForm({
@@ -58,7 +53,7 @@ export function DisplayEditor() {
     }
   }, [formData.theme.fontFamily]);
 
-  const layoutOptions = [
+  const _layoutOptions = [
     {
       value: "simple",
       label: "Simple",
@@ -227,7 +222,10 @@ export function DisplayEditor() {
               max="50"
               value={formData.theme.borderRadius}
               onChange={(e) =>
-                handleThemeChange("borderRadius", parseInt(e.target.value) || 0)
+                handleThemeChange(
+                  "borderRadius",
+                  parseInt(e.target.value, 10) || 0,
+                )
               }
               placeholder="8"
             />
@@ -286,4 +284,3 @@ export function DisplayEditor() {
     </div>
   );
 }
-

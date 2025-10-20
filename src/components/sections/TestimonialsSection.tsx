@@ -29,10 +29,7 @@ export function TestimonialsSection() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 leading-tight">
-            Join{" "}
-            <span className="text-dark-gray">
-              1,000+ Founders
-            </span>
+            Join <span className="text-dark-gray">1,000+ Founders</span>
           </h2>
           <p className="text-base md:text-lg text-foreground-muted">
             Who Stopped Losing Leads
@@ -172,4 +169,3 @@ export function TestimonialsSection() {
     </section>
   );
 }
-

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { EmailService } from "@/lib/resend";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 /**
  * Send welcome email to newly registered users
@@ -27,10 +27,7 @@ export async function POST(request: NextRequest) {
 
     if (error || !profile?.email) {
       console.error("Error fetching user profile:", error);
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Send welcome email
@@ -58,4 +55,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { tokenStorage } from "@/lib/token-storage";
 
@@ -12,32 +12,36 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get("userId");
 
     if (!userId) {
-      return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "User ID is required" },
+        { status: 400 },
+      );
     }
 
-    console.log('🔍 Running OAuth diagnostics for user:', userId);
+    console.log("🔍 Running OAuth diagnostics for user:", userId);
 
     const diagnostics: any = {
       userId,
       timestamp: new Date().toISOString(),
-      checks: {}
+      checks: {},
     };
 
     // 1. Check if user exists in Supabase Auth
     const supabaseAdmin = getSupabaseAdmin();
     try {
-      const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
+      const { data: userData, error: userError } =
+        await supabaseAdmin.auth.admin.getUserById(userId);
       diagnostics.checks.userExists = {
         success: !userError && !!userData,
         error: userError?.message,
         email: userData?.user?.email,
         provider: userData?.user?.app_metadata?.provider,
-        hasProviderToken: !!userData?.user?.app_metadata?.provider_token
+        hasProviderToken: !!userData?.user?.app_metadata?.provider_token,
       };
     } catch (error: any) {
       diagnostics.checks.userExists = {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
 
@@ -48,19 +52,25 @@ export async function GET(request: NextRequest) {
         success: tokenResult.success,
         error: tokenResult.error,
         hasTokens: !!tokenResult.tokens,
-        tokens: tokenResult.tokens ? {
-          hasAccessToken: !!tokenResult.tokens.access_token,
-          hasRefreshToken: !!tokenResult.tokens.refresh_token,
-          expiresAt: tokenResult.tokens.expires_at,
-          expiresAtDate: new Date(tokenResult.tokens.expires_at * 1000).toISOString(),
-          isExpired: tokenResult.tokens.expires_at < Math.floor(Date.now() / 1000),
-          timeUntilExpiry: tokenResult.tokens.expires_at - Math.floor(Date.now() / 1000)
-        } : null
+        tokens: tokenResult.tokens
+          ? {
+              hasAccessToken: !!tokenResult.tokens.access_token,
+              hasRefreshToken: !!tokenResult.tokens.refresh_token,
+              expiresAt: tokenResult.tokens.expires_at,
+              expiresAtDate: new Date(
+                tokenResult.tokens.expires_at * 1000,
+              ).toISOString(),
+              isExpired:
+                tokenResult.tokens.expires_at < Math.floor(Date.now() / 1000),
+              timeUntilExpiry:
+                tokenResult.tokens.expires_at - Math.floor(Date.now() / 1000),
+            }
+          : null,
       };
     } catch (error: any) {
       diagnostics.checks.tokenStorage = {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
 
@@ -76,29 +86,29 @@ export async function GET(request: NextRequest) {
         error: dbError?.message,
         hasRecords: dbTokens && dbTokens.length > 0,
         recordCount: dbTokens?.length || 0,
-        records: dbTokens || []
+        records: dbTokens || [],
       };
     } catch (error: any) {
       diagnostics.checks.databaseDirect = {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
 
     // 4. Test write permissions
     try {
       const testToken = {
-        access_token: "test_diagnostic_" + Date.now(),
-        refresh_token: "test_refresh_" + Date.now(),
-        expires_at: Math.floor(Date.now() / 1000) + 3600
+        access_token: `test_diagnostic_${Date.now()}`,
+        refresh_token: `test_refresh_${Date.now()}`,
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
       };
 
       const storeResult = await tokenStorage.storeTokens(userId, testToken);
-      
+
       diagnostics.checks.writePermissions = {
         success: storeResult.success,
         error: storeResult.error,
-        testWasStored: storeResult.success
+        testWasStored: storeResult.success,
       };
 
       // Clean up test token if successful
@@ -109,7 +119,7 @@ export async function GET(request: NextRequest) {
     } catch (error: any) {
       diagnostics.checks.writePermissions = {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
 
@@ -119,7 +129,7 @@ export async function GET(request: NextRequest) {
       hasGoogleClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
       hasAppUrl: !!process.env.NEXT_PUBLIC_APP_URL,
       appUrl: process.env.NEXT_PUBLIC_APP_URL || "not set",
-      nodeEnv: process.env.NODE_ENV
+      nodeEnv: process.env.NODE_ENV,
     };
 
     // 6. Overall status
@@ -128,42 +138,55 @@ export async function GET(request: NextRequest) {
     const totalChecks = allChecks.length;
 
     diagnostics.summary = {
-      overallHealth: passedChecks === totalChecks ? "HEALTHY" : "ISSUES_DETECTED",
+      overallHealth:
+        passedChecks === totalChecks ? "HEALTHY" : "ISSUES_DETECTED",
       passedChecks,
       totalChecks,
       healthPercentage: Math.round((passedChecks / totalChecks) * 100),
-      recommendations: []
+      recommendations: [],
     };
 
     // Add recommendations based on failures
     if (!diagnostics.checks.userExists?.success) {
-      diagnostics.summary.recommendations.push("User does not exist in Supabase Auth. Ensure user is properly signed up.");
+      diagnostics.summary.recommendations.push(
+        "User does not exist in Supabase Auth. Ensure user is properly signed up.",
+      );
     }
 
     if (!diagnostics.checks.tokenStorage?.success) {
-      diagnostics.summary.recommendations.push("Token storage is failing. Check database schema and RLS policies.");
+      diagnostics.summary.recommendations.push(
+        "Token storage is failing. Check database schema and RLS policies.",
+      );
     }
 
     if (!diagnostics.checks.writePermissions?.success) {
-      diagnostics.summary.recommendations.push("Cannot write tokens to database. Check RLS policies and service role key.");
+      diagnostics.summary.recommendations.push(
+        "Cannot write tokens to database. Check RLS policies and service role key.",
+      );
     }
 
     if (!diagnostics.checks.tokenStorage?.hasTokens) {
-      diagnostics.summary.recommendations.push("No tokens found for user. User needs to re-authenticate with Google.");
+      diagnostics.summary.recommendations.push(
+        "No tokens found for user. User needs to re-authenticate with Google.",
+      );
     }
 
     if (diagnostics.checks.tokenStorage?.tokens?.isExpired) {
-      diagnostics.summary.recommendations.push("Tokens are expired. They should be automatically refreshed on next use.");
+      diagnostics.summary.recommendations.push(
+        "Tokens are expired. They should be automatically refreshed on next use.",
+      );
     }
 
     return NextResponse.json(diagnostics, { status: 200 });
-
   } catch (error: any) {
     console.error("Diagnostic error:", error);
-    return NextResponse.json({ 
-      error: "Diagnostic failed", 
-      message: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Diagnostic failed",
+        message: error.message,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+      },
+      { status: 500 },
+    );
   }
 }

@@ -165,16 +165,19 @@ export async function createCalendarEventFromSubmission(
     console.log("📅 [Calendar] Starting calendar event creation...");
     console.log("📅 [Calendar] User ID:", userId);
     console.log("📅 [Calendar] Form ID:", formId);
-    
+
     // Get Google client
     const { getGoogleClient } = await import("./google");
     const googleClient = await getGoogleClient(userId);
 
     if (!googleClient) {
-      console.error("❌ [Calendar] Google client not available for user:", userId);
+      console.error(
+        "❌ [Calendar] Google client not available for user:",
+        userId,
+      );
       throw new Error("Google client not available");
     }
-    
+
     console.log("✓ [Calendar] Google client obtained");
 
     // Get form's default calendar ID and fields using admin client
@@ -198,31 +201,34 @@ export async function createCalendarEventFromSubmission(
     }
 
     // Find meeting field in submission
-    const meetingField = (form.fields as any[])?.find((f: any) => f.type === "meeting");
-    
+    const meetingField = (form.fields as any[])?.find(
+      (f: any) => f.type === "meeting",
+    );
+
     console.log("📅 [Calendar] Meeting field:", meetingField);
-    
+
     if (!meetingField) {
       console.log("⚠️ [Calendar] No meeting field found in form");
       return null;
     }
 
     const meetingDateTime = submissionData[meetingField.id];
-    
+
     console.log("📅 [Calendar] Meeting time from submission:", {
       fieldId: meetingField.id,
       value: meetingDateTime,
     });
-    
+
     if (!meetingDateTime) {
       console.log("⚠️ [Calendar] No meeting time selected in submission");
       return null;
     }
 
     // Get meeting duration from field settings or form settings (default 60 minutes)
-    const duration = meetingField.meetingSettings?.duration || 
-                    (form.meeting_settings as any)?.duration || 
-                    60;
+    const duration =
+      meetingField.meetingSettings?.duration ||
+      (form.meeting_settings as any)?.duration ||
+      60;
 
     // Calculate end time
     const startDate = new Date(meetingDateTime);
@@ -230,7 +236,7 @@ export async function createCalendarEventFromSubmission(
 
     // Get attendee email from submission (look for email fields)
     const emailField = (form.fields as any[])?.find(
-      (f: any) => f.type === "email" || f.type === "email_field"
+      (f: any) => f.type === "email" || f.type === "email_field",
     );
     const attendeeEmail = emailField ? submissionData[emailField.id] : null;
 
@@ -271,13 +277,22 @@ export async function createCalendarEventFromSubmission(
       eventId: response.data.id,
       htmlLink: response.data.htmlLink,
     });
-    
+
     return response.data;
   } catch (error) {
-    console.error("❌ [Calendar] Error in createCalendarEventFromSubmission:", error);
-    console.error("❌ [Calendar] Error details:", error instanceof Error ? error.message : error);
-    if (error instanceof Error && 'response' in error) {
-      console.error("❌ [Calendar] API Response:", (error as any).response?.data);
+    console.error(
+      "❌ [Calendar] Error in createCalendarEventFromSubmission:",
+      error,
+    );
+    console.error(
+      "❌ [Calendar] Error details:",
+      error instanceof Error ? error.message : error,
+    );
+    if (error instanceof Error && "response" in error) {
+      console.error(
+        "❌ [Calendar] API Response:",
+        (error as any).response?.data,
+      );
     }
     throw error;
   }

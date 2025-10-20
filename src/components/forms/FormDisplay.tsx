@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
-import { FormField } from "@/types/form";
-import { FormDisplayMode, FormLayout, FormTheme } from "@/types/form-display";
-import { StandaloneForm } from "./StandaloneForm";
+import type React from "react";
+import { useState } from "react";
+import type { FormField } from "@/types/form";
+import type {
+  FormDisplayMode,
+  FormLayout,
+  FormTheme,
+} from "@/types/form-display";
 import { FormContent } from "./FormContent";
-import { FormHeader } from "./FormHeader";
+import { StandaloneForm } from "./StandaloneForm";
 
 interface FormDisplayProps {
   formId: string;
@@ -34,9 +38,9 @@ export function FormDisplay({
   const [currentStep, setCurrentStep] = useState(0);
 
   const handleFieldChange = (fieldId: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [fieldId]: value
+      [fieldId]: value,
     }));
   };
 

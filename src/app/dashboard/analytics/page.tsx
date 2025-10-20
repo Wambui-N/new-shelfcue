@@ -61,8 +61,8 @@ export default function AnalyticsPage() {
         setLoading(true);
 
         // Fetch forms
-      const { data: forms, error: formsError } = await supabase
-        .from("forms")
+        const { data: forms, error: formsError } = await supabase
+          .from("forms")
           .select("id, title, status")
           .eq("user_id", user.id);
 
@@ -74,8 +74,8 @@ export default function AnalyticsPage() {
         }
 
         // Fetch submissions
-      const { data: submissions, error: submissionsError } = await supabase
-        .from("submissions")
+        const { data: submissions, error: submissionsError } = await supabase
+          .from("submissions")
           .select("id, form_id, created_at")
           .in("form_id", forms?.map((f: { id: string }) => f.id) || []);
 
@@ -94,12 +94,14 @@ export default function AnalyticsPage() {
 
           const formsThisMonth =
             forms?.filter(
-              (form: { created_at: string }) => new Date(form.created_at) >= firstDayOfMonth,
+              (form: { created_at: string }) =>
+                new Date(form.created_at) >= firstDayOfMonth,
             ).length || 0;
 
           const submissionsThisMonth =
             submissions?.filter(
-              (sub: { created_at: string }) => new Date(sub.created_at) >= firstDayOfMonth,
+              (sub: { created_at: string }) =>
+                new Date(sub.created_at) >= firstDayOfMonth,
             ).length || 0;
 
           const conversionRate =
@@ -120,7 +122,9 @@ export default function AnalyticsPage() {
           const formAnalytics =
             forms?.map((form: { id: string; title: string }) => {
               const formSubmissions =
-                submissions?.filter((sub: { form_id: string }) => sub.form_id === form.id) || [];
+                submissions?.filter(
+                  (sub: { form_id: string }) => sub.form_id === form.id,
+                ) || [];
               const formViews = formSubmissions.length * 10;
               const formConversion =
                 formViews > 0
@@ -148,7 +152,7 @@ export default function AnalyticsPage() {
     };
 
     fetchAnalytics();
-  }, [user]);
+  }, [user, supabase.from]);
 
   const metrics = [
     {
@@ -197,13 +201,15 @@ export default function AnalyticsPage() {
     },
   ];
 
-  const recentActivity = analyticsData.formAnalytics.map((form: FormAnalytics) => ({
-    form: form.form_title || "Untitled Form",
-    submissions: form.total_submissions,
-    views: form.total_views,
-    conversion: form.conversion_rate,
-    trend: form.conversion_rate >= 15 ? "up" : "down",
-  }));
+  const recentActivity = analyticsData.formAnalytics.map(
+    (form: FormAnalytics) => ({
+      form: form.form_title || "Untitled Form",
+      submissions: form.total_submissions,
+      views: form.total_views,
+      conversion: form.conversion_rate,
+      trend: form.conversion_rate >= 15 ? "up" : "down",
+    }),
+  );
 
   if (loading) {
     return <AnalyticsSkeleton />;

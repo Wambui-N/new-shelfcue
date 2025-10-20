@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 
-interface DashboardLayoutProps{
+interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
@@ -61,8 +61,8 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
         setLoading(true);
 
         // Fetch active forms count (published forms)
-      const { data: forms, error: formsError } = await (supabase as any)
-        .from("forms")
+        const { data: forms, error: formsError } = await (supabase as any)
+          .from("forms")
           .select("id, status")
           .eq("user_id", user.id)
           .eq("status", "published");
@@ -75,8 +75,10 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      const { data: submissions, error: submissionsError } = await (supabase as any)
-        .from("submissions")
+        const { data: submissions, error: submissionsError } = await (
+          supabase as any
+        )
+          .from("submissions")
           .select("id")
           .gte("created_at", sevenDaysAgo.toISOString())
           .in("form_id", forms?.map((form: { id: string }) => form.id) || []);
@@ -92,7 +94,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
     };
 
     fetchCounts();
-  }, [user]);
+  }, [user, supabase]);
 
   const primaryNavItems = [
     {

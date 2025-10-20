@@ -1,9 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Calendar, CheckCircle, Sheet, Shield, Zap } from "lucide-react";
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
+import { Calendar, CheckCircle, Sheet, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 

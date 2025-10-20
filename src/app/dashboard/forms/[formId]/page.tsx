@@ -3,13 +3,9 @@
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
-  BarChart3,
   CheckCircle,
-  Copy,
   Edit,
   ExternalLink,
-  Eye,
-  Settings,
   Share2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -37,7 +33,7 @@ function FormViewPage({ params }: FormViewPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [_copied, setCopied] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [formId, setFormId] = useState<string>("");
 
@@ -55,8 +51,8 @@ function FormViewPage({ params }: FormViewPageProps) {
     const fetchForm = async () => {
       setLoading(true);
       try {
-      const { data, error } = await (supabase as any)
-        .from("forms")
+        const { data, error } = await (supabase as any)
+          .from("forms")
           .select("*")
           .eq("id", formId)
           .maybeSingle();
@@ -122,7 +118,7 @@ function FormViewPage({ params }: FormViewPageProps) {
     };
 
     fetchForm();
-  }, [formId, user]);
+  }, [formId, user, supabase]);
 
   const handleSubmit = async (submissionData: Record<string, any>) => {
     try {
@@ -146,7 +142,7 @@ function FormViewPage({ params }: FormViewPageProps) {
     }
   };
 
-  const copyFormUrl = () => {
+  const _copyFormUrl = () => {
     const formUrl = `${window.location.origin}/form/${formId}`;
     navigator.clipboard.writeText(formUrl);
     setCopied(true);

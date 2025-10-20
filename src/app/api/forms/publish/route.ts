@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Check if user has enabled meeting booking in form settings
-    const meetingBookingEnabled =
+    const _meetingBookingEnabled =
       (form as any).settings?.meetingBookingEnabled || false;
 
     const results: any = {};
@@ -155,21 +155,21 @@ export async function POST(request: NextRequest) {
       try {
         console.log("🔵 Creating Google Sheet for form submissions...");
         console.log("📊 Form fields:", (form as any).fields);
-        
+
         const headers = (form as any).fields.map((f: any) => f.label);
         console.log("📋 Headers to create:", headers);
-        
+
         if (hasMeetingField) {
           headers.push("Meeting Link");
           console.log("📅 Added Meeting Link header");
         }
-        
+
         console.log("🚀 Calling sheetsService.createSheet...");
         const newSheet = await sheetsService.createSheet(
           `${(form as any).title} - Responses`,
           headers,
         );
-        
+
         console.log("✅ Google Sheet created:", newSheet);
 
         if (newSheet.spreadsheetId && newSheet.spreadsheetUrl) {
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
             sheet_name: `${(form as any).title} - Responses`,
             sheet_url: newSheet.spreadsheetUrl,
           });
-          
+
           const { data: connection, error: connectionError } = await (
             supabaseAdmin as any
           )
@@ -195,16 +195,19 @@ export async function POST(request: NextRequest) {
             .single();
 
           if (connectionError) {
-            console.error("❌ Failed to save sheet connection:", connectionError);
+            console.error(
+              "❌ Failed to save sheet connection:",
+              connectionError,
+            );
             console.error("Connection error details:", {
               message: connectionError.message,
               details: connectionError.details,
               hint: connectionError.hint,
-              code: connectionError.code
+              code: connectionError.code,
             });
             throw connectionError;
           }
-          
+
           console.log("✅ Sheet connection saved:", connection);
 
           console.log("📝 Updating form with sheet connection ID...");
@@ -212,12 +215,12 @@ export async function POST(request: NextRequest) {
             .from("forms")
             .update({ default_sheet_connection_id: (connection as any).id })
             .eq("id", formId);
-          
+
           if (formUpdateError) {
             console.error("❌ Failed to update form:", formUpdateError);
             throw formUpdateError;
           }
-          
+
           console.log("✅ Form updated with sheet connection");
 
           results.sheet = {
@@ -231,7 +234,7 @@ export async function POST(request: NextRequest) {
         }
       } catch (error: any) {
         console.error("❌ Error creating Google Sheet:", error);
-        
+
         // Log more details about the error
         if (error.response) {
           console.error("Google API Error Response:", {
@@ -240,25 +243,27 @@ export async function POST(request: NextRequest) {
             data: error.response.data,
           });
         }
-        
+
         // Check if it's an authentication error
         if (error.response?.status === 401 || error.response?.status === 403) {
           return NextResponse.json(
             {
               error: "Google authentication failed",
               code: "GOOGLE_AUTH_FAILED",
-              details: "Your Google authentication is invalid or expired. Please reconnect your Google account.",
+              details:
+                "Your Google authentication is invalid or expired. Please reconnect your Google account.",
               action: "reconnect_google",
             },
             { status: 403 },
           );
         }
-        
+
         return NextResponse.json(
           {
             error: "Failed to create Google Sheet",
             details: error instanceof Error ? error.message : "Unknown error",
-            errorDetails: error.response?.data || error.message || "No additional details",
+            errorDetails:
+              error.response?.data || error.message || "No additional details",
           },
           { status: 500 },
         );

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyWebhookSignature } from "@/lib/paystack";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { EmailService } from "@/lib/resend";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 /**
  * Paystack Webhook Handler
@@ -10,18 +10,18 @@ import { EmailService } from "@/lib/resend";
 export async function POST(request: NextRequest) {
   try {
     // Optional: IP whitelisting for additional security
-    const clientIP = request.headers.get("x-forwarded-for") || 
-                    request.headers.get("x-real-ip") || 
-                    "unknown";
-    
-    const allowedIPs = [
-      "52.31.139.75",
-      "52.49.173.169", 
-      "52.214.14.220"
-    ];
-    
+    const clientIP =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+
+    const allowedIPs = ["52.31.139.75", "52.49.173.169", "52.214.14.220"];
+
     // Skip IP check in development
-    if (process.env.NODE_ENV === "production" && !allowedIPs.includes(clientIP)) {
+    if (
+      process.env.NODE_ENV === "production" &&
+      !allowedIPs.includes(clientIP)
+    ) {
       console.error("❌ Webhook request from unauthorized IP:", clientIP);
       return NextResponse.json({ error: "Unauthorized IP" }, { status: 403 });
     }
@@ -133,12 +133,15 @@ export async function POST(request: NextRequest) {
 
         if ((profile as any)?.email && subscription) {
           const plan = (subscription as any).plan;
-          await EmailService.sendSubscriptionConfirmation((profile as any).email, {
-            userName: (profile as any).full_name || "there",
-            planName: plan?.name || "Premium",
-            amount: `₦${(data.amount / 100).toLocaleString()}`,
-            billingCycle: plan?.billing_interval || "monthly",
-          });
+          await EmailService.sendSubscriptionConfirmation(
+            (profile as any).email,
+            {
+              userName: (profile as any).full_name || "there",
+              planName: plan?.name || "Premium",
+              amount: `₦${(data.amount / 100).toLocaleString()}`,
+              billingCycle: plan?.billing_interval || "monthly",
+            },
+          );
         }
 
         console.log(`✅ Subscription created for user ${userId}`);
@@ -173,7 +176,7 @@ export async function POST(request: NextRequest) {
         if (subscriptionData) {
           const profile = (subscriptionData as any).profiles;
           const plan = (subscriptionData as any).plan;
-          
+
           if (profile?.email) {
             await EmailService.sendSubscriptionCancelledNotification(
               profile.email,

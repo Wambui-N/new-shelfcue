@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,13 +7,13 @@ export async function GET(request: NextRequest) {
     const state = searchParams.get("state");
     const error = searchParams.get("error");
 
-    console.log('🧪 Test callback received:', { 
-      hasCode: !!code, 
-      hasState: !!state, 
+    console.log("🧪 Test callback received:", {
+      hasCode: !!code,
+      hasState: !!state,
       state,
       error,
       url: request.url,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     return NextResponse.json({
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       hasState: !!state,
       state,
       error,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
     console.error("Test callback error:", error);

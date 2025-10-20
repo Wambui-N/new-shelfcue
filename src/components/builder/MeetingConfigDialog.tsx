@@ -38,16 +38,6 @@ export function MeetingConfigDialog({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (open && userId) {
-      console.log(
-        "📅 MeetingConfigDialog opened, fetching calendars for user:",
-        userId,
-      );
-      fetchCalendars();
-    }
-  }, [open, userId]);
-
   const fetchCalendars = async () => {
     console.log("📅 Fetching calendars...");
     setLoading(true);
@@ -57,7 +47,7 @@ export function MeetingConfigDialog({
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      const response = await fetch(`/api/google/calendars?userId=${userId}` , {
+      const response = await fetch(`/api/google/calendars?userId=${userId}`, {
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -76,7 +66,7 @@ export function MeetingConfigDialog({
           // No tokens - show actionable error and Connect Google button
           console.log("📅 No Google tokens found.");
           setError(
-            "Google authentication required. Please connect your Google account to continue."
+            "Google authentication required. Please connect your Google account to continue.",
           );
           return;
         }
@@ -104,6 +94,16 @@ export function MeetingConfigDialog({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (open && userId) {
+      console.log(
+        "📅 MeetingConfigDialog opened, fetching calendars for user:",
+        userId,
+      );
+      fetchCalendars();
+    }
+  }, [open, userId, fetchCalendars]);
 
   const handleConfirm = () => {
     console.log("📅 Confirming calendar selection:", selectedCalendar);

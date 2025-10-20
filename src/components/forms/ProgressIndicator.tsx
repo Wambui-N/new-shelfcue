@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
-import { FormTheme } from "@/types/form-display";
 import { cn } from "@/lib/utils";
+import type { FormTheme } from "@/types/form-display";
 
 interface ProgressIndicatorProps {
   currentStep: number;
@@ -13,7 +12,7 @@ interface ProgressIndicatorProps {
 export function ProgressIndicator({
   currentStep,
   totalSteps,
-  theme
+  theme,
 }: ProgressIndicatorProps) {
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
@@ -36,14 +35,12 @@ export function ProgressIndicator({
                 "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
                 index <= currentStep
                   ? "bg-[var(--shelf-primary)] text-white"
-                  : "bg-gray-200 text-gray-500"
+                  : "bg-gray-200 text-gray-500",
               )}
             >
               {index + 1}
             </div>
-            <span className="text-xs text-gray-500 mt-1">
-              Step {index + 1}
-            </span>
+            <span className="text-xs text-gray-500 mt-1">Step {index + 1}</span>
           </div>
         ))}
       </div>

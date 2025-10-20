@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { Check, Crown, Shield, X, Zap } from "lucide-react";
-import { Card } from "@/components/ui/card";
 
 export function ComparisonSection() {
   const comparisons = [

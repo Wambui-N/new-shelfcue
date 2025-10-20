@@ -10,13 +10,13 @@ function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const router = useRouter();
+  const _router = useRouter();
   const searchParams = useSearchParams();
   const { signInWithGoogle } = useAuth();
 
   // Check for error in URL params
   useEffect(() => {
-    const urlError = searchParams.get('error');
+    const urlError = searchParams.get("error");
     if (urlError) {
       setError(decodeURIComponent(urlError));
     }
@@ -49,7 +49,9 @@ function SignInForm() {
 
       {/* Why Google Required */}
       <div className="bg-muted/30 rounded-lg p-4 space-y-3">
-        <p className="text-xs font-semibold text-foreground mb-2">Google account required for:</p>
+        <p className="text-xs font-semibold text-foreground mb-2">
+          Google account required for:
+        </p>
         <div className="flex items-start gap-2">
           <FileSpreadsheet className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
           <p className="text-xs text-muted-foreground">
@@ -107,7 +109,8 @@ function SignInForm() {
 
       {/* Security Note */}
       <p className="text-xs text-center text-muted-foreground">
-        🔒 We use Google OAuth for secure authentication and don't store your password
+        🔒 We use Google OAuth for secure authentication and don't store your
+        password
       </p>
 
       {/* Don't have account */}

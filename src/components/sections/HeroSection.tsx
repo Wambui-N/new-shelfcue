@@ -57,7 +57,9 @@ export function HeroSection() {
           variants={itemVariants}
           className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight mb-3 sm:mb-4 leading-tight px-2"
         >
-          <span className="block text-foreground">The Beautiful Form Builder</span>
+          <span className="block text-foreground">
+            The Beautiful Form Builder
+          </span>
           <span className="block text-dark-gray">
             That Automatically Fills Your Google Sheets
           </span>
@@ -70,7 +72,8 @@ export function HeroSection() {
         >
           Finally, a form builder that does the work for you.{" "}
           <span className="text-foreground font-medium">
-          Beautiful forms that capture leads while automatically organizing them in Google Sheets.
+            Beautiful forms that capture leads while automatically organizing
+            them in Google Sheets.
           </span>
         </motion.p>
 
@@ -81,30 +84,30 @@ export function HeroSection() {
         >
           <Link href="/auth/signup">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                    size="default"
-                    className="group bg-black text-white hover:bg-dark-gray shadow-md hover:shadow-lg transition-all duration-300 text-sm sm:text-base px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-medium w-full sm:w-auto"
-                >
-                    <span className="mr-2">Build Your First Form in Minutes</span>
-              <motion.div
-                className="inline-block"
-                  whileHover={{ x: 2 }}
-                transition={{ duration: 0.2 }}
+              <Button
+                size="default"
+                className="group bg-black text-white hover:bg-dark-gray shadow-md hover:shadow-lg transition-all duration-300 text-sm sm:text-base px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-medium w-full sm:w-auto"
               >
+                <span className="mr-2">Build Your First Form in Minutes</span>
+                <motion.div
+                  className="inline-block"
+                  whileHover={{ x: 2 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <ArrowRight className="w-4 h-4" />
-              </motion.div>
-            </Button>
+                </motion.div>
+              </Button>
             </motion.div>
           </Link>
-              <motion.button
-                onClick={() => {
-                  const demoSection = document.querySelector("#demo");
-                  demoSection?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="inline-flex items-center gap-2 text-foreground-muted hover:text-foreground transition-colors duration-300 text-sm font-medium group px-4 py-2 w-full sm:w-auto justify-center sm:justify-start"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
+          <motion.button
+            onClick={() => {
+              const demoSection = document.querySelector("#demo");
+              demoSection?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="inline-flex items-center gap-2 text-foreground-muted hover:text-foreground transition-colors duration-300 text-sm font-medium group px-4 py-2 w-full sm:w-auto justify-center sm:justify-start"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
             <motion.div
               className="w-8 h-8 rounded-full bg-light-gray/50 flex items-center justify-center group-hover:bg-light-gray transition-colors"
               whileHover={{ scale: 1.1 }}
@@ -115,21 +118,22 @@ export function HeroSection() {
           </motion.button>
         </motion.div>
 
-            {/* Social Proof */}
-            <motion.p
-              variants={itemVariants}
-              className="text-xs sm:text-sm text-foreground-muted max-w-xl mx-auto px-4"
-            >
-              The perfect{" "}
-              <span className="font-semibold text-foreground">
-                Google Forms alternative
-              </span>{" "}
-              for{" "}
-              <span className="font-semibold text-foreground">small businesses</span>{" "}
-              who want beautiful, branded forms
-            </motion.p>
+        {/* Social Proof */}
+        <motion.p
+          variants={itemVariants}
+          className="text-xs sm:text-sm text-foreground-muted max-w-xl mx-auto px-4"
+        >
+          The perfect{" "}
+          <span className="font-semibold text-foreground">
+            Google Forms alternative
+          </span>{" "}
+          for{" "}
+          <span className="font-semibold text-foreground">
+            small businesses
+          </span>{" "}
+          who want beautiful, branded forms
+        </motion.p>
       </motion.div>
-
     </section>
   );
 }

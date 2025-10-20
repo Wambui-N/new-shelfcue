@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import {
-  Activity,
   ArrowRight,
   ChevronDown,
   ChevronUp,
@@ -43,7 +42,7 @@ interface SubmissionRecord {
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const router = useRouter();
+  const _router = useRouter();
   const supabase = createClient();
 
   const [forms, setForms] = useState<FormRecord[]>([]);
@@ -59,7 +58,7 @@ export default function DashboardPage() {
     lastLeadTime: null as string | null,
   });
 
-  const [historicalStats, setHistoricalStats] = useState({
+  const [historicalStats, _setHistoricalStats] = useState({
     submissionsLastWeek: 0,
   });
 
@@ -70,8 +69,8 @@ export default function DashboardPage() {
       setLoading(true);
       try {
         // Fetch forms data
-      const { data: formsData, error: formsError } = await (supabase as any)
-        .from("forms")
+        const { data: formsData, error: formsError } = await (supabase as any)
+          .from("forms")
           .select("id, title, description, created_at, status")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
@@ -79,8 +78,8 @@ export default function DashboardPage() {
         if (!formsError) {
           setForms(formsData as FormRecord[]);
           const publishedCount =
-            formsData?.filter((form: FormRecord) => form.status === "published").length ||
-            0;
+            formsData?.filter((form: FormRecord) => form.status === "published")
+              .length || 0;
           setDashboardStats((prev) => ({
             ...prev,
             totalForms: formsData?.length || 0,
@@ -89,18 +88,19 @@ export default function DashboardPage() {
         }
 
         // Fetch recent submissions
-        const { data: submissionsData, error: submissionsError } =
-        await (supabase as any)
+        const { data: submissionsData, error: submissionsError } = await (
+          supabase as any
+        )
           .from("submissions")
-            .select(`
+          .select(`
             id, form_id, data, created_at,
             forms!inner (
               title
             )
           `)
-            .eq("forms.user_id", user.id)
-            .order("created_at", { ascending: false })
-            .limit(7);
+          .eq("forms.user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(7);
 
         if (!submissionsError) {
           setRecentSubmissions(submissionsData || []);
@@ -130,7 +130,7 @@ export default function DashboardPage() {
     };
 
     fetchData();
-  }, [user]);
+  }, [user, supabase]);
 
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);

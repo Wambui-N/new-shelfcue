@@ -41,8 +41,8 @@ export function SolutionSection() {
             The Simpler Way to Collect and Manage Data
           </h2>
           <p className="text-base md:text-lg text-foreground-muted max-w-2xl mx-auto mb-1">
-            Meet <span className="font-bold text-black">Shelfcue</span>, the modern form builder that connects design,
-            automation, and control.
+            Meet <span className="font-bold text-black">Shelfcue</span>, the
+            modern form builder that connects design, automation, and control.
           </p>
           <p className="text-base md:text-lg text-foreground-muted max-w-2xl mx-auto">
             Whether you’re capturing leads, collecting feedback, or scheduling

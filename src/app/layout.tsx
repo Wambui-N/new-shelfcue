@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { Analytics } from "@vercel/analytics/react";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const satoshi = localFont({
   src: [
@@ -62,12 +62,13 @@ const satoshi = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "ShelfCue - Beautiful Google Sheets Form Builder | The Best Google Forms Alternative",
+  title:
+    "ShelfCue - Beautiful Google Sheets Form Builder | The Best Google Forms Alternative",
   description:
     "Create branded, responsive forms that connect directly to Google Sheets. No Zapier needed. The perfect Google Forms alternative for small businesses. Custom form builder with file uploads, mobile-first design, and automatic Google Sheets sync.",
   keywords: [
     "google forms alternative",
-    "form builder for google sheets", 
+    "form builder for google sheets",
     "customizable form builder",
     "embed google form on website",
     "contact form for small business",
@@ -75,7 +76,7 @@ export const metadata: Metadata = {
     "responsive form builder",
     "file upload form google drive",
     "form to google sheets",
-    "custom google forms"
+    "custom google forms",
   ],
   authors: [{ name: "ShelfCue Team" }],
   creator: "ShelfCue",
@@ -85,31 +86,33 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://shelfcue.com'),
+  metadataBase: new URL("https://shelfcue.com"),
   alternates: {
-    canonical: '/',
+    canonical: "/",
   },
   openGraph: {
     title: "ShelfCue - Beautiful Google Sheets Form Builder",
-    description: "Create branded, responsive forms that connect directly to Google Sheets. No Zapier needed. The perfect Google Forms alternative for small businesses.",
-    url: 'https://shelfcue.com',
-    siteName: 'ShelfCue',
+    description:
+      "Create branded, responsive forms that connect directly to Google Sheets. No Zapier needed. The perfect Google Forms alternative for small businesses.",
+    url: "https://shelfcue.com",
+    siteName: "ShelfCue",
     images: [
       {
-        url: '/og-image.png',
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: 'ShelfCue - Beautiful Google Sheets Form Builder',
+        alt: "ShelfCue - Beautiful Google Sheets Form Builder",
       },
     ],
-    locale: 'en_US',
-    type: 'website',
+    locale: "en_US",
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'ShelfCue - Beautiful Google Sheets Form Builder',
-    description: 'Create branded, responsive forms that connect directly to Google Sheets. No Zapier needed.',
-    images: ['/og-image.png'],
+    card: "summary_large_image",
+    title: "ShelfCue - Beautiful Google Sheets Form Builder",
+    description:
+      "Create branded, responsive forms that connect directly to Google Sheets. No Zapier needed.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -117,9 +120,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
@@ -141,11 +144,25 @@ export default function RootLayout({
         />
         {/* Favicon and app icons */}
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
         <link rel="manifest" href="/site.webmanifest" />
-        
+
         {/* Schema.org structured data */}
         <script
           type="application/ld+json"
@@ -154,28 +171,29 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "SoftwareApplication",
-              "name": "ShelfCue",
-              "description": "Beautiful Google Sheets form builder. Create branded, responsive forms that connect directly to Google Sheets without Zapier.",
-              "url": "https://shelfcue.com",
-              "applicationCategory": "BusinessApplication",
-              "operatingSystem": "Web",
-              "offers": {
+              name: "ShelfCue",
+              description:
+                "Beautiful Google Sheets form builder. Create branded, responsive forms that connect directly to Google Sheets without Zapier.",
+              url: "https://shelfcue.com",
+              applicationCategory: "BusinessApplication",
+              operatingSystem: "Web",
+              offers: {
                 "@type": "Offer",
-                "price": "29",
-                "priceCurrency": "USD",
-                "availability": "https://schema.org/InStock"
+                price: "29",
+                priceCurrency: "USD",
+                availability: "https://schema.org/InStock",
               },
-              "aggregateRating": {
+              aggregateRating: {
                 "@type": "AggregateRating",
-                "ratingValue": "4.9",
-                "ratingCount": "1000"
+                ratingValue: "4.9",
+                ratingCount: "1000",
               },
-              "creator": {
+              creator: {
                 "@type": "Organization",
-                "name": "Made with Make",
-                "url": "https://madewithmake.com"
-              }
-            })
+                name: "Made with Make",
+                url: "https://madewithmake.com",
+              },
+            }),
           }}
         />
       </head>

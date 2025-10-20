@@ -33,7 +33,7 @@ export function PublishProgressDialog({
   onOpenChange,
   steps,
 }: PublishProgressDialogProps) {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [_currentStep, setCurrentStep] = useState(0);
 
   const stepConfigs: StepConfig[] = [
     {

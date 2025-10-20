@@ -34,9 +34,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
               alt="ShelfCue Logo"
               className="w-10 h-10 object-contain"
             />
-            <span className="text-2xl font-bold text-foreground">
-              ShelfCue
-            </span>
+            <span className="text-2xl font-bold text-foreground">ShelfCue</span>
           </div>
         </div>
 

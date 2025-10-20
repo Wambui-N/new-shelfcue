@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUp, Github, Heart, Linkedin, Mail, Twitter } from "lucide-react";
+import { ArrowUp, Mail } from "lucide-react";
 import Link from "next/link";
 
 export function Footer() {
@@ -153,7 +153,6 @@ export function Footer() {
               ))}
             </ul>
           </motion.div>
-
 
           {/* Legal Links */}
           <motion.div variants={itemVariants}>

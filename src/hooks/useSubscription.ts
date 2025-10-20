@@ -102,7 +102,9 @@ export function useSubscription() {
   function canReceiveSubmissions(): boolean {
     if (!hasAccess) return false;
     if ((limits as any).submissions_per_month === -1) return true; // Unlimited
-    return (usage?.submissions_count || 0) < (limits as any).submissions_per_month;
+    return (
+      (usage?.submissions_count || 0) < (limits as any).submissions_per_month
+    );
   }
 
   function hasFeature(feature: string): boolean {

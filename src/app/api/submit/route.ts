@@ -2,9 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getGoogleClient } from "@/lib/google";
 import { createCalendarEventFromSubmission } from "@/lib/googleCalendar";
 import { GoogleSheetsService } from "@/lib/googleSheets";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { incrementUsage, canPerformAction } from "@/lib/subscriptionLimits";
 import { EmailService } from "@/lib/resend";
+import { canPerformAction, incrementUsage } from "@/lib/subscriptionLimits";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(request: NextRequest) {
   try {
@@ -48,12 +48,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Check submission limit for form owner
-    const limitCheck = await canPerformAction(form.user_id, "submissions_per_month");
+    const limitCheck = await canPerformAction(
+      form.user_id,
+      "submissions_per_month",
+    );
     if (!limitCheck.allowed) {
       return NextResponse.json(
-        { 
+        {
           error: "Submission limit reached",
-          message: "This form has reached its submission limit for this month. Please contact the form owner.",
+          message:
+            "This form has reached its submission limit for this month. Please contact the form owner.",
         },
         { status: 429 },
       );
@@ -164,28 +168,28 @@ export async function POST(request: NextRequest) {
     // Background tasks (don't block response) - Now only for email
     (async () => {
       // Send email notification to form owner
-        try {
-          const { data: profile } = await (supabaseAdmin as any)
-            .from("profiles")
-            .select("email, full_name")
-            .eq("id", (form as any).user_id)
-            .single();
+      try {
+        const { data: profile } = await (supabaseAdmin as any)
+          .from("profiles")
+          .select("email, full_name")
+          .eq("id", (form as any).user_id)
+          .single();
 
-          if ((profile as any)?.email) {
-            await EmailService.sendFormSubmissionNotification(
-              (profile as any).email,
-              {
-                formName: (form as any).title || "Untitled Form",
-                formId: formId,
-                submissionId: (submission as any).id,
-                submittedAt: (submission as any).created_at,
-                submitterData: data,
-              },
-            );
-            console.log("✓ Sent email notification to form owner");
-          }
-        } catch (error) {
-          console.error("Error sending email notification:", error);
+        if ((profile as any)?.email) {
+          await EmailService.sendFormSubmissionNotification(
+            (profile as any).email,
+            {
+              formName: (form as any).title || "Untitled Form",
+              formId: formId,
+              submissionId: (submission as any).id,
+              submittedAt: (submission as any).created_at,
+              submitterData: data,
+            },
+          );
+          console.log("✓ Sent email notification to form owner");
+        }
+      } catch (error) {
+        console.error("Error sending email notification:", error);
       }
     })().catch((error) => {
       console.error("Error in background email task:", error);

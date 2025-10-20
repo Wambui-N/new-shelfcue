@@ -116,7 +116,9 @@ export function ShareDialog({
     // Create an image from the SVG
     const svgData = new XMLSerializer().serializeToString(svg);
     const img = new Image();
-    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const svgBlob = new Blob([svgData], {
+      type: "image/svg+xml;charset=utf-8",
+    });
     const url = URL.createObjectURL(svgBlob);
 
     img.onload = () => {
@@ -274,8 +276,8 @@ export function ShareDialog({
                 <p className="text-sm text-muted-foreground mb-4">
                   Scan this code with a mobile device to access your form
                 </p>
-                
-                <div 
+
+                <div
                   ref={qrRef}
                   className="flex justify-center items-center p-8 bg-white rounded-lg border-2 border-dashed border-border"
                   style={{ backgroundColor: qrBgColor }}
@@ -295,12 +297,14 @@ export function ShareDialog({
                 <Label className="text-base font-semibold block">
                   Customize
                 </Label>
-                
+
                 {/* Size Control */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label className="text-sm">Size</Label>
-                    <span className="text-sm text-muted-foreground">{qrSize}px</span>
+                    <span className="text-sm text-muted-foreground">
+                      {qrSize}px
+                    </span>
                   </div>
                   <Slider
                     value={[qrSize]}
@@ -335,7 +339,7 @@ export function ShareDialog({
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label className="text-sm">Background</Label>
                     <div className="flex gap-2">

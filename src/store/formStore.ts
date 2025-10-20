@@ -1,13 +1,11 @@
 import { create } from "zustand";
 import type { FormData, FormField } from "@/types/form";
-import type { FormDisplayMode, FormLayout, FormTheme } from "@/types/form-display";
-import { defaultTheme as displayDefaultTheme } from "@/types/form-display";
 
 interface FormStore {
   formData: FormData;
   isDirty: boolean;
   isSaving: boolean;
-  
+
   // Actions
   updateForm: (updates: Partial<FormData>) => void;
   addField: (field: FormField) => void;
@@ -49,7 +47,7 @@ export const useFormStore = create<FormStore>((set) => ({
   formData: defaultForm,
   isDirty: false,
   isSaving: false,
-  
+
   updateForm: (updates) => {
     set((state) => ({
       formData: { ...state.formData, ...updates },
@@ -63,9 +61,7 @@ export const useFormStore = create<FormStore>((set) => ({
 
       // If a meeting field is added, ensure there's a required email field.
       if (field.type === "meeting") {
-        const hasEmailField = newFields.some(
-          (f) => f.type === "email_field",
-        );
+        const hasEmailField = newFields.some((f) => f.type === "email_field");
         if (!hasEmailField) {
           const emailField: FormField = {
             id: `field_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -79,11 +75,11 @@ export const useFormStore = create<FormStore>((set) => ({
       }
 
       return {
-      formData: {
-        ...state.formData,
+        formData: {
+          ...state.formData,
           fields: newFields,
-      },
-      isDirty: true,
+        },
+        isDirty: true,
       };
     });
   },

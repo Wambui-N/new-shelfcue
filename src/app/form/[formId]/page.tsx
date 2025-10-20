@@ -1,13 +1,16 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { AlertCircle, Loader2, CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { FormDisplay } from "@/components/forms/FormDisplay";
 import { FontLoader } from "@/components/FontLoader";
+import { FormDisplay } from "@/components/forms/FormDisplay";
 import { createThemeFromBrand } from "@/lib/theme-generator";
 import type { FormData } from "@/types/form";
-import type { FormDisplayMode, FormLayout, FormTheme } from "@/types/form-display";
+import type {
+  FormDisplayMode,
+  FormLayout,
+  FormTheme,
+} from "@/types/form-display";
 
 interface PublicFormPageProps {
   params: Promise<{ formId: string }>;
@@ -73,8 +76,13 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
         };
 
         // Create display theme from form theme
-        const theme = data.theme ? { ...defaultTheme, ...data.theme } : defaultTheme;
-        const newDisplayTheme = createThemeFromBrand(theme.primaryColor, theme.fontFamily);
+        const theme = data.theme
+          ? { ...defaultTheme, ...data.theme }
+          : defaultTheme;
+        const newDisplayTheme = createThemeFromBrand(
+          theme.primaryColor,
+          theme.fontFamily,
+        );
 
         setFormData({
           id: formId,
@@ -169,7 +177,8 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
             Submission Received!
           </h2>
           <p className="text-muted-foreground">
-            {formData?.settings?.successMessage || "Thank you for your submission."}
+            {formData?.settings?.successMessage ||
+              "Thank you for your submission."}
           </p>
         </div>
       </div>

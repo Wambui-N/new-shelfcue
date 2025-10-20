@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useFormStore } from "@/store/formStore";
 import type { FormData } from "@/types/form";
 
-interface EditorPageProps{
+interface EditorPageProps {
   params: Promise<{ formId: string }>;
 }
 
@@ -36,8 +36,8 @@ function EditorPage({ params }: EditorPageProps) {
     const fetchForm = async () => {
       setLoading(true);
       try {
-      const { data, error } = await (supabase as any)
-        .from("forms")
+        const { data, error } = await (supabase as any)
+          .from("forms")
           .select("*")
           .eq("id", formId)
           .maybeSingle();
@@ -113,7 +113,7 @@ function EditorPage({ params }: EditorPageProps) {
           hint: error?.hint,
           error,
         });
-        alert("Error loading form: " + (error?.message || "Unknown error"));
+        alert(`Error loading form: ${error?.message || "Unknown error"}`);
         router.push("/dashboard/forms");
       } finally {
         setLoading(false);
@@ -121,7 +121,7 @@ function EditorPage({ params }: EditorPageProps) {
     };
 
     fetchForm();
-  }, [formId, user, loadForm, router]);
+  }, [formId, user, loadForm, router, supabase]);
 
   const handleBack = () => {
     router.push("/dashboard/forms");

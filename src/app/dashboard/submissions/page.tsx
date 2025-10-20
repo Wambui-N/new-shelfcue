@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import {
   Archive,
-  Calendar,
   CheckCircle,
   ChevronDown,
   Download,
@@ -64,11 +63,6 @@ export default function SubmissionsPage() {
   );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    fetchSubmissions();
-    fetchForms();
-  }, [user]);
-
   const fetchForms = async () => {
     if (!user) return;
 
@@ -91,8 +85,8 @@ export default function SubmissionsPage() {
 
     setLoading(true);
     try {
-    const { data, error } = await (supabase as any)
-      .from("submissions")
+      const { data, error } = await (supabase as any)
+        .from("submissions")
         .select(`
           id, form_id, data, created_at,
           forms!inner (
@@ -112,6 +106,11 @@ export default function SubmissionsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSubmissions();
+    fetchForms();
+  }, [fetchForms, fetchSubmissions]);
 
   const filteredSubmissions = useMemo(() => {
     let filtered = submissions;
@@ -186,13 +185,18 @@ export default function SubmissionsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Submissions</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            Submissions
+          </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1">
             View and manage all form submissions
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="border-border w-full sm:w-auto text-sm">
+          <Button
+            variant="outline"
+            className="border-border w-full sm:w-auto text-sm"
+          >
             <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
             Export
           </Button>
@@ -253,7 +257,10 @@ export default function SubmissionsPage() {
             {/* Form Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="h-9 sm:h-10 px-3 text-xs sm:text-sm">
+                <Button
+                  variant="outline"
+                  className="h-9 sm:h-10 px-3 text-xs sm:text-sm"
+                >
                   <Filter className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   <span className="truncate max-w-[100px] sm:max-w-none">
                     {selectedFormId

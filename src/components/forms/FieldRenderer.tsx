@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
-import { FormField } from "@/types/form";
-import { FormTheme } from "@/types/form-display";
-import { cn } from "@/lib/utils";
 import { MeetingTimePicker } from "@/components/ui/meeting-time-picker";
+import { cn } from "@/lib/utils";
+import type { FormField } from "@/types/form";
+import type { FormTheme } from "@/types/form-display";
 
 interface FieldRendererProps {
   field: FormField;
@@ -19,18 +18,18 @@ export function FieldRenderer({
   value,
   onChange,
   theme,
-  isConversational = false
+  isConversational = false,
 }: FieldRendererProps) {
   const baseClasses = cn(
     "w-full px-4 py-3 rounded-lg border border-gray-300",
     "focus:outline-none focus:ring-2 focus:ring-[var(--shelf-primary)] focus:border-transparent",
     "transition-colors duration-200",
-    "text-gray-900 placeholder-gray-500"
+    "text-gray-900 placeholder-gray-500",
   );
 
   const labelClasses = cn(
     "block text-sm font-medium text-gray-700 mb-2",
-    isConversational && "text-lg font-semibold text-gray-900"
+    isConversational && "text-lg font-semibold text-gray-900",
   );
 
   const renderField = () => {
@@ -92,7 +91,10 @@ export function FieldRenderer({
         return (
           <div className="space-y-2">
             {field.options?.map((option, index) => (
-              <label key={index} className="flex items-center space-x-3 cursor-pointer">
+              <label
+                key={index}
+                className="flex items-center space-x-3 cursor-pointer"
+              >
                 <input
                   type="radio"
                   name={field.id}
@@ -112,18 +114,25 @@ export function FieldRenderer({
         return (
           <div className="space-y-2">
             {field.options?.map((option, index) => (
-              <label key={index} className="flex items-center space-x-3 cursor-pointer">
+              <label
+                key={index}
+                className="flex items-center space-x-3 cursor-pointer"
+              >
                 <input
                   type="checkbox"
                   name={field.id}
                   value={option}
-                  checked={Array.isArray(value) ? value.includes(option) : false}
+                  checked={
+                    Array.isArray(value) ? value.includes(option) : false
+                  }
                   onChange={(e) => {
                     const currentValues = Array.isArray(value) ? value : [];
                     if (e.target.checked) {
                       onChange([...currentValues, option]);
                     } else {
-                      onChange(currentValues.filter((v: string) => v !== option));
+                      onChange(
+                        currentValues.filter((v: string) => v !== option),
+                      );
                     }
                   }}
                   className="w-4 h-4 text-[var(--shelf-primary)] border-gray-300 rounded focus:ring-[var(--shelf-primary)]"

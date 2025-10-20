@@ -1,14 +1,20 @@
 "use client";
 
+import {
+  CheckCircle2,
+  Clock,
+  ListChecks,
+  Loader2,
+  Send,
+  Sparkles,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { Loader2, Send, Sparkles, CheckCircle2, Clock, ListChecks } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { createClient } from "@/lib/supabase/client";
 
 type RoadmapStatus = "not_started" | "in_progress" | "beta" | "done";
 
@@ -71,7 +77,7 @@ export default function FeaturesHubPage() {
 
         if (error) throw error;
         if (isMounted && Array.isArray(data)) setRoadmap(data as RoadmapItem[]);
-      } catch (e) {
+      } catch (_e) {
         // Fallback: static examples if table doesn't exist yet
         if (isMounted) {
           setRoadmap([
@@ -145,7 +151,8 @@ export default function FeaturesHubPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Tell us what would help you succeed. We prioritize the most impactful ideas.
+              Tell us what would help you succeed. We prioritize the most
+              impactful ideas.
             </p>
             <div className="space-y-2">
               <Label htmlFor="feature-title">Title</Label>
@@ -177,8 +184,12 @@ export default function FeaturesHubPage() {
                   </>
                 )}
               </Button>
-              {message && <span className="text-sm text-emerald-600">{message}</span>}
-              {error && <span className="text-sm text-destructive">{error}</span>}
+              {message && (
+                <span className="text-sm text-emerald-600">{message}</span>
+              )}
+              {error && (
+                <span className="text-sm text-destructive">{error}</span>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -191,28 +202,45 @@ export default function FeaturesHubPage() {
           <CardContent>
             {loading ? (
               <div className="flex items-center text-sm text-muted-foreground">
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Loading roadmap...
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Loading
+                roadmap...
               </div>
             ) : (
               <div className="space-y-4">
-                {(["beta","in_progress","done","not_started"] as RoadmapStatus[]).map((status) => (
+                {(
+                  [
+                    "beta",
+                    "in_progress",
+                    "done",
+                    "not_started",
+                  ] as RoadmapStatus[]
+                ).map((status) => (
                   <div key={status} className="space-y-2">
                     <div className="flex items-center gap-2">
                       {statusBadge(status)}
                       <span className="text-sm font-medium capitalize">
-                        {status.replace("_"," ")}
+                        {status.replace("_", " ")}
                       </span>
                     </div>
                     <ul className="space-y-2">
                       {grouped[status].length === 0 && (
-                        <li className="text-xs text-muted-foreground">No items yet</li>
+                        <li className="text-xs text-muted-foreground">
+                          No items yet
+                        </li>
                       )}
                       {grouped[status].map((item) => (
-                        <li key={item.id} className="flex items-start justify-between rounded-md border p-3">
+                        <li
+                          key={item.id}
+                          className="flex items-start justify-between rounded-md border p-3"
+                        >
                           <div>
-                            <div className="text-sm font-medium">{item.title}</div>
+                            <div className="text-sm font-medium">
+                              {item.title}
+                            </div>
                             {item.description && (
-                              <div className="text-xs text-muted-foreground mt-1">{item.description}</div>
+                              <div className="text-xs text-muted-foreground mt-1">
+                                {item.description}
+                              </div>
                             )}
                           </div>
                         </li>
@@ -228,5 +256,3 @@ export default function FeaturesHubPage() {
     </div>
   );
 }
-
-

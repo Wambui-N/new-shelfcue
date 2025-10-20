@@ -49,9 +49,7 @@ export function HowItWorksSection() {
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
             Simple Form Building,{" "}
-            <span className="text-dark-gray">
-              Powerful Results
-            </span>
+            <span className="text-dark-gray">Powerful Results</span>
           </h2>
         </motion.div>
 
@@ -159,4 +157,3 @@ export function HowItWorksSection() {
     </section>
   );
 }
-

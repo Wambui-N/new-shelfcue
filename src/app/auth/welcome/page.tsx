@@ -34,8 +34,8 @@ export default function WelcomePage() {
         });
 
         // Check if Google is already connected
-      const { data } = await (supabase as any)
-        .from("user_google_tokens")
+        const { data } = await (supabase as any)
+          .from("user_google_tokens")
           .select("id")
           .eq("user_id", user.id)
           .single();
@@ -46,13 +46,13 @@ export default function WelcomePage() {
         } else {
           setChecking(false);
         }
-      } catch (error) {
+      } catch (_error) {
         setChecking(false);
       }
     };
 
     initializeUser();
-  }, [user, router]);
+  }, [user, router, supabase]);
 
   const handleConnect = () => {
     // Redirect to Google OAuth with return URL

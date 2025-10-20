@@ -141,8 +141,9 @@ export async function canPerformAction(
   const usage = await getUserUsage(userId);
 
   const limit = (limits as any)[limitType];
-  const currentUsage =
-    (usage as any)[`${limitType === "forms" ? "forms_count" : limitType}`];
+  const currentUsage = (usage as any)[
+    `${limitType === "forms" ? "forms_count" : limitType}`
+  ];
 
   // -1 means unlimited
   if (limit === -1) {
@@ -234,7 +235,10 @@ export async function isTrialActive(userId: string): Promise<boolean> {
 
   if (!subscription) return false;
 
-  if ((subscription as any).status === "trial" && (subscription as any).trial_end) {
+  if (
+    (subscription as any).status === "trial" &&
+    (subscription as any).trial_end
+  ) {
     return new Date((subscription as any).trial_end) > new Date();
   }
 

@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getGoogleClient } from "@/lib/google";
 import { GoogleCalendarService } from "@/lib/googleCalendar";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { tokenStorage } from "@/lib/token-storage";
 
 export async function GET(request: NextRequest) {
@@ -16,44 +15,52 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('🔍 Checking Google tokens for user:', userId);
-    
+    console.log("🔍 Checking Google tokens for user:", userId);
+
     // Get Google client
     const googleClient = await getGoogleClient(userId);
     if (!googleClient) {
-      console.log('❌ No Google client found for user:', userId);
-      
+      console.log("❌ No Google client found for user:", userId);
+
       // Check if tokens exist using the new token storage system
       const tokenResult = await tokenStorage.getTokens(userId);
-      
-      console.log('🔍 Token storage result:', { 
-        success: tokenResult.success, 
+
+      console.log("🔍 Token storage result:", {
+        success: tokenResult.success,
         error: tokenResult.error,
-        hasTokens: !!tokenResult.tokens 
+        hasTokens: !!tokenResult.tokens,
       });
-      
+
       return NextResponse.json(
-        { 
-          error: "Google authentication required. Please sign in with Google again.",
+        {
+          error:
+            "Google authentication required. Please sign in with Google again.",
           debug: {
             userId,
             hasTokens: tokenResult.success && !!tokenResult.tokens,
             tokenCount: tokenResult.success && tokenResult.tokens ? 1 : 0,
-            tokens: tokenResult.success && tokenResult.tokens ? [{
-              user_id: userId,
-              hasAccessToken: !!tokenResult.tokens.access_token,
-              hasRefreshToken: !!tokenResult.tokens.refresh_token,
-              expires_at: tokenResult.tokens.expires_at,
-              is_expired: tokenResult.tokens.expires_at < Math.floor(Date.now() / 1000)
-            }] : [],
-            storageError: tokenResult.error
-          }
+            tokens:
+              tokenResult.success && tokenResult.tokens
+                ? [
+                    {
+                      user_id: userId,
+                      hasAccessToken: !!tokenResult.tokens.access_token,
+                      hasRefreshToken: !!tokenResult.tokens.refresh_token,
+                      expires_at: tokenResult.tokens.expires_at,
+                      is_expired:
+                        tokenResult.tokens.expires_at <
+                        Math.floor(Date.now() / 1000),
+                    },
+                  ]
+                : [],
+            storageError: tokenResult.error,
+          },
         },
         { status: 401 },
       );
     }
-    
-    console.log('✅ Google client found for user:', userId);
+
+    console.log("✅ Google client found for user:", userId);
 
     // Get user's calendars
     const calendarService = new GoogleCalendarService(googleClient);

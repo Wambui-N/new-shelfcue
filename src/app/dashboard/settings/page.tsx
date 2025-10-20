@@ -1,15 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bell, CreditCard, Mail, Settings } from "lucide-react";
+import { Bell, CreditCard } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SettingsSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);

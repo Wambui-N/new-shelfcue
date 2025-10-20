@@ -15,7 +15,7 @@ export class GoogleSheetsService {
       console.log("🔵 Starting Google Sheet creation...");
       console.log("📝 Sheet title:", title);
       console.log("📊 Headers:", headers);
-      
+
       const sheets = this.client.getSheets();
       console.log("✅ Google Sheets API client initialized");
 
@@ -60,7 +60,7 @@ export class GoogleSheetsService {
       };
     } catch (error: any) {
       console.error("❌ Error creating Google Sheet:", error);
-      
+
       // Log detailed error information
       if (error.response) {
         console.error("Google API Error:", {
@@ -69,11 +69,11 @@ export class GoogleSheetsService {
           data: error.response.data,
         });
       }
-      
+
       if (error.message) {
         console.error("Error message:", error.message);
       }
-      
+
       throw error;
     }
   }

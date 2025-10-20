@@ -16,16 +16,16 @@ import {
   Smartphone,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { useFormStore } from "@/store/formStore";
+import { DisplayEditor } from "./DisplayEditor";
 import { FieldEditor } from "./FieldEditor";
 import { FormPreview } from "./FormPreview";
 import { FormSettings } from "./FormSettings";
-import { DisplayEditor } from "./DisplayEditor";
 import { MeetingConfigDialog } from "./MeetingConfigDialog";
 import { PublishProgressDialog } from "./PublishProgressDialog";
 import { ShareDialog } from "./ShareDialog";
@@ -38,14 +38,8 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   const router = useRouter();
   const { user } = useAuth();
   const supabase = createClient();
-  const { 
-    formData, 
-    isDirty, 
-    isSaving, 
-    updateForm, 
-    setDirty, 
-    setSaving
-  } = useFormStore();
+  const { formData, isDirty, isSaving, updateForm, setDirty, setSaving } =
+    useFormStore();
   const [activeTab, setActiveTab] = useState("fields");
   const [deviceView, setDeviceView] = useState<"desktop" | "mobile">("desktop");
   const [saveStatus, setSaveStatus] = useState<
@@ -83,59 +77,62 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   }, [formData.fields]);
 
   // Autosave functionality
-  const handleSave = useCallback(async (status?: "draft" | "published") => {
-    console.log("handleSave called");
-    console.log("User:", user ? user.id : "not authenticated");
-    console.log("Form ID:", formData.id);
+  const handleSave = useCallback(
+    async (status?: "draft" | "published") => {
+      console.log("handleSave called");
+      console.log("User:", user ? user.id : "not authenticated");
+      console.log("Form ID:", formData.id);
 
-    if (!user) {
-      console.error("❌ Cannot save: user not authenticated");
-      return null;
-    }
-
-    setSaving(true);
-    setSaveStatus("saving");
-
-    try {
-      // Generate new ID if this is a new form without one
-      const formId = formData.id || crypto.randomUUID();
-
-      console.log(
-        "💾 Saving form:",
-        formId,
-        formData.id ? "(existing)" : "(new draft)",
-      );
-      console.log("Form title:", formData.title);
-
-      const { error } = await supabase.from("forms").upsert({
-        id: formId,
-        user_id: user.id,
-        title: formData.title,
-        description: formData.description,
-        fields: formData.fields,
-        settings: formData.settings,
-        theme: formData.theme,
-        status: status || "draft",
-      } as any);
-
-      if (error) {
-        console.error("❌ Error saving form:", error);
-        setSaveStatus("error");
+      if (!user) {
+        console.error("❌ Cannot save: user not authenticated");
         return null;
       }
 
-      console.log("✓ Form saved successfully");
-      setSaveStatus("saved");
-      setDirty(false);
-      return formId;
-    } catch (error) {
-      console.error("❌ Error saving form:", error);
-      setSaveStatus("error");
-      return null;
-    } finally {
-      setSaving(false);
-    }
-  }, [formData, user, setSaving, setSaveStatus, setDirty]);
+      setSaving(true);
+      setSaveStatus("saving");
+
+      try {
+        // Generate new ID if this is a new form without one
+        const formId = formData.id || crypto.randomUUID();
+
+        console.log(
+          "💾 Saving form:",
+          formId,
+          formData.id ? "(existing)" : "(new draft)",
+        );
+        console.log("Form title:", formData.title);
+
+        const { error } = await supabase.from("forms").upsert({
+          id: formId,
+          user_id: user.id,
+          title: formData.title,
+          description: formData.description,
+          fields: formData.fields,
+          settings: formData.settings,
+          theme: formData.theme,
+          status: status || "draft",
+        } as any);
+
+        if (error) {
+          console.error("❌ Error saving form:", error);
+          setSaveStatus("error");
+          return null;
+        }
+
+        console.log("✓ Form saved successfully");
+        setSaveStatus("saved");
+        setDirty(false);
+        return formId;
+      } catch (error) {
+        console.error("❌ Error saving form:", error);
+        setSaveStatus("error");
+        return null;
+      } finally {
+        setSaving(false);
+      }
+    },
+    [formData, user, setSaving, setDirty, supabase.from],
+  );
 
   useEffect(() => {
     if (!user || !isDirty) return;
@@ -346,29 +343,38 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         setPublishProgress((prev) => ({ ...prev, sheet: "error" }));
 
         // Handle Google not connected, tokens missing, or auth failed
-        if (errorData.code === "GOOGLE_NOT_CONNECTED" || errorData.code === "GOOGLE_TOKENS_MISSING" || errorData.code === "GOOGLE_AUTH_FAILED" || errorData.action === "reconnect_google") {
+        if (
+          errorData.code === "GOOGLE_NOT_CONNECTED" ||
+          errorData.code === "GOOGLE_TOKENS_MISSING" ||
+          errorData.code === "GOOGLE_AUTH_FAILED" ||
+          errorData.action === "reconnect_google"
+        ) {
           // Close progress dialog
           setShowPublishProgress(false);
 
-          const message = (errorData.code === "GOOGLE_TOKENS_MISSING" || errorData.code === "GOOGLE_AUTH_FAILED")
-            ? "🔄 Reconnect Google Account\n\n" +
-              "Your Google authentication has expired or is invalid.\n" +
-              "Please reconnect your Google account to continue publishing forms.\n\n" +
-              "Click OK to reconnect Google now."
-            : "🔗 Connect Google Sheets\n\n" +
-              "To publish your form, you need to connect Google Sheets.\n" +
-              "All form submissions will automatically sync to your Google Sheets.\n\n" +
-              "Click OK to connect Google now.";
+          const message =
+            errorData.code === "GOOGLE_TOKENS_MISSING" ||
+            errorData.code === "GOOGLE_AUTH_FAILED"
+              ? "🔄 Reconnect Google Account\n\n" +
+                "Your Google authentication has expired or is invalid.\n" +
+                "Please reconnect your Google account to continue publishing forms.\n\n" +
+                "Click OK to reconnect Google now."
+              : "🔗 Connect Google Sheets\n\n" +
+                "To publish your form, you need to connect Google Sheets.\n" +
+                "All form submissions will automatically sync to your Google Sheets.\n\n" +
+                "Click OK to connect Google now.";
 
           const connectGoogle = confirm(message);
 
           if (connectGoogle) {
             // Redirect to Google auth with consent prompt to force new tokens
-            const needsReconnect = errorData.code === "GOOGLE_TOKENS_MISSING" || errorData.code === "GOOGLE_AUTH_FAILED";
+            const needsReconnect =
+              errorData.code === "GOOGLE_TOKENS_MISSING" ||
+              errorData.code === "GOOGLE_AUTH_FAILED";
             const authUrl = needsReconnect
               ? "/api/auth/reconnect-google"
               : "/api/auth/google";
-            
+
             // For reconnect, we need to fetch the URL first
             if (needsReconnect) {
               try {
@@ -383,7 +389,9 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 }
               } catch (error) {
                 console.error("Error initiating reconnection:", error);
-                alert("Failed to initiate Google reconnection. Please try again.");
+                alert(
+                  "Failed to initiate Google reconnection. Please try again.",
+                );
               }
             } else {
               window.location.href = authUrl;
@@ -398,7 +406,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
         // Handle other errors
         if (errorData.code === "FORM_NOT_FOUND_AFTER_RETRIES") {
-          throw new Error("Unable to publish: " + errorData.details);
+          throw new Error(`Unable to publish: ${errorData.details}`);
         }
 
         throw new Error(
@@ -436,7 +444,8 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       console.error("Publish error:", error);
       setSaveStatus("error");
       setShowPublishProgress(false);
-      const message = (error as { message?: string })?.message || "Unknown error";
+      const message =
+        (error as { message?: string })?.message || "Unknown error";
       alert(`Failed to publish form: ${message}`);
     } finally {
       setSaving(false);
@@ -567,7 +576,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
               </Button>
             </div>
           </div>
-          
+
           {/* Mobile Save Status */}
           <div className="sm:hidden mt-2">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -642,7 +651,9 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
                   className={
-                    deviceView === "mobile" ? "w-[320px] sm:w-[375px]" : "w-full max-w-3xl"
+                    deviceView === "mobile"
+                      ? "w-[320px] sm:w-[375px]"
+                      : "w-full max-w-3xl"
                   }
                 >
                   {deviceView === "mobile" && (
