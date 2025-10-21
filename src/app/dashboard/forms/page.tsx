@@ -20,7 +20,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormsListSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -45,10 +45,9 @@ import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { canPerformAction } from "@/lib/subscriptionLimits";
 import { createClient } from "@/lib/supabase/client";
-import type { Form } from "@/types/form";
+import type { FormData as Form } from "@/types/form";
 import { PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
 
 interface FormRecord {
   id: string;
@@ -59,6 +58,7 @@ interface FormRecord {
   submissions?: number;
   views?: number;
   last_submission_at?: string;
+  submissions_count?: number;
 }
 
 export default function FormsPage() {
@@ -80,7 +80,7 @@ export default function FormsPage() {
 
   // Delete dialog state
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [formToDelete, setFormToDelete] = useState<FormRecord | null>(null);
+  const [formToDelete, setFormToDelete] = useState<Form | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
   const [error, setError] = useState<string | null>(null);
@@ -116,7 +116,7 @@ export default function FormsPage() {
           : 0,
       }));
 
-      setForms(dataWithCount as unknown as Form[]);
+      setForms(dataWithCount as Form[]);
     } catch (error) {
       console.error("Error fetching forms:", error);
       setError("Failed to load forms. Please try again.");
@@ -205,8 +205,7 @@ export default function FormsPage() {
       const { error } = await supabase
         .from("forms")
         .update({ status: newStatus })
-        .eq("id", formId)
-        .eq("user_id", user?.id);
+        .eq("id", formId);
 
       if (!error) {
         setForms(
@@ -229,8 +228,7 @@ export default function FormsPage() {
       const { error } = await supabase
         .from("forms")
         .delete()
-        .eq("id", formToDelete.id)
-        .eq("user_id", user.id);
+        .eq("id", formToDelete.id);
 
       if (!error) {
         setForms(forms.filter((form) => form.id !== formToDelete.id));
@@ -250,8 +248,7 @@ export default function FormsPage() {
       const { error } = await supabase
         .from("forms")
         .update({ status: "published" })
-        .in("id", formIds)
-        .eq("user_id", user?.id);
+        .in("id", formIds);
 
       if (!error) {
         setForms(
@@ -275,8 +272,7 @@ export default function FormsPage() {
       const { error } = await supabase
         .from("forms")
         .update({ status: "draft" })
-        .in("id", formIds)
-        .eq("user_id", user?.id);
+        .in("id", formIds);
 
       if (!error) {
         setForms(

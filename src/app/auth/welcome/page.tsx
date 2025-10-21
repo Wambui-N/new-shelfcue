@@ -28,7 +28,7 @@ export default function WelcomePage() {
           .from("subscription_plans")
           .select("id")
           .eq("name", "professional")
-          .single();
+          .single<{ id: string }>();
 
         if (planError || !planData) {
           console.error("Could not find professional plan to start trial.");
