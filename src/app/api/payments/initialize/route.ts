@@ -20,9 +20,17 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { amount = 2900, is_trial = false } = body; // Default to $29.00 in cents
+    const { amount, is_trial = false, plan_code } = body;
 
-    console.log("💰 Payment details:", { amount, is_trial });
+    console.log("💰 Payment details:", { amount, is_trial, plan_code });
+
+    if (!plan_code) {
+      console.error("❌ Plan code not provided in request body");
+      return NextResponse.json(
+        { error: "Plan code is required for payment initialization" },
+        { status: 400 },
+      );
+    }
 
     const reference = generatePaymentReference(user.id);
     console.log("📝 Generated reference:", reference);
@@ -42,6 +50,7 @@ export async function POST(request: Request) {
       email: user.email!,
       amount: chargeAmount,
       reference,
+      plan: plan_code,
       callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing/verify`,
       metadata: {
         user_id: user.id,

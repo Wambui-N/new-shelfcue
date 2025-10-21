@@ -37,6 +37,7 @@ type Plan = {
   price_yearly: number;
   features: string[];
   limits: Record<string, any>;
+  paystack_plan_code?: string;
 };
 
 type Subscription = {
@@ -145,6 +146,13 @@ export default function BillingPage() {
         alert("Please sign in to subscribe");
         return;
       }
+      if (!plan?.paystack_plan_code) {
+        alert(
+          "Paystack plan code is not configured. Please contact support.",
+        );
+        setPaymentLoading(false);
+        return;
+      }
 
       const isTrial = !subscription || subscription.status === "inactive";
 
@@ -155,8 +163,9 @@ export default function BillingPage() {
         },
         body: JSON.stringify({
           email: user.email,
-          amount: 2900,
+          amount: plan.price_monthly * 100,
           is_trial: isTrial,
+          plan_code: plan.paystack_plan_code,
         }),
       });
 
