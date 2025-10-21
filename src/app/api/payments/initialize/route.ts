@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generatePaymentReference, getPaystackService } from "@/lib/paystack";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { createServerClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
@@ -73,9 +74,8 @@ export async function POST(request: Request) {
       status: "pending",
     });
 
-    const { data: transactionData, error: transactionError } = await (
-      supabase as any
-    )
+    const supabaseAdmin = getSupabaseAdmin();
+    const { data: transactionData, error: transactionError } = await supabaseAdmin
       .from("payment_transactions")
       .insert({
         user_id: user.id,
