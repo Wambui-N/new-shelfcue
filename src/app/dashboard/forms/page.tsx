@@ -45,21 +45,14 @@ import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { canPerformAction } from "@/lib/subscriptionLimits";
 import { createClient } from "@/lib/supabase/client";
-import type { FormData as Form } from "@/types/form";
+import type { Database } from "@/lib/supabase/database.types";
+
+type Form = Database["public"]["Tables"]["forms"]["Row"] & {
+  submissions_count?: number;
+};
 import { PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface FormRecord {
-  id: string;
-  title: string;
-  description?: string;
-  created_at: string;
-  status: "draft" | "published";
-  submissions?: number;
-  views?: number;
-  last_submission_at?: string;
-  submissions_count?: number;
-}
 
 export default function FormsPage() {
   const { user } = useAuth();
@@ -108,8 +101,8 @@ export default function FormsPage() {
         throw error;
       }
 
-      // Supabase type generation might not be perfect, so we map submissions
-      const dataWithCount = data.map((form) => ({
+      // Map the data to include submissions count
+      const dataWithCount = (data || []).map((form: any) => ({
         ...form,
         submissions_count: Array.isArray(form.submissions)
           ? form.submissions.length
@@ -202,7 +195,7 @@ export default function FormsPage() {
     const newStatus = currentStatus === "published" ? "draft" : "published";
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("forms")
         .update({ status: newStatus })
         .eq("id", formId);
@@ -225,7 +218,7 @@ export default function FormsPage() {
     if (!formToDelete || deleteConfirmation !== "DELETE" || !user?.id) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("forms")
         .delete()
         .eq("id", formToDelete.id);
@@ -245,7 +238,7 @@ export default function FormsPage() {
     const formIds = Array.from(selectedForms);
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("forms")
         .update({ status: "published" })
         .in("id", formIds);
@@ -269,7 +262,7 @@ export default function FormsPage() {
     const formIds = Array.from(selectedForms);
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("forms")
         .update({ status: "draft" })
         .in("id", formIds);
