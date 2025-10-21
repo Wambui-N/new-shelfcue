@@ -51,7 +51,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
               href="/terms"
               className="text-muted-foreground hover:text-foreground underline"
             >
-              Terms of Service
+              Terms and Conditions
             </Link>{" "}
             and our{" "}
             <Link

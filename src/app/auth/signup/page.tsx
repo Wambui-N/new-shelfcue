@@ -148,7 +148,7 @@ export default function SignUpPage() {
           href="/terms"
           className="text-muted-foreground hover:text-foreground underline"
         >
-          Terms of Service
+          Terms and Conditions
         </a>{" "}
         and{" "}
         <a

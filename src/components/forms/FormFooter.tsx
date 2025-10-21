@@ -162,7 +162,7 @@ export function FormFooter({
                 href="/terms"
                 className="hover:text-gray-700 transition-colors"
               >
-                Terms of Service
+                Terms and Conditions
               </a>
             </div>
           )}
