@@ -43,7 +43,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
-import { canPerformAction } from "@/lib/subscriptionLimits";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -87,8 +86,9 @@ export default function FormsPage() {
       }
       setLoading(true);
 
-      // Check if user can create forms
-      const limitCheck = await canPerformAction(user.id, "forms");
+      // Check if user can create forms via API
+      const limitResponse = await fetch("/api/forms/check-limit");
+      const limitCheck = await limitResponse.json();
       setCanCreateForm(limitCheck.allowed);
 
       const { data, error } = await supabase

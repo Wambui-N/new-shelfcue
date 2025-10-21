@@ -21,7 +21,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { canPerformAction } from "@/lib/subscriptionLimits";
 import { createClient } from "@/lib/supabase/client";
 
 interface FormRecord {
@@ -70,8 +69,9 @@ export default function DashboardPage() {
 
       setLoading(true);
       try {
-        // Check if user can create forms
-        const limitCheck = await canPerformAction(user.id, "forms");
+        // Check if user can create forms via API
+        const limitResponse = await fetch("/api/forms/check-limit");
+        const limitCheck = await limitResponse.json();
         setCanCreateForm(limitCheck.allowed);
         // Fetch forms data
       const { data: formsData, error: formsError } = await (supabase as any)
