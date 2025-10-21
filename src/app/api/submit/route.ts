@@ -48,11 +48,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Check submission limit for form owner
+    console.log("Checking submission limit for user:", form.user_id);
     const limitCheck = await canPerformAction(
       form.user_id,
       "submissions_per_month",
     );
+    console.log("Limit check result:", limitCheck);
+
     if (!limitCheck.allowed) {
+      console.error("Submission limit reached:", {
+        userId: form.user_id,
+        limit: limitCheck.limit,
+        usage: limitCheck.usage,
+      });
       return NextResponse.json(
         {
           error: "Submission limit reached",
