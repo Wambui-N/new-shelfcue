@@ -119,9 +119,9 @@ export async function getUserUsage(userId: string): Promise<UsageData> {
 
   return {
     forms_count: formsCount || 0,
-    submissions_count: (usage as any)?.submissions_count || 0,
-    storage_used_mb: (usage as any)?.storage_used_mb || 0,
-    api_calls_count: (usage as any)?.api_calls_count || 0,
+    submissions_count: usage?.submissions_count || 0,
+    storage_used_mb: usage?.storage_used_mb || 0,
+    api_calls_count: usage?.api_calls_count || 0,
   };
 }
 
@@ -141,9 +141,8 @@ export async function canPerformAction(
   const usage = await getUserUsage(userId);
 
   const limit = (limits as any)[limitType];
-  const currentUsage = (usage as any)[
-    `${limitType === "forms" ? "forms_count" : limitType}`
-  ];
+  const currentUsage =
+    (usage as any)[`${limitType === "forms" ? "forms_count" : `${limitType.replace("_per_month", "")}_count`}`];
 
   // -1 means unlimited
   if (limit === -1) {
