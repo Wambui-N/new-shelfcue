@@ -20,7 +20,7 @@ export default function HomePage() {
       <FeaturesSection />
       <HowItWorksSection />
       {/* <TestimonialsSection /> */}
-      <DemoSection />
+      {/* <DemoSection /> */}
       <PricingSection />
       <FAQSection />
       <FinalCTASection />
