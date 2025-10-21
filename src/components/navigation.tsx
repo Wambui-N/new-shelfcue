@@ -104,7 +104,7 @@ export function Navigation() {
                   </Button>
                 </Link>
                 <Link href="/auth/signup">
-                  <Button className="ml-2 bg-dark-gray text-white hover:bg-dark-gray/80 transition-colors duration-300 text-sm px-4 py-2">
+                  <Button className="ml-2 bg-black/70 text-white hover:bg-black transition-colors duration-300 text-sm px-4 py-2">
                     Create a Form
                   </Button>
                 </Link>
@@ -178,7 +178,7 @@ export function Navigation() {
                         href="/auth/signup"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <Button className="w-full mt-1 bg-dark-gray text-white hover:bg-dark-gray/80 transition-colors duration-300">
+                        <Button className="w-full mt-1 bg-black/70 text-white hover:bg-black transition-colors duration-300">
                           Create a Form
                         </Button>
                       </Link>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar, Clock, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -38,7 +38,7 @@ export function MeetingConfigDialog({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCalendars = async () => {
+  const fetchCalendars = useCallback(async () => {
     console.log("📅 Fetching calendars...");
     setLoading(true);
     setError(null);
@@ -93,7 +93,7 @@ export function MeetingConfigDialog({
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
     if (open && userId) {
