@@ -19,7 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
-import type { FormData } from "@/types/form";
+import { useFormStore } from "@/store/formStore";
+import type { FormData, FormSubmission } from "@/types/form";
 
 interface FormViewPageProps {
   params: Promise<{ formId: string }>;
@@ -36,6 +37,8 @@ function FormViewPage({ params }: FormViewPageProps) {
   const [_copied, setCopied] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [formId, setFormId] = useState<string>("");
+  const [activeTab, setActiveTab] = useState("submissions");
+  const { loadForm } = useFormStore();
 
   useEffect(() => {
     const getFormId = async () => {
@@ -104,6 +107,17 @@ function FormViewPage({ params }: FormViewPageProps) {
             ? { ...defaultSettings, ...data.settings }
             : defaultSettings,
         } as FormData);
+        loadForm({
+          id: formId,
+          title: data.title || "Untitled Form",
+          description: data.description || "",
+          status: data.status || "draft",
+          fields: data.fields || [],
+          theme: data.theme ? { ...defaultTheme, ...data.theme } : defaultTheme,
+          settings: data.settings
+            ? { ...defaultSettings, ...data.settings }
+            : defaultSettings,
+        });
       } catch (error: any) {
         console.error("Error fetching form:", {
           message: error?.message,
@@ -118,7 +132,7 @@ function FormViewPage({ params }: FormViewPageProps) {
     };
 
     fetchForm();
-  }, [formId, user, supabase]);
+  }, [formId, user, supabase, loadForm]);
 
   const handleSubmit = async (submissionData: Record<string, any>) => {
     try {
@@ -301,7 +315,7 @@ function FormViewPage({ params }: FormViewPageProps) {
             className="w-full max-w-2xl"
           >
             <Card className="p-6">
-              <FormPreview formData={formData} onSubmit={handleSubmit} />
+              <FormPreview />
             </Card>
           </motion.div>
         </div>

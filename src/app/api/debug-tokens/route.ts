@@ -47,7 +47,8 @@ export async function GET(request: NextRequest) {
               (tokenResult.tokens?.expires_at || 0) * 1000,
             ).toISOString(),
             is_expired:
-              (tokenResult.tokens?.expires_at || 0) < Math.floor(Date.now() / 1000),
+              (tokenResult.tokens?.expires_at || 0) <
+              Math.floor(Date.now() / 1000),
           },
         ]
       : [];
