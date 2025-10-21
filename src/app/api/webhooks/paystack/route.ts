@@ -9,23 +9,6 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
  */
 export async function POST(request: NextRequest) {
   try {
-    // Optional: IP whitelisting for additional security
-    const clientIP =
-      request.headers.get("x-forwarded-for") ||
-      request.headers.get("x-real-ip") ||
-      "unknown";
-
-    const allowedIPs = ["52.31.139.75", "52.49.173.169", "52.214.14.220"];
-
-    // Skip IP check in development
-    if (
-      process.env.NODE_ENV === "production" &&
-      !allowedIPs.includes(clientIP)
-    ) {
-      console.error("❌ Webhook request from unauthorized IP:", clientIP);
-      return NextResponse.json({ error: "Unauthorized IP" }, { status: 403 });
-    }
-
     // Get raw body for signature verification
     const body = await request.text();
     const signature = request.headers.get("x-paystack-signature");
