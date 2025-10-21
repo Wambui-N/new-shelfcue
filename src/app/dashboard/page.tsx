@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
+import { canPerformAction } from "@/lib/subscriptionLimits";
 import { createClient } from "@/lib/supabase/client";
 
 interface FormRecord {
@@ -50,6 +51,7 @@ export default function DashboardPage() {
     SubmissionRecord[]
   >([]);
   const [loading, setLoading] = useState(true);
+  const [canCreateForm, setCanCreateForm] = useState(false);
 
   const [dashboardStats, setDashboardStats] = useState({
     totalForms: 0,
@@ -68,9 +70,12 @@ export default function DashboardPage() {
 
       setLoading(true);
       try {
+        // Check if user can create forms
+        const limitCheck = await canPerformAction(user.id, "forms");
+        setCanCreateForm(limitCheck.allowed);
         // Fetch forms data
-        const { data: formsData, error: formsError } = await (supabase as any)
-          .from("forms")
+      const { data: formsData, error: formsError } = await (supabase as any)
+        .from("forms")
           .select("id, title, description, created_at, status")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
@@ -92,15 +97,15 @@ export default function DashboardPage() {
           supabase as any
         )
           .from("submissions")
-          .select(`
+            .select(`
             id, form_id, data, created_at,
             forms!inner (
               title
             )
           `)
-          .eq("forms.user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(7);
+            .eq("forms.user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(7);
 
         if (!submissionsError) {
           setRecentSubmissions(submissionsData || []);
@@ -360,12 +365,21 @@ export default function DashboardPage() {
                     Manage and track your form performance
                   </p>
                 </div>
-                <Link href="/editor/new">
-                  <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create New Form
-                  </Button>
-                </Link>
+                {canCreateForm ? (
+                  <Link href="/editor/new">
+                    <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create New Form
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/dashboard/billing">
+                    <Button variant="outline" className="w-full sm:w-auto">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Subscribe to Create Forms
+                    </Button>
+                  </Link>
+                )}
               </div>
 
               {forms.length === 0 ? (
@@ -380,12 +394,21 @@ export default function DashboardPage() {
                     Create your first form to start collecting data and building
                     your lead generation system.
                   </p>
-                  <Link href="/editor/new">
-                    <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 px-6 sm:px-8 py-3 shadow-sm">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Your First Form
-                    </Button>
-                  </Link>
+                  {canCreateForm ? (
+                    <Link href="/editor/new">
+                      <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 px-6 sm:px-8 py-3 shadow-sm">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Your First Form
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/dashboard/billing">
+                      <Button variant="outline" className="w-full sm:w-auto px-6 sm:px-8 py-3">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Subscribe to Create Forms
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-3 sm:space-y-4">
