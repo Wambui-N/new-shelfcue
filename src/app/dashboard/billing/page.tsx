@@ -154,8 +154,6 @@ export default function BillingPage() {
         return;
       }
 
-      const isTrial = !subscription || subscription.status === "inactive";
-
       const response = await fetch("/api/payments/initialize", {
         method: "POST",
         headers: {
@@ -164,7 +162,6 @@ export default function BillingPage() {
         body: JSON.stringify({
           email: user.email,
           amount: plan.price_monthly * 100,
-          is_trial: isTrial,
           plan_code: plan.paystack_plan_code,
         }),
       });
@@ -222,9 +219,11 @@ export default function BillingPage() {
 
   const isOnTrial = subscription?.status === "trial";
   const isActive = subscription?.status === "active";
-  const _isExpired =
-    subscription?.status === "expired" ||
-    (isOnTrial && trialDaysRemaining === 0);
+  const isCancelled =
+    subscription?.status === "cancelled" || subscription?.cancel_at_period_end;
+  const isInactive = subscription?.status === "inactive";
+  const hasSubscription = subscription && !isInactive;
+  const isTrialExpired = isOnTrial && trialDaysRemaining === 0;
 
   return (
     <div className="space-y-6 sm:space-y-8 max-w-4xl">
@@ -239,7 +238,7 @@ export default function BillingPage() {
       </div>
 
       {/* Trial Banner */}
-      {isTrialOnboarding && !subscription && (
+      {isOnTrial && trialDaysRemaining > 0 && (
         <Card className="p-4 sm:p-6 border-2 border-primary">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
@@ -247,44 +246,30 @@ export default function BillingPage() {
             </div>
             <div className="flex-1">
               <h2 className="text-lg sm:text-xl font-semibold mb-2">
-                Start Your 14-Day Free Trial
+                You are on a free trial!
               </h2>
               <p className="text-sm text-muted-foreground mb-4">
-                Add your payment details to unlock unlimited forms and
-                submissions. You won't be charged until your trial ends.
+                You have {trialDaysRemaining}{" "}
+                {trialDaysRemaining === 1 ? "day" : "days"} left. Subscribe now
+                to keep your access.
               </p>
-              <div className="flex flex-wrap gap-3 text-xs sm:text-sm">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>No charge today</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>Cancel anytime</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>Full access</span>
-                </div>
-              </div>
             </div>
           </div>
         </Card>
       )}
 
-      {/* Trial Warning */}
-      {isOnTrial && trialDaysRemaining > 0 && trialDaysRemaining <= 3 && (
-        <Card className="p-4 sm:p-6 border-2 border-orange-500 bg-orange-50 dark:bg-orange-950/20">
+      {/* Trial Expired Banner */}
+      {isTrialExpired && (
+        <Card className="p-4 sm:p-6 border-2 border-destructive bg-destructive/10">
           <div className="flex items-start gap-3 sm:gap-4">
-            <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600 flex-shrink-0 mt-0.5" />
+            <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-destructive flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="font-semibold text-orange-900 dark:text-orange-100">
-                Trial ending soon
+              <h3 className="font-semibold text-destructive">
+                Your trial has ended
               </h3>
-              <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">
-                You have {trialDaysRemaining}{" "}
-                {trialDaysRemaining === 1 ? "day" : "days"} left in your trial.
-                Subscribe now to continue using all features.
+              <p className="text-sm text-destructive/80 mt-1">
+                Please subscribe to a plan to continue using our services and
+                creating new forms.
               </p>
             </div>
           </div>
@@ -295,14 +280,27 @@ export default function BillingPage() {
       <Card className="p-4 sm:p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg sm:text-xl font-semibold">Current Plan</h2>
-          {(isActive || isOnTrial) && (
-            <Badge className={isActive ? "bg-green-600" : "bg-blue-600"}>
-              {isActive ? "Active" : "Trial"}
+          {hasSubscription && (
+            <Badge
+              className={
+                isActive
+                  ? "bg-green-600"
+                  : isOnTrial
+                    ? "bg-blue-600"
+                    : isCancelled
+                      ? "bg-yellow-600"
+                      : ""
+              }
+            >
+              {isCancelled
+                ? "Cancels soon"
+                : subscription?.status.charAt(0).toUpperCase() +
+                  subscription?.status.slice(1)}
             </Badge>
           )}
         </div>
 
-        {subscription ? (
+        {hasSubscription ? (
           <div className="space-y-6">
             {/* Plan Details */}
             <div className="flex items-start justify-between">
@@ -400,15 +398,21 @@ export default function BillingPage() {
             </div>
           </div>
         ) : (
-          // No subscription
+          // No subscription / Trial Expired
           <div className="space-y-6">
             <div className="text-center py-8">
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                 <CreditCard className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="text-xl font-bold mb-2">No Active Subscription</h3>
+              <h3 className="text-xl font-bold mb-2">
+                {isTrialExpired
+                  ? "Your Trial Has Ended"
+                  : "No Active Subscription"}
+              </h3>
               <p className="text-muted-foreground mb-6">
-                Start your 14-day free trial to access all features
+                {isTrialExpired
+                  ? "Please subscribe to continue."
+                  : "Subscribe to a plan to get started."}
               </p>
             </div>
 
@@ -451,13 +455,13 @@ export default function BillingPage() {
                   ) : (
                     <>
                       <Zap className="w-4 h-4 mr-2" />
-                      Start Free Trial
+                      Subscribe Now
                     </>
                   )}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
-                  $0.50 authorization charge • Cancel anytime during trial
+                  Cancel anytime.
                 </p>
               </div>
             )}

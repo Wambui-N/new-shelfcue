@@ -22,6 +22,27 @@ export default function WelcomePage() {
     // Send welcome email and check Google connection
     const initializeUser = async () => {
       try {
+        // Create trial subscription
+        // First, get the professional plan ID
+        const { data: planData, error: planError } = await supabase
+          .from("subscription_plans")
+          .select("id")
+          .eq("name", "professional")
+          .single();
+
+        if (planError || !planData) {
+          console.error("Could not find professional plan to start trial.");
+        } else {
+          // Create the trial
+          fetch("/api/subscriptions/create-trial", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ planId: planData.id }),
+          }).catch((error) => {
+            console.error("Failed to create trial subscription:", error);
+          });
+        }
+
         // Send welcome email (fire and forget - don't block user flow)
         fetch("/api/auth/welcome-email", {
           method: "POST",

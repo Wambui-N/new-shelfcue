@@ -43,7 +43,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
+import { canPerformAction } from "@/lib/subscriptionLimits";
 import { createClient } from "@/lib/supabase/client";
+import type { Form } from "@/types/form";
+import { PlusCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 interface FormRecord {
   id: string;
@@ -58,8 +63,9 @@ interface FormRecord {
 
 export default function FormsPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const supabase = createClient();
-  const [forms, setForms] = useState<FormRecord[]>([]);
+  const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedForms, setSelectedForms] = useState<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
@@ -77,26 +83,47 @@ export default function FormsPage() {
   const [formToDelete, setFormToDelete] = useState<FormRecord | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
-  const fetchForms = async () => {
-    if (!user) return;
+  const [error, setError] = useState<string | null>(null);
+  const [canCreateForm, setCanCreateForm] = useState(false);
 
-    setLoading(true);
+  const fetchForms = useCallback(async () => {
     try {
-      const { data, error } = await (supabase as any)
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+
+      // Check if user can create forms
+      const limitCheck = await canPerformAction(user.id, "forms");
+      setCanCreateForm(limitCheck.allowed);
+
+      const { data, error } = await supabase
         .from("forms")
-        .select("id, title, description, created_at, status")
+        .select("id, title, status, created_at, submissions(id)")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      if (!error) {
-        setForms(data as FormRecord[]);
+      if (error) {
+        throw error;
       }
+
+      // Supabase type generation might not be perfect, so we map submissions
+      const dataWithCount = data.map((form) => ({
+        ...form,
+        submissions_count: Array.isArray(form.submissions)
+          ? form.submissions.length
+          : 0,
+      }));
+
+      setForms(dataWithCount as unknown as Form[]);
     } catch (error) {
       console.error("Error fetching forms:", error);
+      setError("Failed to load forms. Please try again.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, supabase]);
 
   useEffect(() => {
     fetchForms();
@@ -134,7 +161,7 @@ export default function FormsPage() {
             new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
           break;
         case "submissions":
-          comparison = (a.submissions || 0) - (b.submissions || 0);
+          comparison = (a.submissions_count || 0) - (b.submissions_count || 0);
           break;
       }
 
@@ -175,7 +202,7 @@ export default function FormsPage() {
     const newStatus = currentStatus === "published" ? "draft" : "published";
 
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("forms")
         .update({ status: newStatus })
         .eq("id", formId)
@@ -220,7 +247,7 @@ export default function FormsPage() {
     const formIds = Array.from(selectedForms);
 
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("forms")
         .update({ status: "published" })
         .in("id", formIds)
@@ -245,7 +272,7 @@ export default function FormsPage() {
     const formIds = Array.from(selectedForms);
 
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("forms")
         .update({ status: "draft" })
         .in("id", formIds)
@@ -296,12 +323,19 @@ export default function FormsPage() {
             Manage all your forms and view performance
           </p>
         </div>
-        <Link href="/editor/new">
-          <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
-            <Plus className="w-4 h-4 mr-2" />
-            Create New Form
-          </Button>
-        </Link>
+        <div className="flex justify-end">
+          {canCreateForm ? (
+            <Button onClick={() => router.push("/editor/new")}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Form
+            </Button>
+          ) : (
+            <Button onClick={() => router.push("/dashboard/billing")}>
+              <Plus className="mr-2 h-4 w-4" />
+              Subscribe to Create Forms
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Toolbar */}
@@ -469,12 +503,13 @@ export default function FormsPage() {
                 Clear search
               </Button>
             ) : (
-              <Link href="/editor/new">
-                <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90">
-                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  Create Your First Form
-                </Button>
-              </Link>
+              <Button
+                onClick={() => router.push("/editor/new")}
+                className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                Create Your First Form
+              </Button>
             )}
           </div>
         </Card>
@@ -552,7 +587,7 @@ export default function FormsPage() {
                       {/* Quick Stats */}
                       <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
                         <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-                        <span>{form.submissions || 0} submissions</span>
+                        <span>{form.submissions_count || 0} submissions</span>
                       </div>
 
                       {/* Quick Actions */}
@@ -723,7 +758,7 @@ export default function FormsPage() {
                           </td>
                           <td className="px-4 py-4">
                             <span className="text-sm text-foreground">
-                              {form.submissions || 0}
+                              {form.submissions_count || 0}
                             </span>
                           </td>
                           <td className="px-4 py-4">
@@ -818,7 +853,7 @@ export default function FormsPage() {
               Delete "{formToDelete?.title}"?
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              This will delete the form and all {formToDelete?.submissions || 0}{" "}
+              This will delete the form and all {formToDelete?.submissions_count || 0}{" "}
               submissions. This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
