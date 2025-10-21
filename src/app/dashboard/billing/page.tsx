@@ -146,7 +146,7 @@ export default function BillingPage() {
         return;
       }
 
-      const isTrial = !subscription;
+      const isTrial = !subscription || subscription.status === "inactive";
 
       const response = await fetch("/api/payments/initialize", {
         method: "POST",
