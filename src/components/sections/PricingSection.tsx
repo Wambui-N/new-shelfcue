@@ -232,6 +232,9 @@ export function PricingSection() {
                     </Button>
                   </motion.div>
                 </Link>
+                <p className="text-xs text-center text-muted-foreground mt-3">
+                  No credit card required
+                </p>
               </motion.div>
 
               {/* Decorative Corner */}
@@ -257,6 +260,8 @@ export function PricingSection() {
             transition={{ duration: 0.2 }}
           >
             <span className="font-semibold">Cancel anytime</span>
+            <div className="w-px h-6 bg-light-gray" />
+            <span className="font-semibold">14-Day Free Trial</span>
             <div className="w-px h-6 bg-light-gray" />
             <span className="font-semibold">5-minute setup</span>
           </motion.div>

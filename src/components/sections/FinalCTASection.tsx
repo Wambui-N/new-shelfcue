@@ -6,7 +6,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export function FinalCTASection() {
-  const benefits = ["Cancel anytime", "5-minute setup"];
+  const benefits = [
+    "14-Day Free Trial",
+    "No credit card required",
+    "Cancel anytime",
+  ];
 
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-background/50 relative overflow-hidden">
@@ -85,6 +89,9 @@ export function FinalCTASection() {
                 </Button>
               </motion.div>
             </Link>
+            <p className="text-xs text-center text-muted-foreground mt-3">
+              No credit card required
+            </p>
           </motion.div>
 
           {/* Risk Reversal */}
