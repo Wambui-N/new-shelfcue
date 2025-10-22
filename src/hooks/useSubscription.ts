@@ -3,14 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-interface SubscriptionPlan {
+export interface SubscriptionPlan {
   id: string;
   name: string;
   display_name: string;
   limits: Record<string, unknown>;
 }
 
-interface Subscription {
+export interface Subscription {
   id: string;
   plan_id: string;
   status: string;
