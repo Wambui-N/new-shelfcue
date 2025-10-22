@@ -52,11 +52,9 @@ export default function NewFormEditorPage() {
 
   return (
     <ProtectedRoute>
-      <SubscriptionGuard feature="form creation">
-        <div className="fixed inset-0 bg-background">
-          <FormBuilder onBack={handleBack} />
-        </div>
-      </SubscriptionGuard>
+      <div className="fixed inset-0 bg-background">
+        <FormBuilder onBack={handleBack} />
+      </div>
     </ProtectedRoute>
   );
 }

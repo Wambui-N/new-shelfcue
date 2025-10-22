@@ -267,7 +267,7 @@ export default function DashboardPage() {
               <div className="text-lg sm:text-2xl lg:text-3xl xl:text-4xl font-bold mb-1 sm:mb-2">
                 {dashboardStats.lastLeadTime
                   ? formatTimeAgo(dashboardStats.lastLeadTime)
-                  : "No leads yet"}
+                  : "No submissions"}
               </div>
               <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium">
                 Last Lead
