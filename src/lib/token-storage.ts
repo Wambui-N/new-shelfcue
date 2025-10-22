@@ -176,7 +176,7 @@ export class TokenStorage {
       return { success: true };
     } catch (error: unknown) {
       console.error("❌ Exception deleting tokens:", error);
-      return { error: (error as Error).message };
+      return { success: false, error: (error as Error).message };
     }
   }
 
