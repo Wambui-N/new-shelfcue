@@ -170,16 +170,43 @@ function AuthCallbackContent() {
           .eq("user_id", data.session.user.id)
           .maybeSingle();
 
-        // If no subscription, redirect to billing to set up trial
+        // If no subscription, auto-create a trial
         if (!subscription) {
           console.log(
-            "No subscription found, redirecting to billing for trial setup",
+            "No subscription found, creating trial automatically...",
           );
-          router.push("/dashboard/billing?trial=true&new=true");
-        } else {
-          console.log("Subscription found, redirecting to dashboard");
-          router.push("/dashboard");
+          
+          try {
+            // Get the professional plan
+            const { data: planData } = await supabase
+              .from("subscription_plans")
+              .select("id")
+              .eq("name", "professional")
+              .single();
+
+            if (planData) {
+              // Create trial subscription
+              const trialResponse = await fetch("/api/subscriptions/create-trial", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ planId: planData.id }),
+              });
+
+              if (trialResponse.ok) {
+                console.log("✅ Trial subscription created successfully");
+              } else {
+                console.error("❌ Failed to create trial subscription");
+              }
+            } else {
+              console.error("❌ Professional plan not found");
+            }
+          } catch (error) {
+            console.error("❌ Error creating trial:", error);
+          }
         }
+
+        console.log("Redirecting to dashboard");
+        router.push("/dashboard");
       } else {
         router.push("/auth/signin?error=no_session");
       }

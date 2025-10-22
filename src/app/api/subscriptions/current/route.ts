@@ -12,7 +12,16 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Get user's current subscription with plan details
+  // Calculate days since account creation
+  const accountCreatedAt = new Date(user.created_at);
+  const now = new Date();
+  const daysSinceCreation = Math.floor(
+    (now.getTime() - accountCreatedAt.getTime()) / (1000 * 60 * 60 * 24),
+  );
+  const trialDaysRemaining = Math.max(0, 14 - daysSinceCreation);
+  const isInInitialTrial = daysSinceCreation < 14;
+
+  // Get user's current subscription with plan details (if exists)
   const { data: subscription, error } = await supabase
     .from("user_subscriptions")
     .select(
@@ -22,7 +31,6 @@ export async function GET() {
       `,
     )
     .eq("user_id", user.id)
-    .in("status", ["trialing", "active"])
     .single();
 
   if (error && error.code !== "PGRST116") {
@@ -42,10 +50,47 @@ export async function GET() {
     return NextResponse.json({ error: formsError.message }, { status: 500 });
   }
 
+  // If user is in their initial 14-day trial and has no subscription record yet,
+  // create a virtual trial subscription for the frontend
+  let finalSubscription = subscription;
+  if (isInInitialTrial && !subscription) {
+    finalSubscription = {
+      id: "initial-trial",
+      user_id: user.id,
+      plan_id: null,
+      status: "trial",
+      trial_start: accountCreatedAt.toISOString(),
+      trial_end: new Date(
+        accountCreatedAt.getTime() + 14 * 24 * 60 * 60 * 1000,
+      ).toISOString(),
+      current_period_start: accountCreatedAt.toISOString(),
+      current_period_end: new Date(
+        accountCreatedAt.getTime() + 14 * 24 * 60 * 60 * 1000,
+      ).toISOString(),
+      billing_cycle: "monthly",
+      cancel_at_period_end: false,
+      plan: {
+        id: "trial",
+        name: "trial",
+        display_name: "Free Trial",
+        limits: {
+          forms: -1, // unlimited
+          submissions_per_month: -1, // unlimited
+          storage_mb: 1000,
+          team_members: 1,
+          analytics: "basic",
+          support: "email",
+        },
+      },
+    } as any;
+  }
+
   return NextResponse.json({
-    subscription: subscription || null,
+    subscription: finalSubscription || null,
     usage: {
       forms_count: formsCount || 0,
     },
+    account_created_at: user.created_at,
+    trial_days_remaining: trialDaysRemaining,
   });
 }

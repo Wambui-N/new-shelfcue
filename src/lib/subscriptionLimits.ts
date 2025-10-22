@@ -33,6 +33,32 @@ export async function getUserLimits(
 ): Promise<SubscriptionLimits> {
   const supabase = getSupabaseAdmin();
 
+  // First, get the user's account creation date
+  const { data: userData } = await (supabase as any).auth.admin.getUserById(
+    userId,
+  );
+
+  if (userData?.user) {
+    const accountCreatedAt = new Date(userData.user.created_at);
+    const now = new Date();
+    const daysSinceCreation = Math.floor(
+      (now.getTime() - accountCreatedAt.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    // Check if user is within their initial 14-day trial period
+    if (daysSinceCreation < 14) {
+      // User is in their initial 14-day free trial - grant full access
+      return {
+        forms: -1, // unlimited
+        submissions_per_month: -1, // unlimited
+        storage_mb: 1000,
+        team_members: 1,
+        analytics: "basic",
+        support: "email",
+      };
+    }
+  }
+
   // Get user's subscription with plan details
   const { data: subscription } = await (supabase as any)
     .from("user_subscriptions")
@@ -81,7 +107,7 @@ export async function getUserLimits(
     return (subscription as any).plan.limits as SubscriptionLimits;
   }
 
-  // No subscription found - deny access
+  // No subscription found and past 14 days - deny access
   return {
     forms: 0,
     submissions_per_month: 0,

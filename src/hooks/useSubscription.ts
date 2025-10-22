@@ -57,18 +57,8 @@ export function useSubscription() {
         setSubscription(data.subscription);
         setUsage(data.usage);
 
-        // Calculate trial days remaining
-        if (
-          data.subscription?.status === "trial" &&
-          data.subscription?.trial_end
-        ) {
-          const trialEnd = new Date(data.subscription.trial_end);
-          const now = new Date();
-          const days = Math.ceil(
-            (trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-          );
-          setTrialDaysRemaining(Math.max(0, days));
-        }
+        // Use trial days remaining from the API (which calculates based on account age)
+        setTrialDaysRemaining(data.trial_days_remaining || 0);
       }
     } catch (error) {
       console.error("Error fetching subscription:", error);
@@ -85,7 +75,8 @@ export function useSubscription() {
   const isActive = subscription?.status === "active";
   const isExpired =
     subscription?.status === "expired" ||
-    (subscription?.status === "trial" && trialDaysRemaining === 0);
+    (subscription?.status === "trial" && trialDaysRemaining === 0) ||
+    subscription?.status === "cancelled";
   const hasAccess = isOnTrial || isActive;
 
   const limits = subscription?.plan?.limits || {
