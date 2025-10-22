@@ -172,26 +172,25 @@ function AuthCallbackContent() {
 
         // If no subscription, auto-create a trial
         if (!subscription) {
-          console.log("No subscription found, creating trial automatically...");
-
+          console.log(
+            "No subscription found, creating trial automatically...",
+          );
+          
           try {
             // Get the professional plan
             const { data: planData } = await supabase
-              .from("plans")
+              .from("subscription_plans")
               .select("id")
               .eq("name", "professional")
-              .single<{ id: string }>();
+              .single();
 
-            if (planData && planData.id) {
+            if (planData) {
               // Create trial subscription
-              const trialResponse = await fetch(
-                "/api/subscriptions/create-trial",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ planId: planData.id }),
-                },
-              );
+              const trialResponse = await fetch("/api/subscriptions/create-trial", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ planId: planData.id }),
+              });
 
               if (trialResponse.ok) {
                 console.log("✅ Trial subscription created successfully");
@@ -200,11 +199,6 @@ function AuthCallbackContent() {
               }
             } else {
               console.error("❌ Professional plan not found");
-              throw new Error("Professional plan not found");
-            }
-            if (!planData) {
-              console.error("❌ Plan data is null or undefined. Cannot proceed.");
-              return;
             }
           } catch (error) {
             console.error("❌ Error creating trial:", error);

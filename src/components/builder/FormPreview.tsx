@@ -28,6 +28,6 @@ export function FormPreview({ className }: FormPreviewProps) {
         onSubmit={handleSubmit}
         isSubmitting={false}
       />
-    </div>
+      </div>
   );
 }

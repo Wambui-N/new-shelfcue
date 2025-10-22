@@ -81,11 +81,11 @@ export class TokenStorage {
           expires_at: data.expires_at,
         },
       };
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error("❌ Exception storing tokens:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error: error.message || "Unknown error occurred",
       };
     }
   }
@@ -129,11 +129,11 @@ export class TokenStorage {
           expires_at: data.expires_at,
         },
       };
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error("❌ Exception retrieving tokens:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error: error.message || "Unknown error occurred",
       };
     }
   }
@@ -174,9 +174,12 @@ export class TokenStorage {
 
       console.log("✅ Tokens deleted successfully for user:", userId);
       return { success: true };
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error("❌ Exception deleting tokens:", error);
-      return { success: false, error: (error as Error).message };
+      return {
+        success: false,
+        error: error.message || "Unknown error occurred",
+      };
     }
   }
 
@@ -223,11 +226,11 @@ export class TokenStorage {
             }
           : undefined,
       };
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error("❌ Exception updating tokens:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error: error.message || "Unknown error occurred",
       };
     }
   }

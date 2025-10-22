@@ -28,17 +28,14 @@ export async function POST(_request: NextRequest) {
 
     if (existingSubscription) {
       return NextResponse.json(
-        {
-          message: "You already have a subscription",
-          subscription: existingSubscription,
-        },
+        { message: "You already have a subscription", subscription: existingSubscription },
         { status: 200 },
       );
     }
 
     // Get the professional plan
     const { data: plan } = await supabaseAdmin
-      .from("plans")
+      .from("subscription_plans")
       .select("id")
       .eq("name", "professional")
       .single();
@@ -78,8 +75,7 @@ export async function POST(_request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message:
-        "Trial created successfully! You now have 14 days of full access.",
+      message: "Trial created successfully! You now have 14 days of full access.",
       subscription: newSubscription,
       trialEnd: trialEndDate.toISOString(),
     });
@@ -87,10 +83,10 @@ export async function POST(_request: NextRequest) {
     console.error("Trial creation error:", error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Failed to create trial",
+        error: error instanceof Error ? error.message : "Failed to create trial",
       },
       { status: 500 },
     );
   }
 }
+
