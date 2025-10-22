@@ -50,7 +50,7 @@ export default function DashboardPage() {
     SubmissionRecord[]
   >([]);
   const [loading, setLoading] = useState(true);
-  const [canCreateForm, setCanCreateForm] = useState(false);
+  const [canCreateForm, setCanCreateForm] = useState(true);
 
   const [dashboardStats, setDashboardStats] = useState({
     totalForms: 0,
@@ -69,10 +69,9 @@ export default function DashboardPage() {
 
       setLoading(true);
       try {
-        // Check if user can create forms via API
-        const limitResponse = await fetch("/api/forms/check-limit");
-        const limitCheck = await limitResponse.json();
-        setCanCreateForm(limitCheck.allowed);
+        // Temporarily allow form creation on the client side.
+        // Enforcement will happen on the backend.
+        setCanCreateForm(true);
         // Fetch forms data
         const { data: formsData, error: formsError } = await (supabase as any)
           .from("forms")

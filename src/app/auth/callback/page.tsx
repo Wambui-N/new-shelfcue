@@ -178,7 +178,7 @@ function AuthCallbackContent() {
           
           try {
             // Get the professional plan
-            const { data: planData } = await supabase
+            const { data: planData } = await (supabase as any)
               .from("subscription_plans")
               .select("id")
               .eq("name", "professional")

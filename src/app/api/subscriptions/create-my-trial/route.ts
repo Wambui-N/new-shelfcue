@@ -34,7 +34,7 @@ export async function POST(_request: NextRequest) {
     }
 
     // Get the professional plan
-    const { data: plan } = await supabaseAdmin
+    const { data: plan } = await (supabaseAdmin as any)
       .from("subscription_plans")
       .select("id")
       .eq("name", "professional")

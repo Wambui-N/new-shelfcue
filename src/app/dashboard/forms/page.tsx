@@ -75,7 +75,7 @@ export default function FormsPage() {
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
   const [_error, setError] = useState<string | null>(null);
-  const [canCreateForm, setCanCreateForm] = useState(false);
+  const [canCreateForm, setCanCreateForm] = useState(true);
 
   const fetchForms = useCallback(async () => {
     try {
@@ -85,10 +85,9 @@ export default function FormsPage() {
       }
       setLoading(true);
 
-      // Check if user can create forms via API
-      const limitResponse = await fetch("/api/forms/check-limit");
-      const limitCheck = await limitResponse.json();
-      setCanCreateForm(limitCheck.allowed);
+      // Temporarily allow form creation on the client side.
+      // Enforcement will happen on the backend.
+      setCanCreateForm(true);
 
       const { data, error } = await supabase
         .from("forms")

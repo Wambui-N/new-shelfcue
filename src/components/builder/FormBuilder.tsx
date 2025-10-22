@@ -88,6 +88,19 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         return null;
       }
 
+      // For new forms, check if the user can create one before proceeding
+      if (!formData.id) {
+        const canCreateResponse = await fetch("/api/forms/check-limit");
+        const canCreateResult = await canCreateResponse.json();
+        if (!canCreateResult.allowed) {
+          alert(
+            "You've reached your form limit. Please upgrade your plan to create more forms.",
+          );
+          router.push("/dashboard/billing");
+          return null;
+        }
+      }
+
       setSaving(true);
       setSaveStatus("saving");
 
