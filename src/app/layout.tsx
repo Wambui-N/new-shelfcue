@@ -164,38 +164,18 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
 
         {/* Schema.org structured data */}
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              name: "ShelfCue",
-              description:
-                "Beautiful Google Sheets form builder. Create branded, responsive forms that connect directly to Google Sheets without Zapier.",
-              url: "https://shelfcue.com",
-              applicationCategory: "BusinessApplication",
-              operatingSystem: "Web",
-              offers: {
-                "@type": "Offer",
-                price: "29",
-                priceCurrency: "USD",
-                availability: "https://schema.org/InStock",
-              },
-              aggregateRating: {
-                "@type": "AggregateRating",
-                ratingValue: "4.9",
-                ratingCount: "1000",
-              },
-              creator: {
-                "@type": "Organization",
-                name: "Made with Make",
-                url: "https://madewithmake.com",
-              },
-            }),
-          }}
-        />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "url": "https://www.example.com/",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://query.example.com/search?q={q}",
+              "query-input": "required name=q"
+            }
+          })}
+        </script>
       </head>
       <body
         className={`${satoshi.variable} font-sans antialiased`}

@@ -73,7 +73,7 @@ export interface FormData {
 export interface FormSubmission {
   id: string;
   formId: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   createdAt: string;
   ipAddress?: string;
   userAgent?: string;

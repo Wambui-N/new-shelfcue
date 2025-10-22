@@ -180,9 +180,9 @@ function AuthCallbackContent() {
               .from("plans")
               .select("id")
               .eq("name", "professional")
-              .single();
+              .single<{ id: string }>();
 
-            if (planData) {
+            if (planData && planData.id) {
               // Create trial subscription
               const trialResponse = await fetch(
                 "/api/subscriptions/create-trial",
@@ -200,6 +200,11 @@ function AuthCallbackContent() {
               }
             } else {
               console.error("❌ Professional plan not found");
+              throw new Error("Professional plan not found");
+            }
+            if (!planData) {
+              console.error("❌ Plan data is null or undefined. Cannot proceed.");
+              return;
             }
           } catch (error) {
             console.error("❌ Error creating trial:", error);
