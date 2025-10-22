@@ -131,7 +131,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
         // If this was a new form (no ID before), redirect to the editor with the new ID
         if (!formData.id && formId) {
-          console.log("📍 Redirecting to /editor/" + formId);
+          console.log(`📍 Redirecting to /editor/${formId}`);
           router.push(`/editor/${formId}`);
           // Update the form store with the new ID
           updateForm({ id: formId });
@@ -146,7 +146,15 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         setSaving(false);
       }
     },
-    [formData, user, setSaving, setDirty, supabase.from],
+    [
+      formData,
+      user,
+      setSaving,
+      setDirty,
+      supabase.from,
+      router.push, // Update the form store with the new ID
+      updateForm,
+    ],
   );
 
   useEffect(() => {

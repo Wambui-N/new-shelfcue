@@ -172,25 +172,26 @@ function AuthCallbackContent() {
 
         // If no subscription, auto-create a trial
         if (!subscription) {
-          console.log(
-            "No subscription found, creating trial automatically...",
-          );
-          
+          console.log("No subscription found, creating trial automatically...");
+
           try {
             // Get the professional plan
             const { data: planData } = await supabase
-              .from("subscription_plans")
+              .from("plans")
               .select("id")
               .eq("name", "professional")
               .single();
 
             if (planData) {
               // Create trial subscription
-              const trialResponse = await fetch("/api/subscriptions/create-trial", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ planId: planData.id }),
-              });
+              const trialResponse = await fetch(
+                "/api/subscriptions/create-trial",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ planId: planData.id }),
+                },
+              );
 
               if (trialResponse.ok) {
                 console.log("✅ Trial subscription created successfully");

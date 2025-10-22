@@ -49,9 +49,8 @@ import type { Database } from "@/lib/supabase/database.types";
 type Form = Database["public"]["Tables"]["forms"]["Row"] & {
   submissions_count?: number;
 };
-import { PlusCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
 
+import { useRouter } from "next/navigation";
 
 export default function FormsPage() {
   const { user } = useAuth();
@@ -75,7 +74,7 @@ export default function FormsPage() {
   const [formToDelete, setFormToDelete] = useState<Form | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [canCreateForm, setCanCreateForm] = useState(false);
 
   const fetchForms = useCallback(async () => {
@@ -842,8 +841,9 @@ export default function FormsPage() {
               Delete "{formToDelete?.title}"?
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              This will delete the form and all {formToDelete?.submissions_count || 0}{" "}
-              submissions. This action cannot be undone.
+              This will delete the form and all{" "}
+              {formToDelete?.submissions_count || 0} submissions. This action
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">

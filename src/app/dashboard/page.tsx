@@ -74,8 +74,8 @@ export default function DashboardPage() {
         const limitCheck = await limitResponse.json();
         setCanCreateForm(limitCheck.allowed);
         // Fetch forms data
-      const { data: formsData, error: formsError } = await (supabase as any)
-        .from("forms")
+        const { data: formsData, error: formsError } = await (supabase as any)
+          .from("forms")
           .select("id, title, description, created_at, status")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
@@ -97,15 +97,15 @@ export default function DashboardPage() {
           supabase as any
         )
           .from("submissions")
-            .select(`
+          .select(`
             id, form_id, data, created_at,
             forms!inner (
               title
             )
           `)
-            .eq("forms.user_id", user.id)
-            .order("created_at", { ascending: false })
-            .limit(7);
+          .eq("forms.user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(7);
 
         if (!submissionsError) {
           setRecentSubmissions(submissionsData || []);
@@ -403,7 +403,10 @@ export default function DashboardPage() {
                     </Link>
                   ) : (
                     <Link href="/dashboard/billing">
-                      <Button variant="outline" className="w-full sm:w-auto px-6 sm:px-8 py-3">
+                      <Button
+                        variant="outline"
+                        className="w-full sm:w-auto px-6 sm:px-8 py-3"
+                      >
                         <Plus className="w-4 h-4 mr-2" />
                         Subscribe to Create Forms
                       </Button>

@@ -19,7 +19,10 @@ export async function POST(request: NextRequest) {
     const { planId } = await request.json();
 
     if (!planId) {
-      return NextResponse.json({ error: "Plan ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Plan ID is required" },
+        { status: 400 },
+      );
     }
 
     const supabaseAdmin = getSupabaseAdmin();

@@ -20,7 +20,7 @@ import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { useFormStore } from "@/store/formStore";
-import type { FormData, FormSubmission } from "@/types/form";
+import type { FormData } from "@/types/form";
 
 interface FormViewPageProps {
   params: Promise<{ formId: string }>;
@@ -37,7 +37,7 @@ function FormViewPage({ params }: FormViewPageProps) {
   const [_copied, setCopied] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [formId, setFormId] = useState<string>("");
-  const [activeTab, setActiveTab] = useState("submissions");
+  const [_activeTab, _setActiveTab] = useState("submissions");
   const { loadForm } = useFormStore();
 
   useEffect(() => {
@@ -134,7 +134,7 @@ function FormViewPage({ params }: FormViewPageProps) {
     fetchForm();
   }, [formId, user, supabase, loadForm]);
 
-  const handleSubmit = async (submissionData: Record<string, any>) => {
+  const _handleSubmit = async (submissionData: Record<string, any>) => {
     try {
       const response = await fetch("/api/submit", {
         method: "POST",

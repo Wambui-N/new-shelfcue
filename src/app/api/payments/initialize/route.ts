@@ -84,22 +84,23 @@ export async function POST(request: Request) {
     });
 
     const supabaseAdmin = getSupabaseAdmin();
-    const { data: transactionData, error: transactionError } = await supabaseAdmin
-      .from("payment_transactions")
-      .insert({
-        user_id: user.id,
-        paystack_reference: reference,
-        amount: chargeAmount / 100, // Convert from cents to dollars
-        currency: "USD",
-        status: "pending",
-        metadata: {
+    const { data: transactionData, error: transactionError } =
+      await supabaseAdmin
+        .from("payment_transactions")
+        .insert({
           user_id: user.id,
-          subscription_type: "professional",
-          is_trial,
-        },
-      })
-      .select()
-      .single();
+          paystack_reference: reference,
+          amount: chargeAmount / 100, // Convert from cents to dollars
+          currency: "USD",
+          status: "pending",
+          metadata: {
+            user_id: user.id,
+            subscription_type: "professional",
+            is_trial,
+          },
+        })
+        .select()
+        .single();
 
     if (transactionError) {
       console.error("❌ Error creating transaction record:", transactionError);

@@ -106,7 +106,7 @@ async function debugDatabase() {
     }
   }
 
-  console.log("\n" + "=".repeat(50));
+  console.log(`\n${"=".repeat(50)}`);
   console.log("\n✅ Debug complete!\n");
 }
 

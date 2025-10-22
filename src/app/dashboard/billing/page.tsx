@@ -70,7 +70,7 @@ export default function BillingPage() {
   const [usage, setUsage] = useState<any>(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [trialDaysRemaining, setTrialDaysRemaining] = useState(0);
-  const [isTrialOnboarding, setIsTrialOnboarding] = useState(false);
+  const [_isTrialOnboarding, setIsTrialOnboarding] = useState(false);
 
   // Cancel subscription state
   const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -147,9 +147,7 @@ export default function BillingPage() {
         return;
       }
       if (!plan?.paystack_plan_code) {
-        alert(
-          "Paystack plan code is not configured. Please contact support.",
-        );
+        alert("Paystack plan code is not configured. Please contact support.");
         setPaymentLoading(false);
         return;
       }
