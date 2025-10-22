@@ -12,10 +12,10 @@ export interface SubscriptionPlan {
 
 export interface Subscription {
   id: string;
-  plan_id: string;
+  plan_id: string | null;
   status: string;
   billing_cycle: string;
-  trial_start: string;
+  trial_start: string | null;
   trial_end: string;
   current_period_end: string;
   cancel_at_period_end: boolean;
