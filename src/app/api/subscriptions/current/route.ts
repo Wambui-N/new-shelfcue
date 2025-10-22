@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import type { Subscription } from "@/hooks/useSubscription";
 
 export async function GET() {
   const supabase = createServerClient();
@@ -15,11 +16,10 @@ export async function GET() {
   // Calculate days since account creation
   const accountCreatedAt = new Date(user.created_at);
   const now = new Date();
-  const daysSinceCreation = Math.floor(
-    (now.getTime() - accountCreatedAt.getTime()) / (1000 * 60 * 60 * 24),
-  );
-  const trialDaysRemaining = Math.max(0, 14 - daysSinceCreation);
-  const isInInitialTrial = daysSinceCreation < 14;
+  const diffTime = Math.abs(now.getTime() - accountCreatedAt.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const trialDaysRemaining = Math.max(0, 15 - diffDays); // Use 15 to include the last day
+  const isInInitialTrial = diffDays <= 14;
 
   // Get user's current subscription with plan details (if exists)
   const { data: subscription, error } = await supabase
@@ -82,7 +82,7 @@ export async function GET() {
           support: "email",
         },
       },
-    } as any;
+    } as Subscription;
   }
 
   return NextResponse.json({

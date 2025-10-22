@@ -34,19 +34,18 @@ export async function getUserLimits(
   const supabase = getSupabaseAdmin();
 
   // First, get the user's account creation date
-  const { data: userData } = await (supabase as any).auth.admin.getUserById(
+  const { data: userData } = await supabase.auth.admin.getUserById(
     userId,
   );
 
   if (userData?.user) {
     const accountCreatedAt = new Date(userData.user.created_at);
     const now = new Date();
-    const daysSinceCreation = Math.floor(
-      (now.getTime() - accountCreatedAt.getTime()) / (1000 * 60 * 60 * 24),
-    );
+    const diffTime = Math.abs(now.getTime() - accountCreatedAt.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     // Check if user is within their initial 14-day trial period
-    if (daysSinceCreation < 14) {
+    if (diffDays <= 14) {
       // User is in their initial 14-day free trial - grant full access
       return {
         forms: -1, // unlimited
@@ -60,7 +59,7 @@ export async function getUserLimits(
   }
 
   // Get user's subscription with plan details
-  const { data: subscription } = await (supabase as any)
+  const { data: subscription } = await supabase
     .from("user_subscriptions")
     .select(
       `
@@ -71,12 +70,12 @@ export async function getUserLimits(
     .eq("user_id", userId)
     .single();
 
-  if ((subscription as any)?.plan) {
+  if (subscription?.plan) {
     // Check if trial has expired
     if (
-      (subscription as any).status === "trial" &&
-      (subscription as any).trial_end &&
-      new Date((subscription as any).trial_end) < new Date()
+      subscription.status === "trial" &&
+      subscription.trial_end &&
+      new Date(subscription.trial_end) < new Date()
     ) {
       // Trial expired - return no access
       return {
@@ -91,8 +90,8 @@ export async function getUserLimits(
 
     // Check if subscription is expired or cancelled
     if (
-      (subscription as any).status === "expired" ||
-      (subscription as any).status === "cancelled"
+      subscription.status === "expired" ||
+      subscription.status === "cancelled"
     ) {
       return {
         forms: 0,
@@ -104,7 +103,7 @@ export async function getUserLimits(
       };
     }
 
-    return (subscription as any).plan.limits as SubscriptionLimits;
+    return subscription.plan.limits as SubscriptionLimits;
   }
 
   // No subscription found and past 14 days - deny access
@@ -135,7 +134,7 @@ export async function getUserUsage(userId: string): Promise<UsageData> {
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-  const { data: usage } = await (supabase as any)
+  const { data: usage } = await supabase
     .from("usage_tracking")
     .select("*")
     .eq("user_id", userId)
@@ -166,8 +165,8 @@ export async function canPerformAction(
   const limits = await getUserLimits(userId);
   const usage = await getUserUsage(userId);
 
-  const limit = (limits as any)[limitType];
-  const currentUsage = (usage as any)[
+  const limit = (limits as Record<string, any>)[limitType];
+  const currentUsage = (usage as Record<string, any>)[
     `${limitType === "forms" ? "forms_count" : `${limitType.replace("_per_month", "")}_count`}`
   ];
 
@@ -230,15 +229,15 @@ export async function incrementUsage(
 
   if (existingUsage) {
     // Update existing record
-    await (supabase as any)
+    await supabase
       .from("usage_tracking")
       .update({
-        [columnName]: ((existingUsage as any)[columnName] || 0) + amount,
+        [columnName]: (existingUsage[columnName as keyof typeof existingUsage] || 0) + amount,
       })
-      .eq("id", (existingUsage as any).id);
+      .eq("id", existingUsage.id);
   } else {
     // Create new record for this period
-    await (supabase as any).from("usage_tracking").insert({
+    await supabase.from("usage_tracking").insert({
       user_id: userId,
       period_start: periodStart.toISOString(),
       period_end: periodEnd.toISOString(),
@@ -253,7 +252,7 @@ export async function incrementUsage(
 export async function isTrialActive(userId: string): Promise<boolean> {
   const supabase = getSupabaseAdmin();
 
-  const { data: subscription } = await (supabase as any)
+  const { data: subscription } = await supabase
     .from("user_subscriptions")
     .select("status, trial_end")
     .eq("user_id", userId)
@@ -262,10 +261,10 @@ export async function isTrialActive(userId: string): Promise<boolean> {
   if (!subscription) return false;
 
   if (
-    (subscription as any).status === "trial" &&
-    (subscription as any).trial_end
+    subscription.status === "trial" &&
+    subscription.trial_end
   ) {
-    return new Date((subscription as any).trial_end) > new Date();
+    return new Date(subscription.trial_end) > new Date();
   }
 
   return false;
@@ -277,7 +276,7 @@ export async function isTrialActive(userId: string): Promise<boolean> {
 export async function getTrialDaysRemaining(userId: string): Promise<number> {
   const supabase = getSupabaseAdmin();
 
-  const { data: subscription } = await (supabase as any)
+  const { data: subscription } = await supabase
     .from("user_subscriptions")
     .select("status, trial_end")
     .eq("user_id", userId)
@@ -285,13 +284,13 @@ export async function getTrialDaysRemaining(userId: string): Promise<number> {
 
   if (
     !subscription ||
-    (subscription as any).status !== "trial" ||
-    !(subscription as any).trial_end
+    subscription.status !== "trial" ||
+    !subscription.trial_end
   ) {
     return 0;
   }
 
-  const trialEnd = new Date((subscription as any).trial_end);
+  const trialEnd = new Date(subscription.trial_end);
   const now = new Date();
   const daysRemaining = Math.ceil(
     (trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
