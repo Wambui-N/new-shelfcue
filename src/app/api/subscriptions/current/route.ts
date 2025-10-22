@@ -52,7 +52,7 @@ export async function GET() {
 
   // If user is in their initial 14-day trial and has no subscription record yet,
   // create a virtual trial subscription for the frontend
-  let finalSubscription = subscription;
+  let finalSubscription: Subscription | null = subscription;
   if (isInInitialTrial && !subscription) {
     finalSubscription = {
       id: "initial-trial",
