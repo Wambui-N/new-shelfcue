@@ -64,7 +64,7 @@ export async function getUserLimits(
     .select(
       `
       *,
-      plan:subscription_plans(*)
+      plan:plans(*)
     `,
     )
     .eq("user_id", userId)
