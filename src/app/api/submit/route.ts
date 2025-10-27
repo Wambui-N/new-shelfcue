@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin();
 
     // Verify the form exists and is published
-    const { data: form, error: formError } = await (supabaseAdmin as any)
+    const { data: form, error: formError } = await supabaseAdmin
       .from("forms")
       .select(`
         id, 
@@ -79,9 +79,7 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get("user-agent") || "unknown";
 
     // Save the submission
-    const { data: submission, error: submissionError } = await (
-      supabaseAdmin as any
-    )
+    const { data: submission, error: submissionError } = await supabaseAdmin
       .from("submissions")
       .insert({
         form_id: formId,
@@ -106,10 +104,10 @@ export async function POST(request: NextRequest) {
     // 1. Create Calendar Event if applicable
     try {
       console.log("📅 Checking calendar configuration...");
-      if ((form as any).default_calendar_id && (form as any).user_id) {
+      if (form.default_calendar_id && form.user_id) {
         console.log("📅 Creating calendar event...");
         const calendarEvent = await createCalendarEventFromSubmission(
-          (form as any).user_id,
+          form.user_id,
           formId,
           data,
         );
@@ -127,17 +125,18 @@ export async function POST(request: NextRequest) {
 
     // 2. Sync to Google Sheets
     try {
-      if ((form as any).sheet_connections && (form as any).user_id) {
-        const sheetConnection = Array.isArray((form as any).sheet_connections)
-          ? (form as any).sheet_connections[0]
-          : (form as any).sheet_connections;
+      if (form.sheet_connections && form.user_id) {
+        // @ts-ignore
+        const sheetConnection = Array.isArray(form.sheet_connections)
+          ? (form.sheet_connections as any)[0]
+          : (form.sheet_connections as any);
 
         if (sheetConnection?.sheet_id) {
-          const googleClient = await getGoogleClient((form as any).user_id);
+          const googleClient = await getGoogleClient(form.user_id);
           if (googleClient) {
             const sheetsService = new GoogleSheetsService(googleClient);
 
-            const rowData = (form as any).fields.map((field: any) => {
+            const rowData = form.fields.map((field) => {
               const value = data[field.id];
               // Handle different field types
               if (field.type === "checkbox") return value ? "Yes" : "No";
@@ -177,20 +176,20 @@ export async function POST(request: NextRequest) {
     (async () => {
       // Send email notification to form owner
       try {
-        const { data: profile } = await (supabaseAdmin as any)
+        const { data: profile } = await supabaseAdmin
           .from("profiles")
           .select("email, full_name")
-          .eq("id", (form as any).user_id)
+          .eq("id", form.user_id)
           .single();
 
-        if ((profile as any)?.email) {
+        if (profile?.email) {
           await EmailService.sendFormSubmissionNotification(
-            (profile as any).email,
+            profile.email,
             {
-              formName: (form as any).title || "Untitled Form",
+              formName: form.title || "Untitled Form",
               formId: formId,
-              submissionId: (submission as any).id,
-              submittedAt: (submission as any).created_at,
+              submissionId: submission.id,
+              submittedAt: submission.created_at,
               submitterData: data,
             },
           );
@@ -208,7 +207,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      submissionId: (submission as any).id,
+      submissionId: submission.id,
     });
   } catch (error) {
     console.error("Error in submit API:", error);

@@ -42,8 +42,9 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({ authUrl });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
     console.error("Error generating auth URL:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

@@ -201,12 +201,12 @@ class PaystackService {
    * Disable a subscription
    */
   async disableSubscription(
-    code: string,
-    token: string,
+    subscription_code: string,
   ): Promise<{ status: boolean; message: string }> {
+    const { data: subscription } = await this.request<{ data: { email_token: string } }>(`/subscription/${subscription_code}`);
     return this.request(`/subscription/disable`, {
       method: "POST",
-      body: JSON.stringify({ code, token }),
+      body: JSON.stringify({ code: subscription_code, token: subscription.email_token }),
     });
   }
 
@@ -214,12 +214,12 @@ class PaystackService {
    * Enable a subscription
    */
   async enableSubscription(
-    code: string,
-    token: string,
+    subscription_code: string,
   ): Promise<{ status: boolean; message: string }> {
+    const { data: subscription } = await this.request<{ data: { email_token: string } }>(`/subscription/${subscription_code}`);
     return this.request(`/subscription/enable`, {
       method: "POST",
-      body: JSON.stringify({ code, token }),
+      body: JSON.stringify({ code: subscription_code, token: subscription.email_token }),
     });
   }
 }

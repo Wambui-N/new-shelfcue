@@ -1,13 +1,30 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
+interface Recommendation {
+  issue: string;
+  solution: string;
+  priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+  note?: string;
+}
+
+interface Diagnostics {
+  timestamp: string;
+  environment: Record<string, unknown>;
+  supabase: Record<string, unknown>;
+  google: Record<string, unknown>;
+  commonIssues?: Record<string, unknown>;
+  recommendations: Recommendation[];
+  overallHealth?: "CRITICAL" | "WARNING" | "HEALTHY";
+}
+
 /**
  * Check Supabase configuration and Google OAuth settings
  * This helps diagnose oauth_error issues
  */
 export async function GET(_request: NextRequest) {
   try {
-    const diagnostics: any = {
+    const diagnostics: Diagnostics = {
       timestamp: new Date().toISOString(),
       environment: {},
       supabase: {},
@@ -43,7 +60,7 @@ export async function GET(_request: NextRequest) {
       const supabaseAdmin = getSupabaseAdmin();
 
       // Try a simple query to verify connection
-      const { data, error } = await (supabaseAdmin as any)
+      const { error } = await supabaseAdmin
         .from("user_google_tokens")
         .select("count")
         .limit(1);
@@ -53,10 +70,11 @@ export async function GET(_request: NextRequest) {
         connectionError: error?.message,
         canQueryDatabase: !error,
       };
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
       diagnostics.supabase = {
         connectionStatus: "FAILED",
-        connectionError: error.message,
+        connectionError: errorMessage,
         canQueryDatabase: false,
       };
     }
@@ -116,10 +134,10 @@ export async function GET(_request: NextRequest) {
 
     // 6. Overall Health
     const criticalIssues = diagnostics.recommendations.filter(
-      (r: any) => r.priority === "CRITICAL",
+      (r) => r.priority === "CRITICAL",
     ).length;
     const highIssues = diagnostics.recommendations.filter(
-      (r: any) => r.priority === "HIGH",
+      (r) => r.priority === "HIGH",
     ).length;
 
     diagnostics.overallHealth =
@@ -131,13 +149,15 @@ export async function GET(_request: NextRequest) {
         "Cache-Control": "no-store, max-age=0",
       },
     });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    const errorStack = error instanceof Error && process.env.NODE_ENV === "development" ? error.stack : undefined;
     console.error("Configuration check error:", error);
     return NextResponse.json(
       {
         error: "Configuration check failed",
-        message: error.message,
-        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+        message: errorMessage,
+        stack: errorStack,
       },
       { status: 500 },
     );

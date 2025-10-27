@@ -2,6 +2,25 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { tokenStorage } from "@/lib/token-storage";
 
+interface DiagnosticCheck {
+  success: boolean;
+  error?: string;
+  [key: string]: unknown;
+}
+
+interface Diagnostics {
+  userId: string;
+  timestamp: string;
+  checks: Record<string, DiagnosticCheck>;
+  summary?: {
+    overallHealth: "HEALTHY" | "ISSUES_DETECTED";
+    passedChecks: number;
+    totalChecks: number;
+    healthPercentage: number;
+    recommendations: string[];
+  };
+}
+
 /**
  * Comprehensive diagnostic endpoint for OAuth and token storage issues
  * Usage: GET /api/diagnose-oauth?userId=YOUR_USER_ID
@@ -20,17 +39,16 @@ export async function GET(request: NextRequest) {
 
     console.log("🔍 Running OAuth diagnostics for user:", userId);
 
-    const diagnostics: any = {
+    const diagnostics: Diagnostics = {
       userId,
       timestamp: new Date().toISOString(),
       checks: {},
     };
 
     // 1. Check if user exists in Supabase Auth
-    const supabaseAdmin = getSupabaseAdmin();
     try {
       const { data: userData, error: userError } =
-        await supabaseAdmin.auth.admin.getUserById(userId);
+        await getSupabaseAdmin().auth.admin.getUserById(userId);
       diagnostics.checks.userExists = {
         success: !userError && !!userData,
         error: userError?.message,
@@ -38,10 +56,11 @@ export async function GET(request: NextRequest) {
         provider: userData?.user?.app_metadata?.provider,
         hasProviderToken: !!userData?.user?.app_metadata?.provider_token,
       };
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
       diagnostics.checks.userExists = {
         success: false,
-        error: error.message,
+        error: errorMessage,
       };
     }
 
@@ -67,16 +86,17 @@ export async function GET(request: NextRequest) {
             }
           : null,
       };
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
       diagnostics.checks.tokenStorage = {
         success: false,
-        error: error.message,
+        error: errorMessage,
       };
     }
 
     // 3. Check database directly
     try {
-      const { data: dbTokens, error: dbError } = await (supabaseAdmin as any)
+      const { data: dbTokens, error: dbError } = await getSupabaseAdmin()
         .from("user_google_tokens")
         .select("*")
         .eq("user_id", userId);
@@ -88,10 +108,11 @@ export async function GET(request: NextRequest) {
         recordCount: dbTokens?.length || 0,
         records: dbTokens || [],
       };
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
       diagnostics.checks.databaseDirect = {
         success: false,
-        error: error.message,
+        error: errorMessage,
       };
     }
 
@@ -116,10 +137,11 @@ export async function GET(request: NextRequest) {
         await tokenStorage.deleteTokens(userId);
         diagnostics.checks.writePermissions.testWasDeleted = true;
       }
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
       diagnostics.checks.writePermissions = {
         success: false,
-        error: error.message,
+        error: errorMessage,
       };
     }
 
@@ -134,7 +156,7 @@ export async function GET(request: NextRequest) {
 
     // 6. Overall status
     const allChecks = Object.values(diagnostics.checks);
-    const passedChecks = allChecks.filter((check: any) => check.success).length;
+    const passedChecks = allChecks.filter((check) => check.success).length;
     const totalChecks = allChecks.length;
 
     diagnostics.summary = {
@@ -178,13 +200,15 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(diagnostics, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    const errorStack = error instanceof Error && process.env.NODE_ENV === "development" ? error.stack : undefined;
     console.error("Diagnostic error:", error);
     return NextResponse.json(
       {
         error: "Diagnostic failed",
-        message: error.message,
-        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+        message: errorMessage,
+        stack: errorStack,
       },
       { status: 500 },
     );

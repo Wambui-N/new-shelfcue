@@ -1,7 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getGoogleClient } from "@/lib/google";
+import { type GoogleAPIClient, getGoogleClient } from "@/lib/google";
 import { GoogleSheetsService } from "@/lib/googleSheets";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import type { FormField } from "@/types/form";
+
+interface Form {
+  id: string;
+  title: string;
+  fields: FormField[];
+  settings: {
+    meetingBookingEnabled?: boolean;
+  };
+  default_sheet_connection_id?: string;
+  default_calendar_id?: string;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,12 +33,12 @@ export async function POST(request: NextRequest) {
     console.log("Using Supabase Admin Client:", !!supabaseAdmin);
 
     // Get form data with retry logic for database consistency
-    let form = null;
-    let formError = null;
+    let form: Form | null = null;
+    let formError: { code: string, message: string, details: string } | null = null;
     let retries = 5; // Try 5 times
 
     while (retries > 0 && !form) {
-      const result = await (supabaseAdmin as any)
+      const result = await supabaseAdmin
         .from("forms")
         .select("*")
         .eq("id", formId)
@@ -99,11 +111,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("✓ Form found:", (form as any).title);
+    console.log("✓ Form found:", form.title);
 
     // Get Google client - REQUIRED for publishing
     console.log("🔍 Getting Google client for user:", userId);
-    let googleClient;
+    let googleClient: GoogleAPIClient | null;
     try {
       googleClient = await getGoogleClient(userId);
       console.log("🔍 Google client result:", !!googleClient);
@@ -140,23 +152,23 @@ export async function POST(request: NextRequest) {
     const sheetsService = new GoogleSheetsService(googleClient);
 
     // Check if form has meeting fields
-    const hasMeetingField = (form as any).fields.some(
-      (field: any) => field.type === "meeting",
+    const hasMeetingField = form.fields.some(
+      (field) => field.type === "meeting",
     );
 
     // Check if user has enabled meeting booking in form settings
     const _meetingBookingEnabled =
-      (form as any).settings?.meetingBookingEnabled || false;
+      form.settings?.meetingBookingEnabled || false;
 
-    const results: any = {};
+    const results: Record<string, unknown> = {};
 
     // 1. Create Google Sheet (REQUIRED - core feature)
-    if (!(form as any).default_sheet_connection_id) {
+    if (!form.default_sheet_connection_id) {
       try {
         console.log("🔵 Creating Google Sheet for form submissions...");
-        console.log("📊 Form fields:", (form as any).fields);
+        console.log("📊 Form fields:", form.fields);
 
-        const headers = (form as any).fields.map((f: any) => f.label);
+        const headers = form.fields.map((f) => f.label);
         console.log("📋 Headers to create:", headers);
 
         if (hasMeetingField) {
@@ -166,7 +178,7 @@ export async function POST(request: NextRequest) {
 
         console.log("🚀 Calling sheetsService.createSheet...");
         const newSheet = await sheetsService.createSheet(
-          `${(form as any).title} - Responses`,
+          `${form.title} - Responses`,
           headers,
         );
 
@@ -177,18 +189,16 @@ export async function POST(request: NextRequest) {
           console.log("📝 Connection data:", {
             user_id: userId,
             sheet_id: newSheet.spreadsheetId,
-            sheet_name: `${(form as any).title} - Responses`,
+            sheet_name: `${form.title} - Responses`,
             sheet_url: newSheet.spreadsheetUrl,
           });
 
-          const { data: connection, error: connectionError } = await (
-            supabaseAdmin as any
-          )
+          const { data: connection, error: connectionError } = await supabaseAdmin
             .from("sheet_connections")
             .insert({
               user_id: userId,
               sheet_id: newSheet.spreadsheetId,
-              sheet_name: `${(form as any).title} - Responses`,
+              sheet_name: `${form.title} - Responses`,
               sheet_url: newSheet.spreadsheetUrl,
             })
             .select()
@@ -211,9 +221,9 @@ export async function POST(request: NextRequest) {
           console.log("✅ Sheet connection saved:", connection);
 
           console.log("📝 Updating form with sheet connection ID...");
-          const { error: formUpdateError } = await (supabaseAdmin as any)
+          const { error: formUpdateError } = await supabaseAdmin
             .from("forms")
-            .update({ default_sheet_connection_id: (connection as any).id })
+            .update({ default_sheet_connection_id: connection.id })
             .eq("id", formId);
 
           if (formUpdateError) {
@@ -232,30 +242,31 @@ export async function POST(request: NextRequest) {
         } else {
           throw new Error("Failed to create Google Sheet");
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error("❌ Error creating Google Sheet:", error);
 
         // Log more details about the error
-        if (error.response) {
+        if (error instanceof Error && 'response' in error) {
+          const response = (error as { response: { status: number, statusText: string, data: unknown } }).response;
           console.error("Google API Error Response:", {
-            status: error.response.status,
-            statusText: error.response.statusText,
-            data: error.response.data,
+            status: response.status,
+            statusText: response.statusText,
+            data: response.data,
           });
-        }
 
-        // Check if it's an authentication error
-        if (error.response?.status === 401 || error.response?.status === 403) {
-          return NextResponse.json(
-            {
-              error: "Google authentication failed",
-              code: "GOOGLE_AUTH_FAILED",
-              details:
-                "Your Google authentication is invalid or expired. Please reconnect your Google account.",
-              action: "reconnect_google",
-            },
-            { status: 403 },
-          );
+          // Check if it's an authentication error
+          if (response.status === 401 || response.status === 403) {
+            return NextResponse.json(
+              {
+                error: "Google authentication failed",
+                code: "GOOGLE_AUTH_FAILED",
+                details:
+                  "Your Google authentication is invalid or expired. Please reconnect your Google account.",
+                action: "reconnect_google",
+              },
+              { status: 403 },
+            );
+          }
         }
 
         return NextResponse.json(
@@ -263,7 +274,7 @@ export async function POST(request: NextRequest) {
             error: "Failed to create Google Sheet",
             details: error instanceof Error ? error.message : "Unknown error",
             errorDetails:
-              error.response?.data || error.message || "No additional details",
+              error instanceof Error && 'response' in error ? (error as { response: { data: unknown } }).response.data : error instanceof Error ? error.message : "No additional details",
           },
           { status: 500 },
         );
@@ -280,13 +291,13 @@ export async function POST(request: NextRequest) {
     if (hasMeetingField) {
       const meetingSettings = {
         enabled: true,
-        calendarId: (form as any).default_calendar_id || null,
+        calendarId: form.default_calendar_id || null,
         duration: 60, // Default 60 minutes
         bufferTime: 15, // Default 15 minutes buffer
         timeSlots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"], // Default slots
       };
 
-      await (supabaseAdmin as any)
+      await supabaseAdmin
         .from("forms")
         .update({
           meeting_settings: meetingSettings,
@@ -303,7 +314,7 @@ export async function POST(request: NextRequest) {
 
     // 4. Update form status to published
     if (!hasMeetingField) {
-      await (supabaseAdmin as any)
+      await supabaseAdmin
         .from("forms")
         .update({ status: "published" })
         .eq("id", formId);

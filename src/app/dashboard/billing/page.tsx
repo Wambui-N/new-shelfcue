@@ -9,6 +9,7 @@ import {
   Loader2,
   Users,
   Zap,
+  AlertCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -27,6 +28,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type Plan = {
   id: string;
@@ -52,6 +61,21 @@ type Subscription = {
   plan: Plan;
 };
 
+type Usage = {
+  forms_count: number;
+  submissions_count: number;
+};
+
+type Invoice = {
+  id: string;
+  invoice_number: string;
+  amount: number;
+  currency: string;
+  status: string;
+  paid_at: string;
+  due_date: string;
+};
+
 const cancellationReasons = [
   "Too expensive",
   "Not using it enough",
@@ -67,10 +91,12 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [plan, setPlan] = useState<Plan | null>(null);
-  const [usage, setUsage] = useState<any>(null);
+  const [usage, setUsage] = useState<Usage | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [trialDaysRemaining, setTrialDaysRemaining] = useState(0);
   const [_isTrialOnboarding, setIsTrialOnboarding] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   // Cancel subscription state
   const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -91,6 +117,7 @@ export default function BillingPage() {
 
   async function fetchData() {
     try {
+      setFetchError(null);
       if (!user) {
         setLoading(false);
         return;
@@ -131,8 +158,16 @@ export default function BillingPage() {
         );
         setPlan(professionalPlan);
       }
+
+      // Fetch invoices
+      const invoicesResponse = await fetch("/api/invoices");
+      if (invoicesResponse.ok) {
+        const invoicesData = await invoicesResponse.json();
+        setInvoices(invoicesData.invoices);
+      }
     } catch (error) {
       console.error("Error fetching billing data:", error);
+      setFetchError("Failed to load billing data. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -189,15 +224,27 @@ export default function BillingPage() {
       setCancelLoading(true);
 
       // Submit cancellation feedback
-      await (supabase as any).from("subscription_cancellations").insert({
+      await supabase.from("subscription_cancellations").insert({
         user_id: user?.id,
         subscription_id: subscription?.id,
         reason: selectedReason,
         feedback: feedback,
       });
 
-      // TODO: Call actual cancellation API
-      // For now, just show success message
+      // Call the new cancellation API
+      const response = await fetch("/api/subscriptions/cancel", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ subscriptionId: subscription?.id }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to cancel subscription");
+      }
+
       alert(
         "Your subscription has been scheduled for cancellation at the end of the billing period.",
       );
@@ -213,6 +260,21 @@ export default function BillingPage() {
 
   if (loading) {
     return <BillingSkeleton />;
+  }
+
+  if (fetchError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-center">
+        <AlertCircle className="w-12 h-12 text-destructive mb-4" />
+        <h2 className="text-xl font-semibold text-destructive">
+          An error occurred
+        </h2>
+        <p className="text-muted-foreground">{fetchError}</p>
+        <Button onClick={fetchData} className="mt-4">
+          Retry
+        </Button>
+      </div>
+    );
   }
 
   const isOnTrial = subscription?.status === "trial";
@@ -466,6 +528,53 @@ export default function BillingPage() {
           </div>
         )}
       </Card>
+
+      {/* Invoice History */}
+      {invoices.length > 0 && (
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-6">
+            Invoice History
+          </h2>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Invoice</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {invoices.map((invoice) => (
+                <TableRow key={invoice.id}>
+                  <TableCell>{invoice.invoice_number}</TableCell>
+                  <TableCell>
+                    {new Date(invoice.paid_at || invoice.due_date).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    ${invoice.amount.toFixed(2)} {invoice.currency}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        invoice.status === "paid" ? "default" : "secondary"
+                      }
+                    >
+                      {invoice.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm">
+                      Download
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+      )}
 
       {/* Cancellation Dialog */}
       <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>

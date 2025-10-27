@@ -63,8 +63,14 @@ export async function GET(request: NextRequest) {
         expiresAtDate: new Date(expiresAtSeconds * 1000).toISOString(),
       });
 
+      if (!tokens.access_token) {
+        return NextResponse.redirect(
+          `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/auth/callback?error=no_access_token`,
+        );
+      }
+
       const storeResult = await tokenStorage.storeTokens(state, {
-        access_token: tokens.access_token!,
+        access_token: tokens.access_token,
         refresh_token: tokens.refresh_token || "",
         expires_at: expiresAtSeconds,
       });
@@ -86,7 +92,7 @@ export async function GET(request: NextRequest) {
         : "http://localhost:3000/dashboard?google_connected=true";
 
     return NextResponse.redirect(redirectUrl);
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error in server OAuth callback:", error);
     return NextResponse.redirect(
       `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/auth/callback?error=oauth_error`,

@@ -35,7 +35,16 @@ export async function POST(request: NextRequest) {
         // Payment successful
         const data = event.data;
         const metadata = data.metadata || {};
-        const userId = metadata.user_id;
+        let userId = metadata.user_id;
+
+        if (!userId && data.customer.email) {
+          const { data: userData } = await supabase.auth.admin.listUsers({
+            email: data.customer.email,
+          });
+          if (userData?.users.length) {
+            userId = userData.users[0].id;
+          }
+        }
 
         if (!userId) {
           console.error("No user_id in charge.success metadata");
@@ -43,7 +52,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Update transaction
-        await (supabase as any)
+        await supabase
           .from("payment_transactions")
           .update({
             status: "success",
@@ -57,7 +66,7 @@ export async function POST(request: NextRequest) {
 
         // Store/update authorization if reusable
         if (data.authorization?.reusable) {
-          await (supabase as any).from("payment_authorizations").upsert(
+          await supabase.from("payment_authorizations").upsert(
             {
               user_id: userId,
               paystack_authorization_code:
@@ -84,7 +93,16 @@ export async function POST(request: NextRequest) {
       case "subscription.create": {
         // Subscription created
         const data = event.data;
-        const userId = data.customer.metadata?.user_id;
+        let userId = data.customer.metadata?.user_id;
+
+        if (!userId && data.customer.email) {
+          const { data: userData } = await supabase.auth.admin.listUsers({
+            email: data.customer.email,
+          });
+          if (userData?.users.length) {
+            userId = userData.users[0].id;
+          }
+        }
 
         if (!userId) {
           console.error("No user_id in subscription.create metadata");
@@ -92,7 +110,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Update subscription with Paystack codes
-        await (supabase as any)
+        await supabase
           .from("user_subscriptions")
           .update({
             paystack_subscription_code: data.subscription_code,
@@ -102,24 +120,26 @@ export async function POST(request: NextRequest) {
           .eq("user_id", userId);
 
         // Send confirmation email
-        const { data: profile } = await (supabase as any)
+        const { data: profile } = await supabase
           .from("profiles")
           .select("email, full_name")
           .eq("id", userId)
           .single();
 
-        const { data: subscription } = await (supabase as any)
+        const { data: subscription } = await supabase
           .from("user_subscriptions")
           .select("plan:subscription_plans(*)")
           .eq("user_id", userId)
           .single();
 
-        if ((profile as any)?.email && subscription) {
-          const plan = (subscription as any).plan;
+        // @ts-ignore
+        if (profile?.email && subscription) {
+          // @ts-ignore
+          const plan = subscription.plan;
           await EmailService.sendSubscriptionConfirmation(
-            (profile as any).email,
+            profile.email,
             {
-              userName: (profile as any).full_name || "there",
+              userName: profile.full_name || "there",
               planName: plan?.name || "Premium",
               amount: `₦${(data.amount / 100).toLocaleString()}`,
               billingCycle: plan?.billing_interval || "monthly",
@@ -147,7 +167,7 @@ export async function POST(request: NextRequest) {
           .eq("paystack_subscription_code", data.subscription_code)
           .single();
 
-        await (supabase as any)
+        await supabase
           .from("user_subscriptions")
           .update({
             status: "cancelled",
@@ -157,8 +177,10 @@ export async function POST(request: NextRequest) {
 
         // Send cancellation email
         if (subscriptionData) {
-          const profile = (subscriptionData as any).profiles;
-          const plan = (subscriptionData as any).plan;
+          // @ts-ignore
+          const profile = subscriptionData.profiles;
+          // @ts-ignore
+          const plan = subscriptionData.plan;
 
           if (profile?.email) {
             await EmailService.sendSubscriptionCancelledNotification(
@@ -166,7 +188,8 @@ export async function POST(request: NextRequest) {
               {
                 userName: profile.full_name || "there",
                 planName: plan?.name || "Premium",
-                endDate: (subscriptionData as any).current_period_end,
+                // @ts-ignore
+                endDate: subscriptionData.current_period_end,
               },
             );
           }
@@ -180,7 +203,7 @@ export async function POST(request: NextRequest) {
         // Subscription set to not renew
         const data = event.data;
 
-        await (supabase as any)
+        await supabase
           .from("user_subscriptions")
           .update({
             status: "non-renewing",
@@ -195,7 +218,16 @@ export async function POST(request: NextRequest) {
       case "invoice.create": {
         // New invoice created
         const data = event.data;
-        const userId = data.customer?.metadata?.user_id;
+        let userId = data.customer?.metadata?.user_id;
+
+        if (!userId && data.customer.email) {
+          const { data: userData } = await supabase.auth.admin.listUsers({
+            email: data.customer.email,
+          });
+          if (userData?.users.length) {
+            userId = userData.users[0].id;
+          }
+        }
 
         if (!userId) {
           console.error("No user_id in invoice.create metadata");
@@ -203,7 +235,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Get subscription
-        const { data: subscription } = await (supabase as any)
+        const { data: subscription } = await supabase
           .from("user_subscriptions")
           .select("id")
           .eq(
@@ -214,9 +246,9 @@ export async function POST(request: NextRequest) {
 
         // Create invoice record
         const invoiceNumber = `INV-${data.id}`;
-        await (supabase as any).from("invoices").insert({
+        await supabase.from("invoices").insert({
           user_id: userId,
-          subscription_id: (subscription as any)?.id,
+          subscription_id: subscription?.id,
           paystack_invoice_code: data.invoice_code,
           invoice_number: invoiceNumber,
           amount: data.amount / 100, // Convert from kobo to naira
@@ -227,15 +259,15 @@ export async function POST(request: NextRequest) {
         });
 
         // Send invoice email
-        const { data: profile } = await (supabase as any)
+        const { data: profile } = await supabase
           .from("profiles")
           .select("email, full_name")
           .eq("id", userId)
           .single();
 
-        if ((profile as any)?.email) {
-          await EmailService.sendInvoiceNotification((profile as any).email, {
-            userName: (profile as any).full_name || "there",
+        if (profile?.email) {
+          await EmailService.sendInvoiceNotification(profile.email, {
+            userName: profile.full_name || "there",
             invoiceNumber,
             amount: `₦${(data.amount / 100).toLocaleString()}`,
             dueDate: data.due_date,
@@ -250,7 +282,7 @@ export async function POST(request: NextRequest) {
         // Invoice updated
         const data = event.data;
 
-        await (supabase as any)
+        await supabase
           .from("invoices")
           .update({
             status: data.status === "success" ? "paid" : data.status,
@@ -267,7 +299,7 @@ export async function POST(request: NextRequest) {
         const data = event.data;
 
         // Get invoice details
-        const { data: invoice } = await (supabase as any)
+        const { data: invoice } = await supabase
           .from("invoices")
           .select(`
             user_id,
@@ -278,7 +310,7 @@ export async function POST(request: NextRequest) {
           .single();
 
         // Update invoice status
-        await (supabase as any)
+        await supabase
           .from("invoices")
           .update({
             status: "failed",
@@ -287,7 +319,7 @@ export async function POST(request: NextRequest) {
 
         // Update subscription status to attention
         if (data.subscription?.subscription_code) {
-          await (supabase as any)
+          await supabase
             .from("user_subscriptions")
             .update({
               status: "attention",
@@ -300,11 +332,13 @@ export async function POST(request: NextRequest) {
 
         // Send payment failed email
         if (invoice) {
-          const profile = (invoice as any).profiles;
+          // @ts-ignore
+          const profile = invoice.profiles;
           if (profile?.email) {
             await EmailService.sendPaymentFailedNotification(profile.email, {
               userName: profile.full_name || "there",
-              amount: `₦${((invoice as any).amount).toLocaleString()}`,
+              // @ts-ignore
+              amount: `₦${(invoice.amount).toLocaleString()}`,
               reason: data.gateway_response,
             });
           }

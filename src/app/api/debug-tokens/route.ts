@@ -60,8 +60,9 @@ export async function GET(request: NextRequest) {
       tokens,
       error: null,
     });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
     console.error("Debug tokens error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

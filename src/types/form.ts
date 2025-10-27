@@ -70,10 +70,12 @@ export interface FormData {
   lastSaved?: Date;
 }
 
+export type SubmissionDataValue = string | number | boolean | string[];
+
 export interface FormSubmission {
   id: string;
   formId: string;
-  data: Record<string, any>;
+  data: Record<string, SubmissionDataValue>;
   createdAt: string;
   ipAddress?: string;
   userAgent?: string;

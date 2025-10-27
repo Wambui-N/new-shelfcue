@@ -16,6 +16,7 @@ import {
   Settings,
   User,
   X,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -27,6 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -46,6 +48,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
   const [activeFormsCount, setActiveFormsCount] = useState(0);
   const [newSubmissionsCount, setNewSubmissionsCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
 
   const handleSignOut = async () => {
     await signOut();
@@ -69,6 +72,17 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
 
         if (!formsError) {
           setActiveFormsCount(forms?.length || 0);
+        }
+
+        // Fetch subscription status
+        const { data: subscription, error: subError } = await supabase
+          .from("user_subscriptions")
+          .select("status")
+          .eq("user_id", user.id)
+          .single();
+
+        if (!subError && subscription) {
+          setSubscriptionStatus(subscription.status);
         }
 
         // Fetch new submissions count (submissions from last 7 days)
@@ -107,21 +121,21 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
       href: "/dashboard/forms",
       label: "Forms",
       icon: FileText,
-      badge: loading
-        ? "..."
-        : activeFormsCount > 0
-          ? activeFormsCount.toString()
-          : null,
+      badge: loading ? (
+        <Skeleton className="h-4 w-4 rounded-full" />
+      ) : activeFormsCount > 0 ? (
+        activeFormsCount.toString()
+      ) : null,
     },
     {
       href: "/dashboard/submissions",
       label: "Submissions",
       icon: Mail,
-      badge: loading
-        ? "..."
-        : newSubmissionsCount > 0
-          ? newSubmissionsCount.toString()
-          : null,
+      badge: loading ? (
+        <Skeleton className="h-4 w-4 rounded-full" />
+      ) : newSubmissionsCount > 0 ? (
+        newSubmissionsCount.toString()
+      ) : null,
     },
     {
       href: "/dashboard/analytics",
@@ -444,6 +458,25 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
 
           {/* Trial Banner */}
           <TrialBanner />
+
+          {/* Payment Failed Banner */}
+          {subscriptionStatus === "attention" && (
+            <div className="bg-destructive/10 border-b border-destructive/20 text-destructive p-3 text-center text-sm">
+              <div className="container mx-auto flex items-center justify-center gap-2">
+                <AlertTriangle className="w-4 h-4" />
+                <span>
+                  Your last payment failed. Please update your payment method to
+                  keep your subscription active.
+                  <Link
+                    href="/dashboard/billing"
+                    className="font-semibold underline ml-2"
+                  >
+                    Update Payment Method
+                  </Link>
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Page Content */}
           <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>

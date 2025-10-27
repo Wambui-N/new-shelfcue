@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       console.log("❌ Payment verification failed:", verification);
 
       // Update transaction as failed
-      await (supabase as any)
+      await supabase
         .from("payment_transactions")
         .update({
           status: "failed",
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       reference,
     );
 
-    const { data: transaction, error: txQueryError } = await (supabase as any)
+    const { data: transaction, error: txQueryError } = await supabase
       .from("payment_transactions")
       .select("*")
       .eq("paystack_reference", reference)
@@ -102,9 +102,7 @@ export async function GET(request: NextRequest) {
 
       // Create the transaction record if it doesn't exist (payment was successful on Paystack)
       console.log("🔄 Creating transaction record from Paystack data...");
-      const { data: newTransaction, error: createError } = await (
-        supabase as any
-      )
+      const { data: newTransaction, error: createError } = await supabase
         .from("payment_transactions")
         .insert({
           user_id: user.id,
@@ -145,7 +143,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Update transaction record to success with Paystack details
-    await (supabase as any)
+    await supabase
       .from("payment_transactions")
       .update({
         status: "success",
@@ -158,7 +156,7 @@ export async function GET(request: NextRequest) {
       .eq("paystack_reference", reference);
 
     // Store authorization details
-    await (supabase as any).from("payment_authorizations").upsert(
+    await supabase.from("payment_authorizations").upsert(
       {
         user_id: user.id,
         paystack_authorization_code: txData.authorization.authorization_code,
@@ -171,14 +169,14 @@ export async function GET(request: NextRequest) {
         channel: txData.authorization.channel,
         is_reusable: txData.authorization.reusable,
         is_default: true,
-      } as any,
+      },
       {
         onConflict: "paystack_authorization_code",
       },
     );
 
     // Get professional plan
-    const { data: plan } = await (supabase as any)
+    const { data: plan } = await supabase
       .from("subscription_plans")
       .select("*")
       .eq("name", "professional")
@@ -202,7 +200,7 @@ export async function GET(request: NextRequest) {
     const periodEnd = new Date(now);
     periodEnd.setMonth(periodEnd.getMonth() + 1);
 
-    await (supabase as any).from("user_subscriptions").upsert(
+    await supabase.from("user_subscriptions").upsert(
       {
         user_id: user.id,
         plan_id: plan.id,
@@ -217,7 +215,7 @@ export async function GET(request: NextRequest) {
           : periodEnd.toISOString(),
         cancel_at_period_end: false,
         cancelled_at: null,
-      } as any,
+      },
       {
         onConflict: "user_id",
       },
@@ -230,26 +228,26 @@ export async function GET(request: NextRequest) {
 
     // Create invoice
     const invoiceNumber = `INV-${Date.now()}-${user.id.substring(0, 8)}`;
-    await (supabase as any).from("invoices").insert({
+    await supabase.from("invoices").insert({
       user_id: user.id,
       invoice_number: invoiceNumber,
       amount: txData.amount / 100, // Convert from cents to dollars
       currency: "USD",
       status: "paid",
       paid_at: txData.paid_at,
-    } as any);
+    });
 
     // Update transaction with subscription ID
-    const { data: newSubscription } = await (supabase as any)
+    const { data: newSubscription } = await supabase
       .from("user_subscriptions")
       .select("id")
       .eq("user_id", user.id)
       .single();
 
     if (newSubscription) {
-      await (supabase as any)
+      await supabase
         .from("payment_transactions")
-        .update({ subscription_id: (newSubscription as any).id })
+        .update({ subscription_id: newSubscription.id })
         .eq("paystack_reference", reference);
     }
 

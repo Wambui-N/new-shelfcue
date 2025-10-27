@@ -53,15 +53,22 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error("Missing Supabase environment variables");
+      return NextResponse.redirect(
+        new URL("/dashboard?error=missing_env_vars", request.url),
+      );
+    }
+
     // Create Supabase client for server-side operations
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    );
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     // Find user by email using auth admin API
     const { data: authUsers, error: listError } =
-      await supabase.auth.admin.listUsers();
+      await supabase.auth.admin.listUsers({ email: userInfo.email });
 
     if (listError) {
       console.error("Error listing users:", listError);
@@ -70,7 +77,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const user = authUsers.users.find((u) => u.email === userInfo.email);
+    const user = authUsers.users[0];
 
     if (!user) {
       console.error("User not found in Supabase auth:", userInfo.email);
@@ -94,10 +101,16 @@ export async function GET(request: NextRequest) {
       currentTime: Math.floor(Date.now() / 1000),
     });
 
+    if (!tokens.access_token) {
+      return NextResponse.redirect(
+        new URL("/dashboard?error=no_access_token", request.url),
+      );
+    }
+
     const { error: dbError } = await supabase.from("user_google_tokens").upsert(
       {
         user_id: userId,
-        access_token: tokens.access_token!,
+        access_token: tokens.access_token,
         refresh_token: tokens.refresh_token || "",
         expires_at: expiresAt,
         updated_at: new Date().toISOString(),
@@ -119,9 +132,11 @@ export async function GET(request: NextRequest) {
     // Redirect to return URL
     console.log("🔄 Redirecting to:", state);
     return NextResponse.redirect(new URL(state, request.url));
-  } catch (error: any) {
+  } catch (error) {
     console.error("❌ Error in Google OAuth callback:", error);
-    console.error("❌ Error stack:", error.stack);
+    if (error instanceof Error) {
+      console.error("❌ Error stack:", error.stack);
+    }
     return NextResponse.redirect(
       new URL("/dashboard?error=google_callback_failed", request.url),
     );

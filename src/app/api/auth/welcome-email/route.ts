@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabaseAdmin();
 
     // Get user profile
-    const { data: profile, error } = await (supabase as any)
+    const { data: profile, error } = await supabase
       .from("profiles")
       .select("email, full_name")
       .eq("id", userId)

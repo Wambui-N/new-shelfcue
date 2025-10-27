@@ -53,10 +53,11 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
     console.error("❌ [API] /store-tokens Exception:", error);
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
+      { error: "Internal Server Error", details: errorMessage },
       { status: 500 },
     );
   }

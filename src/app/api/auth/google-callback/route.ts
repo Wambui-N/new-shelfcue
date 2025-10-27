@@ -39,11 +39,18 @@ export async function GET(request: NextRequest) {
       (tokens.expiry_date || Date.now() + 3600000) / 1000,
     );
 
-    const { error: tokenError } = await (supabaseAdmin as any)
+    if (!tokens.access_token) {
+      return NextResponse.json(
+        { error: "Google authentication failed: no access token" },
+        { status: 500 },
+      );
+    }
+
+    const { error: tokenError } = await supabaseAdmin
       .from("user_google_tokens")
       .upsert({
         user_id: state,
-        access_token: tokens.access_token!,
+        access_token: tokens.access_token,
         refresh_token: tokens.refresh_token || "",
         expires_at: expiresAtSeconds,
       });
@@ -62,8 +69,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(
       `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard?google_connected=true`,
     );
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
     console.error("Error exchanging code for tokens:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

@@ -67,10 +67,11 @@ export async function GET(request: NextRequest) {
     const calendars = await calendarService.getUserCalendars();
 
     return NextResponse.json({ calendars });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Failed to fetch calendars";
     console.error("Error in calendars API:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch calendars" },
+      { error: errorMessage },
       { status: 500 },
     );
   }

@@ -39,6 +39,10 @@ export async function POST(request: Request) {
     // Paystack requires a minimum amount, so charge $0.50 for trials
     const chargeAmount = is_trial ? 50 : amount;
 
+    if (!user.email) {
+      return NextResponse.json({ error: "User has no email" }, { status: 400 });
+    }
+
     console.log(
       "💳 Charge amount:",
       chargeAmount,
@@ -47,7 +51,7 @@ export async function POST(request: Request) {
 
     console.log("🚀 Initializing Paystack transaction...");
     const initResponse = await paystack.initializeTransaction({
-      email: user.email!,
+      email: user.email,
       amount: chargeAmount,
       reference,
       plan: plan_code,
