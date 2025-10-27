@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 type RoadmapStatus = "not_started" | "in_progress" | "beta" | "done";
 
@@ -28,6 +29,7 @@ interface RoadmapItem {
 
 export default function FeaturesHubPage() {
   const supabase = createClient();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -81,11 +83,32 @@ export default function FeaturesHubPage() {
         // Fallback: static examples if table doesn't exist yet
         if (isMounted) {
           setRoadmap([
-            { id: "1", title: "Developer API", status: "beta" },
+            {
+              id: "email_users",
+              title: "Email to users after filling form",
+              status: "in_progress",
+            },
+            {
+              id: "meeting_reminders",
+              title: "Follow-up reminding of meetings",
+              status: "in_progress",
+            },
+            {
+              id: "conditional_logic",
+              title: "Conditional logic (show/hide fields)",
+              status: "in_progress",
+            },
+            { id: "multi_step_forms", title: "Multi-step forms", status: "in_progress" },
+            { id: "file_uploads", title: "File uploads on forms", status: "in_progress" },
+            {
+              id: "custom_thank_you",
+              title: "Custom thank you pages",
+              status: "in_progress",
+            },
             { id: "2", title: "Form visit analytics", status: "done" },
             { id: "3", title: "Question drop-off analytics", status: "done" },
             { id: "4", title: "Framer plugin", status: "done" },
-            { id: "5", title: "AI assistant", status: "in_progress" },
+            { id: "template_forms", title: "Template forms section", status: "not_started" },
           ]);
         }
       } finally {
@@ -103,8 +126,10 @@ export default function FeaturesHubPage() {
     setMessage(null);
     setError(null);
     try {
+      if (!user) throw new Error("You must be logged in to submit a request.");
       if (!title.trim()) throw new Error("Please enter a short title");
       const payload = {
+        user_id: user.id,
         title: title.trim(),
         details: details.trim() || null,
       };
