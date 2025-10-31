@@ -31,7 +31,7 @@ export function SolutionSection() {
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-background/50">
       <motion.div
-        className="container mx-auto max-w-5xl"
+        className="container mx-auto max-w-6xl"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
@@ -55,7 +55,7 @@ export function SolutionSection() {
         <div className="grid md:grid-cols-3 gap-6">
           {steps.map((step, index) => (
             <motion.div
-              key={index}
+              key={step.title}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -70,8 +70,8 @@ export function SolutionSection() {
               <div className="relative p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all duration-500 h-full hover:shadow-lg">
                 {/* Step Number */}
                 <motion.div
-                  className="absolute -top-3 -left-3 w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white font-bold text-sm shadow-md"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  className="absolute -top-4 -left-4 w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center text-lg font-bold"
+                  whileHover={{ scale: 1.2, rotate: 10 }}
                   transition={{ duration: 0.3 }}
                 >
                   {index + 1}
@@ -100,7 +100,7 @@ export function SolutionSection() {
                     className="hidden md:block absolute top-1/2 -right-3 w-6 h-0.5 bg-light-gray"
                     initial={{ scaleX: 0 }}
                     whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: true, amount: 0.5 }}
                     transition={{ duration: 0.8, delay: 0.5 + index * 0.2 }}
                   />
                 )}

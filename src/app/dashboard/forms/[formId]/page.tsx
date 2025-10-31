@@ -54,7 +54,7 @@ function FormViewPage({ params }: FormViewPageProps) {
     const fetchForm = async () => {
       setLoading(true);
       try {
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from("forms")
           .select("*")
           .eq("id", formId)
@@ -118,11 +118,11 @@ function FormViewPage({ params }: FormViewPageProps) {
             ? { ...defaultSettings, ...data.settings }
             : defaultSettings,
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : "An unknown error occurred";
         console.error("Error fetching form:", {
-          message: error?.message,
-          code: error?.code,
-          details: error?.details,
+          message: errorMessage,
           error,
         });
         setError("Form not found or an error occurred.");
@@ -134,7 +134,7 @@ function FormViewPage({ params }: FormViewPageProps) {
     fetchForm();
   }, [formId, user, supabase, loadForm]);
 
-  const _handleSubmit = async (submissionData: Record<string, any>) => {
+  const _handleSubmit = async (submissionData: Record<string, unknown>) => {
     try {
       const response = await fetch("/api/submit", {
         method: "POST",
@@ -151,8 +151,10 @@ function FormViewPage({ params }: FormViewPageProps) {
 
       // Dispatch event to refresh sidebar counts
       window.dispatchEvent(new CustomEvent("submissionReceived"));
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred";
+      setError(errorMessage);
     }
   };
 
@@ -336,7 +338,7 @@ function FormViewPage({ params }: FormViewPageProps) {
 }
 
 // Wrap with ProtectedRoute
-export default function ProtectedFormViewPage(props: any) {
+export default function ProtectedFormViewPage(props: FormViewPageProps) {
   return (
     <ProtectedRoute>
       <FormViewPage {...props} />

@@ -33,13 +33,8 @@ export function HowItWorksSection() {
   ];
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-background">
-      <motion.div
-        className="container mx-auto max-w-5xl"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-      >
+    <section id="how-it-works" className="py-16 sm:py-24 bg-background">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
@@ -51,16 +46,16 @@ export function HowItWorksSection() {
             Simple Form Building,{" "}
             <span className="text-dark-gray">Powerful Results</span>
           </h2>
+          <p className="text-base md:text-lg text-foreground-muted max-w-2xl mx-auto">
+            Start collecting leads in just three simple steps.
+          </p>
         </motion.div>
 
-        <div className="relative">
-          {/* Connection Line */}
-          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-light-gray/30 transform -translate-y-1/2" />
-
+        <div className="mt-12">
           <div className="grid md:grid-cols-3 gap-6 relative">
-            {steps.map((step, index) => (
+            {steps.map((step) => (
               <motion.div
-                key={index}
+                key={step.title}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -138,7 +133,10 @@ export function HowItWorksSection() {
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
+                        role="img"
+                        aria-labelledby="check-icon"
                       >
+                        <title id="check-icon">Check</title>
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -153,7 +151,7 @@ export function HowItWorksSection() {
             ))}
           </div>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

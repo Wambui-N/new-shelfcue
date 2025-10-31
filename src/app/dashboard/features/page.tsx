@@ -72,7 +72,7 @@ export default function FeaturesHubPage() {
     const fetchRoadmap = async () => {
       setLoading(true);
       try {
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from("roadmap_items")
           .select("id, title, status, description, created_at")
           .order("created_at", { ascending: false });
@@ -133,15 +133,17 @@ export default function FeaturesHubPage() {
         title: title.trim(),
         details: details.trim() || null,
       };
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("feature_requests")
         .insert(payload);
       if (error) throw error;
       setTitle("");
       setDetails("");
       setMessage("Thanks! Your request has been submitted.");
-    } catch (e: any) {
-      setError(e?.message || "Failed to submit request");
+    } catch (e: unknown) {
+      const errorMessage =
+        e instanceof Error ? e.message : "Failed to submit request";
+      setError(errorMessage);
     } finally {
       setSubmitting(false);
     }

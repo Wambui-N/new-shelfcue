@@ -98,15 +98,15 @@ export function ProblemSection() {
 
         {/* Problems Grid */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
+          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
           variants={containerVariants}
         >
-          {problems.map((problem, index) => (
+          {problems.map((problem) => (
             <motion.div
-              key={index}
+              key={problem.title}
               variants={itemVariants}
               whileHover={{
-                y: -8,
+                y: -5,
                 transition: { duration: 0.3 },
               }}
               className="group"

@@ -1,9 +1,10 @@
 import { google } from "googleapis";
+import type { OAuth2Client } from "google-auth-library";
 import { getSupabaseAdmin } from "./supabase/admin";
 import { tokenStorage } from "./token-storage";
 
 export class GoogleAPIClient {
-  private oauth2Client: any;
+  private oauth2Client: OAuth2Client;
 
   constructor(accessToken: string, refreshToken: string) {
     this.oauth2Client = new google.auth.OAuth2(
@@ -74,7 +75,7 @@ export async function getGoogleClient(
 
           // Update tokens in database
           const updateResult = await tokenStorage.updateTokens(userId, {
-            access_token: newCredentials.access_token!,
+            access_token: newCredentials.access_token || "",
             refresh_token: newCredentials.refresh_token || tokens.refresh_token,
             expires_at:
               Math.floor(Date.now() / 1000) +
@@ -84,7 +85,7 @@ export async function getGoogleClient(
           if (updateResult.success) {
             console.log("✅ Tokens refreshed successfully");
             return new GoogleAPIClient(
-              newCredentials.access_token!,
+              newCredentials.access_token || "",
               newCredentials.refresh_token || tokens.refresh_token || "",
             );
           }
@@ -113,14 +114,14 @@ export async function getGoogleClient(
 
     // Check if user has Google identity linked
     const googleIdentity = userData?.user?.identities?.find(
-      (identity: any) => identity.provider === "google",
+      (identity) => identity.provider === "google",
     );
 
     if (googleIdentity) {
       console.log("✅ Found Google identity for user");
 
       // Try to extract tokens from identity_data
-      const identityData = googleIdentity.identity_data as any;
+      const identityData = googleIdentity.identity_data as Record<string, unknown> | undefined;
 
       // Supabase stores tokens in different places depending on the setup
       // Try multiple possible locations
@@ -139,15 +140,15 @@ export async function getGoogleClient(
 
         // Store these tokens in our custom table for future use
         const storeResult = await tokenStorage.storeTokens(userId, {
-          access_token: possibleAccessToken,
-          refresh_token: possibleRefreshToken || "",
+          access_token: possibleAccessToken as string,
+          refresh_token: (possibleRefreshToken as string) || "",
           expires_at: Math.floor(Date.now() / 1000) + 3600, // Default 1 hour
         });
 
         if (storeResult.success) {
           return new GoogleAPIClient(
-            possibleAccessToken,
-            possibleRefreshToken || "",
+            possibleAccessToken as string,
+            (possibleRefreshToken as string) || "",
           );
         }
       }

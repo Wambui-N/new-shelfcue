@@ -10,7 +10,7 @@ interface FormPreviewProps {
 export function FormPreview({ className }: FormPreviewProps) {
   const { formData } = useFormStore();
 
-  const handleSubmit = async (data: Record<string, any>) => {
+  const handleSubmit = async (data: Record<string, unknown>) => {
     console.log("Form submitted (preview mode):", data);
     // This is a preview, so we don't actually submit
   };

@@ -124,7 +124,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
           settings: formData.settings,
           theme: formData.theme,
           status: status || "draft",
-        } as any);
+        });
 
         if (error) {
           console.error("❌ Error saving form:", error);
@@ -263,7 +263,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     console.log("📅 Saving default_calendar_id to form...");
     if (formData.id && user) {
       try {
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from("forms")
           .update({
             default_calendar_id: calendarId,
@@ -714,6 +714,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
           <div className="flex-shrink-0 bg-background border-b border-border">
             <div className="grid grid-cols-3">
               <button
+                type="button"
                 onClick={() => setActiveTab("fields")}
                 className={`flex items-center justify-center gap-2 h-12 text-sm font-medium transition-colors ${
                   activeTab === "fields"
@@ -725,6 +726,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 <span className="hidden sm:inline">Fields</span>
               </button>
               <button
+                type="button"
                 onClick={() => setActiveTab("settings")}
                 className={`flex items-center justify-center gap-2 h-12 text-sm font-medium transition-colors ${
                   activeTab === "settings"
@@ -736,6 +738,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 <span className="hidden sm:inline">Settings</span>
               </button>
               <button
+                type="button"
                 onClick={() => setActiveTab("display")}
                 className={`flex items-center justify-center gap-2 h-12 text-sm font-medium transition-colors ${
                   activeTab === "display"

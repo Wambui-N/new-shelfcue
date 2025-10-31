@@ -1,4 +1,5 @@
 import { Navigation } from "@/components/navigation";
+import { ComparisonSection } from "@/components/sections/ComparisonSection";
 import { DemoSection } from "@/components/sections/DemoSection";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { FeaturesSection } from "@/components/sections/FeaturesSection";
@@ -21,6 +22,7 @@ export default function HomePage() {
       <HowItWorksSection />
       {/* <TestimonialsSection /> */}
       <DemoSection />
+      <ComparisonSection />
       <PricingSection />
       <FAQSection />
       <FinalCTASection />

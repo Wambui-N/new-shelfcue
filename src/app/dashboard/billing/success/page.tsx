@@ -2,7 +2,7 @@
 
 import { CheckCircle, Loader2, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
@@ -13,11 +13,7 @@ function SuccessContent() {
   const [subscriptionActive, setSubscriptionActive] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
-  useEffect(() => {
-    checkSubscriptionStatus();
-  }, [checkSubscriptionStatus]);
-
-  async function checkSubscriptionStatus() {
+  const checkSubscriptionStatus = useCallback(async () => {
     try {
       const supabase = createClient();
       const {
@@ -55,7 +51,11 @@ function SuccessContent() {
       console.error("Error checking subscription:", error);
       setLoading(false);
     }
-  }
+  }, [retryCount]);
+
+  useEffect(() => {
+    checkSubscriptionStatus();
+  }, [checkSubscriptionStatus]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

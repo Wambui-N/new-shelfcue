@@ -1,6 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyWebhookSignature } from "@/lib/paystack";
-import { EmailService } from "@/lib/resend";
+import {
+  sendSubscriptionConfirmation,
+  sendSubscriptionCancelledNotification,
+  sendInvoiceNotification,
+  sendPaymentFailedNotification,
+} from "@/lib/resend";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 /**
@@ -38,11 +43,12 @@ export async function POST(request: NextRequest) {
         let userId = metadata.user_id;
 
         if (!userId && data.customer.email) {
-          const { data: userData } = await supabase.auth.admin.listUsers({
-            email: data.customer.email,
-          });
-          if (userData?.users.length) {
-            userId = userData.users[0].id;
+          const { data: userData } = await supabase.auth.admin.listUsers();
+          const user = userData?.users.find(
+            (u) => u.email === data.customer.email,
+          );
+          if (user) {
+            userId = user.id;
           }
         }
 
@@ -96,11 +102,12 @@ export async function POST(request: NextRequest) {
         let userId = data.customer.metadata?.user_id;
 
         if (!userId && data.customer.email) {
-          const { data: userData } = await supabase.auth.admin.listUsers({
-            email: data.customer.email,
-          });
-          if (userData?.users.length) {
-            userId = userData.users[0].id;
+          const { data: userData } = await supabase.auth.admin.listUsers();
+          const user = userData?.users.find(
+            (u) => u.email === data.customer.email,
+          );
+          if (user) {
+            userId = user.id;
           }
         }
 
@@ -132,11 +139,11 @@ export async function POST(request: NextRequest) {
           .eq("user_id", userId)
           .single();
 
-        // @ts-ignore
+        // @ts-expect-error
         if (profile?.email && subscription) {
-          // @ts-ignore
+          // @ts-expect-error
           const plan = subscription.plan;
-          await EmailService.sendSubscriptionConfirmation(
+          await sendSubscriptionConfirmation(
             profile.email,
             {
               userName: profile.full_name || "there",
@@ -177,18 +184,18 @@ export async function POST(request: NextRequest) {
 
         // Send cancellation email
         if (subscriptionData) {
-          // @ts-ignore
+          // @ts-expect-error
           const profile = subscriptionData.profiles;
-          // @ts-ignore
+          // @ts-expect-error
           const plan = subscriptionData.plan;
 
           if (profile?.email) {
-            await EmailService.sendSubscriptionCancelledNotification(
+            await sendSubscriptionCancelledNotification(
               profile.email,
               {
                 userName: profile.full_name || "there",
                 planName: plan?.name || "Premium",
-                // @ts-ignore
+                // @ts-expect-error
                 endDate: subscriptionData.current_period_end,
               },
             );
@@ -221,11 +228,12 @@ export async function POST(request: NextRequest) {
         let userId = data.customer?.metadata?.user_id;
 
         if (!userId && data.customer.email) {
-          const { data: userData } = await supabase.auth.admin.listUsers({
-            email: data.customer.email,
-          });
-          if (userData?.users.length) {
-            userId = userData.users[0].id;
+          const { data: userData } = await supabase.auth.admin.listUsers();
+          const user = userData?.users.find(
+            (u) => u.email === data.customer.email,
+          );
+          if (user) {
+            userId = user.id;
           }
         }
 
@@ -259,15 +267,16 @@ export async function POST(request: NextRequest) {
         });
 
         // Send invoice email
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("email, full_name")
-          .eq("id", userId)
-          .single();
+        const { data: userData } = await supabase.auth.admin.getUserById(userId);
 
-        if (profile?.email) {
-          await EmailService.sendInvoiceNotification(profile.email, {
-            userName: profile.full_name || "there",
+        if (userData?.user?.email) {
+          const fullName =
+            userData.user.user_metadata?.full_name ||
+            userData.user.user_metadata?.name ||
+            "there";
+          
+          await sendInvoiceNotification(userData.user.email, {
+            userName: fullName,
             invoiceNumber,
             amount: `₦${(data.amount / 100).toLocaleString()}`,
             dueDate: data.due_date,
@@ -332,12 +341,12 @@ export async function POST(request: NextRequest) {
 
         // Send payment failed email
         if (invoice) {
-          // @ts-ignore
+          // @ts-expect-error
           const profile = invoice.profiles;
           if (profile?.email) {
-            await EmailService.sendPaymentFailedNotification(profile.email, {
+            await sendPaymentFailedNotification(profile.email, {
               userName: profile.full_name || "there",
-              // @ts-ignore
+              // @ts-expect-error
               amount: `₦${(invoice.amount).toLocaleString()}`,
               reason: data.gateway_response,
             });

@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import type { FormHeaderConfig, FormTheme } from "@/types/form-display";
+import type { FormHeaderConfig } from "@/types/form-display";
 
 interface FormHeaderProps {
   title: string;
   description?: string;
-  theme: FormTheme;
   showLogo?: boolean;
   showTitle?: boolean;
   showDescription?: boolean;
@@ -17,7 +16,6 @@ interface FormHeaderProps {
 export function FormHeader({
   title,
   description,
-  theme,
   showLogo = true,
   showTitle = true,
   showDescription = true,

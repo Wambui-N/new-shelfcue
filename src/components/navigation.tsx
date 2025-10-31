@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -55,15 +56,16 @@ export function Navigation() {
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-16">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center group">
               <div className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 relative">
-                <img
+                <Image
                   src="/1.png"
                   alt="ShelfCue Logo"
-                  className="w-full h-full object-contain"
+                  fill
+                  className="object-contain"
                 />
               </div>
               <span className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-200">
@@ -77,6 +79,7 @@ export function Navigation() {
             <div className="flex items-center space-x-8">
               {navigationItems.map((item) => (
                 <button
+                  type="button"
                   key={item.name}
                   onClick={(e) => handleNavClick(item.href, e)}
                   className="relative text-muted-foreground hover:text-foreground px-4 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer group"
@@ -142,6 +145,7 @@ export function Navigation() {
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-background/95 backdrop-blur-lg border-t border-border">
                 {navigationItems.map((item) => (
                   <button
+                    type="button"
                     key={item.name}
                     onClick={(e) => {
                       handleNavClick(item.href, e);

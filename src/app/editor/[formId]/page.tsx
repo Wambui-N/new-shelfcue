@@ -36,7 +36,7 @@ function EditorPage({ params }: EditorPageProps) {
     const fetchForm = async () => {
       setLoading(true);
       try {
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from("forms")
           .select("*")
           .eq("id", formId)
@@ -63,7 +63,7 @@ function EditorPage({ params }: EditorPageProps) {
 
         // Ensure fields have stable unique ids
         const normalizedFields = Array.isArray(data.fields)
-          ? data.fields.map((f: any, idx: number) => ({
+          ? data.fields.map((f: { id?: string }, idx: number) => ({
               ...f,
               id:
                 f?.id && typeof f.id === "string"
@@ -105,15 +105,14 @@ function EditorPage({ params }: EditorPageProps) {
             : defaultSettings,
           lastSaved: new Date(),
         } as FormData);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
         console.error("Error fetching form:", {
-          message: error?.message,
-          code: error?.code,
-          details: error?.details,
-          hint: error?.hint,
+          message: errorMessage,
           error,
         });
-        alert(`Error loading form: ${error?.message || "Unknown error"}`);
+        alert(`Error loading form: ${errorMessage}`);
         router.push("/dashboard/forms");
       } finally {
         setLoading(false);

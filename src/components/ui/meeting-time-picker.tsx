@@ -11,7 +11,6 @@ interface MeetingTimePickerProps {
   onChange: (datetime: string) => void;
   duration?: number; // in minutes
   bufferTime?: number; // in minutes
-  availableSlots?: string[]; // ISO datetime strings
   placeholder?: string;
   disabled?: boolean;
   className?: string;
@@ -120,7 +119,6 @@ export function MeetingTimePicker({
   onChange,
   duration = 30,
   bufferTime = 0,
-  availableSlots = [],
   placeholder = "Select date and time",
   disabled = false,
   className,
@@ -298,16 +296,15 @@ export function MeetingTimePicker({
 
                 {/* Calendar Grid */}
                 <div className="grid grid-cols-7 gap-1">
-                  {calendarDays.map((date, index) => {
+                  {calendarDays.map((date) => {
                     const available = isDateAvailable(date);
                     const currentMonth = isCurrentMonth(date);
-                    const today = isToday(date);
                     const selected = isSelectedDate(date);
                     const hasValue = isCurrentValueDate(date);
 
                     return (
                       <button
-                        key={index}
+                        key={date.toISOString()}
                         type="button"
                         onClick={() => available && handleDateSelect(date)}
                         disabled={!available}
@@ -322,7 +319,7 @@ export function MeetingTimePicker({
                             "text-gray-300 cursor-not-allowed",
                           selected &&
                             "bg-gray-900 text-white hover:bg-gray-800",
-                          today && !selected && "bg-blue-100 text-blue-900",
+                          isToday(date) && !selected && "bg-blue-100 text-blue-900",
                           hasValue &&
                             !selected &&
                             "bg-green-100 text-green-900",

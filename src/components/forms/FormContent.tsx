@@ -2,22 +2,24 @@
 
 import type React from "react";
 import { cn } from "@/lib/utils";
-import type { FormField } from "@/types/form";
+import type { FormField } from "@/lib/types";
 import {
-  type FormLayout,
-  type FormTheme,
   layoutPresets,
 } from "@/types/form-display";
 import { FieldRenderer } from "./FieldRenderer";
 import { ProgressIndicator } from "./ProgressIndicator";
+import type { SubmissionDataValue } from "@/app/api/submit/route";
 
 interface FormContentProps {
   fields: FormField[];
-  formData: Record<string, any>;
-  onFieldChange: (fieldId: string, value: any) => void;
+  formData: Record<string, SubmissionDataValue>;
+  onFieldChange: (fieldId: string, value: SubmissionDataValue) => void;
   onSubmit: (e: React.FormEvent) => void;
-  layout: FormLayout;
-  theme: FormTheme;
+  layout: "grid" | "hero" | "conversational";
+  theme: {
+    fontFamily: string;
+    // Add other theme properties if needed
+  };
   currentStep: number;
   onStepChange: (step: number) => void;
   isSubmitting: boolean;

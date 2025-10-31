@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
 
     // Find user by email using auth admin API
     const { data: authUsers, error: listError } =
-      await supabase.auth.admin.listUsers({ email: userInfo.email });
+      await supabase.auth.admin.listUsers();
 
     if (listError) {
       console.error("Error listing users:", listError);
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const user = authUsers.users[0];
+    const user = authUsers.users.find((u) => u.email === userInfo.email);
 
     if (!user) {
       console.error("User not found in Supabase auth:", userInfo.email);

@@ -1,18 +1,15 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { FormTheme } from "@/types/form-display";
 
 interface ProgressIndicatorProps {
   currentStep: number;
   totalSteps: number;
-  theme: FormTheme;
 }
 
 export function ProgressIndicator({
   currentStep,
   totalSteps,
-  theme,
 }: ProgressIndicatorProps) {
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
@@ -29,10 +26,10 @@ export function ProgressIndicator({
       {/* Step Numbers */}
       <div className="flex justify-between items-center">
         {Array.from({ length: totalSteps }, (_, index) => (
-          <div key={index} className="flex flex-col items-center">
+          <div key={`step-${index + 1}`} className="flex flex-col items-center">
             <div
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
+                "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300",
                 index <= currentStep
                   ? "bg-[var(--shelf-primary)] text-white"
                   : "bg-gray-200 text-gray-500",

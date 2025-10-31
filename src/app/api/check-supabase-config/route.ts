@@ -29,6 +29,7 @@ export async function GET(_request: NextRequest) {
       environment: {},
       supabase: {},
       google: {},
+      recommendations: [],
     };
 
     // 1. Environment Variables Check

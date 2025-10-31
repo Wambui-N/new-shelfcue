@@ -55,7 +55,7 @@ export function MeetingConfigDialog({
       console.log("📅 Calendar fetch response:", response.status);
 
       if (!response.ok) {
-        let errorData: any = {};
+        let errorData: { error?: string } = {};
         try {
           errorData = await response.json();
         } catch (_) {
@@ -84,11 +84,13 @@ export function MeetingConfigDialog({
       if (primaryCalendar) {
         setSelectedCalendar(primaryCalendar.id);
       }
-    } catch (err: any) {
-      if (err?.name === "AbortError") {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") {
         setError("Request timed out. Please try again.");
       } else {
-        setError(err.message || "Failed to fetch calendars");
+        setError(
+          (err as { message?: string })?.message || "Failed to fetch calendars",
+        );
       }
     } finally {
       setLoading(false);

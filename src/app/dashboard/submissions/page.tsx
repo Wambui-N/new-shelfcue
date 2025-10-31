@@ -16,7 +16,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { SubmissionsSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,15 +36,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import type { SubmissionDataValue } from "@/types/form";
 
 type Submission = {
   id: string;
   form_id: string;
-  data: Record<string, any>;
+  data: Record<string, SubmissionDataValue>;
   created_at: string;
-  forms?: { title: string } | { title: string }[];
+  forms?: { title: string };
 };
 
 type FormSummary = { id: string; title: string };
@@ -63,7 +65,7 @@ export default function SubmissionsPage() {
   );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  const fetchForms = async () => {
+  const fetchForms = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -78,21 +80,23 @@ export default function SubmissionsPage() {
     } catch (error) {
       console.error("Error fetching forms:", error);
     }
-  };
+  }, [user, supabase]);
 
-  const fetchSubmissions = async () => {
+  const fetchSubmissions = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("submissions")
-        .select(`
+        .select(
+          `
           id, form_id, data, created_at,
-          forms!inner (
+          form:forms!inner (
             title
           )
-        `)
+        `,
+        )
         .eq("forms.user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(100);
@@ -105,7 +109,7 @@ export default function SubmissionsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, supabase]);
 
   useEffect(() => {
     fetchSubmissions();
@@ -147,9 +151,7 @@ export default function SubmissionsPage() {
   };
 
   const getFormTitle = (submission: Submission) => {
-    return Array.isArray(submission.forms)
-      ? submission.forms[0]?.title
-      : submission.forms?.title || "Form";
+    return submission.forms?.title || "Form";
   };
 
   const getTimeAgo = (dateString: string) => {
@@ -491,10 +493,16 @@ export default function SubmissionsPage() {
                     key={key}
                     className="border-b border-border pb-3 last:border-0"
                   >
-                    <label className="text-sm font-medium text-foreground capitalize">
+                    <Label
+                      htmlFor={`submission-detail-${key}`}
+                      className="text-sm font-medium text-foreground capitalize"
+                    >
                       {key.replace(/_/g, " ")}
-                    </label>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    </Label>
+                    <p
+                      id={`submission-detail-${key}`}
+                      className="text-sm text-muted-foreground mt-1"
+                    >
                       {String(value)}
                     </p>
                   </div>

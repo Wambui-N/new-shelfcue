@@ -185,9 +185,9 @@ export function PricingSection() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3, duration: 0.6 }}
               >
-                {plan.features.map((feature, featureIndex) => (
+                {plan.features.map((feature) => (
                   <motion.li
-                    key={featureIndex}
+                    key={feature}
                     className="flex items-start group/feature"
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}

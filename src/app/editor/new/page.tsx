@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { FormBuilder } from "@/components/builder/FormBuilder";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { SubscriptionGuard } from "@/components/SubscriptionGuard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFormStore } from "@/store/formStore";
 

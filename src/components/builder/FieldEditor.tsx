@@ -194,16 +194,16 @@ export function FieldEditor() {
                         <Label className="text-xs text-muted-foreground">
                           Options
                         </Label>
-                        {field.options?.map((option, optionIndex) => (
+                        {field.options?.map((option) => (
                           <div
-                            key={optionIndex}
+                            key={option.value}
                             className="flex items-center gap-2"
                           >
                             <Input
-                              value={option}
+                              value={option.value}
                               onChange={(e) => {
                                 const newOptions = [...(field.options || [])];
-                                newOptions[optionIndex] = e.target.value;
+                                newOptions[option.value] = e.target.value;
                                 updateField(field.id, { options: newOptions });
                               }}
                               className="text-sm"
@@ -215,7 +215,7 @@ export function FieldEditor() {
                               onClick={() => {
                                 const newOptions =
                                   field.options?.filter(
-                                    (_, i) => i !== optionIndex,
+                                    (_, i) => i !== option.value,
                                   ) || [];
                                 updateField(field.id, { options: newOptions });
                               }}

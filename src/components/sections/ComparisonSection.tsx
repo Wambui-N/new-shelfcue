@@ -1,146 +1,55 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Crown, Shield, X, Zap } from "lucide-react";
+import {
+  Calendar,
+  Check,
+  DollarSign,
+  Link2,
+  Puzzle,
+  X,
+  Zap,
+} from "lucide-react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+
+const tools = [
+  { name: "Calendly", icon: Calendar, cost: "$12/mo", feature: "Basic scheduling" },
+  { name: "Typeform", icon: Puzzle, cost: "$25/mo", feature: "Beautiful forms" },
+  { name: "Simple CRM", icon: Link2, cost: "$15/mo", feature: "Lead tracking" },
+  { name: "Zapier", icon: Zap, cost: "$20/mo", feature: "Automation" },
+];
+
+const comparison = [
+  { feature: "Smart Scheduling", tools: "❌", shelfcue: "✅" },
+  { feature: "Custom Form Builder", tools: "❌", shelfcue: "✅" },
+  { feature: "Lead Management", tools: "❌", shelfcue: "✅" },
+  { feature: "Google Integration", tools: "❌", shelfcue: "✅" },
+  { feature: "Real-time Tracking", tools: "❌", shelfcue: "✅" },
+  { feature: "Single Dashboard", tools: "❌", shelfcue: "✅" },
+];
 
 export function ComparisonSection() {
-  const comparisons = [
-    {
-      category: "Setup & Ease of Use",
-      features: [
-        {
-          name: "No-code form builder",
-          shelfcue: true,
-          competitor1: false,
-          competitor2: true,
-        },
-        {
-          name: "60-second setup",
-          shelfcue: true,
-          competitor1: false,
-          competitor2: false,
-        },
-        {
-          name: "Drag & drop interface",
-          shelfcue: true,
-          competitor1: true,
-          competitor2: false,
-        },
-        {
-          name: "Mobile responsive",
-          shelfcue: true,
-          competitor1: true,
-          competitor2: true,
-        },
-      ],
-    },
-    {
-      category: "Integrations & Automation",
-      features: [
-        {
-          name: "Google Sheets sync",
-          shelfcue: true,
-          competitor1: true,
-          competitor2: false,
-        },
-        {
-          name: "CRM integrations",
-          shelfcue: true,
-          competitor1: false,
-          competitor2: true,
-        },
-        {
-          name: "Webhook support",
-          shelfcue: true,
-          competitor1: true,
-          competitor2: true,
-        },
-        {
-          name: "Zapier integration",
-          shelfcue: true,
-          competitor1: false,
-          competitor2: false,
-        },
-      ],
-    },
-    {
-      category: "Analytics & Insights",
-      features: [
-        {
-          name: "Real-time analytics",
-          shelfcue: true,
-          competitor1: true,
-          competitor2: false,
-        },
-        {
-          name: "Conversion tracking",
-          shelfcue: true,
-          competitor1: false,
-          competitor2: true,
-        },
-        {
-          name: "Custom reports",
-          shelfcue: true,
-          competitor1: false,
-          competitor2: true,
-        },
-        {
-          name: "Export capabilities",
-          shelfcue: true,
-          competitor1: true,
-          competitor2: true,
-        },
-      ],
-    },
-    {
-      category: "Security & Compliance",
-      features: [
-        {
-          name: "GDPR compliant",
-          shelfcue: true,
-          competitor1: true,
-          competitor2: false,
-        },
-        {
-          name: "SSL encryption",
-          shelfcue: true,
-          competitor1: true,
-          competitor2: true,
-        },
-        {
-          name: "Data backup",
-          shelfcue: true,
-          competitor1: false,
-          competitor2: true,
-        },
-        {
-          name: "Audit logs",
-          shelfcue: true,
-          competitor1: false,
-          competitor2: false,
-        },
-      ],
-    },
-  ];
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: 0.15,
         delayChildren: 0.1,
       },
     },
   };
 
-  const tableVariants = {
+  const itemVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
         duration: 0.6,
+        ease: [0.22, 1, 0.36, 1] as const,
       },
     },
   };
@@ -148,184 +57,244 @@ export function ComparisonSection() {
   return (
     <section
       id="comparison"
-      className="py-20 px-4 sm:px-6 lg:px-8 bg-background"
+      className="py-16 px-4 sm:px-6 lg:px-8 bg-background relative overflow-hidden"
     >
+      {/* Background Elements */}
+      <div className="absolute inset-0 opacity-5">
+        <motion.div
+          className="absolute top-1/4 right-1/4 w-72 h-72 bg-primary/20 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.3, 0.6, 0.3],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+          }}
+        />
+      </div>
+
       <motion.div
-        className="container mx-auto max-w-7xl"
+        className="container mx-auto max-w-6xl relative z-10"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
       >
+        {/* Header */}
         <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+          variants={itemVariants}
         >
-          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
-            Why Choose
-            <span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              ShelfCue?
-            </span>
+          <motion.div
+            className="inline-flex items-center gap-2 px-3 py-1 bg-light-gray/30 text-black rounded-full text-xs font-medium mb-6 border border-light-gray"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
+            <DollarSign className="w-3 h-3" />
+            <span>Save Money, Save Time</span>
+          </motion.div>
+
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
+            Stop Paying for{" "}
+            <span className="text-primary">4 Separate Tools</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            See how we stack up against the competition. Built for founders who
-            value simplicity and results.
+
+          <p className="text-base md:text-lg text-foreground-muted max-w-3xl mx-auto leading-relaxed">
+            Replace multiple subscriptions with one affordable solution
           </p>
         </motion.div>
 
-        <motion.div variants={tableVariants} className="space-y-8">
-          {comparisons.map((category, categoryIndex) => (
+        {/* Tools Grid */}
+        <motion.div
+          className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12"
+          variants={itemVariants}
+        >
+          {tools.map((tool) => {
+            const IconComponent = tool.icon;
+            return (
+              <motion.div
+                key={tool.name}
+                whileHover={{ y: -5, scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Card className="p-4 text-center border-2 border-muted hover:border-primary transition-colors">
+                  <IconComponent className="w-8 h-8 mx-auto mb-2 text-primary" />
+                  <p className="text-sm font-semibold text-foreground mb-1">
+                    {tool.name}
+                  </p>
+                  <p className="text-xs text-foreground-muted">{tool.feature}</p>
+                  <p className="text-sm font-bold text-primary mt-2">
+                    {tool.cost}
+                  </p>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+
+        {/* Plus Icon with = Shelfcue */}
             <motion.div
-              key={category.category}
-              className="bg-card rounded-2xl p-8 border border-border shadow-sm"
-              variants={tableVariants}
-              whileHover={{ y: -2 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h3 className="text-xl font-semibold text-foreground mb-6 flex items-center gap-3">
+          className="flex items-center justify-center mb-8"
+          variants={itemVariants}
+        >
                 <motion.div
-                  animate={{
-                    rotate: [0, 5, -5, 0],
-                    scale: [1, 1.05, 1],
-                  }}
+            className="text-4xl font-bold text-foreground"
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              repeatDelay: 3,
+            }}
+          >
+            +
+          </motion.div>
+          <motion.span
+            className="mx-4 text-6xl text-primary"
+            animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{
-                    duration: 4,
+              duration: 2,
                     repeat: Infinity,
                   }}
                 >
-                  {categoryIndex === 0 && (
-                    <Zap className="w-6 h-6 text-yellow-500" />
-                  )}
-                  {categoryIndex === 1 && (
-                    <Shield className="w-6 h-6 text-blue-500" />
-                  )}
-                  {categoryIndex === 2 && (
-                    <Crown className="w-6 h-6 text-purple-500" />
-                  )}
-                  {categoryIndex === 3 && (
-                    <Shield className="w-6 h-6 text-green-500" />
-                  )}
-                </motion.div>
-                {category.category}
-              </h3>
-
-              <div className="overflow-hidden">
-                <div className="grid grid-cols-4 gap-4 text-sm font-medium text-muted-foreground mb-4">
-                  <div>Feature</div>
-                  <div className="text-center">
-                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
-                      ShelfCue
-                    </span>
-                  </div>
-                  <div className="text-center">
-                    <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-xs">
-                      Typeform
-                    </span>
-                  </div>
-                  <div className="text-center">
-                    <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-xs">
-                      Google Forms
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {category.features.map((feature, featureIndex) => (
-                    <motion.div
-                      key={feature.name}
-                      className="grid grid-cols-4 gap-4 py-3 border-b border-border/50 last:border-0"
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: featureIndex * 0.1, duration: 0.5 }}
-                    >
-                      <div className="font-medium text-foreground">
-                        {feature.name}
-                      </div>
-                      <div className="flex justify-center">
-                        <motion.div
-                          animate={{
-                            scale: feature.shelfcue
-                              ? [1, 1.2, 1]
-                              : [0.8, 1, 0.8],
-                            backgroundColor: feature.shelfcue
-                              ? "#151419"
-                              : "#cfcecb",
-                          }}
-                          transition={{
-                            duration: feature.shelfcue ? 2 : 1,
-                            repeat: feature.shelfcue ? Infinity : 0,
-                          }}
-                          className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                            feature.shelfcue
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          {feature.shelfcue ? (
-                            <Check className="w-4 h-4" />
-                          ) : (
-                            <X className="w-4 h-4" />
-                          )}
-                        </motion.div>
-                      </div>
-                      <div className="flex justify-center">
-                        <div
-                          className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                            feature.competitor1
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                          }`}
-                        >
-                          {feature.competitor1 ? (
-                            <Check className="w-4 h-4" />
-                          ) : (
-                            <X className="w-4 h-4" />
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex justify-center">
-                        <div
-                          className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                            feature.competitor2
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                          }`}
-                        >
-                          {feature.competitor2 ? (
-                            <Check className="w-4 h-4" />
-                          ) : (
-                            <X className="w-4 h-4" />
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+            =
+          </motion.span>
+          <div className="flex items-center gap-3 bg-primary/10 px-6 py-4 rounded-2xl border-2 border-primary">
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+              <Image
+                src="/1.png"
+                alt="Shelfcue"
+                width={24}
+                height={24}
+                className="w-6 h-6"
+              />
+            </div>
+            <div className="text-left">
+              <p className="text-xl font-bold text-foreground">Shelfcue</p>
+              <p className="text-sm text-primary font-semibold">$29/mo</p>
+            </div>
+          </div>
         </motion.div>
 
-        {/* Bottom CTA */}
-        <motion.div
-          className="text-center mt-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+        {/* Comparison Table */}
+                    <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12"
+          variants={itemVariants}
         >
-          <motion.div
-            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
+          {/* Before - Multiple Tools */}
+          <Card className="p-6 border-2 border-muted">
+            <div className="flex items-center gap-2 mb-6">
+              <X className="w-6 h-6 text-red-500" />
+              <h3 className="text-xl font-bold text-foreground">Before</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center py-3 border-b border-muted">
+                <span className="text-foreground-muted">Total Cost</span>
+                <span className="text-2xl font-bold text-foreground">$72/mo</span>
+              </div>
+              <div className="flex justify-between items-center py-3 border-b border-muted">
+                <span className="text-foreground-muted">No. of Tools</span>
+                <span className="text-xl font-semibold text-foreground">4</span>
+                      </div>
+              <div className="flex justify-between items-center py-3 border-b border-muted">
+                <span className="text-foreground-muted">Complexity</span>
+                <span className="text-xl font-semibold text-red-500">High</span>
+                      </div>
+              <div className="flex justify-between items-center pt-3">
+                <span className="text-foreground-muted">Connected</span>
+                <span className="text-xl font-semibold text-red-500">❌</span>
+                        </div>
+                      </div>
+          </Card>
+
+          {/* After - Shelfcue */}
+          <Card className="p-6 border-2 border-primary bg-primary/5">
+            <div className="flex items-center gap-2 mb-6">
+              <Check className="w-6 h-6 text-primary" />
+              <h3 className="text-xl font-bold text-foreground">After</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center py-3 border-b border-muted">
+                <span className="text-foreground-muted">Total Cost</span>
+                <span className="text-2xl font-bold text-primary">$29/mo</span>
+              </div>
+              <div className="flex justify-between items-center py-3 border-b border-muted">
+                <span className="text-foreground-muted">No. of Tools</span>
+                <span className="text-xl font-semibold text-primary">1</span>
+              </div>
+              <div className="flex justify-between items-center py-3 border-b border-muted">
+                <span className="text-foreground-muted">Complexity</span>
+                <span className="text-xl font-semibold text-primary">Low</span>
+              </div>
+              <div className="flex justify-between items-center pt-3">
+                <span className="text-foreground-muted">Connected</span>
+                <span className="text-xl font-semibold text-primary">✅</span>
+                        </div>
+                      </div>
+          </Card>
+                    </motion.div>
+
+        {/* Feature Comparison */}
+        <motion.div variants={itemVariants}>
+          <Card className="p-6 border-2 border-muted">
+            <h3 className="text-xl font-bold text-center mb-6 text-foreground">
+              Feature Comparison
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-muted">
+                    <th className="text-left py-3 text-sm font-semibold text-foreground-muted">
+                      Feature
+                    </th>
+                    <th className="text-center py-3 text-sm font-semibold text-foreground-muted">
+                      Other Tools
+                    </th>
+                    <th className="text-center py-3 text-sm font-semibold text-primary">
+                      Shelfcue
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparison.map((item) => (
+                    <tr
+                      key={item.feature}
+                      className="border-b border-muted hover:bg-muted/30 transition-colors"
+                    >
+                      <td className="py-3 text-foreground font-medium">
+                        {item.feature}
+                      </td>
+                      <td className="text-center py-3 text-foreground-muted">
+                        {item.tools}
+                      </td>
+                      <td className="text-center py-3 text-primary font-bold">
+                        {item.shelfcue}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+                </div>
+          </Card>
+        </motion.div>
+
+        {/* CTA */}
+        <motion.div
+          className="text-center mt-12"
+          variants={itemVariants}
+        >
+          <Button
+            asChild
+            className="bg-primary text-white hover:bg-primary/90 px-8 py-6 text-lg font-semibold shadow-xl"
+            size="lg"
           >
-            <Crown className="w-5 h-5" />
-            <span>Join 10,000+ businesses already using ShelfCue</span>
-          </motion.div>
+            <a href="/auth/signup">
+              Start Your 14-Day Free Trial
+            </a>
+          </Button>
+          <p className="text-sm text-foreground-muted mt-4">
+            Save $516/year. No credit card required.
+          </p>
         </motion.div>
       </motion.div>
     </section>

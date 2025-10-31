@@ -12,7 +12,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { BillingSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,7 @@ type Plan = {
   price_monthly: number;
   price_yearly: number;
   features: string[];
-  limits: Record<string, any>;
+  limits: Record<string, string | number>;
   paystack_plan_code?: string;
 };
 
@@ -107,15 +107,7 @@ export default function BillingPage() {
   // Create a client-side Supabase instance
   const supabase = createClient();
 
-  useEffect(() => {
-    // Check if this is trial onboarding from query params
-    const params = new URLSearchParams(window.location.search);
-    setIsTrialOnboarding(params.get("trial") === "true");
-
-    fetchData();
-  }, [fetchData]);
-
-  async function fetchData() {
+  const fetchData = useCallback(async () => {
     try {
       setFetchError(null);
       if (!user) {
@@ -123,10 +115,13 @@ export default function BillingPage() {
         return;
       }
 
+      const session = await supabase.auth.getSession();
+      const accessToken = session.data.session?.access_token;
+
       // Fetch current subscription
       const subResponse = await fetch("/api/subscriptions/current", {
         headers: {
-          Authorization: `Bearer ${(user as any).access_token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -171,7 +166,15 @@ export default function BillingPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [user, supabase.auth]);
+
+  useEffect(() => {
+    // Check if this is trial onboarding from query params
+    const params = new URLSearchParams(window.location.search);
+    setIsTrialOnboarding(params.get("trial") === "true");
+
+    fetchData();
+  }, [fetchData]);
 
   async function handleSubscribe() {
     try {
@@ -494,8 +497,11 @@ export default function BillingPage() {
                 </div>
 
                 <ul className="space-y-2 py-4">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2 text-sm">
+                  {plan.features.map((feature) => (
+                    <li
+                      key={feature}
+                      className="flex items-start gap-2 text-sm"
+                    >
                       <CheckCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                       <span>{feature}</span>
                     </li>

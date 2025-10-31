@@ -42,7 +42,7 @@ function getBackgroundStyle(theme: FormTheme): React.CSSProperties {
     return { backgroundColor: "#ffffff" };
   }
 
-  const { type, color, gradient, image, overlay } = theme.background;
+  const { type, color, gradient, image } = theme.background;
 
   switch (type) {
     case "solid":

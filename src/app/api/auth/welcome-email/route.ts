@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { EmailService } from "@/lib/resend";
+import { sendWelcomeEmail } from "@/lib/resend";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 /**
@@ -18,23 +18,28 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabaseAdmin();
 
-    // Get user profile
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("email, full_name")
-      .eq("id", userId)
-      .single();
+    // Get user info from auth users
+    const { data: userData, error: userError } =
+      await supabase.auth.admin.getUserById(userId);
 
-    if (error || !profile?.email) {
-      console.error("Error fetching user profile:", error);
+    if (userError || !userData?.user?.email) {
+      console.error("Error fetching user:", userError);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const user = userData.user;
+    const email = user.email;
+    const fullName =
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      "there";
+
+    if (!email) {
+      return NextResponse.json({ error: "User has no email" }, { status: 400 });
+    }
+
     // Send welcome email
-    const result = await EmailService.sendWelcomeEmail(
-      profile.email,
-      profile.full_name || "there",
-    );
+    const result = await sendWelcomeEmail(email, fullName);
 
     if (result.success) {
       return NextResponse.json({

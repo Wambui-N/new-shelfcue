@@ -45,6 +45,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/database.types";
+import { Label } from "@/components/ui/label";
 
 type Form = Database["public"]["Tables"]["forms"]["Row"] & {
   submissions_count?: number;
@@ -100,7 +101,7 @@ export default function FormsPage() {
       }
 
       // Map the data to include submissions count
-      const dataWithCount = (data || []).map((form: any) => ({
+      const dataWithCount = (data || []).map((form) => ({
         ...form,
         submissions_count: Array.isArray(form.submissions)
           ? form.submissions.length
@@ -193,7 +194,7 @@ export default function FormsPage() {
     const newStatus = currentStatus === "published" ? "draft" : "published";
 
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("forms")
         .update({ status: newStatus })
         .eq("id", formId);
@@ -216,7 +217,7 @@ export default function FormsPage() {
     if (!formToDelete || deleteConfirmation !== "DELETE" || !user?.id) return;
 
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("forms")
         .delete()
         .eq("id", formToDelete.id);
@@ -236,7 +237,7 @@ export default function FormsPage() {
     const formIds = Array.from(selectedForms);
 
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("forms")
         .update({ status: "published" })
         .in("id", formIds);
@@ -260,7 +261,7 @@ export default function FormsPage() {
     const formIds = Array.from(selectedForms);
 
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("forms")
         .update({ status: "draft" })
         .in("id", formIds);
@@ -847,10 +848,14 @@ export default function FormsPage() {
           </DialogHeader>
           <div className="py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
+              <Label
+                htmlFor="delete-confirmation"
+                className="text-sm font-medium text-foreground"
+              >
                 Type "DELETE" to confirm:
-              </label>
+              </Label>
               <Input
+                id="delete-confirmation"
                 value={deleteConfirmation}
                 onChange={(e) => setDeleteConfirmation(e.target.value)}
                 placeholder="DELETE"

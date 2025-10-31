@@ -17,6 +17,54 @@ function VerifyContent() {
   );
   const [message, setMessage] = useState("");
 
+  const verifyPayment = useCallback(
+    async (ref: string) => {
+      try {
+        const supabase = createClient();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session) {
+          setStatus("error");
+          setMessage("Please sign in to verify payment");
+          return;
+        }
+
+        const response = await fetch(`/api/payments/verify?reference=${ref}`, {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        console.log("🔍 Verification response:", {
+          status: response.status,
+          ok: response.ok,
+          data: data,
+        });
+
+        if (response.ok && data.success) {
+          setStatus("success");
+          setMessage(
+            "Payment verified successfully! Your subscription is now active.",
+          );
+        } else {
+          setStatus("error");
+          const errorMessage =
+            data.details || data.error || "Payment verification failed";
+          setMessage(errorMessage);
+          console.error("❌ Payment verification failed:", data);
+        }
+      } catch (_error) {
+        setStatus("error");
+        setMessage("An error occurred while verifying payment");
+      }
+    },
+    [],
+  );
+
   useEffect(() => {
     if (reference) {
       verifyPayment(reference);
@@ -25,51 +73,6 @@ function VerifyContent() {
       setMessage("No payment reference found");
     }
   }, [reference, verifyPayment]);
-
-  async function verifyPayment(ref: string) {
-    try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        setStatus("error");
-        setMessage("Please sign in to verify payment");
-        return;
-      }
-
-      const response = await fetch(`/api/payments/verify?reference=${ref}`, {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      console.log("🔍 Verification response:", {
-        status: response.status,
-        ok: response.ok,
-        data: data,
-      });
-
-      if (response.ok && data.success) {
-        setStatus("success");
-        setMessage(
-          "Payment verified successfully! Your subscription is now active.",
-        );
-      } else {
-        setStatus("error");
-        const errorMessage =
-          data.details || data.error || "Payment verification failed";
-        setMessage(errorMessage);
-        console.error("❌ Payment verification failed:", data);
-      }
-    } catch (_error) {
-      setStatus("error");
-      setMessage("An error occurred while verifying payment");
-    }
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

@@ -2,23 +2,20 @@
 
 import { MeetingTimePicker } from "@/components/ui/meeting-time-picker";
 import { cn } from "@/lib/utils";
-import type { FormField } from "@/types/form";
-import type { FormTheme } from "@/types/form-display";
+import type { FormField } from "@/lib/types";
+import { Textarea } from "../ui/textarea";
+import type { SubmissionDataValue } from "@/app/api/submit/route";
 
 interface FieldRendererProps {
   field: FormField;
-  value: any;
-  onChange: (value: any) => void;
-  theme: FormTheme;
-  isConversational?: boolean;
+  value: SubmissionDataValue;
+  onChange: (value: SubmissionDataValue) => void;
 }
 
 export function FieldRenderer({
   field,
   value,
   onChange,
-  theme,
-  isConversational = false,
 }: FieldRendererProps) {
   const baseClasses = cn(
     "w-full px-4 py-3 rounded-lg border border-gray-300",
@@ -32,6 +29,13 @@ export function FieldRenderer({
     isConversational && "text-lg font-semibold text-gray-900",
   );
 
+  const commonProps = {
+    id: field.id,
+    placeholder: field.placeholder,
+    required: field.required,
+    className: baseClasses,
+  };
+
   const renderField = () => {
     switch (field.type) {
       case "text":
@@ -40,9 +44,7 @@ export function FieldRenderer({
             type="text"
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            placeholder={field.placeholder}
-            required={field.required}
-            className={baseClasses}
+            {...commonProps}
           />
         );
 
@@ -52,19 +54,16 @@ export function FieldRenderer({
             type="email"
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            placeholder={field.placeholder}
-            required={field.required}
-            className={baseClasses}
+            {...commonProps}
           />
         );
 
       case "textarea":
         return (
-          <textarea
+          <Textarea
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            placeholder={field.placeholder}
-            required={field.required}
+            {...commonProps}
             rows={4}
             className={cn(baseClasses, "resize-none")}
           />
@@ -73,15 +72,14 @@ export function FieldRenderer({
       case "select":
         return (
           <select
-            value={value || ""}
+            value={(value as string) || ""}
             onChange={(e) => onChange(e.target.value)}
-            required={field.required}
-            className={baseClasses}
+            {...commonProps}
           >
             <option value="">{field.placeholder || "Select an option"}</option>
-            {field.options?.map((option, index) => (
-              <option key={index} value={option}>
-                {option}
+            {field.options?.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
               </option>
             ))}
           </select>
@@ -90,21 +88,21 @@ export function FieldRenderer({
       case "radio":
         return (
           <div className="space-y-2">
-            {field.options?.map((option, index) => (
+            {field.options?.map((option) => (
               <label
-                key={index}
+                key={option.value}
                 className="flex items-center space-x-3 cursor-pointer"
               >
                 <input
                   type="radio"
                   name={field.id}
-                  value={option}
-                  checked={value === option}
+                  value={option.value}
+                  checked={value === option.value}
                   onChange={(e) => onChange(e.target.value)}
                   required={field.required}
                   className="w-4 h-4 text-[var(--shelf-primary)] border-gray-300 focus:ring-[var(--shelf-primary)]"
                 />
-                <span className="text-sm text-gray-700">{option}</span>
+                <span className="text-sm text-gray-700">{option.label}</span>
               </label>
             ))}
           </div>
@@ -113,31 +111,31 @@ export function FieldRenderer({
       case "checkbox":
         return (
           <div className="space-y-2">
-            {field.options?.map((option, index) => (
+            {field.options?.map((option) => (
               <label
-                key={index}
+                key={option.value}
                 className="flex items-center space-x-3 cursor-pointer"
               >
                 <input
                   type="checkbox"
                   name={field.id}
-                  value={option}
+                  value={option.value}
                   checked={
-                    Array.isArray(value) ? value.includes(option) : false
+                    Array.isArray(value) ? value.includes(option.value) : false
                   }
                   onChange={(e) => {
                     const currentValues = Array.isArray(value) ? value : [];
                     if (e.target.checked) {
-                      onChange([...currentValues, option]);
+                      onChange([...currentValues, option.value]);
                     } else {
                       onChange(
-                        currentValues.filter((v: string) => v !== option),
+                        currentValues.filter((v: string) => v !== option.value),
                       );
                     }
                   }}
                   className="w-4 h-4 text-[var(--shelf-primary)] border-gray-300 rounded focus:ring-[var(--shelf-primary)]"
                 />
-                <span className="text-sm text-gray-700">{option}</span>
+                <span className="text-sm text-gray-700">{option.label}</span>
               </label>
             ))}
           </div>
@@ -160,9 +158,7 @@ export function FieldRenderer({
             type="tel"
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            placeholder={field.placeholder}
-            required={field.required}
-            className={baseClasses}
+            {...commonProps}
           />
         );
 
@@ -172,9 +168,7 @@ export function FieldRenderer({
             type="number"
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            placeholder={field.placeholder}
-            required={field.required}
-            className={baseClasses}
+            {...commonProps}
           />
         );
 
@@ -184,8 +178,7 @@ export function FieldRenderer({
             type="date"
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            required={field.required}
-            className={baseClasses}
+            {...commonProps}
           />
         );
 
@@ -195,9 +188,7 @@ export function FieldRenderer({
             type="text"
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            placeholder={field.placeholder}
-            required={field.required}
-            className={baseClasses}
+            {...commonProps}
           />
         );
     }

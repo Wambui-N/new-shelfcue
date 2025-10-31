@@ -54,23 +54,39 @@ export class GoogleSheetsService {
       }
 
       console.log("✅ Google Sheet creation complete");
+
+      if (!spreadsheetId || !response.data.spreadsheetUrl) {
+        throw new Error("Failed to create spreadsheet with valid ID and URL");
+      }
+
       return {
-        spreadsheetId: spreadsheetId!,
-        spreadsheetUrl: response.data.spreadsheetUrl!,
+        spreadsheetId: spreadsheetId,
+        spreadsheetUrl: response.data.spreadsheetUrl,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("❌ Error creating Google Sheet:", error);
 
       // Log detailed error information
-      if (error.response) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        error.response &&
+        typeof error.response === "object"
+      ) {
+        const response = error.response as {
+          status?: unknown;
+          statusText?: unknown;
+          data?: unknown;
+        };
         console.error("Google API Error:", {
-          status: error.response.status,
-          statusText: error.response.statusText,
-          data: error.response.data,
+          status: response.status,
+          statusText: response.statusText,
+          data: response.data,
         });
       }
 
-      if (error.message) {
+      if (error instanceof Error && error.message) {
         console.error("Error message:", error.message);
       }
 
@@ -104,7 +120,7 @@ export class GoogleSheetsService {
    */
   async append(
     spreadsheetId: string,
-    data: any[],
+    data: (string | number | boolean)[],
     sheetName: string = "Form Responses",
   ) {
     try {

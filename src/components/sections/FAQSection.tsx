@@ -3,63 +3,117 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { CreditCard, HelpCircle, Shield, Zap } from "lucide-react";
 import { useState } from "react";
+import JsonLd from "../JsonLd";
+
+const faqData = {
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What is Shelfcue?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Shelfcue is a no-code form builder that allows you to create beautiful, branded forms that connect directly to your Google Sheets. It's designed to be simple, powerful, and affordable, replacing the need for multiple tools like Calendly, Typeform, and Zapier.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How does the Google Sheets integration work?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Our native integration means that as soon as a user submits a form, the data is instantly and automatically sent to a Google Sheet of your choice. No manual exporting, and no third-party connectors needed.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can I schedule meetings with Shelfcue?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes! Shelfcue has a built-in meeting scheduler. You can add a meeting field to your forms, connect your Google Calendar, and let your leads book a time that works for both of you, directly from the form.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is there a free trial?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Absolutely. We offer a 14-day free trial on all our plans, with no credit card required. You get access to all the features to see if Shelfcue is the right fit for you.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can I customize the design of my forms?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes, you have full control over the look and feel of your forms. Customize colors, fonts, backgrounds, and layouts to match your brand perfectly.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is my data secure?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "We take data security very seriously. All data is encrypted in transit and at rest. For Google integrations, we use secure OAuth 2.0 to ensure your account is protected.",
+      },
+    },
+  ],
+};
+
+const faqs = [
+  {
+    category: "Setup & Getting Started",
+    icon: <Zap className="w-6 h-6" />,
+    color: "text-black",
+    questions: [
+      {
+        question: "How is this different from Google Forms?",
+        answer:
+          "ShelfCue creates beautiful, branded forms that match your website design. Unlike Google Forms, you can customize colors, add your logo, and embed forms without ugly borders. Plus, data flows directly into Google Sheets without any setup.",
+      },
+      {
+        question: "Do I need Zapier or coding skills?",
+        answer:
+          "No! ShelfCue connects directly to Google Sheets with one click. No Zapier needed. No coding required. Everything works automatically once you connect your Google account.",
+      },
+    ],
+  },
+  {
+    category: "Google Sheets Integration",
+    icon: <Shield className="w-6 h-6" />,
+    color: "text-dark-gray",
+    questions: [
+      {
+        question: "How does the Google Sheets connection work?",
+        answer:
+          "Simply connect your Google account once. Every form submission automatically appears in your Google Sheets spreadsheet. You can choose which sheet and columns to use. It's that simple.",
+      },
+      {
+        question: "Can I use existing Google Sheets?",
+        answer:
+          "Yes! You can connect to any existing Google Sheets spreadsheet. Choose which columns to use, and form data will flow right into your existing workflow.",
+      },
+    ],
+  },
+  {
+    category: "Form Building & Customization",
+    icon: <CreditCard className="w-6 h-6" />,
+    color: "text-black",
+    questions: [
+      {
+        question: "Can I make forms that match my brand?",
+        answer:
+          "Absolutely! Add your logo, choose your brand colors, and customize fonts. Make forms that look like they belong on your website, not generic Google Forms.",
+      },
+      {
+        question: "Do the forms work on mobile devices?",
+        answer:
+          "Yes! All ShelfCue forms are mobile-responsive and work perfectly on phones, tablets, and computers. Your forms will look great and work smoothly on any device.",
+      },
+    ],
+  },
+];
 
 export function FAQSection() {
   const [openItems, setOpenItems] = useState<Set<number>>(new Set());
-
-  const faqs = [
-    {
-      category: "Setup & Getting Started",
-      icon: <Zap className="w-6 h-6" />,
-      color: "text-black",
-      questions: [
-        {
-          question: "How is this different from Google Forms?",
-          answer:
-            "ShelfCue creates beautiful, branded forms that match your website design. Unlike Google Forms, you can customize colors, add your logo, and embed forms without ugly borders. Plus, data flows directly into Google Sheets without any setup.",
-        },
-        {
-          question: "Do I need Zapier or coding skills?",
-          answer:
-            "No! ShelfCue connects directly to Google Sheets with one click. No Zapier needed. No coding required. Everything works automatically once you connect your Google account.",
-        },
-      ],
-    },
-    {
-      category: "Google Sheets Integration",
-      icon: <Shield className="w-6 h-6" />,
-      color: "text-dark-gray",
-      questions: [
-        {
-          question: "How does the Google Sheets connection work?",
-          answer:
-            "Simply connect your Google account once. Every form submission automatically appears in your Google Sheets spreadsheet. You can choose which sheet and columns to use. It's that simple.",
-        },
-        {
-          question: "Can I use existing Google Sheets?",
-          answer:
-            "Yes! You can connect to any existing Google Sheets spreadsheet. Choose which columns to use, and form data will flow right into your existing workflow.",
-        },
-      ],
-    },
-    {
-      category: "Form Building & Customization",
-      icon: <CreditCard className="w-6 h-6" />,
-      color: "text-black",
-      questions: [
-        {
-          question: "Can I make forms that match my brand?",
-          answer:
-            "Absolutely! Add your logo, choose your brand colors, and customize fonts. Make forms that look like they belong on your website, not generic Google Forms.",
-        },
-        {
-          question: "Do the forms work on mobile devices?",
-          answer:
-            "Yes! All ShelfCue forms are mobile-responsive and work perfectly on phones, tablets, and computers. Your forms will look great and work smoothly on any device.",
-        },
-      ],
-    },
-  ];
 
   const toggleItem = (index: number) => {
     const newOpenItems = new Set(openItems);
@@ -96,23 +150,11 @@ export function FAQSection() {
   return (
     <>
       {/* FAQ Schema Markup */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: faqs.flatMap((category) =>
-              category.questions.map((faq) => ({
-                "@type": "Question",
-                name: faq.question,
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: faq.answer,
-                },
-              })),
-            ),
-          }),
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqData.mainEntity,
         }}
       />
       <section
@@ -141,6 +183,7 @@ export function FAQSection() {
           whileInView="visible"
           viewport={{ once: true }}
         >
+          {/* Header */}
           <motion.div
             className="text-center mb-12"
             initial={{ opacity: 0, y: 30 }}
@@ -162,11 +205,12 @@ export function FAQSection() {
               <span className="text-dark-gray">We Have Answers.</span>
             </h2>
 
-            <p className="text-base md:text-lg text-foreground-muted max-w-3xl mx-auto leading-relaxed">
-              Everything you need to know about Shelfcue.
+            <p className="text-base md:text-lg text-foreground-muted max-w-3xl mx-auto">
+              Find answers to common questions about Shelfcue.
             </p>
           </motion.div>
 
+          {/* Categories */}
           <div className="space-y-8">
             {faqs.map((category, categoryIndex) => (
               <motion.div
@@ -202,7 +246,7 @@ export function FAQSection() {
 
                     return (
                       <motion.div
-                        key={faqIndex}
+                        key={globalIndex}
                         className="border border-border rounded-lg overflow-hidden"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}

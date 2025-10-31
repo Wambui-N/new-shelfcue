@@ -207,10 +207,10 @@ export function DemoSection() {
             >
               {demoSteps.map((step, index) => (
                 <motion.div
-                  key={index}
+                  key={step.title}
                   className={`p-3 rounded-lg border-2 transition-all duration-500 ${
                     currentStep === index
-                      ? "border-black bg-light-gray/20 shadow-md"
+                      ? "bg-primary/10 border-primary shadow-lg"
                       : "border-light-gray hover:border-dark-gray"
                   }`}
                   animate={{

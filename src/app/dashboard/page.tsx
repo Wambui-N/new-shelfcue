@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import type { SubmissionDataValue } from "@/types/form";
 
 interface FormRecord {
   id: string;
@@ -35,7 +36,7 @@ interface FormRecord {
 interface SubmissionRecord {
   id: string;
   form_id: string;
-  data: Record<string, any>;
+  data: Record<string, SubmissionDataValue>;
   created_at: string;
   forms?: { title: string } | { title: string }[];
 }
@@ -73,7 +74,7 @@ export default function DashboardPage() {
         // Enforcement will happen on the backend.
         setCanCreateForm(true);
         // Fetch forms data
-        const { data: formsData, error: formsError } = await (supabase as any)
+        const { data: formsData, error: formsError } = await supabase
           .from("forms")
           .select("id, title, description, created_at, status")
           .eq("user_id", user.id)
@@ -92,9 +93,7 @@ export default function DashboardPage() {
         }
 
         // Fetch recent submissions
-        const { data: submissionsData, error: submissionsError } = await (
-          supabase as any
-        )
+        const { data: submissionsData, error: submissionsError } = await supabase
           .from("submissions")
           .select(`
             id, form_id, data, created_at,

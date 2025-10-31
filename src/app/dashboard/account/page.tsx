@@ -67,10 +67,12 @@ export default function AccountPage() {
       }
 
       setMessage({ type: "success", text: "Account updated successfully!" });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update account";
       setMessage({
         type: "error",
-        text: error.message || "Failed to update account",
+        text: errorMessage,
       });
     } finally {
       setSaving(false);
@@ -92,10 +94,12 @@ export default function AccountPage() {
       // For now, just sign out
       await supabase.auth.signOut();
       window.location.href = "/";
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete account";
       setMessage({
         type: "error",
-        text: error.message || "Failed to delete account",
+        text: errorMessage,
       });
     } finally {
       setLoading(false);

@@ -178,7 +178,7 @@ function AuthCallbackContent() {
           
           try {
             // Get the professional plan
-            const { data: planData } = await (supabase as any)
+            const { data: planData } = await supabase
               .from("subscription_plans")
               .select("id")
               .eq("name", "professional")
@@ -216,9 +216,7 @@ function AuthCallbackContent() {
   }, [
     router,
     searchParams,
-    supabase.from,
-    supabase.auth.getSession,
-    supabase.auth.signOut,
+    supabase,
   ]);
 
   return (
@@ -232,7 +230,10 @@ function AuthCallbackContent() {
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
+                role="img"
+                aria-label="Error Icon"
               >
+                <title>Error Icon</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

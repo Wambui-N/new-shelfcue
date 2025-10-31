@@ -100,12 +100,11 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
         setDisplayMode(data.displayMode || "standalone");
         setLayout(data.layout || "simple");
         setDisplayTheme(newDisplayTheme);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
         console.error("Error fetching form:", {
-          message: error?.message,
-          code: error?.code,
-          details: error?.details,
-          hint: error?.hint,
+          message: errorMessage,
           error,
         });
         setError("Form not found or an error occurred.");
@@ -117,7 +116,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
     fetchForm();
   }, [formId]);
 
-  const handleSubmit = async (submissionData: Record<string, any>) => {
+  const handleSubmit = async (submissionData: Record<string, unknown>) => {
     try {
       const response = await fetch("/api/submit", {
         method: "POST",
@@ -133,7 +132,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
       // Dispatch event to refresh dashboard counts
       window.dispatchEvent(new CustomEvent("submissionReceived"));
       setIsSubmitted(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error submitting form:", err);
       throw err;
     }

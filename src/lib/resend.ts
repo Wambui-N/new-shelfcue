@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import type { SubmissionDataValue } from "@/types/form";
 
 // Initialize Resend client
 export const resend = new Resend(process.env.RESEND_API_KEY);
@@ -8,249 +9,245 @@ export const DEFAULT_FROM_EMAIL =
   process.env.RESEND_FROM_EMAIL || "ShelfCue <noreply@shelfcue.com>";
 
 /**
- * Email service for sending transactional emails
+ * Send form submission notification to form owner
  */
-export class EmailService {
-  /**
-   * Send form submission notification to form owner
-   */
-  static async sendFormSubmissionNotification(
-    recipientEmail: string,
-    {
-      formName,
-      formId,
-      submissionId,
-      submittedAt,
-      submitterData,
-    }: {
-      formName: string;
-      formId: string;
-      submissionId: string;
-      submittedAt: string;
-      submitterData: Record<string, any>;
-    },
-  ) {
-    try {
-      const { data, error } = await resend.emails.send({
-        from: DEFAULT_FROM_EMAIL,
-        to: recipientEmail,
-        subject: `New Form Submission: ${formName}`,
-        html: EmailService.getFormSubmissionEmailHtml({
-          formName,
-          formId,
-          submissionId,
-          submittedAt,
-          submitterData,
-        }),
-      });
+export async function sendFormSubmissionNotification(
+  recipientEmail: string,
+  {
+    formName,
+    formId,
+    submissionId,
+    submittedAt,
+    submitterData,
+  }: {
+    formName: string;
+    formId: string;
+    submissionId: string;
+    submittedAt: string;
+    submitterData: Record<string, SubmissionDataValue>;
+  },
+) {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: DEFAULT_FROM_EMAIL,
+      to: recipientEmail,
+      subject: `New Form Submission: ${formName}`,
+      html: getFormSubmissionEmailHtml({
+        formName,
+        formId,
+        submissionId,
+        submittedAt,
+        submitterData,
+      }),
+    });
 
-      if (error) {
-        console.error("Error sending form submission email:", error);
-        return { success: false, error };
-      }
-
-      console.log("✓ Form submission email sent:", data?.id);
-      return { success: true, data };
-    } catch (error) {
+    if (error) {
       console.error("Error sending form submission email:", error);
       return { success: false, error };
     }
+
+    console.log("✓ Form submission email sent:", data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error sending form submission email:", error);
+    return { success: false, error };
   }
+}
 
-  /**
-   * Send welcome email to new user
-   */
-  static async sendWelcomeEmail(recipientEmail: string, userName: string) {
-    try {
-      const { data, error } = await resend.emails.send({
-        from: DEFAULT_FROM_EMAIL,
-        to: recipientEmail,
-        subject: "Welcome to ShelfCue! 🎉",
-        html: EmailService.getWelcomeEmailHtml(userName),
-      });
+/**
+ * Send welcome email to new user
+ */
+export async function sendWelcomeEmail(recipientEmail: string, userName: string) {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: DEFAULT_FROM_EMAIL,
+      to: recipientEmail,
+      subject: "Welcome to ShelfCue! 🎉",
+      html: getWelcomeEmailHtml(userName),
+    });
 
-      if (error) {
-        console.error("Error sending welcome email:", error);
-        return { success: false, error };
-      }
-
-      console.log("✓ Welcome email sent:", data?.id);
-      return { success: true, data };
-    } catch (error) {
+    if (error) {
       console.error("Error sending welcome email:", error);
       return { success: false, error };
     }
+
+    console.log("✓ Welcome email sent:", data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error sending welcome email:", error);
+    return { success: false, error };
   }
+}
 
-  /**
-   * Send subscription confirmation email
-   */
-  static async sendSubscriptionConfirmation(
-    recipientEmail: string,
-    {
-      userName,
-      planName,
-      amount,
-      billingCycle,
-    }: {
-      userName: string;
-      planName: string;
-      amount: string;
-      billingCycle: string;
-    },
-  ) {
-    try {
-      const { data, error } = await resend.emails.send({
-        from: DEFAULT_FROM_EMAIL,
-        to: recipientEmail,
-        subject: `Subscription Confirmed: ${planName} Plan`,
-        html: EmailService.getSubscriptionConfirmationHtml({
-          userName,
-          planName,
-          amount,
-          billingCycle,
-        }),
-      });
+/**
+ * Send subscription confirmation email
+ */
+export async function sendSubscriptionConfirmation(
+  recipientEmail: string,
+  {
+    userName,
+    planName,
+    amount,
+    billingCycle,
+  }: {
+    userName: string;
+    planName: string;
+    amount: string;
+    billingCycle: string;
+  },
+) {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: DEFAULT_FROM_EMAIL,
+      to: recipientEmail,
+      subject: `Subscription Confirmed: ${planName} Plan`,
+      html: getSubscriptionConfirmationHtml({
+        userName,
+        planName,
+        amount,
+        billingCycle,
+      }),
+    });
 
-      if (error) {
-        console.error("Error sending subscription confirmation email:", error);
-        return { success: false, error };
-      }
-
-      console.log("✓ Subscription confirmation email sent:", data?.id);
-      return { success: true, data };
-    } catch (error) {
+    if (error) {
       console.error("Error sending subscription confirmation email:", error);
       return { success: false, error };
     }
+
+    console.log("✓ Subscription confirmation email sent:", data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error sending subscription confirmation email:", error);
+    return { success: false, error };
   }
+}
 
-  /**
-   * Send payment failed notification
-   */
-  static async sendPaymentFailedNotification(
-    recipientEmail: string,
-    {
-      userName,
-      amount,
-      reason,
-    }: {
-      userName: string;
-      amount: string;
-      reason?: string;
-    },
-  ) {
-    try {
-      const { data, error } = await resend.emails.send({
-        from: DEFAULT_FROM_EMAIL,
-        to: recipientEmail,
-        subject: "Payment Failed - Action Required",
-        html: EmailService.getPaymentFailedHtml({ userName, amount, reason }),
-      });
+/**
+ * Send payment failed notification
+ */
+export async function sendPaymentFailedNotification(
+  recipientEmail: string,
+  {
+    userName,
+    amount,
+    reason,
+  }: {
+    userName: string;
+    amount: string;
+    reason?: string;
+  },
+) {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: DEFAULT_FROM_EMAIL,
+      to: recipientEmail,
+      subject: "Payment Failed - Action Required",
+      html: getPaymentFailedHtml({ userName, amount, reason }),
+    });
 
-      if (error) {
-        console.error("Error sending payment failed email:", error);
-        return { success: false, error };
-      }
-
-      console.log("✓ Payment failed email sent:", data?.id);
-      return { success: true, data };
-    } catch (error) {
+    if (error) {
       console.error("Error sending payment failed email:", error);
       return { success: false, error };
     }
+
+    console.log("✓ Payment failed email sent:", data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error sending payment failed email:", error);
+    return { success: false, error };
   }
+}
 
-  /**
-   * Send invoice notification
-   */
-  static async sendInvoiceNotification(
-    recipientEmail: string,
-    {
-      userName,
-      invoiceNumber,
-      amount,
-      dueDate,
-      invoiceUrl,
-    }: {
-      userName: string;
-      invoiceNumber: string;
-      amount: string;
-      dueDate: string;
-      invoiceUrl?: string;
-    },
-  ) {
-    try {
-      const { data, error } = await resend.emails.send({
-        from: DEFAULT_FROM_EMAIL,
-        to: recipientEmail,
-        subject: `New Invoice: ${invoiceNumber}`,
-        html: EmailService.getInvoiceHtml({
-          userName,
-          invoiceNumber,
-          amount,
-          dueDate,
-          invoiceUrl,
-        }),
-      });
+/**
+ * Send invoice notification
+ */
+export async function sendInvoiceNotification(
+  recipientEmail: string,
+  {
+    userName,
+    invoiceNumber,
+    amount,
+    dueDate,
+    invoiceUrl,
+  }: {
+    userName: string;
+    invoiceNumber: string;
+    amount: string;
+    dueDate: string;
+    invoiceUrl?: string;
+  },
+) {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: DEFAULT_FROM_EMAIL,
+      to: recipientEmail,
+      subject: `New Invoice: ${invoiceNumber}`,
+      html: getInvoiceHtml({
+        userName,
+        invoiceNumber,
+        amount,
+        dueDate,
+        invoiceUrl,
+      }),
+    });
 
-      if (error) {
-        console.error("Error sending invoice email:", error);
-        return { success: false, error };
-      }
-
-      console.log("✓ Invoice email sent:", data?.id);
-      return { success: true, data };
-    } catch (error) {
+    if (error) {
       console.error("Error sending invoice email:", error);
       return { success: false, error };
     }
+
+    console.log("✓ Invoice email sent:", data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error sending invoice email:", error);
+    return { success: false, error };
   }
+}
 
-  /**
-   * Send subscription cancelled notification
-   */
-  static async sendSubscriptionCancelledNotification(
-    recipientEmail: string,
-    {
-      userName,
-      planName,
-      endDate,
-    }: {
-      userName: string;
-      planName: string;
-      endDate: string;
-    },
-  ) {
-    try {
-      const { data, error } = await resend.emails.send({
-        from: DEFAULT_FROM_EMAIL,
-        to: recipientEmail,
-        subject: "Subscription Cancelled",
-        html: EmailService.getSubscriptionCancelledHtml({
-          userName,
-          planName,
-          endDate,
-        }),
-      });
+/**
+ * Send subscription cancelled notification
+ */
+export async function sendSubscriptionCancelledNotification(
+  recipientEmail: string,
+  {
+    userName,
+    planName,
+    endDate,
+  }: {
+    userName: string;
+    planName: string;
+    endDate: string;
+  },
+) {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: DEFAULT_FROM_EMAIL,
+      to: recipientEmail,
+      subject: "Subscription Cancelled",
+      html: getSubscriptionCancelledHtml({
+        userName,
+        planName,
+        endDate,
+      }),
+    });
 
-      if (error) {
-        console.error("Error sending subscription cancelled email:", error);
-        return { success: false, error };
-      }
-
-      console.log("✓ Subscription cancelled email sent:", data?.id);
-      return { success: true, data };
-    } catch (error) {
+    if (error) {
       console.error("Error sending subscription cancelled email:", error);
       return { success: false, error };
     }
+
+    console.log("✓ Subscription cancelled email sent:", data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error sending subscription cancelled email:", error);
+    return { success: false, error };
   }
+}
 
-  // ========== HTML Templates ==========
+// ========== HTML Templates ==========
 
-  private static getBaseEmailStyle() {
-    return `
+function getBaseEmailStyle() {
+  return `
       <style>
         body {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -339,40 +336,40 @@ export class EmailService {
         }
       </style>
     `;
-  }
+}
 
-  private static getFormSubmissionEmailHtml({
-    formName,
-    formId,
-    submissionId,
-    submittedAt,
-    submitterData,
-  }: {
-    formName: string;
-    formId: string;
-    submissionId: string;
-    submittedAt: string;
-    submitterData: Record<string, any>;
-  }) {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const submissionUrl = `${appUrl}/dashboard/submissions?formId=${formId}`;
+function getFormSubmissionEmailHtml({
+  formName,
+  formId,
+  submissionId,
+  submittedAt,
+  submitterData,
+}: {
+  formName: string;
+  formId: string;
+  submissionId: string;
+  submittedAt: string;
+  submitterData: Record<string, SubmissionDataValue>;
+}) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const submissionUrl = `${appUrl}/dashboard/submissions?formId=${formId}`;
 
-    const dataRows = Object.entries(submitterData)
-      .map(
-        ([key, value]) => `
+  const dataRows = Object.entries(submitterData)
+    .map(
+      ([key, value]) => `
         <tr>
           <td>${key}</td>
           <td>${value || "—"}</td>
         </tr>
       `,
-      )
-      .join("");
+    )
+    .join("");
 
-    return `
+  return `
       <!DOCTYPE html>
       <html>
         <head>
-          ${EmailService.getBaseEmailStyle()}
+          ${getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -404,17 +401,17 @@ export class EmailService {
         </body>
       </html>
     `;
-  }
+}
 
-  private static getWelcomeEmailHtml(userName: string) {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const dashboardUrl = `${appUrl}/dashboard`;
+function getWelcomeEmailHtml(userName: string) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const dashboardUrl = `${appUrl}/dashboard`;
 
-    return `
+  return `
       <!DOCTYPE html>
       <html>
         <head>
-          ${EmailService.getBaseEmailStyle()}
+          ${getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -452,27 +449,27 @@ export class EmailService {
         </body>
       </html>
     `;
-  }
+}
 
-  private static getSubscriptionConfirmationHtml({
-    userName,
-    planName,
-    amount,
-    billingCycle,
-  }: {
-    userName: string;
-    planName: string;
-    amount: string;
-    billingCycle: string;
-  }) {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const billingUrl = `${appUrl}/dashboard/billing`;
+function getSubscriptionConfirmationHtml({
+  userName,
+  planName,
+  amount,
+  billingCycle,
+}: {
+  userName: string;
+  planName: string;
+  amount: string;
+  billingCycle: string;
+}) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const billingUrl = `${appUrl}/dashboard/billing`;
 
-    return `
+  return `
       <!DOCTYPE html>
       <html>
         <head>
-          ${EmailService.getBaseEmailStyle()}
+          ${getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -515,25 +512,25 @@ export class EmailService {
         </body>
       </html>
     `;
-  }
+}
 
-  private static getPaymentFailedHtml({
-    userName,
-    amount,
-    reason,
-  }: {
-    userName: string;
-    amount: string;
-    reason?: string;
-  }) {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const billingUrl = `${appUrl}/dashboard/billing`;
+function getPaymentFailedHtml({
+  userName,
+  amount,
+  reason,
+}: {
+  userName: string;
+  amount: string;
+  reason?: string;
+}) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const billingUrl = `${appUrl}/dashboard/billing`;
 
-    return `
+  return `
       <!DOCTYPE html>
       <html>
         <head>
-          ${EmailService.getBaseEmailStyle()}
+          ${getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -563,26 +560,26 @@ export class EmailService {
         </body>
       </html>
     `;
-  }
+}
 
-  private static getInvoiceHtml({
-    userName,
-    invoiceNumber,
-    amount,
-    dueDate,
-    invoiceUrl,
-  }: {
-    userName: string;
-    invoiceNumber: string;
-    amount: string;
-    dueDate: string;
-    invoiceUrl?: string;
-  }) {
-    return `
+function getInvoiceHtml({
+  userName,
+  invoiceNumber,
+  amount,
+  dueDate,
+  invoiceUrl,
+}: {
+  userName: string;
+  invoiceNumber: string;
+  amount: string;
+  dueDate: string;
+  invoiceUrl?: string;
+}) {
+  return `
       <!DOCTYPE html>
       <html>
         <head>
-          ${EmailService.getBaseEmailStyle()}
+          ${getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -624,25 +621,25 @@ export class EmailService {
         </body>
       </html>
     `;
-  }
+}
 
-  private static getSubscriptionCancelledHtml({
-    userName,
-    planName,
-    endDate,
-  }: {
-    userName: string;
-    planName: string;
-    endDate: string;
-  }) {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const billingUrl = `${appUrl}/dashboard/billing`;
+function getSubscriptionCancelledHtml({
+  userName,
+  planName,
+  endDate,
+}: {
+  userName: string;
+  planName: string;
+  endDate: string;
+}) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const billingUrl = `${appUrl}/dashboard/billing`;
 
-    return `
+  return `
       <!DOCTYPE html>
       <html>
         <head>
-          ${EmailService.getBaseEmailStyle()}
+          ${getBaseEmailStyle()}
         </head>
         <body>
           <div class="email-container">
@@ -673,5 +670,4 @@ export class EmailService {
         </body>
       </html>
     `;
-  }
 }

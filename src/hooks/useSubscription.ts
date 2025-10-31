@@ -95,15 +95,15 @@ export function useSubscription() {
 
   function canCreateForm(): boolean {
     if (!hasAccess) return false;
-    if ((limits as any).forms === -1) return true; // Unlimited
-    return (usage?.forms_count || 0) < (limits as any).forms;
+    if (limits.forms === -1) return true; // Unlimited
+    return (usage?.forms_count || 0) < (limits.forms as number);
   }
 
   function canReceiveSubmissions(): boolean {
     if (!hasAccess) return false;
-    if ((limits as any).submissions_per_month === -1) return true; // Unlimited
+    if (limits.submissions_per_month === -1) return true; // Unlimited
     return (
-      (usage?.submissions_count || 0) < (limits as any).submissions_per_month
+      (usage?.submissions_count || 0) < (limits.submissions_per_month as number)
     );
   }
 

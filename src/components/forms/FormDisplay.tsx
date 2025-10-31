@@ -1,30 +1,24 @@
 "use client";
 
-import type React from "react";
+import Image from "next/image";
 import { useState } from "react";
-import type { FormField } from "@/types/form";
-import type {
-  FormDisplayMode,
-  FormLayout,
-  FormTheme,
-} from "@/types/form-display";
+import type { FormField, FormLayout, FormTheme } from "@/lib/types";
 import { FormContent } from "./FormContent";
 import { StandaloneForm } from "./StandaloneForm";
+import type { SubmissionDataValue } from "@/app/api/submit/route";
 
-interface FormDisplayProps {
-  formId: string;
+export interface FormDisplayProps {
   title: string;
   description?: string;
   fields: FormField[];
   mode: FormDisplayMode;
   layout: FormLayout;
   theme: FormTheme;
-  onSubmit: (data: Record<string, any>) => Promise<void>;
+  onSubmit: (data: Record<string, SubmissionDataValue>) => Promise<void>;
   isSubmitting?: boolean;
 }
 
 export function FormDisplay({
-  formId,
   title,
   description,
   fields,
@@ -34,10 +28,12 @@ export function FormDisplay({
   onSubmit,
   isSubmitting = false,
 }: FormDisplayProps) {
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [formData, setFormData] = useState<Record<string, SubmissionDataValue>>(
+    {},
+  );
   const [currentStep, setCurrentStep] = useState(0);
 
-  const handleFieldChange = (fieldId: string, value: any) => {
+  const handleFieldChange = (fieldId: string, value: SubmissionDataValue) => {
     setFormData((prev) => ({
       ...prev,
       [fieldId]: value,
@@ -81,10 +77,24 @@ export function FormDisplay({
         )}
         {theme.logoUrl && (
           <div className="absolute left-4 bottom-2">
-            <img
+            <Image
               src={theme.logoUrl}
               alt="Logo"
+              width={40}
+              height={40}
               className="h-8 sm:h-10 w-auto rounded"
+            />
+          </div>
+        )}
+        {theme.logoUrl && (
+          <div className="absolute right-4 bottom-2">
+            <Image
+              src={theme.logoUrl}
+              alt="Logo"
+              width={40}
+              height={40}
+              className="h-8 sm:h-10 w-auto rounded"
+              key={theme.logoUrl}
             />
           </div>
         )}

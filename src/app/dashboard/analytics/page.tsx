@@ -17,10 +17,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
-import type { Database } from "@/lib/supabase/database.types";
-
-type Form = Database["public"]["Tables"]["forms"]["Row"];
-type Submission = Database["public"]["Tables"]["submissions"]["Row"];
 
 interface FormAnalytics {
   form_title: string;
@@ -305,9 +301,9 @@ export default function AnalyticsPage() {
           <div className="p-6">
             {recentActivity.length > 0 ? (
               <div className="space-y-4">
-                {recentActivity.map((form, index) => (
+                {recentActivity.map((form) => (
                   <motion.div
-                    key={index}
+                    key={form.form_title}
                     className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-accent/50 transition-colors"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}

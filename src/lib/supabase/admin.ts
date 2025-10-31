@@ -45,7 +45,7 @@ export const supabaseAdmin = new Proxy(
   {
     get(_target, prop) {
       const admin = initializeAdmin();
-      return (admin as any)[prop];
+      return Reflect.get(admin, prop);
     },
   },
 );

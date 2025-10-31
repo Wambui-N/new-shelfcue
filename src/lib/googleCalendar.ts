@@ -66,13 +66,13 @@ export class GoogleCalendarService {
    */
   async createCalendarEventFromSubmission(
     formId: string,
-    submissionData: Record<string, any>,
+    submissionData: Record<string, unknown>,
     calendarId: string,
   ) {
     try {
       // Get form calendar settings
       const supabase = getSupabaseAdmin();
-      const { data: form, error } = await (supabase as any)
+      const { data: form, error } = await supabase
         .from("forms")
         .select("calendar_settings")
         .eq("id", formId)
@@ -159,7 +159,7 @@ export class GoogleCalendarService {
 export async function createCalendarEventFromSubmission(
   userId: string,
   formId: string,
-  submissionData: Record<string, any>,
+  submissionData: Record<string, unknown>,
 ) {
   try {
     console.log("📅 [Calendar] Starting calendar event creation...");
@@ -182,7 +182,7 @@ export async function createCalendarEventFromSubmission(
 
     // Get form's default calendar ID and fields using admin client
     const supabase = getSupabaseAdmin();
-    const { data: form } = await (supabase as any)
+    const { data: form } = await supabase
       .from("forms")
       .select("default_calendar_id, fields, title, meeting_settings")
       .eq("id", formId)
@@ -192,7 +192,7 @@ export async function createCalendarEventFromSubmission(
       hasForm: !!form,
       calendarId: form?.default_calendar_id,
       title: form?.title,
-      fieldsCount: (form?.fields as any[])?.length,
+      fieldsCount: (form?.fields as FormField[])?.length,
     });
 
     if (!form || !form.default_calendar_id) {
@@ -201,8 +201,8 @@ export async function createCalendarEventFromSubmission(
     }
 
     // Find meeting field in submission
-    const meetingField = (form.fields as any[])?.find(
-      (f: any) => f.type === "meeting",
+    const meetingField = (form.fields as FormField[])?.find(
+      (f) => f.type === "meeting",
     );
 
     console.log("📅 [Calendar] Meeting field:", meetingField);
@@ -227,16 +227,16 @@ export async function createCalendarEventFromSubmission(
     // Get meeting duration from field settings or form settings (default 60 minutes)
     const duration =
       meetingField.meetingSettings?.duration ||
-      (form.meeting_settings as any)?.duration ||
+      (form.meeting_settings as { duration?: number })?.duration ||
       60;
 
     // Calculate end time
-    const startDate = new Date(meetingDateTime);
+    const startDate = new Date(meetingDateTime as string);
     const endDate = new Date(startDate.getTime() + duration * 60000);
 
     // Get attendee email from submission (look for email fields)
-    const emailField = (form.fields as any[])?.find(
-      (f: any) => f.type === "email" || f.type === "email_field",
+    const emailField = (form.fields as FormField[])?.find(
+      (f) => f.type === "email" || f.type === "email_field",
     );
     const attendeeEmail = emailField ? submissionData[emailField.id] : null;
 
@@ -291,7 +291,7 @@ export async function createCalendarEventFromSubmission(
     if (error instanceof Error && "response" in error) {
       console.error(
         "❌ [Calendar] API Response:",
-        (error as any).response?.data,
+        (error as { response?: { data?: unknown } }).response?.data,
       );
     }
     throw error;

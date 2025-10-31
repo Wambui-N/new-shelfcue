@@ -40,9 +40,11 @@ export async function GET(request: NextRequest) {
         count: calendarList.data.items?.length || 0,
       };
       console.log("✅ Calendar API working");
-    } catch (error: any) {
-      results.calendar = { success: false, error: error.message, count: 0 };
-      console.log("❌ Calendar API failed:", error.message);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      results.calendar = { success: false, error: errorMessage, count: 0 };
+      console.log("❌ Calendar API failed:", errorMessage);
     }
 
     // Test Sheets API
@@ -57,9 +59,11 @@ export async function GET(request: NextRequest) {
         title: response.data.properties?.title || "",
       };
       console.log("✅ Sheets API working");
-    } catch (error: any) {
-      results.sheets = { success: false, error: error.message, title: "" };
-      console.log("❌ Sheets API failed:", error.message);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      results.sheets = { success: false, error: errorMessage, title: "" };
+      console.log("❌ Sheets API failed:", errorMessage);
     }
 
     // Test Drive API
@@ -72,9 +76,11 @@ export async function GET(request: NextRequest) {
         count: response.data.files?.length || 0,
       };
       console.log("✅ Drive API working");
-    } catch (error: any) {
-      results.drive = { success: false, error: error.message, count: 0 };
-      console.log("❌ Drive API failed:", error.message);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      results.drive = { success: false, error: errorMessage, count: 0 };
+      console.log("❌ Drive API failed:", errorMessage);
     }
 
     return NextResponse.json({
@@ -90,8 +96,10 @@ export async function GET(request: NextRequest) {
           .map(([api]) => api),
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Test Google APIs error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

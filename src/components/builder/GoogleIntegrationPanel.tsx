@@ -9,7 +9,7 @@ import {
   Plus,
   Sheet,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,6 +25,21 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 
+interface GoogleCalendar {
+  id: string;
+  summary: string;
+  description?: string;
+  primary?: boolean;
+  backgroundColor?: string;
+}
+
+interface GoogleSheet {
+  id: string;
+  sheet_id: string;
+  sheet_name: string;
+  sheet_url: string;
+}
+
 interface GoogleIntegrationPanelProps {
   formId: string;
   formFields: Array<{ id: string; label: string; type: string }>;
@@ -37,8 +52,10 @@ export function GoogleIntegrationPanel({
   const { user } = useAuth();
   const supabase = createClient();
   const [isGoogleConnected, setIsGoogleConnected] = useState(false);
-  const [connectedSheet, setConnectedSheet] = useState<any>(null);
-  const [connectedCalendar, setConnectedCalendar] = useState<any>(null);
+  const [connectedSheet, setConnectedSheet] = useState<GoogleSheet | null>(null);
+  const [connectedCalendar, setConnectedCalendar] = useState<{ id: string } | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
 
   // Sheets dialog
@@ -48,14 +65,14 @@ export function GoogleIntegrationPanel({
 
   // Calendar dialog
   const [showCalendarDialog, setShowCalendarDialog] = useState(false);
-  const [calendars, setCalendars] = useState<any[]>([]);
+  const [calendars, setCalendars] = useState<GoogleCalendar[]>([]);
   const [loadingCalendars, setLoadingCalendars] = useState(false);
 
-  const checkGoogleConnection = async () => {
+  const checkGoogleConnection = useCallback(async () => {
     if (!user) return;
 
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("user_google_tokens")
         .select("id")
         .eq("user_id", user.id)
@@ -67,13 +84,13 @@ export function GoogleIntegrationPanel({
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase, user]);
 
-  const fetchConnectedIntegrations = async () => {
+  const fetchConnectedIntegrations = useCallback(async () => {
     if (!user || !formId) return;
 
     try {
-      const { data: form } = await (supabase as any)
+      const { data: form } = await supabase
         .from("forms")
         .select(`
           default_sheet_connection_id,
@@ -100,10 +117,10 @@ export function GoogleIntegrationPanel({
           setConnectedCalendar({ id: form.default_calendar_id });
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error fetching integrations:", error);
     }
-  };
+  }, [supabase, user, formId]);
 
   useEffect(() => {
     checkGoogleConnection();
@@ -141,6 +158,7 @@ export function GoogleIntegrationPanel({
       const data = await response.json();
 
       setConnectedSheet({
+        id: "", // This will be set by the database
         sheet_id: data.spreadsheetId,
         sheet_name: newSheetName,
         sheet_url: data.spreadsheetUrl,
@@ -148,9 +166,11 @@ export function GoogleIntegrationPanel({
 
       setShowSheetsDialog(false);
       setNewSheetName("");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error creating sheet:", error);
-      alert(error.message || "Failed to create Google Sheet");
+      alert(
+        (error as { message?: string })?.message || "Failed to create Google Sheet",
+      );
     } finally {
       setCreatingSheet(false);
     }
@@ -169,9 +189,11 @@ export function GoogleIntegrationPanel({
 
       const data = await response.json();
       setCalendars(data.calendars || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error loading calendars:", error);
-      alert(error.message || "Failed to load calendars");
+      alert(
+        (error as { message?: string })?.message || "Failed to load calendars",
+      );
     } finally {
       setLoadingCalendars(false);
     }
@@ -181,7 +203,7 @@ export function GoogleIntegrationPanel({
     if (!user || !formId) return;
 
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("forms")
         .update({ default_calendar_id: calendarId })
         .eq("id", formId)
@@ -191,9 +213,11 @@ export function GoogleIntegrationPanel({
 
       setConnectedCalendar({ id: calendarId });
       setShowCalendarDialog(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error connecting calendar:", error);
-      alert(error.message || "Failed to connect calendar");
+      alert(
+        (error as { message?: string })?.message || "Failed to connect calendar",
+      );
     }
   };
 
@@ -212,10 +236,16 @@ export function GoogleIntegrationPanel({
       <Card className="p-6">
         <div className="text-center py-8">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8" viewBox="0 0 24 24">
+            <svg
+              className="w-8 h-8"
+              viewBox="0 0 24 24"
+              role="img"
+              aria-labelledby="google-drive-icon"
+            >
+              <title id="google-drive-icon">Google Drive</title>
               <path
                 fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                d="M7.71 5.49L12 12l4.29-6.51a.996.996 0 1 0-1.7-1.1L12 9.8 9.41 4.39a.996.996 0 1 0-1.7 1.1z"
               />
               <path
                 fill="#34A853"
@@ -242,10 +272,16 @@ export function GoogleIntegrationPanel({
             onClick={handleConnectGoogle}
             className="bg-primary text-primary-foreground"
           >
-            <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
+            <svg
+              className="w-4 h-4 mr-2"
+              viewBox="0 0 24 24"
+              role="img"
+              aria-labelledby="google-icon-2"
+            >
+              <title id="google-icon-2">Google</title>
               <path
                 fill="currentColor"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,4.73 12.19,4.73C15.29,4.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2 12.19,2C6.42,2 2.03,6.8 2.03,12C2.03,17.05 6.16,22 12.19,22C17.6,22 21.54,18.33 21.54,12.81C21.54,11.88 21.35,11.1 21.35,11.1Z"
               />
             </svg>
             Connect Google

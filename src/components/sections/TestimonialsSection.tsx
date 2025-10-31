@@ -79,7 +79,7 @@ export function TestimonialsSection() {
               >
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <motion.div
-                    key={i}
+                    key={`star-${testimonial.author}-${i}`}
                     initial={{ opacity: 0, scale: 0 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}

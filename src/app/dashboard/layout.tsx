@@ -22,6 +22,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { TrialBanner } from "@/components/subscriptions/TrialBanner";
 import { Badge } from "@/components/ui/badge";
@@ -64,7 +65,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
         setLoading(true);
 
         // Fetch active forms count (published forms)
-        const { data: forms, error: formsError } = await (supabase as any)
+        const { data: forms, error: formsError } = await supabase
           .from("forms")
           .select("id, status")
           .eq("user_id", user.id)
@@ -89,9 +90,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-        const { data: submissions, error: submissionsError } = await (
-          supabase as any
-        )
+        const { data: submissions, error: submissionsError } = await supabase
           .from("submissions")
           .select("id")
           .gte("created_at", sevenDaysAgo.toISOString())
@@ -177,10 +176,12 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <img
+                  <Image
                     src="/1.png"
                     alt="ShelfCue"
-                    className="w-5 h-5 object-contain"
+                    width={20}
+                    height={20}
+                    className="object-contain"
                   />
                 </motion.div>
                 <AnimatePresence>
@@ -293,6 +294,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
               {/* User Menu */}
               <div className="relative">
                 <button
+                  type="button"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all hover:bg-accent w-full"
                   title={sidebarCollapsed ? "User Menu" : undefined}
@@ -369,7 +371,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
           {/* Mobile Header */}
           <div className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/95 backdrop-blur-sm px-4 sm:hidden">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <img src="/sc-logo.png" alt="ShelfCue" className="w-6 h-6" />
+              <Image src="/sc-logo.png" alt="ShelfCue" width={24} height={24} />
               <span className="text-sm font-bold text-foreground">
                 ShelfCue
               </span>
@@ -444,6 +446,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
                       <span>Settings</span>
                     </Link>
                     <button
+                      type="button"
                       onClick={handleSignOut}
                       className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-accent w-full"
                     >

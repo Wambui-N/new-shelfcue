@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, CheckCircle, Loader2, Sheet, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,92 +11,82 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-interface PublishProgressDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  steps: {
-    saving?: "pending" | "loading" | "completed" | "error";
-    sheet?: "pending" | "loading" | "completed" | "error";
-    meeting?: "pending" | "loading" | "completed" | "error";
-  };
-}
-
-interface StepConfig {
-  key: string;
-  icon: React.ReactNode;
-  label: string;
-  description: string;
-}
+export type PublishStep = {
+  saving: "pending" | "loading" | "completed";
+  sheet: "pending" | "loading" | "completed";
+  meeting?: "pending" | "loading" | "completed";
+};
 
 export function PublishProgressDialog({
   open,
-  onOpenChange,
   steps,
-}: PublishProgressDialogProps) {
+}: {
+  open: boolean;
+  steps: PublishStep;
+}) {
   const [_currentStep, setCurrentStep] = useState(0);
 
-  const stepConfigs: StepConfig[] = [
-    {
-      key: "saving",
-      icon: <Sparkles className="w-5 h-5" />,
-      label: "Saving Form",
-      description: "Securing your form data...",
-    },
-    {
-      key: "sheet",
-      icon: <Sheet className="w-5 h-5" />,
-      label: "Creating Google Sheet",
-      description: "Setting up automatic data sync...",
-    },
-    ...(steps.meeting
-      ? [
-          {
-            key: "meeting",
+  const stepConfigs = useMemo(
+    () => ({
+      saving: {
+        icon: <Sparkles className="w-5 h-5" />,
+        label: "Saving Form",
+        description: "Securing your form data...",
+      },
+      sheet: {
+        icon: <Sheet className="w-5 h-5" />,
+        label: "Creating Google Sheet",
+        description: "Setting up automatic data sync...",
+      },
+      meeting: steps.meeting
+        ? {
             icon: <Calendar className="w-5 h-5" />,
             label: "Configuring Calendar",
             description: "Setting up meeting bookings...",
-          },
-        ]
-      : []),
-  ];
+          }
+        : undefined,
+    }),
+    [steps.meeting],
+  );
 
   // Auto-update current step based on progress
   useEffect(() => {
-    const activeSteps = stepConfigs.filter(
-      (config) => steps[config.key as keyof typeof steps],
-    );
+    const activeSteps = Object.entries(stepConfigs)
+      .filter(([, config]) => config)
+      .map(([key]) => key);
+
     const loadingIndex = activeSteps.findIndex(
-      (config) => steps[config.key as keyof typeof steps] === "loading",
+      (key) => steps[key as keyof typeof steps] === "loading",
     );
     const completedCount = activeSteps.filter(
-      (config) => steps[config.key as keyof typeof steps] === "completed",
+      (key) => steps[key as keyof typeof steps] === "completed",
     ).length;
 
     if (loadingIndex !== -1) {
       setCurrentStep(loadingIndex);
-    } else if (completedCount === activeSteps.length && completedCount > 0) {
-      setCurrentStep(activeSteps.length); // All done
+    } else {
+      setCurrentStep(completedCount);
     }
   }, [steps, stepConfigs]);
 
   const getStepStatus = (stepKey: string) => {
-    return steps[stepKey as keyof typeof steps] || "pending";
+    return steps[stepKey as keyof typeof steps];
   };
 
-  const allCompleted = stepConfigs
-    .filter((config) => steps[config.key as keyof typeof steps])
-    .every((config) => steps[config.key as keyof typeof steps] === "completed");
+  const allCompleted = Object.entries(stepConfigs)
+    .filter(([, config]) => config)
+    .every(([key]) => steps[key as keyof typeof steps] === "completed");
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(open) => {
+      onOpenChange={(_open) => {
         // Prevent closing the dialog while publishing is in progress
         const isPublishing = Object.values(steps).some(
           (status) => status === "loading",
         );
         if (!isPublishing) {
-          onOpenChange(open);
+          // onOpenChange(open); // This line was removed as per the new_code
         }
       }}
     >
@@ -172,17 +162,17 @@ export function PublishProgressDialog({
 
           {/* Progress Steps */}
           <div className="space-y-4">
-            {stepConfigs
-              .filter((config) => steps[config.key as keyof typeof steps])
-              .map((config, index) => {
-                const status = getStepStatus(config.key);
+            {Object.entries(stepConfigs)
+              .filter(([, config]) => config)
+              .map(([key, config], index) => {
+                const status = getStepStatus(key);
                 const isCompleted = status === "completed";
                 const isLoading = status === "loading";
                 const isError = status === "error";
 
                 return (
                   <motion.div
-                    key={config.key}
+                    key={key}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
@@ -219,7 +209,7 @@ export function PublishProgressDialog({
                       ) : isLoading ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
                       ) : (
-                        config.icon
+                        config?.icon
                       )}
                     </div>
 
@@ -232,13 +222,13 @@ export function PublishProgressDialog({
                             : ""
                         }`}
                       >
-                        {config.label}
+                        {config?.label}
                       </h3>
                       <p className="text-sm text-muted-foreground mt-0.5">
                         {isCompleted
                           ? "✓ Completed"
                           : isLoading
-                            ? config.description
+                            ? config?.description
                             : "Waiting..."}
                       </p>
                     </div>

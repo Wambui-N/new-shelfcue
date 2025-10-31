@@ -2,9 +2,26 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getGoogleClient } from "@/lib/google";
 import { createCalendarEventFromSubmission } from "@/lib/googleCalendar";
 import { GoogleSheetsService } from "@/lib/googleSheets";
-import { EmailService } from "@/lib/resend";
+import { sendFormSubmissionNotification } from "@/lib/resend";
 import { canPerformAction, incrementUsage } from "@/lib/subscriptionLimits";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import type { FormField } from "@/types/form";
+
+type SheetConnection = {
+  sheet_id: string;
+  sheet_url: string;
+};
+
+type FormWithConnections = {
+  id: string;
+  title: string;
+  status: string;
+  user_id: string;
+  fields: FormField[];
+  default_sheet_connection_id: string | null;
+  default_calendar_id: string | null;
+  sheet_connections: SheetConnection | SheetConnection[] | null;
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +40,8 @@ export async function POST(request: NextRequest) {
     // Verify the form exists and is published
     const { data: form, error: formError } = await supabaseAdmin
       .from("forms")
-      .select(`
+      .select(
+        `
         id, 
         title,
         status, 
@@ -35,10 +53,11 @@ export async function POST(request: NextRequest) {
           sheet_id,
           sheet_url
         )
-      `)
+      `,
+      )
       .eq("id", formId)
       .eq("status", "published")
-      .single();
+      .single<FormWithConnections>();
 
     if (formError || !form) {
       return NextResponse.json(
@@ -126,10 +145,12 @@ export async function POST(request: NextRequest) {
     // 2. Sync to Google Sheets
     try {
       if (form.sheet_connections && form.user_id) {
-        // @ts-ignore
-        const sheetConnection = Array.isArray(form.sheet_connections)
-          ? (form.sheet_connections as any)[0]
-          : (form.sheet_connections as any);
+        // @ts-expect-error - Supabase type inference is incorrect for related tables
+        const sheetConnection: SheetConnection | undefined = Array.isArray(
+          form.sheet_connections,
+        )
+          ? form.sheet_connections[0]
+          : form.sheet_connections;
 
         if (sheetConnection?.sheet_id) {
           const googleClient = await getGoogleClient(form.user_id);
@@ -176,15 +197,12 @@ export async function POST(request: NextRequest) {
     (async () => {
       // Send email notification to form owner
       try {
-        const { data: profile } = await supabaseAdmin
-          .from("profiles")
-          .select("email, full_name")
-          .eq("id", form.user_id)
-          .single();
+        const { data: userData, error: userError } =
+          await supabaseAdmin.auth.admin.getUserById(form.user_id);
 
-        if (profile?.email) {
-          await EmailService.sendFormSubmissionNotification(
-            profile.email,
+        if (!userError && userData?.user?.email) {
+          await sendFormSubmissionNotification(
+            userData.user.email,
             {
               formName: form.title || "Untitled Form",
               formId: formId,

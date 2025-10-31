@@ -1,65 +1,44 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { Toaster } from "@/components/ui/sonner";
+import JsonLd from "@/components/JsonLd";
+import { cn } from "@/lib/utils";
+import { fontSans } from "@/lib/fonts";
 
-const satoshi = localFont({
-  src: [
-    {
-      path: "../../public/fonts/Satoshi-Light.otf",
-      weight: "300",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Satoshi-LightItalic.otf",
-      weight: "300",
-      style: "italic",
-    },
-    {
-      path: "../../public/fonts/Satoshi-Regular.otf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Satoshi-Italic.otf",
-      weight: "400",
-      style: "italic",
-    },
-    {
-      path: "../../public/fonts/Satoshi-Medium.otf",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Satoshi-MediumItalic.otf",
-      weight: "500",
-      style: "italic",
-    },
-    {
-      path: "../../public/fonts/Satoshi-Bold.otf",
-      weight: "700",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Satoshi-BoldItalic.otf",
-      weight: "700",
-      style: "italic",
-    },
-    {
-      path: "../../public/fonts/Satoshi-Black.otf",
-      weight: "900",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Satoshi-BlackItalic.otf",
-      weight: "900",
-      style: "italic",
-    },
-  ],
-  variable: "--font-satoshi",
-  display: "swap",
-});
+const siteConfig = {
+  name: "ShelfCue",
+  description:
+    "Capture leads, schedule meetings, and automate workflows with smart forms.",
+  url: "https://shelfcue.com",
+  ogImage: "https://shelfcue.com/og.png",
+  links: {
+    twitter: "https://twitter.com/shelfcue",
+    github: "https://github.com/shelfcue/shelfcue",
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: siteConfig.name,
+  description: siteConfig.description,
+  url: siteConfig.url,
+  logo: `${siteConfig.url}/logo.png`,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any",
+  offers: {
+    "@type": "Offer",
+    price: "29.00",
+    priceCurrency: "USD",
+  },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    reviewCount: "88",
+  },
+};
 
 export const metadata: Metadata = {
   title:
@@ -164,43 +143,10 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
 
         {/* Schema.org structured data */}
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              name: "ShelfCue",
-              description:
-                "Beautiful Google Sheets form builder. Create branded, responsive forms that connect directly to Google Sheets without Zapier.",
-              url: "https://shelfcue.com",
-              applicationCategory: "BusinessApplication",
-              operatingSystem: "Web",
-              offers: {
-                "@type": "Offer",
-                price: "29",
-                priceCurrency: "USD",
-                availability: "https://schema.org/InStock",
-              },
-              aggregateRating: {
-                "@type": "AggregateRating",
-                ratingValue: "4.9",
-                ratingCount: "1000",
-              },
-              creator: {
-                "@type": "Organization",
-                name: "Made with Make",
-                url: "https://madewithmake.com",
-              },
-            }),
-          }}
-        />
       </head>
-      <body
-        className={`${satoshi.variable} font-sans antialiased`}
-        suppressHydrationWarning
-      >
+      <body className={cn("min-h-screen bg-background", fontSans.className)}>
+        <Toaster />
+        <JsonLd data={jsonLd} />
         <AuthProvider>{children}</AuthProvider>
         <Analytics />
       </body>

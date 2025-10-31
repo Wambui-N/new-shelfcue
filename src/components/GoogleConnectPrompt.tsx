@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Calendar, CheckCircle, Sheet, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -16,18 +15,47 @@ export function GoogleConnectPrompt({
 }: GoogleConnectPromptProps) {
   const permissions = [
     {
-      icon: <Sheet className="w-5 h-5" />,
+      id: "sheets",
+      icon: (
+        <svg
+          className="w-10 h-10 text-primary-foreground"
+          viewBox="0 0 24 24"
+          role="img"
+          aria-labelledby="google-sheets-icon"
+        >
+          <title id="google-sheets-icon">Google Sheets</title>
+          <path
+            fill="currentColor"
+            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6zm2-1h8v-2H8v2zm0-4h8v-2H8v2zm0-4h8V9H8v2z"
+          />
+        </svg>
+      ),
       title: "Google Sheets",
       description: "Automatically sync form submissions to spreadsheets",
       color: "bg-green-100 text-green-600",
     },
     {
-      icon: <Calendar className="w-5 h-5" />,
+      id: "calendar",
+      icon: (
+        <svg
+          className="w-10 h-10 text-primary-foreground"
+          viewBox="0 0 24 24"
+          role="img"
+          aria-labelledby="google-calendar-icon"
+        >
+          <title id="google-calendar-icon">Google Calendar</title>
+          <path
+            fill="currentColor"
+            d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 14H5V8h14v10zM7 10h5v5H7z"
+          />
+        </svg>
+      ),
       title: "Google Calendar",
       description: "Create calendar events from form submissions",
       color: "bg-blue-100 text-blue-600",
     },
     {
+      id: "shield",
       icon: <Shield className="w-5 h-5" />,
       title: "Secure Access",
       description: "Your data is encrypted and never shared with third parties",
@@ -61,22 +89,13 @@ export function GoogleConnectPrompt({
               <svg
                 className="w-10 h-10 text-primary-foreground"
                 viewBox="0 0 24 24"
+                role="img"
+                aria-labelledby="google-icon"
               >
+                <title id="google-icon">Google</title>
                 <path
                   fill="currentColor"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,4.73 12.19,4.73C15.29,4.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2 12.19,2C6.42,2 2.03,6.8 2.03,12C2.03,17.05 6.16,22 12.19,22C17.6,22 21.54,18.33 21.54,12.81C21.54,11.88 21.35,11.1 21.35,11.1Z"
                 />
               </svg>
             </motion.div>
@@ -91,12 +110,12 @@ export function GoogleConnectPrompt({
 
           {/* Benefits */}
           <div className="space-y-4 mb-8">
-            {permissions.map((permission, index) => (
+            {permissions.map((permission) => (
               <motion.div
-                key={index}
+                key={permission.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 + 0.3, duration: 0.4 }}
+                transition={{ delay: permission.id === "sheets" ? 0.3 : permission.id === "calendar" ? 0.4 : 0.5, duration: 0.4 }}
               >
                 <div className="flex items-start gap-4 p-4 bg-background-secondary rounded-xl border border-border">
                   <div
@@ -156,10 +175,11 @@ export function GoogleConnectPrompt({
               onClick={onConnect}
               className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 h-12"
             >
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" role="img" aria-labelledby="google-icon">
+                <title id="google-icon">Google</title>
                 <path
                   fill="currentColor"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,4.73 12.19,4.73C15.29,4.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2 12.19,2C6.42,2 2.03,6.8 2.03,12C2.03,17.05 6.16,22 12.19,22C17.6,22 21.54,18.33 21.54,12.81C21.54,11.88 21.35,11.1 21.35,11.1Z"
                 />
               </svg>
               Connect Google Account
