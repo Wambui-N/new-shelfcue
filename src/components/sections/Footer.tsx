@@ -23,7 +23,7 @@ export function Footer() {
   const socialLinks = [
     {
       name: "Email",
-      href: "mailto:wambui@mewithmake.com",
+      href: "mailto:contact@shelfcue.com",
       icon: <Mail className="w-5 h-5" />,
     },
   ];

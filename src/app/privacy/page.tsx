@@ -139,7 +139,7 @@ export default function PrivacyPolicy() {
               <li>Data portability in machine-readable format</li>
             </ul>
             <p className="text-foreground-muted mt-4">
-              <strong>Contact:</strong> wambui@madewithmake.com for data
+              <strong>Contact:</strong> contact@shelfcue.com for data
               requests.
             </p>
           </section>

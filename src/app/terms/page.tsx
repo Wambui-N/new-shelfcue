@@ -195,7 +195,7 @@ export default function TermsAndConditions() {
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">Contact</h2>
             <p className="text-foreground-muted">
-              wambui@madewithmake.com for questions.
+              contact@shelfcue.com for questions.
             </p>
           </section>
         </div>
