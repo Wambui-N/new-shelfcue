@@ -64,27 +64,35 @@ function AuthCallbackContent() {
             return;
           }
 
-          const { data: existingUser, error: userError } = await supabase
-            .from("users")
-            .select("id")
-            .eq("email", data.session.user.email)
-            .single();
+          try {
+            const response = await fetch("/api/auth/check-user", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: data.session.user.email }),
+            });
 
-          if (userError && userError.code !== "PGRST116") {
-            console.error("Error checking user existence:", userError);
+            if (!response.ok) {
+              console.error(
+                "Error checking user existence:",
+                response.statusText,
+              );
+              router.push("/auth/signin?error=user_check_failed");
+              return;
+            }
+
+            const result = (await response.json()) as { exists?: boolean };
+
+            if (!result.exists) {
+              console.log(
+                "User not found in database, redirecting to signup with consent",
+              );
+              await supabase.auth.signOut();
+              router.push("/auth/signup?consent=true");
+              return;
+            }
+          } catch (error) {
+            console.error("Error checking user existence:", error);
             router.push("/auth/signin?error=user_check_failed");
-            return;
-          }
-
-          // If user doesn't exist in database, redirect to signup with consent
-          if (!existingUser) {
-            console.log(
-              "User not found in database, redirecting to signup with consent",
-            );
-            // Sign out the current session
-            await supabase.auth.signOut();
-            // Redirect to signup with consent prompt
-            router.push("/auth/signup?consent=true");
             return;
           }
         }
