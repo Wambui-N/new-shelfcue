@@ -13,23 +13,46 @@ export async function POST(request: NextRequest) {
 		}
 
 		const supabaseAdmin = getSupabaseAdmin();
-		const { data, error } = await (supabaseAdmin as any)
-			.from("users")
-			.select("id")
-			.eq("email", email.trim().toLowerCase())
-			.maybeSingle();
+		const adminApi = (supabaseAdmin.auth.admin ?? {}) as {
+			getUserByEmail?: (
+				email: string,
+			) => Promise<{ data: { user: unknown } | null; error: unknown }>;
+			listUsers?: (
+				params?: { page?: number; perPage?: number },
+			) => Promise<{ data: { users: Array<{ email?: string }> } | null }>;
+		};
 
-		if (error) {
-			console.error("Error checking user existence:", error);
+		let exists = false;
+		let lastError: unknown;
+
+		if (typeof adminApi.getUserByEmail === "function") {
+			const { data, error } = await adminApi.getUserByEmail(
+				email.trim().toLowerCase(),
+			);
+			if (error && (error as { message?: string }).message !== "User not found") {
+				lastError = error;
+			} else {
+				exists = !!data?.user;
+			}
+		} else if (typeof adminApi.listUsers === "function") {
+			const list = await adminApi.listUsers();
+			exists = !!list?.data?.users?.some(
+				(user) =>
+					user.email?.toLowerCase() === email.trim().toLowerCase(),
+			);
+		} else {
+			lastError = new Error("Supabase admin API does not expose user listing");
+		}
+
+		if (lastError) {
+			console.error("Error checking user existence:", lastError);
 			return NextResponse.json(
 				{ error: "Failed to check user" },
 				{ status: 500 },
 			);
 		}
 
-		return NextResponse.json({
-			exists: !!data,
-		});
+		return NextResponse.json({ exists });
 	} catch (error) {
 		console.error("Unexpected error checking user:", error);
 		return NextResponse.json(
