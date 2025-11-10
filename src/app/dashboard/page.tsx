@@ -287,7 +287,7 @@ export default function DashboardPage() {
                   : "No submissions"}
               </div>
               <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium">
-                Last Lead
+                Last Submission
               </div>
             </motion.div>
           </Link>

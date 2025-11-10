@@ -37,7 +37,7 @@ export class GoogleSheetsService {
       });
 
       console.log("✅ Spreadsheet created:", response.data.spreadsheetId);
-      const spreadsheetId = response.data.spreadsheetId;
+      const spreadsheetId = response.data.spreadsheetId ?? null;
 
       // If headers provided, add them as the first row
       if (headers && headers.length > 0 && spreadsheetId) {
@@ -53,25 +53,45 @@ export class GoogleSheetsService {
         console.log("✅ Headers added successfully");
       }
 
+      const spreadsheetUrl = response.data.spreadsheetUrl ?? null;
+
+      if (!spreadsheetId || !spreadsheetUrl) {
+        throw new Error("Google Sheets API did not return spreadsheet identifiers.");
+      }
+
       console.log("✅ Google Sheet creation complete");
       return {
-        spreadsheetId: spreadsheetId!,
-        spreadsheetUrl: response.data.spreadsheetUrl!,
+        spreadsheetId,
+        spreadsheetUrl,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("❌ Error creating Google Sheet:", error);
 
       // Log detailed error information
-      if (error.response) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        (error as { response?: { status?: number; statusText?: string; data?: unknown } })
+          .response
+      ) {
+        const response = (error as {
+          response: { status?: number; statusText?: string; data?: unknown };
+        }).response;
         console.error("Google API Error:", {
-          status: error.response.status,
-          statusText: error.response.statusText,
-          data: error.response.data,
+          status: response.status,
+          statusText: response.statusText,
+          data: response.data,
         });
       }
 
-      if (error.message) {
-        console.error("Error message:", error.message);
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof (error as { message?: string }).message === "string"
+      ) {
+        console.error("Error message:", (error as { message: string }).message);
       }
 
       throw error;
@@ -104,20 +124,33 @@ export class GoogleSheetsService {
    */
   async append(
     spreadsheetId: string,
-    data: any[],
-    sheetName: string = "Form Responses",
+    data: unknown[],
+    options: {
+      sheetName?: string;
+      timeZone?: string;
+    } = {},
   ) {
     try {
       const sheets = this.client.getSheets();
+      const sheetName = options.sheetName ?? "Form Responses";
+      const timeZone =
+        options.timeZone ??
+        process.env.FORM_SUBMISSION_TIMEZONE ??
+        process.env.TZ ??
+        Intl.DateTimeFormat().resolvedOptions().timeZone ??
+        "UTC";
 
       // Add timestamp as first column in DD/MM/YYYY format
-      const timestamp = new Date().toLocaleDateString("en-GB", {
+      const timestampFormatter = new Intl.DateTimeFormat("en-GB", {
+        timeZone,
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
       });
+
+      const timestamp = timestampFormatter.format(new Date());
       const rowData = [timestamp, ...data];
 
       const response = await sheets.spreadsheets.values.append({

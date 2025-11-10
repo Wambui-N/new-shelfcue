@@ -6,6 +6,33 @@ import { EmailService } from "@/lib/resend";
 import { canPerformAction, incrementUsage } from "@/lib/subscriptionLimits";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
+type FormFieldDefinition = { id: string; type?: string | null };
+
+type SheetConnectionRecord = {
+  sheet_id: string | null;
+  sheet_url: string | null;
+};
+
+type FormRecord = {
+  id: string;
+  title: string;
+  status: string;
+  user_id: string;
+  fields: FormFieldDefinition[];
+  settings?: Record<string, unknown> | null;
+  default_sheet_connection_id?: string | null;
+  default_calendar_id?: string | null;
+  sheet_connections?:
+    | SheetConnectionRecord
+    | SheetConnectionRecord[]
+    | null;
+};
+
+type SubmissionRecord = {
+  id: string;
+  created_at: string;
+};
+
 export async function POST(request: NextRequest) {
   try {
     const { formId, data } = await request.json();
@@ -19,9 +46,11 @@ export async function POST(request: NextRequest) {
 
     // Use admin client to bypass RLS for public form access
     const supabaseAdmin = getSupabaseAdmin();
+    /* biome-ignore lint/suspicious/noExplicitAny: Supabase admin helpers expose wider capabilities than generated types cover. */
+    const supabaseAdminClient = supabaseAdmin as any;
 
     // Verify the form exists and is published
-    const { data: form, error: formError } = await (supabaseAdmin as any)
+    const { data: form, error: formError } = await supabaseAdminClient
       .from("forms")
       .select(`
         id, 
@@ -29,6 +58,7 @@ export async function POST(request: NextRequest) {
         status, 
         user_id, 
         fields,
+        settings,
         default_sheet_connection_id,
         default_calendar_id,
         sheet_connections (
@@ -47,17 +77,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const formRecord = form as FormRecord;
+
     // Check submission limit for form owner
-    console.log("Checking submission limit for user:", form.user_id);
+    console.log("Checking submission limit for user:", formRecord.user_id);
     const limitCheck = await canPerformAction(
-      form.user_id,
+      formRecord.user_id,
       "submissions_per_month",
     );
     console.log("Limit check result:", limitCheck);
 
     if (!limitCheck.allowed) {
       console.error("Submission limit reached:", {
-        userId: form.user_id,
+        userId: formRecord.user_id,
         limit: limitCheck.limit,
         usage: limitCheck.usage,
       });
@@ -71,6 +103,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const formSettings = formRecord.settings ?? {};
+    const formTimeZone =
+      (typeof formSettings?.timezone === "string" &&
+      formSettings.timezone.trim().length > 0
+        ? formSettings.timezone.trim()
+        : null) ||
+      (typeof formSettings?.time_zone === "string" &&
+      formSettings.time_zone.trim().length > 0
+        ? formSettings.time_zone.trim()
+        : null) ||
+      process.env.FORM_SUBMISSION_TIMEZONE ||
+      process.env.TZ ||
+      Intl.DateTimeFormat().resolvedOptions().timeZone ||
+      "UTC";
+
     // Get client IP and user agent
     const ipAddress =
       request.headers.get("x-forwarded-for") ||
@@ -79,9 +126,7 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get("user-agent") || "unknown";
 
     // Save the submission
-    const { data: submission, error: submissionError } = await (
-      supabaseAdmin as any
-    )
+    const { data: submission, error: submissionError } = await supabaseAdminClient
       .from("submissions")
       .insert({
         form_id: formId,
@@ -101,15 +146,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Sequentially handle Google integrations
+    const submissionRecord = submission as SubmissionRecord;
+
     let calendarEventLink: string | null = null;
 
     // 1. Create Calendar Event if applicable
     try {
       console.log("📅 Checking calendar configuration...");
-      if ((form as any).default_calendar_id && (form as any).user_id) {
+      if (formRecord.default_calendar_id && formRecord.user_id) {
         console.log("📅 Creating calendar event...");
         const calendarEvent = await createCalendarEventFromSubmission(
-          (form as any).user_id,
+          formRecord.user_id,
           formId,
           data,
         );
@@ -127,30 +174,33 @@ export async function POST(request: NextRequest) {
 
     // 2. Sync to Google Sheets
     try {
-      if ((form as any).sheet_connections && (form as any).user_id) {
-        const sheetConnection = Array.isArray((form as any).sheet_connections)
-          ? (form as any).sheet_connections[0]
-          : (form as any).sheet_connections;
+      if (formRecord.sheet_connections && formRecord.user_id) {
+        const sheetConnection = Array.isArray(formRecord.sheet_connections)
+          ? formRecord.sheet_connections[0]
+          : formRecord.sheet_connections;
 
         if (sheetConnection?.sheet_id) {
-          const googleClient = await getGoogleClient((form as any).user_id);
+          const googleClient = await getGoogleClient(formRecord.user_id);
           if (googleClient) {
             const sheetsService = new GoogleSheetsService(googleClient);
 
-            const rowData = (form as any).fields.map((field: any) => {
-              const value = data[field.id];
+            const meetingFormatter = new Intl.DateTimeFormat("en-GB", {
+              timeZone: formTimeZone,
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+            const rowData = formRecord.fields.map((field) => {
+              const value = data[field.id as keyof typeof data];
               // Handle different field types
               if (field.type === "checkbox") return value ? "Yes" : "No";
               if (field.type === "meeting" && value) {
                 try {
                   const date = new Date(value);
-                  return date.toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  });
+                  return meetingFormatter.format(date);
                 } catch {
                   return value;
                 }
@@ -163,7 +213,9 @@ export async function POST(request: NextRequest) {
               rowData.push(calendarEventLink);
             }
 
-            await sheetsService.append(sheetConnection.sheet_id, rowData);
+            await sheetsService.append(sheetConnection.sheet_id, rowData, {
+              timeZone: formTimeZone,
+            });
             console.log("✓ Synced to Google Sheets");
           }
         }
@@ -177,20 +229,22 @@ export async function POST(request: NextRequest) {
     (async () => {
       // Send email notification to form owner
       try {
-        const { data: profile } = await (supabaseAdmin as any)
+        const { data: profile } = await supabaseAdminClient
           .from("profiles")
           .select("email, full_name")
-          .eq("id", (form as any).user_id)
+          .eq("id", formRecord.user_id)
           .single();
 
-        if ((profile as any)?.email) {
+        const profileRecord = profile as { email?: string | null; full_name?: string | null };
+
+        if (profileRecord?.email) {
           await EmailService.sendFormSubmissionNotification(
-            (profile as any).email,
+            profileRecord.email,
             {
-              formName: (form as any).title || "Untitled Form",
+              formName: formRecord.title || "Untitled Form",
               formId: formId,
-              submissionId: (submission as any).id,
-              submittedAt: (submission as any).created_at,
+              submissionId: submissionRecord.id,
+              submittedAt: submissionRecord.created_at,
               submitterData: data,
             },
           );
@@ -204,11 +258,11 @@ export async function POST(request: NextRequest) {
     });
 
     // Increment submission usage counter
-    await incrementUsage(form.user_id, "submissions", 1);
+    await incrementUsage(formRecord.user_id, "submissions", 1);
 
     return NextResponse.json({
       success: true,
-      submissionId: (submission as any).id,
+      submissionId: submissionRecord.id,
     });
   } catch (error) {
     console.error("Error in submit API:", error);
