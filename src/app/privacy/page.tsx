@@ -64,6 +64,22 @@ export default function PrivacyPolicy() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
+              7. Supabase Authentication
+            </h2>
+            <p className="text-foreground-muted mb-4">
+              We use Supabase to securely manage user authentication and data storage.
+            </p>
+            <p className="text-foreground-muted">
+              During Google Sign-In, you may briefly be redirected to a Supabase
+              domain (ending in <code>.supabase.co</code>) for verification. This process
+              is secure and required for login functionality. Supabase does not have
+              access to your personal data beyond what is necessary to authenticate
+              your account.
+            </p>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-foreground mb-6">
               2. How We Use Your Information
             </h2>
             <p className="text-foreground-muted mb-4">
