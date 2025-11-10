@@ -183,30 +183,19 @@ function AuthCallbackContent() {
           console.log(
             "No subscription found, creating trial automatically...",
           );
-          
+
           try {
-            // Get the professional plan
-            const { data: planData } = await (supabase as any)
-              .from("subscription_plans")
-              .select("id")
-              .eq("name", "professional")
-              .single();
-
-            if (planData) {
-              // Create trial subscription
-              const trialResponse = await fetch("/api/subscriptions/create-trial", {
+            const trialResponse = await fetch(
+              "/api/subscriptions/create-my-trial",
+              {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ planId: planData.id }),
-              });
+              },
+            );
 
-              if (trialResponse.ok) {
-                console.log("✅ Trial subscription created successfully");
-              } else {
-                console.error("❌ Failed to create trial subscription");
-              }
+            if (trialResponse.ok) {
+              console.log("✅ Trial subscription created successfully");
             } else {
-              console.error("❌ Professional plan not found");
+              console.error("❌ Failed to create trial subscription");
             }
           } catch (error) {
             console.error("❌ Error creating trial:", error);
@@ -214,20 +203,17 @@ function AuthCallbackContent() {
         }
 
         console.log("Redirecting to dashboard");
-        router.push("/dashboard");
+        router.replace("/dashboard");
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 1000);
       } else {
         router.push("/auth/signin?error=no_session");
       }
     };
 
     handleAuthCallback();
-  }, [
-    router,
-    searchParams,
-    supabase.from,
-    supabase.auth.getSession,
-    supabase.auth.signOut,
-  ]);
+  }, [router, searchParams, supabase]);
 
   return (
     <div className="bg-background flex items-center justify-center">
@@ -240,7 +226,12 @@ function AuthCallbackContent() {
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
+                role="img"
+                aria-labelledby="auth-error-icon-title"
               >
+                <title id="auth-error-icon-title">
+                  Authentication error icon
+                </title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
