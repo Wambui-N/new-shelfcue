@@ -16,7 +16,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { SubmissionsSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,10 +39,12 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 
+type SubmissionDataValue = string | number | boolean | null | undefined;
+
 type Submission = {
   id: string;
   form_id: string;
-  data: Record<string, any>;
+  data: Record<string, SubmissionDataValue>;
   created_at: string;
   forms?: { title: string } | { title: string }[];
 };
@@ -63,8 +65,11 @@ export default function SubmissionsPage() {
   );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  const fetchForms = async () => {
-    if (!user) return;
+  const fetchForms = useCallback(async () => {
+    if (!user?.id) {
+      setForms([]);
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -78,21 +83,26 @@ export default function SubmissionsPage() {
     } catch (error) {
       console.error("Error fetching forms:", error);
     }
-  };
+  }, [supabase, user?.id]);
 
-  const fetchSubmissions = async () => {
-    if (!user) return;
-
+  const fetchSubmissions = useCallback(async () => {
     setLoading(true);
+
+    if (!user?.id) {
+      setSubmissions([]);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("submissions")
-        .select(`
-          id, form_id, data, created_at,
-          forms!inner (
+        .select(
+          `id, form_id, data, created_at,
+          forms:forms!inner (
             title
-          )
-        `)
+          )`,
+        )
         .eq("forms.user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(100);
@@ -105,7 +115,7 @@ export default function SubmissionsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase, user?.id]);
 
   useEffect(() => {
     fetchSubmissions();
@@ -491,9 +501,9 @@ export default function SubmissionsPage() {
                     key={key}
                     className="border-b border-border pb-3 last:border-0"
                   >
-                    <label className="text-sm font-medium text-foreground capitalize">
+                    <p className="text-sm font-medium text-foreground capitalize">
                       {key.replace(/_/g, " ")}
-                    </label>
+                    </p>
                     <p className="text-sm text-muted-foreground mt-1">
                       {String(value)}
                     </p>
