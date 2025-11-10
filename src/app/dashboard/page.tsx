@@ -29,13 +29,19 @@ interface FormRecord {
   description?: string;
   created_at: string;
   status: "draft" | "published";
-  submissions?: number;
+  submissions_count?: number;
 }
+
+type FormQueryResult = FormRecord & {
+  submissions?: Array<{ count: number }>;
+};
+
+type SubmissionDataValue = string | number | boolean | null | undefined;
 
 interface SubmissionRecord {
   id: string;
   form_id: string;
-  data: Record<string, any>;
+  data: Record<string, SubmissionDataValue>;
   created_at: string;
   forms?: { title: string } | { title: string }[];
 }
@@ -73,28 +79,38 @@ export default function DashboardPage() {
         // Enforcement will happen on the backend.
         setCanCreateForm(true);
         // Fetch forms data
-        const { data: formsData, error: formsError } = await (supabase as any)
+        const { data: formsData, error: formsError } = await supabase
           .from("forms")
-          .select("id, title, description, created_at, status")
+          .select(
+            `id, title, description, created_at, status,
+            submissions:submissions(count)`,
+          )
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
 
-        if (!formsError) {
-          setForms(formsData as FormRecord[]);
+        if (!formsError && formsData) {
+          const normalizedForms = (formsData as FormQueryResult[]).map(
+            (form) => ({
+              ...form,
+              submissions_count: Array.isArray(form.submissions)
+                ? form.submissions[0]?.count ?? 0
+                : 0,
+            }),
+          );
+
+          setForms(normalizedForms);
           const publishedCount =
-            formsData?.filter((form: FormRecord) => form.status === "published")
+            normalizedForms.filter((form) => form.status === "published")
               .length || 0;
           setDashboardStats((prev) => ({
             ...prev,
-            totalForms: formsData?.length || 0,
+            totalForms: normalizedForms.length,
             publishedForms: publishedCount,
           }));
         }
 
         // Fetch recent submissions
-        const { data: submissionsData, error: submissionsError } = await (
-          supabase as any
-        )
+        const { data: submissionsData, error: submissionsError } = await supabase
           .from("submissions")
           .select(`
             id, form_id, data, created_at,
@@ -106,19 +122,20 @@ export default function DashboardPage() {
           .order("created_at", { ascending: false })
           .limit(7);
 
-        if (!submissionsError) {
-          setRecentSubmissions(submissionsData || []);
+        if (!submissionsError && submissionsData) {
+          const normalizedSubmissions = submissionsData as SubmissionRecord[];
+          setRecentSubmissions(normalizedSubmissions);
 
           // Calculate leads this week
           const oneWeekAgo = new Date();
           oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
           const leadsThisWeek =
-            submissionsData?.filter(
-              (sub: SubmissionRecord) => new Date(sub.created_at) >= oneWeekAgo,
+            normalizedSubmissions.filter(
+              (sub) => new Date(sub.created_at) >= oneWeekAgo,
             ).length || 0;
 
           // Get last lead time
-          const lastLeadTime = submissionsData?.[0]?.created_at || null;
+          const lastLeadTime = normalizedSubmissions[0]?.created_at ?? null;
 
           setDashboardStats((prev) => ({
             ...prev,
@@ -246,7 +263,7 @@ export default function DashboardPage() {
                 {dashboardStats.leadsThisWeek}
               </div>
               <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium">
-                Leads This Week
+                Submissions This Week
               </div>
             </motion.div>
           </Link>
@@ -448,7 +465,7 @@ export default function DashboardPage() {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-                            {form.submissions || 0} submissions
+                            {form.submissions_count ?? 0} submissions
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
