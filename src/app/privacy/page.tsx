@@ -64,22 +64,6 @@ export default function PrivacyPolicy() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              7. Supabase Authentication
-            </h2>
-            <p className="text-foreground-muted mb-4">
-              We use Supabase to securely manage user authentication and data storage.
-            </p>
-            <p className="text-foreground-muted">
-              During Google Sign-In, you may briefly be redirected to a Supabase
-              domain (ending in <code>.supabase.co</code>) for verification. This process
-              is secure and required for login functionality. Supabase does not have
-              access to your personal data beyond what is necessary to authenticate
-              your account.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-foreground mb-6">
               2. How We Use Your Information
             </h2>
             <p className="text-foreground-muted mb-4">
@@ -120,15 +104,105 @@ export default function PrivacyPolicy() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              4. Data Sharing & Disclosure
+              4. Google Services Integration
+            </h2>
+            <p className="text-foreground-muted mb-4">
+              When you connect your Google account, Shelfcue integrates with Google
+              Sheets and Google Calendar to provide core functionality:
+            </p>
+
+            <h3 className="text-xl font-semibold text-foreground mb-4 mt-6">
+              Google Sheets:
+            </h3>
+            <ul className="list-disc pl-6 mb-6 text-foreground-muted space-y-2">
+              <li>
+                <strong>What We Create:</strong> When you publish a form, we
+                automatically create a new Google Sheet in your Google Drive named
+                &quot;[Form Title] - Responses&quot;. This sheet is owned by you and
+                stored in your Google Drive.
+              </li>
+              <li>
+                <strong>What We Write:</strong> Each time someone submits your form,
+                we append a new row to your sheet containing:
+                <ul className="list-disc pl-6 mt-2 space-y-1">
+                  <li>A timestamp of when the submission was received</li>
+                  <li>All form field values (names, emails, messages, etc.)</li>
+                  <li>Meeting date/time (if your form includes meeting scheduling)</li>
+                  <li>Calendar event link (if a meeting was created)</li>
+                </ul>
+              </li>
+              <li>
+                <strong>What We Don&apos;t Do:</strong> We do not read, modify, or
+                delete existing Google Sheets that we did not create. We do not access
+                other files in your Google Drive. We do not share your sheets with
+                anyone.
+              </li>
+              <li>
+                <strong>Your Control:</strong> You own and fully control all Google
+                Sheets created by Shelfcue. You can view, edit, delete, or share them
+                at any time through Google Drive. You can revoke our access at any time
+                from your Google Account settings.
+              </li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-foreground mb-4 mt-6">
+              Google Calendar:
+            </h3>
+            <ul className="list-disc pl-6 mb-6 text-foreground-muted space-y-2">
+              <li>
+                <strong>What We Create:</strong> If your form includes meeting
+                scheduling, we create calendar events in your Google Calendar when
+                someone books a meeting through your form.
+              </li>
+              <li>
+                <strong>Your Control:</strong> You own and control all calendar events
+                created by Shelfcue. You can view, edit, or delete them at any time
+                through Google Calendar.
+              </li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-foreground mb-4 mt-6">
+              Permissions We Request:
+            </h3>
+            <ul className="list-disc pl-6 text-foreground-muted space-y-2">
+              <li>
+                <strong>Create and manage Google Drive files:</strong> Required to
+                create new Google Sheets and write form submission data. This scope
+                only allows access to files that Shelfcue creates, not your existing
+                files.
+              </li>
+              <li>
+                <strong>View and manage Google Calendar:</strong> Required to create
+                calendar events for meeting bookings
+              </li>
+            </ul>
+            <p className="text-foreground-muted mt-4">
+              You can revoke these permissions at any time from your{" "}
+              <a
+                href="https://myaccount.google.com/permissions"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline"
+              >
+                Google Account settings
+              </a>
+              . Revoking access will prevent new form submissions from syncing to
+              Google Sheets, but existing sheets and data will remain in your Google
+              Drive.
+            </p>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-foreground mb-6">
+              5. Data Sharing & Disclosure
             </h2>
             <p className="text-foreground-muted mb-4">
               We never sell your data. We only share data with:
             </p>
             <ul className="list-disc pl-6 text-foreground-muted space-y-2">
               <li>
-                <strong>Google Sheets:</strong> When you explicitly connect and
-                sync forms
+                <strong>Google Services:</strong> As described in Section 4 above,
+                when you connect your Google account
               </li>
               <li>
                 <strong>Paystack:</strong> For payment processing only
@@ -144,7 +218,23 @@ export default function PrivacyPolicy() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              5. Your Rights (CCPA & GDPR Compliance)
+              6. Supabase Authentication
+            </h2>
+            <p className="text-foreground-muted mb-4">
+              We use Supabase to securely manage user authentication and data storage.
+            </p>
+            <p className="text-foreground-muted">
+              During Google Sign-In, you may briefly be redirected to a Supabase
+              domain (ending in <code>.supabase.co</code>) for verification. This process
+              is secure and required for login functionality. Supabase does not have
+              access to your personal data beyond what is necessary to authenticate
+              your account.
+            </p>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-foreground mb-6">
+              7. Your Rights (CCPA & GDPR Compliance)
             </h2>
             <p className="text-foreground-muted mb-4">You have the right to:</p>
             <ul className="list-disc pl-6 text-foreground-muted space-y-2">
@@ -162,7 +252,7 @@ export default function PrivacyPolicy() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              6. International Data Transfers
+              8. International Data Transfers
             </h2>
             <p className="text-foreground-muted">
               By using Shelfcue, you acknowledge your data may be processed

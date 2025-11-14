@@ -17,9 +17,8 @@ export async function GET(request: NextRequest) {
       access_type: "offline",
       prompt: "consent", // Force consent screen to get refresh token
       scope: [
-        "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/calendar",
-        "https://www.googleapis.com/auth/drive.readonly",
+        "https://www.googleapis.com/auth/drive.file",
         "https://www.googleapis.com/auth/userinfo.email",
         "https://www.googleapis.com/auth/userinfo.profile",
       ],

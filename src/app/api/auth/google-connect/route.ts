@@ -30,7 +30,6 @@ export async function GET(request: NextRequest) {
       access_type: "offline",
       scope: [
         "https://www.googleapis.com/auth/calendar",
-        "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive.file",
         "openid",
         "email",

@@ -130,16 +130,12 @@ export function GoogleConnectPrompt({
                 </h4>
                 <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
                   <li>
-                    • <strong>View and manage Google Sheets</strong> - To sync
-                    form submissions
+                    • <strong>Create and manage Google Sheets files</strong> - To
+                    create sheets and sync form submissions
                   </li>
                   <li>
                     • <strong>View and manage Google Calendar</strong> - To
                     create events
-                  </li>
-                  <li>
-                    • <strong>View Google Drive files</strong> - To list your
-                    existing sheets
                   </li>
                 </ul>
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-3">

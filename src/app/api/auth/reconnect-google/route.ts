@@ -21,7 +21,7 @@ export async function POST() {
     provider: "google",
     options: {
       scopes:
-        "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets",
+        "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file",
       redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
       queryParams: {
         access_type: "offline",
