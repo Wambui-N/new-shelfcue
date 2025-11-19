@@ -445,9 +445,14 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
           throw new Error(`Unable to publish: ${errorData.details}`);
         }
 
-        throw new Error(
-          errorData.details || errorData.error || "Failed to publish form",
-        );
+        // Extract error message from response (check multiple possible fields)
+        const errorMessage = 
+          errorData.message || 
+          errorData.details || 
+          errorData.error || 
+          `Failed to publish form (${publishResponse.status})`;
+        
+        throw new Error(errorMessage);
       }
 
       const publishResult = await publishResponse.json();

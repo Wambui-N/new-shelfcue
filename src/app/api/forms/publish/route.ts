@@ -299,13 +299,18 @@ export async function POST(request: NextRequest) {
         timeSlots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"], // Default slots
       };
 
-      await (supabaseAdmin as any)
+      const { error: meetingUpdateError } = await (supabaseAdmin as any)
         .from("forms")
         .update({
           meeting_settings: meetingSettings,
           status: "published",
         })
         .eq("id", formId);
+
+      if (meetingUpdateError) {
+        console.error("❌ Failed to update form with meeting settings:", meetingUpdateError);
+        throw new Error(`Failed to update form: ${meetingUpdateError.message}`);
+      }
 
       results.meeting = {
         enabled: true,
@@ -316,10 +321,15 @@ export async function POST(request: NextRequest) {
 
     // 4. Update form status to published
     if (!hasMeetingField) {
-      await (supabaseAdmin as any)
+      const { error: statusUpdateError } = await (supabaseAdmin as any)
         .from("forms")
         .update({ status: "published" })
         .eq("id", formId);
+
+      if (statusUpdateError) {
+        console.error("❌ Failed to update form status:", statusUpdateError);
+        throw new Error(`Failed to update form status: ${statusUpdateError.message}`);
+      }
     }
 
     console.log("✓ Form status updated to published");
@@ -331,8 +341,15 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error publishing form:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorDetails = error instanceof Error ? error.stack : String(error);
+    console.error("Error details:", errorDetails);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { 
+        error: "Internal server error",
+        message: errorMessage,
+        details: process.env.NODE_ENV === "development" ? errorDetails : undefined,
+      },
       { status: 500 },
     );
   }
