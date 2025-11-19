@@ -13,6 +13,7 @@ export async function GET() {
   }
 
   // Get user's current subscription with plan details
+  // Include "trial", "active", "expired", and "cancelled" to properly check trial expiration
   const { data: subscription, error } = await supabase
     .from("user_subscriptions")
     .select(
@@ -22,7 +23,7 @@ export async function GET() {
       `,
     )
     .eq("user_id", user.id)
-    .in("status", ["trialing", "active"])
+    .in("status", ["trial", "active", "expired", "cancelled"])
     .single();
 
   if (error && error.code !== "PGRST116") {

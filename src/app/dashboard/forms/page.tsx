@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import {
   ChevronDown,
+  Clock,
   Edit,
   Eye,
   FileText,
@@ -45,6 +46,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/database.types";
+import { useSubscription } from "@/hooks/useSubscription";
 
 type Form = Database["public"]["Tables"]["forms"]["Row"] & {
   submissions_count?: number;
@@ -56,6 +58,7 @@ export default function FormsPage() {
   const { user } = useAuth();
   const router = useRouter();
   const supabase = createClient();
+  const { isOnTrial, trialDaysRemaining } = useSubscription();
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedForms, setSelectedForms] = useState<Set<string>>(new Set());
@@ -303,11 +306,24 @@ export default function FormsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-            Forms
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              Forms
+            </h1>
+            {isOnTrial && trialDaysRemaining > 0 && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800">
+                <Clock className="w-3 h-3 mr-1" />
+                Trial: {trialDaysRemaining} {trialDaysRemaining === 1 ? "day" : "days"}
+              </Badge>
+            )}
+          </div>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Manage all your forms and view performance
+            {isOnTrial && trialDaysRemaining > 0 && (
+              <span className="ml-2 text-blue-600 dark:text-blue-400">
+                • You're on a 14-day free trial
+              </span>
+            )}
           </p>
         </div>
         <div className="flex justify-end">
@@ -478,7 +494,7 @@ export default function FormsPage() {
             <p className="text-muted-foreground text-center mb-6 sm:mb-8 max-w-md text-sm sm:text-lg">
               {searchQuery
                 ? "Try adjusting your search or filters to find what you're looking for."
-                : "Create your first form to start capturing leads and syncing them to Google Sheets automatically."}
+                : "Create your first form to start capturing submissions and syncing them to Google Sheets automatically."}
             </p>
             {searchQuery ? (
               <Button

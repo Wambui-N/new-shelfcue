@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface FormRecord {
   id: string;
@@ -50,6 +51,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const _router = useRouter();
   const supabase = createClient();
+  const { isOnTrial, trialDaysRemaining } = useSubscription();
 
   const [forms, setForms] = useState<FormRecord[]>([]);
   const [recentSubmissions, setRecentSubmissions] = useState<
@@ -214,6 +216,36 @@ export default function DashboardPage() {
           </motion.p>
         </div>
 
+        {/* Trial Period Indicator */}
+        {isOnTrial && trialDaysRemaining > 0 && (
+          <motion.div
+            className="mb-6 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 sm:p-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                You're on a 14-Day Free Trial
+              </h3>
+            </div>
+            <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
+              {trialDaysRemaining} {trialDaysRemaining === 1 ? "day" : "days"} remaining. 
+              Enjoy full access to all features during your trial period.
+            </p>
+            <Link href="/dashboard/billing">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-blue-300 text-blue-900 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-100 dark:hover:bg-blue-900"
+              >
+                View Plans
+              </Button>
+            </Link>
+          </motion.div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Active Forms */}
           <Link href="/dashboard/forms">
@@ -326,7 +358,7 @@ export default function DashboardPage() {
                     No submissions yet
                   </h3>
                   <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                    Share your forms to start capturing leads!
+                    Share your forms to start capturing submissions!
                   </p>
                 </div>
               ) : (

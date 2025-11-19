@@ -88,19 +88,6 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         return null;
       }
 
-      // For new forms, check if the user can create one before proceeding
-      if (!formData.id) {
-        const canCreateResponse = await fetch("/api/forms/check-limit");
-        const canCreateResult = await canCreateResponse.json();
-        if (!canCreateResult.allowed) {
-          alert(
-            "You've reached your form limit. Please upgrade your plan to create more forms.",
-          );
-          router.push("/dashboard/billing");
-          return null;
-        }
-      }
-
       setSaving(true);
       setSaveStatus("saving");
 
@@ -115,24 +102,39 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         );
         console.log("Form title:", formData.title);
 
-        const { error } = await supabase.from("forms").upsert({
-          id: formId,
-          user_id: user.id,
-          title: formData.title,
-          description: formData.description,
-          fields: formData.fields,
-          settings: formData.settings,
-          theme: formData.theme,
-          status: status || "draft",
-        } as any);
+        // Use API route which enforces subscription limits server-side
+        const response = await fetch(`/api/forms/${formId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: formData.title,
+            description: formData.description,
+            fields: formData.fields,
+            settings: formData.settings,
+            theme: formData.theme,
+            status: status || "draft",
+          }),
+        });
 
-        if (error) {
-          console.error("❌ Error saving form:", error);
-          setSaveStatus("error");
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("❌ Error saving form:", errorData);
+          
+          // If it's a subscription limit error, redirect to billing
+          if (response.status === 403 && errorData.error === "Form limit reached") {
+            alert(errorData.message || "You've reached your form limit. Please upgrade your plan to create more forms.");
+            router.push("/dashboard/billing");
+          } else {
+            setSaveStatus("error");
+          }
           return null;
         }
 
-        console.log("✓ Form saved successfully");
+        const result = await response.json();
+        console.log("✓ Form saved successfully", result);
+
         setSaveStatus("saved");
         setDirty(false);
 

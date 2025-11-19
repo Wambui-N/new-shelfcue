@@ -237,19 +237,18 @@ export default function BillingPage() {
 
       {/* Trial Banner */}
       {isOnTrial && trialDaysRemaining > 0 && (
-        <Card className="p-4 sm:p-6 border-2 border-primary">
+        <Card className="p-4 sm:p-6 border-2 border-primary bg-primary/5">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-              <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
             </div>
             <div className="flex-1">
               <h2 className="text-lg sm:text-xl font-semibold mb-2">
-                You are on a free trial!
+                You're on a <strong>14-Day Free Trial</strong>
               </h2>
               <p className="text-sm text-muted-foreground mb-4">
-                You have {trialDaysRemaining}{" "}
-                {trialDaysRemaining === 1 ? "day" : "days"} left. Subscribe now
-                to keep your access.
+                {trialDaysRemaining} {trialDaysRemaining === 1 ? "day" : "days"} remaining in your trial period. 
+                Enjoy full access to all features. Subscribe now to continue after your trial ends.
               </p>
             </div>
           </div>
