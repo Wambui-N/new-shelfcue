@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FormBuilder } from "@/components/builder/FormBuilder";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { SubscriptionGuard } from "@/components/SubscriptionGuard";
+import { FormEditSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFormStore } from "@/store/formStore";
 
@@ -12,9 +12,70 @@ export default function NewFormEditorPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { resetForm, loadForm } = useFormStore();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const checkSubscription = async () => {
+      try {
+        // Check subscription status first
+        const subscriptionResponse = await fetch("/api/subscriptions/current");
+        if (subscriptionResponse.ok) {
+          const subData = await subscriptionResponse.json();
+          const subscription = subData.subscription;
+          
+          // Check if trial has expired
+          if (
+            subscription?.status === "trial" &&
+            subscription?.trial_end
+          ) {
+            const trialEnd = new Date(subscription.trial_end);
+            const now = new Date();
+            if (trialEnd < now) {
+              // Trial expired - redirect to billing
+              alert("Your trial has expired. Please subscribe to create new forms.");
+              router.push("/dashboard/billing");
+              return;
+            }
+          }
+          
+          // Check if subscription is expired or cancelled
+          if (
+            subscription?.status === "expired" ||
+            subscription?.status === "cancelled"
+          ) {
+            alert("Your subscription has expired. Please subscribe to create new forms.");
+            router.push("/dashboard/billing");
+            return;
+          }
+
+          // Check if user can create forms
+          const limitResponse = await fetch("/api/forms/check-limit");
+          if (limitResponse.ok) {
+            const limitData = await limitResponse.json();
+            if (!limitData.allowed) {
+              alert(limitData.message || "You've reached your form limit. Please upgrade your plan to create more forms.");
+              router.push("/dashboard/billing");
+              return;
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error checking subscription:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSubscription();
+  }, [user, router]);
+
+  useEffect(() => {
+    if (!user || loading) return;
 
     // Reset form store for new form (in-memory only, no DB creation yet)
     resetForm();
@@ -44,11 +105,21 @@ export default function NewFormEditorPage() {
       },
       lastSaved: undefined,
     });
-  }, [user, resetForm, loadForm]);
+  }, [user, loading, resetForm, loadForm]);
 
   const handleBack = () => {
     router.push("/dashboard/forms");
   };
+
+  if (loading) {
+    return (
+      <ProtectedRoute>
+        <div className="fixed inset-0 bg-background">
+          <FormEditSkeleton />
+        </div>
+      </ProtectedRoute>
+    );
+  }
 
   return (
     <ProtectedRoute>
