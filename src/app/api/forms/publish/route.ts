@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { canPerformAction } from "@/lib/subscriptionLimits";
 import { getGoogleClient } from "@/lib/google";
 import { GoogleSheetsService } from "@/lib/googleSheets";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -11,6 +12,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
+      );
+    }
+
+    // Check if user can receive submissions (subscription check)
+    const limitCheck = await canPerformAction(userId, "submissions_per_month");
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: "Subscription required",
+          message: limitCheck.message || "Your trial has expired. Please subscribe to publish forms and receive submissions.",
+        },
+        { status: 403 },
       );
     }
 

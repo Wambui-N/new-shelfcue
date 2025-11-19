@@ -19,6 +19,7 @@ import {
   Trash2,
   Users,
   X,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -58,7 +59,7 @@ export default function FormsPage() {
   const { user } = useAuth();
   const router = useRouter();
   const supabase = createClient();
-  const { isOnTrial, trialDaysRemaining } = useSubscription();
+  const { isOnTrial, isExpired, trialDaysRemaining, hasAccess, canCreateForm: canCreateFormFromHook } = useSubscription();
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedForms, setSelectedForms] = useState<Set<string>>(new Set());
@@ -79,6 +80,7 @@ export default function FormsPage() {
 
   const [_error, setError] = useState<string | null>(null);
   const [canCreateForm, setCanCreateForm] = useState(true);
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   const fetchForms = useCallback(async () => {
     try {
@@ -88,9 +90,19 @@ export default function FormsPage() {
       }
       setLoading(true);
 
-      // Temporarily allow form creation on the client side.
-      // Enforcement will happen on the backend.
-      setCanCreateForm(true);
+      // Check subscription status for form creation
+      if (!hasAccess || !canCreateFormFromHook) {
+        setCanCreateForm(false);
+      } else {
+        // Check with backend
+        const limitResponse = await fetch("/api/forms/check-limit");
+        if (limitResponse.ok) {
+          const limitData = await limitResponse.json();
+          setCanCreateForm(limitData.allowed);
+        } else {
+          setCanCreateForm(true); // Default to true if check fails
+        }
+      }
 
       const { data, error } = await supabase
         .from("forms")
@@ -193,25 +205,47 @@ export default function FormsPage() {
   };
 
   const handleStatusToggle = async (formId: string, currentStatus: string) => {
+    // If trying to activate (draft -> published) and trial is expired, block it
+    if (currentStatus === "draft" && isExpired) {
+      alert("Your trial has expired. Please subscribe to activate forms and receive submissions.");
+      handleSubscribe();
+      return;
+    }
+
     const newStatus = currentStatus === "published" ? "draft" : "published";
 
     try {
-      const { error } = await (supabase as any)
-        .from("forms")
-        .update({ status: newStatus })
-        .eq("id", formId);
+      // Use API route which enforces subscription checks
+      const response = await fetch(`/api/forms/${formId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
-      if (!error) {
-        setForms(
-          forms.map((form) =>
-            form.id === formId
-              ? { ...form, status: newStatus as "draft" | "published" }
-              : form,
-          ),
-        );
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 403) {
+          alert(errorData.message || "Subscription required to publish forms.");
+          handleSubscribe();
+        } else {
+          alert(errorData.error || "Failed to update form status.");
+        }
+        return;
       }
+
+      // Update local state
+      setForms(
+        forms.map((form) =>
+          form.id === formId
+            ? { ...form, status: newStatus as "draft" | "published" }
+            : form,
+        ),
+      );
     } catch (error) {
       console.error("Error updating form status:", error);
+      alert("Failed to update form status. Please try again.");
     }
   };
 
@@ -236,6 +270,13 @@ export default function FormsPage() {
   };
 
   const handleBulkActivate = async () => {
+    // Block activation if trial is expired
+    if (isExpired) {
+      alert("Your trial has expired. Please subscribe to activate forms and receive submissions.");
+      handleSubscribe();
+      return;
+    }
+
     const formIds = Array.from(selectedForms);
 
     try {
@@ -297,12 +338,104 @@ export default function FormsPage() {
     return date.toLocaleDateString();
   };
 
+  const handleSubscribe = async () => {
+    try {
+      setPaymentLoading(true);
+
+      if (!user?.email) {
+        alert("Please sign in to subscribe");
+        return;
+      }
+
+      // Fetch the professional plan
+      const plansResponse = await fetch("/api/subscriptions/plans");
+      if (!plansResponse.ok) {
+        throw new Error("Failed to fetch plans");
+      }
+
+      const plansData = await plansResponse.json();
+      const professionalPlan = plansData.plans.find(
+        (p: any) => p.name === "professional",
+      );
+
+      if (!professionalPlan?.paystack_plan_code) {
+        alert("Paystack plan code is not configured. Please contact support.");
+        return;
+      }
+
+      // Initialize payment
+      const response = await fetch("/api/payments/initialize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: user.email,
+          amount: professionalPlan.price_monthly * 100,
+          plan_code: professionalPlan.paystack_plan_code,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to initialize payment");
+      }
+
+      const data = await response.json();
+      // Redirect to Paystack payment page
+      window.location.href = data.authorization_url;
+    } catch (error) {
+      console.error("Error initiating payment:", error);
+      alert("Failed to initiate payment. Please try again.");
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
   if (loading) {
     return <FormsListSkeleton />;
   }
 
   return (
     <div className="space-y-6">
+      {/* Expired Trial Alert */}
+      {isExpired && (
+        <Card className="border-2 border-red-500 bg-red-50 dark:bg-red-950/20">
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-red-600 dark:text-red-400" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-red-900 dark:text-red-100 mb-2">
+                  Your Trial Has Expired
+                </h3>
+                <p className="text-sm text-red-800 dark:text-red-200 mb-4">
+                  Your 14-day free trial has ended. To continue using ShelfCue, you'll need to subscribe. 
+                  <strong className="block mt-2">You can no longer:</strong>
+                  <ul className="list-disc list-inside mt-1 space-y-1">
+                    <li>Create new forms</li>
+                    <li>Receive form submissions</li>
+                  </ul>
+                  <span className="block mt-2">Your existing forms are still accessible, but they won't receive new submissions.</span>
+                </p>
+                <Button
+                  onClick={handleSubscribe}
+                  disabled={paymentLoading}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  size="lg"
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  {paymentLoading ? "Processing..." : "Subscribe Now to Continue"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -316,6 +449,12 @@ export default function FormsPage() {
                 Trial: {trialDaysRemaining} {trialDaysRemaining === 1 ? "day" : "days"}
               </Badge>
             )}
+            {isExpired && (
+              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800">
+                <Clock className="w-3 h-3 mr-1" />
+                Trial Expired
+              </Badge>
+            )}
           </div>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Manage all your forms and view performance
@@ -324,18 +463,27 @@ export default function FormsPage() {
                 • You're on a 14-day free trial
               </span>
             )}
+            {isExpired && (
+              <span className="ml-2 text-red-600 dark:text-red-400">
+                • Subscribe to create new forms and receive submissions
+              </span>
+            )}
           </p>
         </div>
         <div className="flex justify-end">
-          {canCreateForm ? (
+          {canCreateForm && !isExpired ? (
             <Button onClick={() => router.push("/editor/new")}>
               <Plus className="mr-2 h-4 w-4" />
               Create Form
             </Button>
           ) : (
-            <Button onClick={() => router.push("/dashboard/billing")}>
-              <Plus className="mr-2 h-4 w-4" />
-              Subscribe to Create Forms
+            <Button 
+              onClick={handleSubscribe}
+              disabled={paymentLoading}
+              className="bg-primary hover:bg-primary/90"
+            >
+              <Zap className="mr-2 h-4 w-4" />
+              {paymentLoading ? "Processing..." : "Subscribe to Continue"}
             </Button>
           )}
         </div>
@@ -452,7 +600,9 @@ export default function FormsPage() {
                   variant="outline"
                   size="sm"
                   onClick={handleBulkActivate}
+                  disabled={isExpired}
                   className="text-xs"
+                  title={isExpired ? "Subscribe to activate forms" : ""}
                 >
                   <Play className="w-3 h-3 mr-1" />
                   Activate
@@ -507,11 +657,21 @@ export default function FormsPage() {
               </Button>
             ) : (
               <Button
-                onClick={() => router.push("/editor/new")}
+                onClick={isExpired ? handleSubscribe : () => router.push("/editor/new")}
+                disabled={paymentLoading}
                 className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Create Your First Form
+                {isExpired ? (
+                  <>
+                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                    {paymentLoading ? "Processing..." : "Subscribe to Create Forms"}
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                    Create Your First Form
+                  </>
+                )}
               </Button>
             )}
           </div>
@@ -639,6 +799,7 @@ export default function FormsPage() {
                               onClick={() =>
                                 handleStatusToggle(form.id, form.status)
                               }
+                              disabled={isExpired && form.status === "draft"}
                             >
                               {form.status === "published" ? (
                                 <>
@@ -648,7 +809,7 @@ export default function FormsPage() {
                               ) : (
                                 <>
                                   <Play className="w-4 h-4 mr-2" />
-                                  Activate
+                                  {isExpired ? "Activate (Subscribe Required)" : "Activate"}
                                 </>
                               )}
                             </DropdownMenuItem>
@@ -745,6 +906,8 @@ export default function FormsPage() {
                                 onCheckedChange={() =>
                                   handleStatusToggle(form.id, form.status)
                                 }
+                                disabled={isExpired && form.status === "draft"}
+                                title={isExpired && form.status === "draft" ? "Subscribe to activate forms" : ""}
                               />
                               <Badge
                                 variant={
@@ -757,6 +920,11 @@ export default function FormsPage() {
                                   ? "Active"
                                   : "Draft"}
                               </Badge>
+                              {isExpired && form.status === "draft" && (
+                                <span className="text-xs text-muted-foreground" title="Subscribe to activate">
+                                  (Locked)
+                                </span>
+                              )}
                             </div>
                           </td>
                           <td className="px-4 py-4">
