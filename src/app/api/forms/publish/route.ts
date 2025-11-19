@@ -189,23 +189,51 @@ export async function POST(request: NextRequest) {
           console.log("💾 Saving sheet connection to database...");
           console.log("📝 Connection data:", {
             user_id: userId,
+            form_id: formId,
             sheet_id: newSheet.spreadsheetId,
             sheet_name: `${(form as any).title} - Responses`,
-            sheet_url: newSheet.spreadsheetUrl, // For logging only, not stored in DB
+            sheet_url: newSheet.spreadsheetUrl,
           });
 
-          const { data: connection, error: connectionError } = await (
-            supabaseAdmin as any
-          )
-            .from("sheet_connections")
-            .insert({
-              user_id: userId,
-              form_id: formId,
-              sheet_id: newSheet.spreadsheetId,
-              sheet_name: `${(form as any).title} - Responses`,
-            })
-            .select()
-            .single();
+          // Try inserting with retry logic in case of schema cache issues
+          let connection = null;
+          let connectionError = null;
+          let insertRetries = 3;
+          
+          while (insertRetries > 0 && !connection) {
+            const result = await (supabaseAdmin as any)
+              .from("sheet_connections")
+              .insert({
+                user_id: userId,
+                form_id: formId,
+                sheet_id: newSheet.spreadsheetId,
+                sheet_name: `${(form as any).title} - Responses`,
+                sheet_url: newSheet.spreadsheetUrl,
+              })
+              .select()
+              .single();
+
+            connection = result.data;
+            connectionError = result.error;
+
+            if (connection) {
+              console.log("✅ Sheet connection saved successfully");
+              break;
+            }
+
+            // If it's a schema cache error, wait and retry
+            if (connectionError?.message?.includes("schema cache") || 
+                connectionError?.details?.includes("schema cache")) {
+              insertRetries--;
+              if (insertRetries > 0) {
+                console.log(`⚠️ Schema cache issue, retrying... (${insertRetries} attempts left)`);
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+              }
+            } else {
+              // Not a schema cache error, break immediately
+              break;
+            }
+          }
 
           if (connectionError) {
             console.error(
@@ -218,6 +246,15 @@ export async function POST(request: NextRequest) {
               hint: connectionError.hint,
               code: connectionError.code,
             });
+            
+            // Provide helpful error message for schema cache issues
+            if (connectionError.message?.includes("schema cache") || 
+                connectionError.details?.includes("schema cache")) {
+              throw new Error(
+                "Database schema cache is out of sync. Please try again in a few moments, or contact support if the issue persists."
+              );
+            }
+            
             throw connectionError;
           }
 
