@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
 
     // Use admin client to bypass RLS for public form access
     const supabaseAdmin = getSupabaseAdmin();
-    /* biome-ignore lint/suspicious/noExplicitAny: Supabase admin helpers expose wider capabilities than generated types cover. */
     const supabaseAdminClient = supabaseAdmin as any;
 
     // Verify the form exists and is published

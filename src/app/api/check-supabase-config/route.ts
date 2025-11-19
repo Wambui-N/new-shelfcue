@@ -43,7 +43,7 @@ export async function GET(_request: NextRequest) {
       const supabaseAdmin = getSupabaseAdmin();
 
       // Try a simple query to verify connection
-      const { data, error } = await (supabaseAdmin as any)
+      const { error } = await (supabaseAdmin as any)
         .from("user_google_tokens")
         .select("count")
         .limit(1);

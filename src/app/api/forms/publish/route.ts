@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
 
     // Get Google client - REQUIRED for publishing
     console.log("🔍 Getting Google client for user:", userId);
-    let googleClient;
+    let googleClient: Awaited<ReturnType<typeof getGoogleClient>> | null = null;
     try {
       googleClient = await getGoogleClient(userId);
       console.log("🔍 Google client result:", !!googleClient);

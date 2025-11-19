@@ -19,9 +19,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/database.types";
 
-type Form = Database["public"]["Tables"]["forms"]["Row"];
-type Submission = Database["public"]["Tables"]["submissions"]["Row"];
-
 interface FormAnalytics {
   form_title: string;
   total_submissions: number;
