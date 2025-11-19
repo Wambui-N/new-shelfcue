@@ -200,6 +200,7 @@ export async function POST(request: NextRequest) {
             .from("sheet_connections")
             .insert({
               user_id: userId,
+              form_id: formId,
               sheet_id: newSheet.spreadsheetId,
               sheet_name: `${(form as any).title} - Responses`,
               sheet_url: newSheet.spreadsheetUrl,

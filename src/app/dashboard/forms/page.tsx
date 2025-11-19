@@ -129,7 +129,7 @@ export default function FormsPage() {
     } finally {
       setLoading(false);
     }
-  }, [user, supabase]);
+  }, [user, supabase, hasAccess, canCreateFormFromHook]);
 
   useEffect(() => {
     fetchForms();
@@ -1031,10 +1031,11 @@ export default function FormsPage() {
           </DialogHeader>
           <div className="py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
+              <label htmlFor="delete-confirmation" className="text-sm font-medium text-foreground">
                 Type "DELETE" to confirm:
               </label>
               <Input
+                id="delete-confirmation"
                 value={deleteConfirmation}
                 onChange={(e) => setDeleteConfirmation(e.target.value)}
                 placeholder="DELETE"

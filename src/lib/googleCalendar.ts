@@ -160,6 +160,7 @@ export async function createCalendarEventFromSubmission(
   userId: string,
   formId: string,
   submissionData: Record<string, any>,
+  timeZone?: string,
 ) {
   try {
     console.log("📅 [Calendar] Starting calendar event creation...");
@@ -244,6 +245,14 @@ export async function createCalendarEventFromSubmission(
     const attendeeName = attendeeEmail ? ` with ${attendeeEmail}` : "";
     const eventTitle = `${form.title}${attendeeName}`;
 
+    // Use provided timezone or fallback to system timezone
+    const eventTimeZone =
+      timeZone ||
+      process.env.FORM_SUBMISSION_TIMEZONE ||
+      process.env.TZ ||
+      Intl.DateTimeFormat().resolvedOptions().timeZone ||
+      "UTC";
+
     // Create the event
     const calendar = googleClient.getCalendar();
     const event: CalendarEvent = {
@@ -251,11 +260,11 @@ export async function createCalendarEventFromSubmission(
       description: `Form submission for: ${form.title}`,
       start: {
         dateTime: startDate.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timeZone: eventTimeZone,
       },
       end: {
         dateTime: endDate.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timeZone: eventTimeZone,
       },
       attendees: attendeeEmail ? [{ email: attendeeEmail }] : [],
     };

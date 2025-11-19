@@ -13,7 +13,7 @@ export default function PrivacyPolicy() {
           </h1>
 
           <p className="text-foreground-muted mb-8">
-            Last updated: {new Date().toLocaleDateString()}
+            Last updated: November 19, 2025
           </p>
 
           <section className="mb-12">

@@ -10,7 +10,6 @@ type FormFieldDefinition = { id: string; type?: string | null };
 
 type SheetConnectionRecord = {
   sheet_id: string | null;
-  sheet_url: string | null;
 };
 
 type FormRecord = {
@@ -60,9 +59,8 @@ export async function POST(request: NextRequest) {
         settings,
         default_sheet_connection_id,
         default_calendar_id,
-        sheet_connections (
-          sheet_id,
-          sheet_url
+        sheet_connections!sheet_connections_form_id_fkey (
+          sheet_id
         )
       `)
       .eq("id", formId)
@@ -158,6 +156,7 @@ export async function POST(request: NextRequest) {
           formRecord.user_id,
           formId,
           data,
+          formTimeZone,
         );
         if (calendarEvent?.htmlLink) {
           calendarEventLink = calendarEvent.htmlLink;
@@ -173,50 +172,93 @@ export async function POST(request: NextRequest) {
 
     // 2. Sync to Google Sheets
     try {
-      if (formRecord.sheet_connections && formRecord.user_id) {
-        const sheetConnection = Array.isArray(formRecord.sheet_connections)
+      // Get sheet connection - try from join first, then fallback to direct query
+      let sheetConnection: { sheet_id: string | null } | null = null;
+      
+      if (formRecord.sheet_connections) {
+        const connection = Array.isArray(formRecord.sheet_connections)
           ? formRecord.sheet_connections[0]
           : formRecord.sheet_connections;
+        
+        if (connection?.sheet_id) {
+          sheetConnection = { sheet_id: connection.sheet_id };
+        }
+      }
+      
+      // Fallback: Query directly using default_sheet_connection_id
+      if (!sheetConnection?.sheet_id && formRecord.default_sheet_connection_id) {
+        const { data: connectionData, error: connectionError } = await supabaseAdminClient
+          .from("sheet_connections")
+          .select("sheet_id")
+          .eq("id", formRecord.default_sheet_connection_id)
+          .single();
+        
+        if (!connectionError && connectionData?.sheet_id) {
+          sheetConnection = { sheet_id: connectionData.sheet_id };
+        }
+      }
 
-        if (sheetConnection?.sheet_id) {
-          const googleClient = await getGoogleClient(formRecord.user_id);
-          if (googleClient) {
-            const sheetsService = new GoogleSheetsService(googleClient);
+      if (sheetConnection?.sheet_id && formRecord.user_id) {
+        const googleClient = await getGoogleClient(formRecord.user_id);
+        if (googleClient) {
+          const sheetsService = new GoogleSheetsService(googleClient);
 
-            const meetingFormatter = new Intl.DateTimeFormat("en-GB", {
-              timeZone: formTimeZone,
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
+          // Create formatters for date/time fields with user's timezone
+          const dateTimeFormatter = new Intl.DateTimeFormat("en-GB", {
+            timeZone: formTimeZone,
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
-            const rowData = formRecord.fields.map((field) => {
-              const value = data[field.id as keyof typeof data];
-              // Handle different field types
-              if (field.type === "checkbox") return value ? "Yes" : "No";
-              if (field.type === "meeting" && value) {
-                try {
-                  const date = new Date(value);
-                  return meetingFormatter.format(date);
-                } catch {
-                  return value;
-                }
+          const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+            timeZone: formTimeZone,
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+
+          const rowData = formRecord.fields.map((field) => {
+            const value = data[field.id as keyof typeof data];
+            
+            // Handle different field types
+            if (field.type === "checkbox") return value ? "Yes" : "No";
+            
+            // Format date/time fields with timezone
+            if (field.type === "meeting" && value) {
+              try {
+                const date = new Date(value);
+                return dateTimeFormatter.format(date);
+              } catch {
+                return value;
               }
-              return value || "";
-            });
-
-            // Add the calendar link if it was created
-            if (calendarEventLink) {
-              rowData.push(calendarEventLink);
             }
+            
+            // Format date fields with timezone
+            if (field.type === "date" && value) {
+              try {
+                const date = new Date(value);
+                // If it's a date-only field, format without time
+                return dateFormatter.format(date);
+              } catch {
+                return value;
+              }
+            }
+            
+            return value || "";
+          });
 
-            await sheetsService.append(sheetConnection.sheet_id, rowData, {
-              timeZone: formTimeZone,
-            });
-            console.log("✓ Synced to Google Sheets");
+          // Add the calendar link if it was created
+          if (calendarEventLink) {
+            rowData.push(calendarEventLink);
           }
+
+          await sheetsService.append(sheetConnection.sheet_id, rowData, {
+            timeZone: formTimeZone,
+          });
+          console.log("✓ Synced to Google Sheets");
         }
       }
     } catch (error) {
