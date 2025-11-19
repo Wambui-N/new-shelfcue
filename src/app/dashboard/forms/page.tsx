@@ -45,6 +45,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/database.types";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -52,8 +53,6 @@ import { useSubscription } from "@/hooks/useSubscription";
 type Form = Database["public"]["Tables"]["forms"]["Row"] & {
   submissions_count?: number;
 };
-
-import { useRouter } from "next/navigation";
 
 export default function FormsPage() {
   const { user } = useAuth();
@@ -91,7 +90,7 @@ export default function FormsPage() {
       setLoading(true);
 
       // Check subscription status for form creation
-      if (!hasAccess || !canCreateFormFromHook) {
+      if (!hasAccess || !canCreateFormFromHook()) {
         setCanCreateForm(false);
       } else {
         // Check with backend
@@ -129,7 +128,7 @@ export default function FormsPage() {
     } finally {
       setLoading(false);
     }
-  }, [user, supabase, hasAccess, canCreateFormFromHook]);
+  }, [user, supabase, hasAccess]);
 
   useEffect(() => {
     fetchForms();

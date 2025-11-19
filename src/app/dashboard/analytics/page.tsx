@@ -303,7 +303,7 @@ export default function AnalyticsPage() {
               <div className="space-y-4">
                 {recentActivity.map((form, index) => (
                   <motion.div
-                    key={index}
+                    key={`${form.form}-${form.submissions}-${index}`}
                     className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-accent/50 transition-colors"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}

@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
             user_id: userId,
             sheet_id: newSheet.spreadsheetId,
             sheet_name: `${(form as any).title} - Responses`,
-            sheet_url: newSheet.spreadsheetUrl,
+            sheet_url: newSheet.spreadsheetUrl, // For logging only, not stored in DB
           });
 
           const { data: connection, error: connectionError } = await (
@@ -203,7 +203,6 @@ export async function POST(request: NextRequest) {
               form_id: formId,
               sheet_id: newSheet.spreadsheetId,
               sheet_name: `${(form as any).title} - Responses`,
-              sheet_url: newSheet.spreadsheetUrl,
             })
             .select()
             .single();
