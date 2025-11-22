@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +11,30 @@ import { GoogleIntegrationPanel } from "./GoogleIntegrationPanel";
 
 export function FormSettings() {
   const { formData, updateForm } = useFormStore();
+  const titleManuallyChangedRef = useRef(false);
+  const previousTitleRef = useRef(formData.title);
+
+  // Auto-sync header with title initially, unless title was manually changed
+  useEffect(() => {
+    // If title changed and it wasn't from our auto-sync, mark as manually changed
+    if (previousTitleRef.current !== formData.title) {
+      // Check if this was a manual change (not from header sync)
+      if (!titleManuallyChangedRef.current) {
+        titleManuallyChangedRef.current = true;
+      }
+      previousTitleRef.current = formData.title;
+    }
+
+    // If header is empty or matches previous title, and title wasn't manually changed, sync it
+    if (
+      !titleManuallyChangedRef.current &&
+      (!formData.header || formData.header === previousTitleRef.current)
+    ) {
+      if (formData.title && formData.title !== formData.header) {
+        updateForm({ header: formData.title });
+      }
+    }
+  }, [formData.title, formData.header, updateForm]);
 
   return (
     <div className="space-y-6">
@@ -24,9 +49,28 @@ export function FormSettings() {
             <Input
               id="title"
               value={formData.title}
-              onChange={(e) => updateForm({ title: e.target.value })}
+              onChange={(e) => {
+                titleManuallyChangedRef.current = true;
+                updateForm({ title: e.target.value });
+              }}
               placeholder="Enter form title"
             />
+            <p className="text-xs text-muted-foreground">
+              This is the internal title for your form
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="header">Form Header</Label>
+            <Input
+              id="header"
+              value={formData.header || formData.title || ""}
+              onChange={(e) => updateForm({ header: e.target.value })}
+              placeholder="Enter form header (shown to users)"
+            />
+            <p className="text-xs text-muted-foreground">
+              This is displayed to users. Initially syncs with title, but can be customized independently.
+            </p>
           </div>
 
           <div className="space-y-2">

@@ -71,9 +71,11 @@ export function FormContent({
   return (
     <div
       className={cn(
-        "w-full max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-8",
-        layoutConfig.spacing === "tight" && "py-3 sm:py-4",
-        layoutConfig.spacing === "loose" && "py-6 sm:py-12",
+        "w-full max-w-4xl mx-auto",
+        "px-4 sm:px-6 md:px-8 lg:px-12", // Reduced padding on mobile
+        "py-6 sm:py-8 md:py-12", // Reduced padding on mobile
+        layoutConfig.spacing === "tight" && "py-4 sm:py-6 md:py-8",
+        layoutConfig.spacing === "loose" && "py-8 sm:py-12 md:py-16",
       )}
     >
       {/* Progress Indicator */}
@@ -88,12 +90,11 @@ export function FormContent({
       {/* Form Container */}
       <div
         className={cn(
-          "bg-white shadow-lg p-4 sm:p-6 md:p-8",
+          "p-4 sm:p-6 md:p-8",
           layout === "hero" && "max-w-2xl mx-auto",
           layout === "conversational" &&
             "min-h-[300px] sm:min-h-[400px] flex flex-col justify-center",
         )}
-        style={{ borderRadius: "var(--shelf-radius)" }}
       >
         {/* Title/Description inside the form container */}
         {(title || description) && (
@@ -164,7 +165,8 @@ export function FormContent({
                   onClick={handlePrevious}
                   disabled={currentStep === 0}
                   className={cn(
-                    "px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-colors",
+                    "min-h-[44px] min-w-[44px]", // Touch-friendly minimum size
+                    "px-4 sm:px-6 py-3 sm:py-3 text-sm sm:text-base font-medium transition-colors",
                     currentStep === 0
                       ? "text-gray-400 cursor-not-allowed"
                       : "text-gray-600 hover:text-gray-800 hover:bg-gray-100",
@@ -178,7 +180,8 @@ export function FormContent({
                   type="submit"
                   disabled={isSubmitting}
                   className={cn(
-                    "px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-medium text-white transition-colors",
+                    "min-h-[44px] min-w-[44px]", // Touch-friendly minimum size
+                    "px-6 sm:px-8 py-3 sm:py-3 text-sm sm:text-base font-medium text-white transition-colors",
                     "bg-[var(--shelf-primary)] hover:opacity-90",
                     "disabled:opacity-50 disabled:cursor-not-allowed",
                   )}
@@ -196,7 +199,8 @@ export function FormContent({
                 type="submit"
                 disabled={isSubmitting}
                 className={cn(
-                  "w-full px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-white transition-colors",
+                  "w-full min-h-[44px]", // Touch-friendly minimum size
+                  "px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-white transition-colors",
                   "bg-[var(--shelf-primary)] hover:opacity-90",
                   "disabled:opacity-50 disabled:cursor-not-allowed",
                   layout === "hero" && "sm:text-lg sm:py-5",

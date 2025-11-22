@@ -87,6 +87,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
         setFormData({
           id: formId,
           title: data.title || "Form",
+          header: data.header || data.title || "Form",
           description: data.description || "",
           status: data.status || "published",
           fields: data.fields || [],
@@ -167,19 +168,62 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
   }
 
   if (isSubmitted) {
+    const theme = formData?.theme || {
+      primaryColor: "#151419",
+      backgroundColor: "#fafafa",
+      textColor: "#151419",
+      borderRadius: 8,
+      fontFamily: "Satoshi",
+    };
+
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          backgroundColor: theme.backgroundColor,
+          fontFamily: theme.fontFamily,
+        }}
+      >
         <div className="text-center max-w-md mx-auto px-4">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-green-600" />
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            style={{
+              backgroundColor: `${theme.primaryColor}20`,
+            }}
+          >
+            <CheckCircle
+              className="w-8 h-8"
+              style={{ color: theme.primaryColor }}
+            />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">
+          <h2
+            className="text-2xl font-bold mb-2"
+            style={{ color: theme.textColor }}
+          >
             Submission Received!
           </h2>
-          <p className="text-muted-foreground">
+          <p style={{ color: theme.textColor, opacity: 0.8 }}>
             {formData?.settings?.successMessage ||
               "Thank you for your submission."}
           </p>
+
+          {/* Watermark */}
+          {formData?.settings?.showWatermark !== false && (
+            <div className="mt-12 pt-6 border-t" style={{ borderColor: `${theme.primaryColor}20` }}>
+              <p className="text-xs" style={{ color: theme.textColor, opacity: 0.6 }}>
+                Powered by{" "}
+                <a
+                  href="https://shelfcue.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:no-underline"
+                  style={{ color: theme.primaryColor }}
+                >
+                  ShelfCue
+                </a>
+              </p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -192,13 +236,17 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
         <FormDisplay
           formId={formData.id || "public-form"}
           title={formData.title}
+          header={formData.header}
           description={formData.description}
           fields={formData.fields}
           mode={displayMode}
           layout={layout}
-          theme={displayTheme}
+          theme={formData.theme}
           onSubmit={handleSubmit}
           isSubmitting={false}
+          leftSectionDescription={formData.settings.leftSectionDescription}
+          leftSectionLink={formData.settings.leftSectionLink}
+          showWatermark={formData.settings.showWatermark !== false}
         />
       </>
     );

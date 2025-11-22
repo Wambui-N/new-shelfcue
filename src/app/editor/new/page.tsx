@@ -85,15 +85,16 @@ export default function NewFormEditorPage() {
     loadForm({
       id: "", // No ID yet - will be generated on first save
       title: "Untitled Form",
+      header: "Untitled Form", // Auto-sync with title initially
       description: "",
       status: "draft",
       fields: [],
       theme: {
-        primaryColor: "#151419",
-        backgroundColor: "#fafafa",
+        primaryColor: "#151419", // SaaS primary color
+        backgroundColor: "#fafafa", // SaaS background color
         textColor: "#151419",
         borderRadius: 8,
-        fontFamily: "Inter",
+        fontFamily: "Satoshi", // SaaS default font
       },
       settings: {
         showTitle: true,
@@ -102,6 +103,9 @@ export default function NewFormEditorPage() {
         successMessage: "Thank you for your submission!",
         collectEmail: false,
         allowMultipleSubmissions: true,
+        showWatermark: true,
+        mode: "standalone",
+        layout: "simple",
       },
       lastSaved: undefined,
     });

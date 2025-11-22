@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
         user_id: userId,
         sheet_id: spreadsheetId,
         sheet_name: title,
+        sheet_url: spreadsheetUrl,
         form_id: "", // Placeholder - this will be updated when linked to a form
       })
       .select()

@@ -6,6 +6,8 @@ import {
   ArrowLeft,
   CheckCircle,
   ChevronRight,
+  Edit,
+  Eye,
   Loader2,
   Monitor,
   Palette,
@@ -20,6 +22,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useFormStore } from "@/store/formStore";
 import { DisplayEditor } from "./DisplayEditor";
@@ -42,6 +45,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     useFormStore();
   const [activeTab, setActiveTab] = useState("fields");
   const [deviceView, setDeviceView] = useState<"desktop" | "mobile">("desktop");
+  const [mobileViewMode, setMobileViewMode] = useState<"preview" | "edit">("preview"); // Mobile toggle between preview and edit
   const [saveStatus, setSaveStatus] = useState<
     "idle" | "saving" | "saved" | "error"
   >("idle");
@@ -652,9 +656,35 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
       {/* Main Content Area */}
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+        {/* Mobile Toggle Button - Only visible on mobile */}
+        <div className="lg:hidden fixed bottom-4 right-4 z-50 safe-bottom">
+          <Button
+            onClick={() =>
+              setMobileViewMode(mobileViewMode === "preview" ? "edit" : "preview")
+            }
+            size="lg"
+            className="h-14 w-14 rounded-full shadow-lg touch-target"
+            aria-label={mobileViewMode === "preview" ? "Switch to Edit" : "Switch to Preview"}
+          >
+            {mobileViewMode === "preview" ? (
+              <Edit className="w-6 h-6" />
+            ) : (
+              <Eye className="w-6 h-6" />
+            )}
+          </Button>
+        </div>
+
         {/* Left Side - Preview (Larger Width) */}
-        <div className="flex-1 border-r border-border overflow-y-auto bg-background-secondary/50">
-          <div className="p-3 sm:p-6 min-h-full">
+        <div
+          className={cn(
+            "flex-1 border-r border-border overflow-y-auto bg-background-secondary/50",
+            // On mobile, show/hide based on view mode
+            "lg:block",
+            mobileViewMode === "preview" ? "block" : "hidden",
+            "smooth-scroll", // Better scrolling on mobile
+          )}
+        >
+          <div className="p-3 sm:p-6 min-h-full pb-20 lg:pb-6">
             {/* Device Toggle */}
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <h3 className="text-base sm:text-lg font-semibold text-foreground">
@@ -665,7 +695,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   variant={deviceView === "desktop" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setDeviceView("desktop")}
-                  className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm"
+                  className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm min-w-[44px] min-h-[44px] touch-target"
                 >
                   <Monitor className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   <span className="hidden sm:inline">Desktop</span>
@@ -674,7 +704,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   variant={deviceView === "mobile" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setDeviceView("mobile")}
-                  className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm"
+                  className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm min-w-[44px] min-h-[44px] touch-target"
                 >
                   <Smartphone className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   <span className="hidden sm:inline">Mobile</span>
@@ -716,41 +746,48 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         </div>
 
         {/* Right Side - Editor Tabs (Smaller Width) */}
-        <div className="w-full lg:w-[420px] flex flex-col bg-background border-t lg:border-t-0 lg:border-l border-border">
+        <div
+          className={cn(
+            "w-full lg:w-[420px] flex flex-col bg-background border-t lg:border-t-0 lg:border-l border-border",
+            // On mobile, show/hide based on view mode
+            "lg:block",
+            mobileViewMode === "edit" ? "block" : "hidden",
+          )}
+        >
           {/* Tab Headers */}
           <div className="flex-shrink-0 bg-background border-b border-border">
             <div className="grid grid-cols-3">
               <button
                 onClick={() => setActiveTab("fields")}
-                className={`flex items-center justify-center gap-2 h-12 text-sm font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 h-14 text-sm font-medium transition-colors touch-target ${
                   activeTab === "fields"
                     ? "bg-background text-foreground border-b-2 border-primary"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-5 h-5" />
                 <span className="hidden sm:inline">Fields</span>
               </button>
               <button
                 onClick={() => setActiveTab("settings")}
-                className={`flex items-center justify-center gap-2 h-12 text-sm font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 h-14 text-sm font-medium transition-colors touch-target ${
                   activeTab === "settings"
                     ? "bg-background text-foreground border-b-2 border-primary"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Settings className="w-4 h-4" />
+                <Settings className="w-5 h-5" />
                 <span className="hidden sm:inline">Settings</span>
               </button>
               <button
                 onClick={() => setActiveTab("display")}
-                className={`flex items-center justify-center gap-2 h-12 text-sm font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 h-14 text-sm font-medium transition-colors touch-target ${
                   activeTab === "display"
                     ? "bg-background text-foreground border-b-2 border-primary"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Palette className="w-4 h-4" />
+                <Palette className="w-5 h-5" />
                 <span className="hidden sm:inline">Display</span>
               </button>
             </div>
@@ -758,8 +795,8 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
           {/* Tab Content - Scrollable */}
           <div
-            className="flex-1 p-4"
-            style={{ overflowY: "scroll", maxHeight: "100%" }}
+            className="flex-1 p-4 overflow-y-auto"
+            style={{ maxHeight: "100%" }}
           >
             {activeTab === "fields" && <FieldEditor />}
             {activeTab === "settings" && <FormSettings />}

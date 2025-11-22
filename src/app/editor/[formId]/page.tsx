@@ -106,11 +106,11 @@ function EditorPage({ params }: EditorPageProps) {
 
         // Default theme
         const defaultTheme = {
-          primaryColor: "#151419",
-          backgroundColor: "#fafafa",
+          primaryColor: "#151419", // SaaS primary color
+          backgroundColor: "#fafafa", // SaaS background color
           textColor: "#151419",
           borderRadius: 8,
-          fontFamily: "Inter",
+          fontFamily: "Satoshi", // SaaS default font
         };
 
         // Default settings
@@ -122,12 +122,15 @@ function EditorPage({ params }: EditorPageProps) {
           collectEmail: false,
           allowMultipleSubmissions: true,
           showWatermark: true,
+          mode: "standalone",
+          layout: "simple",
         };
 
         // Load form data with proper structure
         loadForm({
           id: formId,
           title: data.title || "Untitled Form",
+          header: data.header || data.title || "Untitled Form", // Use header if exists, else sync with title
           description: data.description || "",
           status: data.status || "draft",
           fields: normalizedFields,

@@ -20,15 +20,16 @@ interface FormStore {
 
 const defaultForm: FormData = {
   title: "",
+  header: "", // Will auto-sync with title initially
   description: "",
   status: "draft",
   fields: [],
   theme: {
-    primaryColor: "#151419",
-    backgroundColor: "#fafafa",
+    primaryColor: "#151419", // SaaS primary color
+    backgroundColor: "#fafafa", // SaaS background color
     textColor: "#151419",
     borderRadius: 8,
-    fontFamily: "Satoshi",
+    fontFamily: "Satoshi", // SaaS default font
   },
   settings: {
     showTitle: true,

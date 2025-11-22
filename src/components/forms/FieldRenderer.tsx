@@ -21,10 +21,12 @@ export function FieldRenderer({
   isConversational = false,
 }: FieldRendererProps) {
   const baseClasses = cn(
-    "w-full px-4 py-3 rounded-lg border border-gray-300",
+    "w-full px-4 py-3 sm:py-3 rounded-lg border border-gray-300",
+    "min-h-[44px]", // Touch-friendly minimum height for inputs
     "focus:outline-none focus:ring-2 focus:ring-[var(--shelf-primary)] focus:border-transparent",
     "transition-colors duration-200",
     "text-gray-900 placeholder-gray-500",
+    "text-base", // Prevent zoom on iOS by using at least 16px font
   );
 
   const labelClasses = cn(
@@ -66,7 +68,11 @@ export function FieldRenderer({
             placeholder={field.placeholder}
             required={field.required}
             rows={4}
-            className={cn(baseClasses, "resize-none")}
+            className={cn(
+              baseClasses,
+              "resize-none min-h-[100px]", // Minimum height for textarea
+              "text-base", // Prevent zoom on iOS
+            )}
           />
         );
 

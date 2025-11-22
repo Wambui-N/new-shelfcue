@@ -43,6 +43,7 @@ export interface FormField {
 export interface FormData {
   id?: string;
   title: string;
+  header?: string; // Separate from title, auto-syncs initially
   description?: string;
   status: "draft" | "published";
   fields: FormField[];
@@ -53,6 +54,7 @@ export interface FormData {
     borderRadius: number;
     fontFamily: string;
     logoUrl?: string;
+    backgroundImageUrl?: string; // For photo background upload
   };
   settings: {
     showTitle: boolean;
@@ -65,6 +67,8 @@ export interface FormData {
     showWatermark?: boolean;
     mode?: "standalone" | "embed";
     layout?: "simple" | "compact" | "conversational" | "hero";
+    leftSectionDescription?: string; // Description text for left branding section
+    leftSectionLink?: string; // Optional link/CTA for left section
   };
   default_calendar_id?: string;
   lastSaved?: Date;

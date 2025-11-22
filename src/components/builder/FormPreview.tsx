@@ -20,6 +20,7 @@ export function FormPreview({ className }: FormPreviewProps) {
       <FormDisplay
         formId={formData.id || "preview"}
         title={formData.title || "Untitled Form"}
+        header={formData.header}
         description={formData.description}
         fields={formData.fields}
         mode={formData.settings.mode || "standalone"}
@@ -27,6 +28,9 @@ export function FormPreview({ className }: FormPreviewProps) {
         theme={formData.theme}
         onSubmit={handleSubmit}
         isSubmitting={false}
+        leftSectionDescription={formData.settings.leftSectionDescription}
+        leftSectionLink={formData.settings.leftSectionLink}
+        showWatermark={formData.settings.showWatermark !== false}
       />
       </div>
   );

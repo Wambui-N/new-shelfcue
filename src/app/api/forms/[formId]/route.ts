@@ -86,6 +86,7 @@ export async function PUT(
         id: formId,
         user_id: user.id,
         title: body.title,
+        header: body.header || body.title, // Use header if provided, else sync with title
         description: body.description,
         fields: body.fields,
         settings: body.settings,

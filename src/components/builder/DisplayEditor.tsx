@@ -6,8 +6,10 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { availableFonts } from "@/lib/fonts";
 import { useFormStore } from "@/store/formStore";
+import { ImageUpload } from "./ImageUpload";
 
 export function DisplayEditor() {
   const { formData, updateForm } = useFormStore();
@@ -158,9 +160,18 @@ export function DisplayEditor() {
             </div>
           </div>
 
-          {/* Logo URL */}
+          {/* Logo Upload */}
           <div className="space-y-2">
-            <Label htmlFor="logo-url">Logo URL</Label>
+            <Label>Logo</Label>
+            <ImageUpload
+              value={formData.theme.logoUrl}
+              onChange={(url) => handleThemeChange("logoUrl", url || "")}
+              type="logo"
+              label=""
+            />
+            <p className="text-xs text-muted-foreground">
+              Upload your logo or enter a URL below
+            </p>
             <Input
               id="logo-url"
               type="url"
@@ -169,8 +180,75 @@ export function DisplayEditor() {
               placeholder="https://example.com/logo.png"
               className="flex-1"
             />
+          </div>
+
+          {/* Background Image Upload */}
+          <div className="space-y-2">
+            <Label>Background Image</Label>
+            <ImageUpload
+              value={formData.theme.backgroundImageUrl}
+              onChange={(url) =>
+                handleThemeChange("backgroundImageUrl", url || "")
+              }
+              type="background"
+              label=""
+              aspectRatio="16/9"
+            />
             <p className="text-xs text-muted-foreground">
-              URL for your logo image.
+              Upload a background image for the left section or enter a URL below
+            </p>
+            <Input
+              id="background-image-url"
+              type="url"
+              value={formData.theme.backgroundImageUrl || ""}
+              onChange={(e) =>
+                handleThemeChange("backgroundImageUrl", e.target.value)
+              }
+              placeholder="https://example.com/background.jpg"
+              className="flex-1"
+            />
+          </div>
+        </div>
+      </Card>
+
+      {/* Left Section Branding */}
+      <Card className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Palette className="w-5 h-5 text-primary" />
+          <h3 className="text-lg font-semibold text-foreground">
+            Left Section Branding
+          </h3>
+        </div>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="left-description">Description</Label>
+            <Textarea
+              id="left-description"
+              value={formData.settings.leftSectionDescription || ""}
+              onChange={(e) =>
+                handleSettingsChange("leftSectionDescription", e.target.value)
+              }
+              placeholder="Add a description for the left branding section..."
+              rows={4}
+            />
+            <p className="text-xs text-muted-foreground">
+              This text will appear on the left section with the background image
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="left-link">Link (Optional)</Label>
+            <Input
+              id="left-link"
+              type="url"
+              value={formData.settings.leftSectionLink || ""}
+              onChange={(e) =>
+                handleSettingsChange("leftSectionLink", e.target.value)
+              }
+              placeholder="https://example.com"
+            />
+            <p className="text-xs text-muted-foreground">
+              Optional link/CTA to display in the left section
             </p>
           </div>
         </div>
