@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { availableFonts } from "@/lib/fonts";
+import { defaultBackgrounds } from "@/lib/default-backgrounds";
 import { useFormStore } from "@/store/formStore";
 import { ImageUpload } from "./ImageUpload";
 
@@ -160,6 +162,26 @@ export function DisplayEditor() {
             </div>
           </div>
 
+          {/* Description Color */}
+          <div className="space-y-2">
+            <Label htmlFor="description-color">Description Color</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="description-color"
+                type="color"
+                value={formData.theme.descriptionColor || formData.theme.textColor}
+                onChange={(e) => handleThemeChange("descriptionColor", e.target.value)}
+                className="w-12 h-10 p-1 border rounded"
+              />
+              <Input
+                value={formData.theme.descriptionColor || formData.theme.textColor}
+                onChange={(e) => handleThemeChange("descriptionColor", e.target.value)}
+                placeholder="#52525b"
+                className="flex-1"
+              />
+            </div>
+          </div>
+
           {/* Logo Upload */}
           <div className="space-y-2">
             <Label>Logo</Label>
@@ -182,28 +204,108 @@ export function DisplayEditor() {
             />
           </div>
 
+          {/* Default Backgrounds */}
+          <div className="space-y-2">
+            <Label>Default Background</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {defaultBackgrounds.map((bg) => (
+                <button
+                  key={bg.id}
+                  type="button"
+                  onClick={() => {
+                    // Clear custom image when selecting default
+                    handleThemeChange("backgroundImageUrl", "");
+                    handleThemeChange("defaultBackgroundId", bg.id);
+                  }}
+                  className={cn(
+                    "relative h-20 rounded-lg border-2 transition-all overflow-hidden",
+                    formData.theme.defaultBackgroundId === bg.id
+                      ? "border-primary ring-2 ring-primary/20"
+                      : "border-border hover:border-primary/50",
+                  )}
+                  style={{
+                    background: bg.gradient,
+                  }}
+                >
+                  <div className="absolute inset-0 bg-black/10" />
+                  <div className="relative z-10 p-2 h-full flex flex-col justify-end">
+                    <p className="text-xs font-medium text-white drop-shadow-sm">
+                      {bg.name}
+                    </p>
+                    <p className="text-xs text-white/80 drop-shadow-sm">
+                      {bg.description}
+                    </p>
+                  </div>
+                  {formData.theme.defaultBackgroundId === bg.id && (
+                    <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                      <svg
+                        className="w-3 h-3 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                handleThemeChange("defaultBackgroundId", "");
+                handleThemeChange("backgroundImageUrl", "");
+              }}
+              className={cn(
+                "w-full h-10 rounded-lg border-2 transition-all",
+                !formData.theme.defaultBackgroundId && !formData.theme.backgroundImageUrl
+                  ? "border-primary ring-2 ring-primary/20 bg-primary/5"
+                  : "border-border hover:border-primary/50",
+              )}
+            >
+              <span className="text-sm font-medium">None (Solid Color)</span>
+            </button>
+            <p className="text-xs text-muted-foreground">
+              Choose a default gradient background or upload your own image below
+            </p>
+          </div>
+
           {/* Background Image Upload */}
           <div className="space-y-2">
-            <Label>Background Image</Label>
+            <Label>Custom Background Image</Label>
             <ImageUpload
               value={formData.theme.backgroundImageUrl}
-              onChange={(url) =>
-                handleThemeChange("backgroundImageUrl", url || "")
-              }
+              onChange={(url) => {
+                // Clear default background when uploading custom image
+                if (url) {
+                  handleThemeChange("defaultBackgroundId", "");
+                }
+                handleThemeChange("backgroundImageUrl", url || "");
+              }}
               type="background"
               label=""
               aspectRatio="16/9"
             />
             <p className="text-xs text-muted-foreground">
-              Upload a background image for the left section or enter a URL below
+              Upload a custom background image for the left section or enter a URL below
             </p>
             <Input
               id="background-image-url"
               type="url"
               value={formData.theme.backgroundImageUrl || ""}
-              onChange={(e) =>
-                handleThemeChange("backgroundImageUrl", e.target.value)
-              }
+              onChange={(e) => {
+                // Clear default background when entering custom URL
+                if (e.target.value) {
+                  handleThemeChange("defaultBackgroundId", "");
+                }
+                handleThemeChange("backgroundImageUrl", e.target.value);
+              }}
               placeholder="https://example.com/background.jpg"
               className="flex-1"
             />

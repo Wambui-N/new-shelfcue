@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { cn } from "@/lib/utils";
+import { getFontFamily } from "@/lib/fonts";
 import type { FormTheme } from "@/types/form-display";
 
 interface StandaloneFormProps {
@@ -23,7 +24,7 @@ export function StandaloneForm({
       style={
         {
           ...backgroundStyle,
-          fontFamily: theme.fontFamily,
+          fontFamily: getFontFamily(theme.fontFamily),
           "--shelf-primary": theme.primaryColor,
           "--shelf-radius": `${theme.borderRadius}px`,
           "--shelf-shadow":

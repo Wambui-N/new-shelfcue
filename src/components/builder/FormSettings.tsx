@@ -201,45 +201,6 @@ export function FormSettings() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="collect-email">Collect Email</Label>
-              <p className="text-sm text-muted-foreground">
-                Automatically collect submitter's email
-              </p>
-            </div>
-            <Switch
-              id="collect-email"
-              checked={formData.settings.collectEmail}
-              onCheckedChange={(checked) =>
-                updateForm({
-                  settings: { ...formData.settings, collectEmail: checked },
-                })
-              }
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="allow-multiple">Allow Multiple Submissions</Label>
-              <p className="text-sm text-muted-foreground">
-                Allow users to submit the form multiple times
-              </p>
-            </div>
-            <Switch
-              id="allow-multiple"
-              checked={formData.settings.allowMultipleSubmissions}
-              onCheckedChange={(checked) =>
-                updateForm({
-                  settings: {
-                    ...formData.settings,
-                    allowMultipleSubmissions: checked,
-                  },
-                })
-              }
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
               <Label htmlFor="show-watermark">Show ShelfCue Watermark</Label>
               <p className="text-sm text-muted-foreground">
                 Display "Powered by ShelfCue" at the bottom of the form

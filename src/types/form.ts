@@ -51,10 +51,12 @@ export interface FormData {
     primaryColor: string;
     backgroundColor: string;
     textColor: string;
+    descriptionColor?: string;
     borderRadius: number;
     fontFamily: string;
     logoUrl?: string;
     backgroundImageUrl?: string; // For photo background upload
+    defaultBackgroundId?: string; // ID of selected default background (gradient-1, gradient-2, etc.)
   };
   settings: {
     showTitle: boolean;

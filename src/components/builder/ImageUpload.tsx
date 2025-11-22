@@ -71,10 +71,10 @@ export function ImageUpload({
         });
 
       if (uploadError) {
-        // If bucket doesn't exist, try to create it (this will fail on client, but we'll show a helpful error)
+        // If bucket doesn't exist, provide a more helpful error message
         if (uploadError.message.includes("Bucket not found")) {
           throw new Error(
-            "Storage bucket not configured. Please contact support.",
+            "Storage bucket 'form-assets' not found. Please create it in your Supabase project dashboard as per STORAGE_SETUP.md.",
           );
         }
         throw uploadError;

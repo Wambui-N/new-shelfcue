@@ -15,45 +15,54 @@ ADD COLUMN IF NOT EXISTS header TEXT;
 -- Step 3: Create storage policies for form-assets bucket
 -- Users can only upload/read their own form assets
 -- Note: These policies assume the bucket exists. Create it in Supabase dashboard first.
+-- See STORAGE_SETUP.md for detailed instructions.
+
+-- IMPORTANT: Before running these policies, create the 'form-assets' bucket in Supabase Dashboard:
+-- 1. Go to Storage → Buckets → New bucket
+-- 2. Name: form-assets
+-- 3. Public bucket: Yes
+-- 4. File size limit: 5 MB
+-- 5. Allowed MIME types: image/*
+
+-- Drop existing policies if they exist (to allow re-running this migration)
+DROP POLICY IF EXISTS "Users can upload form assets" ON storage.objects;
+DROP POLICY IF EXISTS "Users can read their own form assets" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own form assets" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own form assets" ON storage.objects;
 
 -- Policy: Users can upload files to their own folder
--- CREATE POLICY "Users can upload form assets"
--- ON storage.objects FOR INSERT
--- TO authenticated
--- WITH CHECK (
---   bucket_id = 'form-assets' AND
---   (storage.foldername(name))[1] = auth.uid()::text
--- );
+CREATE POLICY "Users can upload form assets"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'form-assets' AND
+  (storage.foldername(name))[1] = auth.uid()::text
+);
 
 -- Policy: Users can read their own form assets
--- CREATE POLICY "Users can read their own form assets"
--- ON storage.objects FOR SELECT
--- TO authenticated
--- USING (
---   bucket_id = 'form-assets' AND
---   (storage.foldername(name))[1] = auth.uid()::text
--- );
+CREATE POLICY "Users can read their own form assets"
+ON storage.objects FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'form-assets' AND
+  (storage.foldername(name))[1] = auth.uid()::text
+);
 
 -- Policy: Users can update their own form assets
--- CREATE POLICY "Users can update their own form assets"
--- ON storage.objects FOR UPDATE
--- TO authenticated
--- USING (
---   bucket_id = 'form-assets' AND
---   (storage.foldername(name))[1] = auth.uid()::text
--- );
+CREATE POLICY "Users can update their own form assets"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'form-assets' AND
+  (storage.foldername(name))[1] = auth.uid()::text
+);
 
 -- Policy: Users can delete their own form assets
--- CREATE POLICY "Users can delete their own form assets"
--- ON storage.objects FOR DELETE
--- TO authenticated
--- USING (
---   bucket_id = 'form-assets' AND
---   (storage.foldername(name))[1] = auth.uid()::text
--- );
-
--- Note: The actual bucket creation and policy setup should be done via:
--- 1. Supabase Dashboard → Storage → Create Bucket (name: form-assets, public: true)
--- 2. Or via Supabase Management API
--- 3. Then uncomment and run the policies above
+CREATE POLICY "Users can delete their own form assets"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'form-assets' AND
+  (storage.foldername(name))[1] = auth.uid()::text
+);
 

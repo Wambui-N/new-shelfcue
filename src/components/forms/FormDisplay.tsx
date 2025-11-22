@@ -12,6 +12,8 @@ import type {
 import { FormContent } from "./FormContent";
 import { StandaloneForm } from "./StandaloneForm";
 import { generateImageOverlay } from "@/lib/gradient-generator";
+import { getDefaultBackgroundGradient } from "@/lib/default-backgrounds";
+import { useFormStore } from "@/store/formStore";
 
 interface FormDisplayProps {
   formId: string;
@@ -35,6 +37,7 @@ interface FormDisplayProps {
   leftSectionDescription?: string;
   leftSectionLink?: string;
   showWatermark?: boolean;
+  deviceView?: "desktop" | "mobile";
 }
 
 export function FormDisplay({
@@ -51,7 +54,10 @@ export function FormDisplay({
   leftSectionDescription,
   leftSectionLink,
   showWatermark = true,
+  deviceView = "desktop",
 }: FormDisplayProps) {
+
+  const settings = useFormStore(state => state.formData.settings);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -74,6 +80,8 @@ export function FormDisplay({
   const displayTheme: FormTheme = isSimpleTheme
     ? {
         primaryColor: theme.primaryColor,
+        textColor: theme.textColor,
+        descriptionColor: "descriptionColor" in theme ? theme.descriptionColor : theme.textColor,
         fontFamily: theme.fontFamily,
         borderRadius: theme.borderRadius,
         logoUrl: theme.logoUrl,
@@ -89,11 +97,20 @@ export function FormDisplay({
   // Use header if provided, otherwise fall back to title
   const displayTitle = header || title;
 
-  // Generate gradient overlay for background image
+  // Check for default background or custom image
+  const defaultBackgroundId = isSimpleTheme && "defaultBackgroundId" in theme && theme.defaultBackgroundId
+    ? theme.defaultBackgroundId
+    : undefined;
+  const defaultBackgroundGradient = defaultBackgroundId && typeof defaultBackgroundId === "string"
+    ? getDefaultBackgroundGradient(defaultBackgroundId)
+    : undefined;
+  
   const backgroundImageUrl = isSimpleTheme && "backgroundImageUrl" in theme
     ? theme.backgroundImageUrl
     : displayTheme.background?.image;
-  const gradientOverlay = backgroundImageUrl
+  
+  // Generate gradient overlay for background image (only if custom image, not default gradient)
+  const gradientOverlay = backgroundImageUrl && !defaultBackgroundGradient
     ? generateImageOverlay(
         displayTheme.primaryColor,
         "backgroundColor" in theme ? theme.backgroundColor : "#fafafa",
@@ -112,8 +129,9 @@ export function FormDisplay({
       currentStep={currentStep}
       onStepChange={setCurrentStep}
       isSubmitting={isSubmitting}
-      title={displayTitle}
-      description={description}
+      title={settings.showTitle ? displayTitle : undefined}
+      description={settings.showDescription ? description : undefined}
+      submitButtonText={settings.submitButtonText}
     />
   );
 
@@ -142,17 +160,25 @@ export function FormDisplay({
 
   return (
     <StandaloneForm theme={displayTheme}>
-      <div className="min-h-screen flex flex-col md:flex-row">
+      <div className={cn("min-h-screen flex flex-col", deviceView === 'desktop' && 'md:flex-row')}>
         {/* Left Section - Branding */}
         <div
           className={cn(
-            "relative w-full md:w-1/2 flex flex-col justify-between",
-            "h-[250px] md:min-h-screen", // Shorter on mobile (250px), full height on desktop
+            "relative w-full flex flex-col justify-between",
+            deviceView === 'desktop' ? "md:w-1/2 md:min-h-screen" : "w-full",
+            "h-[250px]", // Shorter on mobile (250px), full height on desktop
             "p-4 md:p-12", // Reduced padding on mobile
           )}
+          style={
+            defaultBackgroundGradient
+              ? {
+                  background: defaultBackgroundGradient,
+                }
+              : undefined
+          }
         >
           {/* Background Image with Gradient Overlay */}
-          {backgroundImageUrl && (
+          {backgroundImageUrl && !defaultBackgroundGradient && (
             <>
               <div
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -219,14 +245,20 @@ export function FormDisplay({
         </div>
 
         {/* Right Section - Form */}
-        <div className="w-full md:w-1/2 flex flex-col bg-white">
+        <div 
+          className={cn("w-full flex flex-col", deviceView === 'desktop' && "md:w-1/2")}
+          style={{ backgroundColor: "backgroundColor" in theme ? theme.backgroundColor : "#ffffff" }}
+        >
           <div className="flex-1 overflow-y-auto">
             {formContent}
           </div>
 
           {/* Watermark */}
           {showWatermark && (
-            <div className="w-full text-center py-4 border-t border-border bg-white">
+            <div 
+              className="w-full text-center py-4 border-t border-border"
+              style={{ backgroundColor: "backgroundColor" in theme ? theme.backgroundColor : "#ffffff" }}
+            >
               <p className="text-xs text-muted-foreground">
                 Powered by{" "}
                 <a

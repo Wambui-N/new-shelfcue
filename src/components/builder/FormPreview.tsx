@@ -5,9 +5,10 @@ import { useFormStore } from "@/store/formStore";
 
 interface FormPreviewProps {
   className?: string;
+  deviceView?: "desktop" | "mobile";
 }
 
-export function FormPreview({ className }: FormPreviewProps) {
+export function FormPreview({ className, deviceView }: FormPreviewProps) {
   const { formData } = useFormStore();
 
   const handleSubmit = async (data: Record<string, any>) => {
@@ -31,6 +32,7 @@ export function FormPreview({ className }: FormPreviewProps) {
         leftSectionDescription={formData.settings.leftSectionDescription}
         leftSectionLink={formData.settings.leftSectionLink}
         showWatermark={formData.settings.showWatermark !== false}
+        deviceView={deviceView}
       />
       </div>
   );

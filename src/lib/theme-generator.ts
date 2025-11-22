@@ -79,6 +79,7 @@ export function createThemeFromBrand(
 
   return {
     primaryColor,
+    textColor: "#1f2937", // Default dark gray text color
     fontFamily: fontFamily || "Inter, system-ui, sans-serif",
     borderRadius: 8,
     secondaryColors: palette,

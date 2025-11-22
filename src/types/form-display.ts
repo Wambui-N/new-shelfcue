@@ -5,6 +5,8 @@ export type FormLayout = "simple" | "compact" | "conversational" | "hero";
 export interface FormTheme {
   // Quick Branding (Level 1)
   primaryColor: string;
+  textColor: string;
+  descriptionColor?: string;
   fontFamily: string;
   borderRadius: number;
   // Optional brand assets
@@ -97,6 +99,7 @@ export interface LayoutConfig {
 // Default theme
 export const defaultTheme: FormTheme = {
   primaryColor: "#3b82f6",
+  textColor: "#1f2937",
   fontFamily: "Inter, system-ui, sans-serif",
   borderRadius: 8,
   background: {

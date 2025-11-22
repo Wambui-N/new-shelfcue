@@ -134,6 +134,12 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
       // Dispatch event to refresh dashboard counts
       window.dispatchEvent(new CustomEvent("submissionReceived"));
       setIsSubmitted(true);
+      
+      // Handle redirect if URL is provided
+      if (formData?.settings?.redirectUrl) {
+        window.location.href = formData.settings.redirectUrl;
+      }
+
     } catch (err: any) {
       console.error("Error submitting form:", err);
       throw err;

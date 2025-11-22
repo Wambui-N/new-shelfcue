@@ -730,13 +730,15 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   {deviceView === "mobile" && (
                     <div className="w-[320px] sm:w-[375px] bg-background rounded-xl border border-border shadow-lg overflow-hidden">
                       <div className="p-3 sm:p-4">
-                        <FormPreview />
+                        <FormPreview deviceView={deviceView} />
                       </div>
                     </div>
                   )}
                   {deviceView === "desktop" && (
-                    <div className="bg-background rounded-xl border border-border shadow-lg p-3 sm:p-4 max-w-full">
-                      <FormPreview />
+                    <div className="bg-background rounded-xl border border-border shadow-lg max-w-full overflow-hidden">
+                      <div className="w-[125%] h-auto origin-top-left scale-[0.8]">
+                        <FormPreview deviceView={deviceView} />
+                      </div>
                     </div>
                   )}
                 </motion.div>

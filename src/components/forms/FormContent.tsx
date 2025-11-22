@@ -23,6 +23,7 @@ interface FormContentProps {
   isSubmitting: boolean;
   title?: string;
   description?: string;
+  submitButtonText?: string;
 }
 
 export function FormContent({
@@ -37,6 +38,7 @@ export function FormContent({
   isSubmitting,
   title,
   description,
+  submitButtonText = "Submit",
 }: FormContentProps) {
   const layoutConfig = layoutPresets[layout];
   const isConversational = layout === "conversational";
@@ -101,16 +103,16 @@ export function FormContent({
           <div className="mb-4 sm:mb-6">
             {title && (
               <h2
-                className="text-xl sm:text-2xl font-semibold text-gray-900"
-                style={{ fontFamily: theme.fontFamily }}
+                className="text-xl sm:text-2xl font-semibold"
+                style={{ fontFamily: theme.fontFamily, color: theme.textColor }}
               >
                 {title}
               </h2>
             )}
             {description && (
               <p
-                className="mt-1 text-sm sm:text-base text-gray-600"
-                style={{ fontFamily: theme.fontFamily }}
+                className="mt-1 text-sm sm:text-base"
+                style={{ fontFamily: theme.fontFamily, color: theme.descriptionColor || theme.textColor }}
               >
                 {description}
               </p>
@@ -190,7 +192,7 @@ export function FormContent({
                   {isLastStep
                     ? isSubmitting
                       ? "Submitting..."
-                      : "Submit"
+                      : submitButtonText
                     : "Next"}
                 </button>
               </>
@@ -207,7 +209,7 @@ export function FormContent({
                 )}
                 style={{ borderRadius: "var(--shelf-radius)" }}
               >
-                {isSubmitting ? "Submitting..." : "Submit"}
+                {isSubmitting ? "Submitting..." : submitButtonText}
               </button>
             )}
           </div>
