@@ -4,6 +4,26 @@ import { getGoogleClient } from "@/lib/google";
 import { GoogleSheetsService } from "@/lib/googleSheets";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
+function isSchemaCacheError(error: { message?: string; details?: string } | null) {
+  if (!error) return false;
+  return (
+    error.message?.toLowerCase().includes("schema cache") ||
+    error.details?.toLowerCase().includes("schema cache")
+  );
+}
+
+async function reloadSchemaCache(client: ReturnType<typeof getSupabaseAdmin>) {
+  try {
+    console.log("♻️ Reloading Supabase schema cache...");
+    await (client as any).rpc("schema_cache_reload");
+    console.log("✅ Schema cache reload triggered");
+    return true;
+  } catch (error) {
+    console.error("❌ Failed to reload schema cache:", error);
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { formId, userId } = await request.json();
@@ -199,6 +219,7 @@ export async function POST(request: NextRequest) {
           let connection = null;
           let connectionError = null;
           let insertRetries = 3;
+          let schemaCacheReloaded = false;
           
           while (insertRetries > 0 && !connection) {
             const result = await (supabaseAdmin as any)
@@ -222,8 +243,10 @@ export async function POST(request: NextRequest) {
             }
 
             // If it's a schema cache error, wait and retry
-            if (connectionError?.message?.includes("schema cache") || 
-                connectionError?.details?.includes("schema cache")) {
+            if (isSchemaCacheError(connectionError)) {
+              if (!schemaCacheReloaded) {
+                schemaCacheReloaded = await reloadSchemaCache(supabaseAdmin as any);
+              }
               insertRetries--;
               if (insertRetries > 0) {
                 console.log(`⚠️ Schema cache issue, retrying... (${insertRetries} attempts left)`);
@@ -248,8 +271,7 @@ export async function POST(request: NextRequest) {
             });
             
             // Provide helpful error message for schema cache issues
-            if (connectionError.message?.includes("schema cache") || 
-                connectionError.details?.includes("schema cache")) {
+            if (isSchemaCacheError(connectionError)) {
               throw new Error(
                 "Database schema cache is out of sync. Please try again in a few moments, or contact support if the issue persists."
               );
