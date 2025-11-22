@@ -283,7 +283,7 @@ export function MeetingTimePicker({
                 </div>
 
                 {/* Day Headers */}
-                <div className="grid grid-cols-7 gap-1.5 sm:gap-2 mb-2">
+                <div className="grid grid-cols-7 gap-1.5 sm:gap-2 mb-2 px-1">
                   {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map(
                     (day) => (
                       <div
@@ -297,7 +297,7 @@ export function MeetingTimePicker({
                 </div>
 
                 {/* Calendar Grid */}
-                <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+                <div className="grid grid-cols-7 gap-1.5 sm:gap-2 px-1">
                   {calendarDays.map((date, index) => {
                     const available = isDateAvailable(date);
                     const currentMonth = isCurrentMonth(date);
@@ -312,20 +312,20 @@ export function MeetingTimePicker({
                         onClick={() => available && handleDateSelect(date)}
                         disabled={!available}
                         className={cn(
-                          "h-9 sm:h-10 w-full min-w-[2.1rem] text-xs sm:text-sm rounded-md transition-colors flex items-center justify-center border",
-                          !currentMonth && "text-gray-300 border-gray-200",
+                          "h-9 sm:h-10 w-full min-w-[2.1rem] text-xs sm:text-sm rounded-md transition-colors flex items-center justify-center",
+                          !currentMonth && "text-gray-300",
                           currentMonth &&
                             available &&
-                            "text-gray-900 border-gray-300 hover:bg-gray-100 hover:border-gray-400",
+                            "text-gray-900 hover:bg-gray-100",
                           !available &&
                             currentMonth &&
-                            "text-gray-300 border-gray-200 cursor-not-allowed",
+                            "text-gray-300 cursor-not-allowed",
                           selected &&
-                            "bg-black text-white border-black hover:bg-gray-900",
-                          today && !selected && "bg-gray-100 text-black border-gray-400",
+                            "bg-black text-white hover:bg-gray-900",
+                          today && !selected && "bg-gray-100 text-black",
                           hasValue &&
                             !selected &&
-                            "bg-gray-200 text-black border-gray-400",
+                            "bg-gray-200 text-black",
                         )}
                       >
                         {date.getDate()}

@@ -163,7 +163,7 @@ export function DisplayEditor() {
 
           {/* Description Color */}
           <div className="space-y-2">
-            <Label htmlFor="description-color">Description Color</Label>
+            <Label htmlFor="description-color">Branding Text Color</Label>
             <div className="flex items-center gap-2">
               <Input
                 id="description-color"

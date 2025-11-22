@@ -115,14 +115,8 @@ export function FormDisplay({
     ? generateAutoGradient(accentColor, backgroundColor)
     : undefined;
   
-  // Generate gradient overlay for background image (only if custom image is used)
-  const gradientOverlay = backgroundImageUrl
-    ? generateImageOverlay(
-        accentColor,
-        backgroundColor,
-        0.6,
-      )
-    : undefined;
+  // Optional gradient overlay for background image (disabled to let custom images display true colors)
+  const gradientOverlay = undefined;
 
   const formContent = (
     <FormContent
@@ -200,14 +194,6 @@ export function FormDisplay({
                   backgroundImage: `url(${backgroundImageUrl})`,
                 }}
               />
-              {gradientOverlay && (
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: gradientOverlay,
-                  }}
-                />
-              )}
             </>
           )}
 
