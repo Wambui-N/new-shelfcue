@@ -713,7 +713,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
             </div>
 
             {/* Preview Container */}
-            <div className="flex justify-center items-start w-full overflow-hidden">
+            <div className="flex justify-center items-start w-full overflow-hidden px-3 sm:px-6 border border-border rounded-lg">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={deviceView}
