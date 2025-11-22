@@ -11,8 +11,7 @@ import type {
 } from "@/types/form-display";
 import { FormContent } from "./FormContent";
 import { StandaloneForm } from "./StandaloneForm";
-import { generateImageOverlay } from "@/lib/gradient-generator";
-import { getDefaultBackgroundGradient } from "@/lib/default-backgrounds";
+import { generateImageOverlay, generateAutoGradient } from "@/lib/gradient-generator";
 import { useFormStore } from "@/store/formStore";
 
 interface FormDisplayProps {
@@ -97,23 +96,28 @@ export function FormDisplay({
   // Use header if provided, otherwise fall back to title
   const displayTitle = header || title;
 
-  // Check for default background or custom image
-  const defaultBackgroundId = isSimpleTheme && "defaultBackgroundId" in theme && theme.defaultBackgroundId
-    ? theme.defaultBackgroundId
-    : undefined;
-  const defaultBackgroundGradient = defaultBackgroundId && typeof defaultBackgroundId === "string"
-    ? getDefaultBackgroundGradient(defaultBackgroundId)
-    : undefined;
+  // Get background color and accent color from theme
+  const backgroundColor = isSimpleTheme && "backgroundColor" in theme
+    ? theme.backgroundColor
+    : "#fafafa";
+  const accentColor = displayTheme.primaryColor;
   
+  // Check for custom background image
   const backgroundImageUrl = isSimpleTheme && "backgroundImageUrl" in theme
     ? theme.backgroundImageUrl
     : displayTheme.background?.image;
   
-  // Generate gradient overlay for background image (only if custom image, not default gradient)
-  const gradientOverlay = backgroundImageUrl && !defaultBackgroundGradient
+  // Generate automatic gradient background (if no custom image)
+  // This creates a beautiful gradient from very light accent to full accent color with swirl
+  const autoGradient = !backgroundImageUrl
+    ? generateAutoGradient(accentColor, backgroundColor)
+    : undefined;
+  
+  // Generate gradient overlay for background image (only if custom image is used)
+  const gradientOverlay = backgroundImageUrl
     ? generateImageOverlay(
-        displayTheme.primaryColor,
-        "backgroundColor" in theme ? theme.backgroundColor : "#fafafa",
+        accentColor,
+        backgroundColor,
         0.6,
       )
     : undefined;
@@ -141,17 +145,24 @@ export function FormDisplay({
         {formContent}
         {showWatermark && (
           <div className="w-full text-center py-4">
-            <p className="text-xs text-muted-foreground">
-              Powered by{" "}
-              <a
-                href="https://shelfcue.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline"
-              >
-                ShelfCue
-              </a>
-            </p>
+            <div className="flex items-center justify-center gap-2">
+              <img
+                src="/1.png"
+                alt="ShelfCue Logo"
+                className="h-4 w-auto opacity-70"
+              />
+              <p className="text-xs text-muted-foreground">
+                Powered by{" "}
+                <a
+                  href="https://shelfcue.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  ShelfCue
+                </a>
+              </p>
+            </div>
           </div>
         )}
       </>
@@ -160,25 +171,26 @@ export function FormDisplay({
 
   return (
     <StandaloneForm theme={displayTheme}>
-      <div className={cn("min-h-screen flex flex-col", deviceView === 'desktop' && 'md:flex-row')}>
+      <div className={cn("min-h-screen flex flex-col overflow-x-hidden", deviceView === 'desktop' && 'md:flex-row')}>
         {/* Left Section - Branding */}
         <div
           className={cn(
-            "relative w-full flex flex-col justify-between",
+            "relative w-full flex flex-col justify-between flex-shrink-0",
             deviceView === 'desktop' ? "md:w-1/2 md:min-h-screen" : "w-full",
             "h-[250px]", // Shorter on mobile (250px), full height on desktop
             "p-4 md:p-12", // Reduced padding on mobile
           )}
           style={
-            defaultBackgroundGradient
+            autoGradient
               ? {
-                  background: defaultBackgroundGradient,
+                  background: autoGradient,
+                  backgroundBlendMode: "normal",
                 }
               : undefined
           }
         >
           {/* Background Image with Gradient Overlay */}
-          {backgroundImageUrl && !defaultBackgroundGradient && (
+          {backgroundImageUrl && (
             <>
               <div
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -246,10 +258,10 @@ export function FormDisplay({
 
         {/* Right Section - Form */}
         <div 
-          className={cn("w-full flex flex-col", deviceView === 'desktop' && "md:w-1/2")}
+          className={cn("w-full flex flex-col flex-shrink-0 overflow-x-hidden", deviceView === 'desktop' && "md:w-1/2")}
           style={{ backgroundColor: "backgroundColor" in theme ? theme.backgroundColor : "#ffffff" }}
         >
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden">
             {formContent}
           </div>
 
@@ -259,18 +271,25 @@ export function FormDisplay({
               className="w-full text-center py-4 border-t border-border"
               style={{ backgroundColor: "backgroundColor" in theme ? theme.backgroundColor : "#ffffff" }}
             >
-              <p className="text-xs text-muted-foreground">
-                Powered by{" "}
-                <a
-                  href="https://shelfcue.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                  style={{ color: displayTheme.primaryColor }}
-                >
-                  ShelfCue
-                </a>
-              </p>
+              <div className="flex items-center justify-center gap-2">
+                <img
+                  src="/1.png"
+                  alt="ShelfCue Logo"
+                  className="h-4 w-auto opacity-70"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Powered by{" "}
+                  <a
+                    href="https://shelfcue.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                    style={{ color: displayTheme.primaryColor }}
+                  >
+                    ShelfCue
+                  </a>
+                </p>
+              </div>
             </div>
           )}
         </div>

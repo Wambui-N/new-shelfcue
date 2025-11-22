@@ -283,8 +283,8 @@ export function MeetingTimePicker({
                 </div>
 
                 {/* Day Headers */}
-                <div className="grid grid-cols-7 gap-1 mb-2">
-                  {["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"].map(
+                <div className="grid grid-cols-7 gap-2 mb-2">
+                  {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map(
                     (day) => (
                       <div
                         key={day}
@@ -297,7 +297,7 @@ export function MeetingTimePicker({
                 </div>
 
                 {/* Calendar Grid */}
-                <div className="grid grid-cols-7 gap-1">
+                <div className="grid grid-cols-7 gap-2">
                   {calendarDays.map((date, index) => {
                     const available = isDateAvailable(date);
                     const currentMonth = isCurrentMonth(date);
@@ -312,7 +312,7 @@ export function MeetingTimePicker({
                         onClick={() => available && handleDateSelect(date)}
                         disabled={!available}
                         className={cn(
-                          "h-8 w-8 text-xs rounded-md transition-colors",
+                          "h-10 w-full min-w-[2.5rem] text-sm rounded-md transition-colors flex items-center justify-center",
                           !currentMonth && "text-gray-300",
                           currentMonth &&
                             available &&

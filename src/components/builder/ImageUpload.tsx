@@ -57,10 +57,9 @@ export function ImageUpload({
         throw new Error("You must be logged in to upload images");
       }
 
-      // Generate unique filename
+      // Generate unique filename inside user's folder
       const fileExt = file.name.split(".").pop();
-      const fileName = `${user.id}/${type}-${Date.now()}.${fileExt}`;
-      const filePath = `form-assets/${fileName}`;
+      const filePath = `${user.id}/${type}-${Date.now()}.${fileExt}`;
 
       // Upload to Supabase storage
       const { data: uploadData, error: uploadError } = await supabase.storage

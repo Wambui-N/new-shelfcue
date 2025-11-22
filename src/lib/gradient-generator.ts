@@ -109,3 +109,27 @@ export const gradientPresets = {
     }),
 };
 
+/**
+ * Generate an automatic gradient background with swirl effect
+ * Creates a beautiful gradient from very light accent color (top) to full accent color (bottom)
+ * with a subtle radial swirl for visual interest
+ */
+export function generateAutoGradient(
+  accentColor: string,
+  backgroundColor: string,
+): string {
+  // Convert accent color to very light version (almost white with hint of accent)
+  const lightAccent = hexToRgba(accentColor, 0.15); // Very transparent at top
+  const mediumAccent = hexToRgba(accentColor, 0.4); // Medium in middle
+  const fullAccent = accentColor; // Full color at bottom
+  
+  // Create a multi-stop linear gradient with a radial swirl overlay effect
+  // The gradient goes from very light (top) to full color (bottom)
+  // We'll use a combination of linear and radial gradients for the swirl effect
+  return `
+    linear-gradient(180deg, ${lightAccent} 0%, ${mediumAccent} 50%, ${fullAccent} 100%),
+    radial-gradient(ellipse at 30% 20%, ${hexToRgba(accentColor, 0.3)} 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, ${hexToRgba(accentColor, 0.2)} 0%, transparent 50%)
+  `.trim();
+}
+

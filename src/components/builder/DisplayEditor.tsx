@@ -9,7 +9,6 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { availableFonts } from "@/lib/fonts";
-import { defaultBackgrounds } from "@/lib/default-backgrounds";
 import { useFormStore } from "@/store/formStore";
 import { ImageUpload } from "./ImageUpload";
 
@@ -204,76 +203,16 @@ export function DisplayEditor() {
             />
           </div>
 
-          {/* Default Backgrounds */}
+          {/* Background Info */}
           <div className="space-y-2">
-            <Label>Default Background</Label>
-            <div className="grid grid-cols-2 gap-3">
-              {defaultBackgrounds.map((bg) => (
-                <button
-                  key={bg.id}
-                  type="button"
-                  onClick={() => {
-                    // Clear custom image when selecting default
-                    handleThemeChange("backgroundImageUrl", "");
-                    handleThemeChange("defaultBackgroundId", bg.id);
-                  }}
-                  className={cn(
-                    "relative h-20 rounded-lg border-2 transition-all overflow-hidden",
-                    formData.theme.defaultBackgroundId === bg.id
-                      ? "border-primary ring-2 ring-primary/20"
-                      : "border-border hover:border-primary/50",
-                  )}
-                  style={{
-                    background: bg.gradient,
-                  }}
-                >
-                  <div className="absolute inset-0 bg-black/10" />
-                  <div className="relative z-10 p-2 h-full flex flex-col justify-end">
-                    <p className="text-xs font-medium text-white drop-shadow-sm">
-                      {bg.name}
-                    </p>
-                    <p className="text-xs text-white/80 drop-shadow-sm">
-                      {bg.description}
-                    </p>
-                  </div>
-                  {formData.theme.defaultBackgroundId === bg.id && (
-                    <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-                      <svg
-                        className="w-3 h-3 text-white"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={3}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                </button>
-              ))}
+            <Label>Background</Label>
+            <div className="p-3 rounded-lg bg-muted/50 border border-border">
+              <p className="text-xs text-muted-foreground">
+                The background automatically uses a beautiful gradient from your accent color. 
+                It transitions from a very light tint at the top to the full accent color at the bottom, 
+                with a subtle swirl effect for visual interest.
+              </p>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                handleThemeChange("defaultBackgroundId", "");
-                handleThemeChange("backgroundImageUrl", "");
-              }}
-              className={cn(
-                "w-full h-10 rounded-lg border-2 transition-all",
-                !formData.theme.defaultBackgroundId && !formData.theme.backgroundImageUrl
-                  ? "border-primary ring-2 ring-primary/20 bg-primary/5"
-                  : "border-border hover:border-primary/50",
-              )}
-            >
-              <span className="text-sm font-medium">None (Solid Color)</span>
-            </button>
-            <p className="text-xs text-muted-foreground">
-              Choose a default gradient background or upload your own image below
-            </p>
           </div>
 
           {/* Background Image Upload */}

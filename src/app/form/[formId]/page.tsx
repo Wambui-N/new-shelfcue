@@ -216,18 +216,25 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
           {/* Watermark */}
           {formData?.settings?.showWatermark !== false && (
             <div className="mt-12 pt-6 border-t" style={{ borderColor: `${theme.primaryColor}20` }}>
-              <p className="text-xs" style={{ color: theme.textColor, opacity: 0.6 }}>
-                Powered by{" "}
-                <a
-                  href="https://shelfcue.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:no-underline"
-                  style={{ color: theme.primaryColor }}
-                >
-                  ShelfCue
-                </a>
-              </p>
+              <div className="flex items-center justify-center gap-2">
+                <img
+                  src="/1.png"
+                  alt="ShelfCue Logo"
+                  className="h-4 w-auto opacity-70"
+                />
+                <p className="text-xs" style={{ color: theme.textColor, opacity: 0.6 }}>
+                  Powered by{" "}
+                  <a
+                    href="https://shelfcue.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:no-underline"
+                    style={{ color: theme.primaryColor }}
+                  >
+                    ShelfCue
+                  </a>
+                </p>
+              </div>
             </div>
           )}
         </div>

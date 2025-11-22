@@ -735,9 +735,11 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                     </div>
                   )}
                   {deviceView === "desktop" && (
-                    <div className="bg-background rounded-xl border border-border shadow-lg max-w-full overflow-hidden">
-                      <div className="w-[125%] h-auto origin-top-left scale-[0.8]">
-                        <FormPreview deviceView={deviceView} />
+                    <div className="bg-background rounded-xl border border-border shadow-lg w-full max-w-full overflow-hidden">
+                      <div className="w-full max-w-full scale-[0.75] origin-top-left">
+                        <div className="w-[133.33%]">
+                          <FormPreview deviceView={deviceView} />
+                        </div>
                       </div>
                     </div>
                   )}

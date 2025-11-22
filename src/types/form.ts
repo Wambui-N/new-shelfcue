@@ -56,7 +56,6 @@ export interface FormData {
     fontFamily: string;
     logoUrl?: string;
     backgroundImageUrl?: string; // For photo background upload
-    defaultBackgroundId?: string; // ID of selected default background (gradient-1, gradient-2, etc.)
   };
   settings: {
     showTitle: boolean;
