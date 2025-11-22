@@ -171,11 +171,11 @@ export function FormDisplay({
 
   return (
     <StandaloneForm theme={displayTheme}>
-      <div className={cn("min-h-screen flex flex-col overflow-x-hidden", deviceView === 'desktop' && 'md:flex-row')}>
+      <div className={cn("min-h-screen flex flex-col overflow-x-hidden w-full", deviceView === 'desktop' && 'md:flex-row')}>
         {/* Left Section - Branding */}
         <div
           className={cn(
-            "relative w-full flex flex-col justify-between flex-shrink-0",
+            "relative w-full flex flex-col justify-between flex-shrink-0 overflow-hidden",
             deviceView === 'desktop' ? "md:w-1/2 md:min-h-screen" : "w-full",
             "h-[250px]", // Shorter on mobile (250px), full height on desktop
             "p-4 md:p-12", // Reduced padding on mobile
@@ -226,12 +226,13 @@ export function FormDisplay({
             )}
 
             {/* Description and Link */}
-            <div className="flex-1 flex flex-col justify-end">
+            <div className="flex-1 flex flex-col justify-end items-start">
               {leftSectionDescription && (
                 <p
-                  className="text-white text-sm md:text-lg lg:text-xl mb-3 md:mb-6" // Smaller text on mobile
+                  className="text-white text-xs md:text-sm mb-2 md:mb-3 text-left" // Smaller text, left-aligned
                   style={{
                     fontFamily: displayTheme.fontFamily,
+                    color: displayTheme.descriptionColor || "rgba(255, 255, 255, 0.95)",
                     textShadow: "0 2px 4px rgba(0,0,0,0.3)",
                   }}
                 >
@@ -243,9 +244,10 @@ export function FormDisplay({
                   href={leftSectionLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white text-sm md:text-base underline hover:no-underline inline-block" // Smaller text on mobile
+                  className="text-white text-xs md:text-sm underline hover:no-underline text-left" // Smaller text, left-aligned
                   style={{
                     fontFamily: displayTheme.fontFamily,
+                    color: displayTheme.descriptionColor || "rgba(255, 255, 255, 0.95)",
                     textShadow: "0 2px 4px rgba(0,0,0,0.3)",
                   }}
                 >

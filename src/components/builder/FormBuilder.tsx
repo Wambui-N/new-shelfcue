@@ -684,9 +684,9 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
             "smooth-scroll", // Better scrolling on mobile
           )}
         >
-          <div className="p-3 sm:p-6 min-h-full pb-20 lg:pb-6">
+          <div className="p-0 min-h-full pb-20 lg:pb-6">
             {/* Device Toggle */}
-            <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 px-3 sm:px-6 pt-3 sm:pt-6">
               <h3 className="text-base sm:text-lg font-semibold text-foreground">
                 Live Preview
               </h3>
@@ -713,7 +713,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
             </div>
 
             {/* Preview Container */}
-            <div className="flex justify-center items-start">
+            <div className="flex justify-center items-start w-full overflow-hidden">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={deviceView}
@@ -724,20 +724,18 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   className={
                     deviceView === "mobile"
                       ? "w-[320px] sm:w-[375px]"
-                      : "w-full max-w-3xl"
+                      : "w-full max-w-full"
                   }
                 >
                   {deviceView === "mobile" && (
-                    <div className="w-[320px] sm:w-[375px] bg-background rounded-xl border border-border shadow-lg overflow-hidden">
-                      <div className="p-3 sm:p-4">
-                        <FormPreview deviceView={deviceView} />
-                      </div>
+                    <div className="w-[320px] sm:w-[375px] overflow-hidden">
+                      <FormPreview deviceView={deviceView} />
                     </div>
                   )}
                   {deviceView === "desktop" && (
-                    <div className="bg-background rounded-xl border border-border shadow-lg w-full max-w-full overflow-hidden">
-                      <div className="w-full max-w-full scale-[0.75] origin-top-left">
-                        <div className="w-[133.33%]">
+                    <div className="w-full overflow-hidden">
+                      <div className="scale-[0.7] origin-top-left w-[142.86%]">
+                        <div className="w-full">
                           <FormPreview deviceView={deviceView} />
                         </div>
                       </div>

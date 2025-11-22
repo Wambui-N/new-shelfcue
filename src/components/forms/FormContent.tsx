@@ -73,7 +73,7 @@ export function FormContent({
   return (
     <div
       className={cn(
-        "w-full max-w-4xl mx-auto",
+        "w-full max-w-4xl mx-auto overflow-x-hidden",
         "px-4 sm:px-6 md:px-8 lg:px-12", // Reduced padding on mobile
         "py-6 sm:py-8 md:py-12", // Reduced padding on mobile
         layoutConfig.spacing === "tight" && "py-4 sm:py-6 md:py-8",
@@ -103,7 +103,7 @@ export function FormContent({
           <div className="mb-4 sm:mb-6">
             {title && (
               <h2
-                className="text-xl sm:text-2xl font-semibold"
+                className="text-lg sm:text-xl md:text-2xl font-semibold"
                 style={{ fontFamily: theme.fontFamily, color: theme.textColor }}
               >
                 {title}

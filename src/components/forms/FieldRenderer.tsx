@@ -21,16 +21,16 @@ export function FieldRenderer({
   isConversational = false,
 }: FieldRendererProps) {
   const baseClasses = cn(
-    "w-full px-4 py-3 sm:py-3 rounded-lg border border-gray-300",
+    "w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-300",
     "min-h-[44px]", // Touch-friendly minimum height for inputs
     "focus:outline-none focus:ring-2 focus:ring-[var(--shelf-primary)] focus:border-transparent",
     "transition-colors duration-200",
     "text-gray-900 placeholder-gray-500",
-    "text-base", // Prevent zoom on iOS by using at least 16px font
+    "text-sm sm:text-base", // Prevent zoom on iOS while keeping mobile size smaller
   );
 
   const labelClasses = cn(
-    "block text-sm font-medium text-gray-700 mb-2",
+    "block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2",
     isConversational && "text-lg font-semibold text-gray-900",
   );
 
@@ -99,7 +99,7 @@ export function FieldRenderer({
             {field.options?.map((option, index) => (
               <label
                 key={index}
-                className="flex items-center space-x-3 cursor-pointer"
+                className="flex items-center space-x-2 sm:space-x-3 cursor-pointer"
               >
                 <input
                   type="radio"
@@ -110,7 +110,7 @@ export function FieldRenderer({
                   required={field.required}
                   className="w-4 h-4 text-[var(--shelf-primary)] border-gray-300 focus:ring-[var(--shelf-primary)]"
                 />
-                <span className="text-sm text-gray-700">{option}</span>
+                <span className="text-xs sm:text-sm text-gray-700">{option}</span>
               </label>
             ))}
           </div>
@@ -122,7 +122,7 @@ export function FieldRenderer({
             {field.options?.map((option, index) => (
               <label
                 key={index}
-                className="flex items-center space-x-3 cursor-pointer"
+                className="flex items-center space-x-2 sm:space-x-3 cursor-pointer"
               >
                 <input
                   type="checkbox"
@@ -143,7 +143,7 @@ export function FieldRenderer({
                   }}
                   className="w-4 h-4 text-[var(--shelf-primary)] border-gray-300 rounded focus:ring-[var(--shelf-primary)]"
                 />
-                <span className="text-sm text-gray-700">{option}</span>
+                <span className="text-xs sm:text-sm text-gray-700">{option}</span>
               </label>
             ))}
           </div>
