@@ -41,6 +41,7 @@ const defaultForm: FormData = {
     showWatermark: true,
     mode: "standalone",
     layout: "simple",
+        leftSectionHeadline: "",
   },
 };
 

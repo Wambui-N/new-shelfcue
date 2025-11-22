@@ -33,6 +33,7 @@ interface FormDisplayProps {
   };
   onSubmit: (data: Record<string, any>) => Promise<void>;
   isSubmitting?: boolean;
+  leftSectionHeadline?: string;
   leftSectionDescription?: string;
   leftSectionLink?: string;
   showWatermark?: boolean;
@@ -50,6 +51,7 @@ export function FormDisplay({
   theme,
   onSubmit,
   isSubmitting = false,
+  leftSectionHeadline,
   leftSectionDescription,
   leftSectionLink,
   showWatermark = true,
@@ -225,8 +227,20 @@ export function FormDisplay({
               </div>
             )}
 
-            {/* Description and Link */}
+            {/* Headline, Description and Link */}
             <div className="flex-1 flex flex-col justify-end items-start">
+              {leftSectionHeadline && (
+                <p
+                  className="text-white text-sm sm:text-base md:text-lg font-semibold mb-2 text-left"
+                  style={{
+                    fontFamily: displayTheme.fontFamily,
+                    color: displayTheme.descriptionColor || "rgba(255, 255, 255, 0.95)",
+                    textShadow: "0 2px 4px rgba(0,0,0,0.25)",
+                  }}
+                >
+                  {leftSectionHeadline}
+                </p>
+              )}
               {leftSectionDescription && (
                 <p
                   className="text-white text-xs md:text-sm mb-2 md:mb-3 text-left" // Smaller text, left-aligned

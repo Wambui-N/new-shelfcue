@@ -257,6 +257,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
           theme={formData.theme}
           onSubmit={handleSubmit}
           isSubmitting={false}
+        leftSectionHeadline={formData.settings.leftSectionHeadline}
           leftSectionDescription={formData.settings.leftSectionDescription}
           leftSectionLink={formData.settings.leftSectionLink}
           showWatermark={formData.settings.showWatermark !== false}

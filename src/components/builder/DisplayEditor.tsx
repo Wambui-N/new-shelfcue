@@ -262,6 +262,21 @@ export function DisplayEditor() {
         </div>
         <div className="space-y-4">
           <div className="space-y-2">
+            <Label htmlFor="left-headline">Headline</Label>
+            <Input
+              id="left-headline"
+              value={formData.settings.leftSectionHeadline || ""}
+              onChange={(e) =>
+                handleSettingsChange("leftSectionHeadline", e.target.value)
+              }
+              placeholder="Add a headline or title..."
+            />
+            <p className="text-xs text-muted-foreground">
+              A short title that appears at the top of the left branding section.
+            </p>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="left-description">Description</Label>
             <Textarea
               id="left-description"
@@ -273,7 +288,7 @@ export function DisplayEditor() {
               rows={4}
             />
             <p className="text-xs text-muted-foreground">
-              This text will appear on the left section with the background image
+              This text will appear below the headline on the left section.
             </p>
           </div>
 

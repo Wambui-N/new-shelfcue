@@ -68,6 +68,7 @@ export interface FormData {
     showWatermark?: boolean;
     mode?: "standalone" | "embed";
     layout?: "simple" | "compact" | "conversational" | "hero";
+          leftSectionHeadline?: string; // Optional headline for left branding section
     leftSectionDescription?: string; // Description text for left branding section
     leftSectionLink?: string; // Optional link/CTA for left section
   };

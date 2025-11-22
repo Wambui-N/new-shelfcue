@@ -29,6 +29,7 @@ export function FormPreview({ className, deviceView }: FormPreviewProps) {
         theme={formData.theme}
         onSubmit={handleSubmit}
         isSubmitting={false}
+        leftSectionHeadline={formData.settings.leftSectionHeadline}
         leftSectionDescription={formData.settings.leftSectionDescription}
         leftSectionLink={formData.settings.leftSectionLink}
         showWatermark={formData.settings.showWatermark !== false}

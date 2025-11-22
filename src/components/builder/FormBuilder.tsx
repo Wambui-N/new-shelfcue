@@ -713,7 +713,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
             </div>
 
             {/* Preview Container */}
-            <div className="flex justify-center items-start w-full overflow-hidden px-3 sm:px-6 border border-border rounded-lg">
+            <div className="flex justify-center items-start w-full overflow-hidden px-4 sm:px-6">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={deviceView}
@@ -728,14 +728,14 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   }
                 >
                   {deviceView === "mobile" && (
-                    <div className="w-[320px] sm:w-[375px] overflow-hidden">
+                    <div className="w-[320px] sm:w-[375px] overflow-hidden border border-border rounded-lg">
                       <FormPreview deviceView={deviceView} />
                     </div>
                   )}
                   {deviceView === "desktop" && (
                     <div className="w-full overflow-hidden">
                       <div className="scale-[0.7] origin-top-left w-[142.86%]">
-                        <div className="w-full">
+                        <div className="w-full border border-border rounded-lg">
                           <FormPreview deviceView={deviceView} />
                         </div>
                       </div>
