@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
           status: "failed",
           gateway_response: verification.data?.status || "unknown",
         })
-        .eq("reference", reference);
+        .eq("paystack_reference", reference);
 
       return NextResponse.json(
         {

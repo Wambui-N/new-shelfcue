@@ -78,6 +78,11 @@ export async function getUserLimits(
       };
     }
 
+    // Return plan limits for all valid subscriptions
+    // This includes:
+    // - Active paid subscriptions (status="active")
+    // - Active trials (status="trial" with trial_end in the future)
+    // - Any other non-expired/non-cancelled status
     return (subscription as any).plan.limits as SubscriptionLimits;
   }
 

@@ -3,6 +3,26 @@ import { canPerformAction } from "@/lib/subscriptionLimits";
 import { createServerClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
+const defaultTheme = {
+  primaryColor: "#151419",
+  backgroundColor: "#fafafa",
+  textColor: "#151419",
+  borderRadius: 8,
+  fontFamily: "Satoshi",
+};
+
+const defaultSettings = {
+  showTitle: true,
+  showDescription: true,
+  submitButtonText: "Submit",
+  successMessage: "Thank you for your submission!",
+  collectEmail: false,
+  allowMultipleSubmissions: true,
+  showWatermark: true,
+  mode: "standalone",
+  layout: "simple",
+};
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ formId: string }> },
@@ -58,8 +78,28 @@ export async function PUT(
     const { formId } = await params;
     const body = await request.json();
 
+    // Defensive defaults to avoid null JSON errors
+    const safeTheme = {
+      ...defaultTheme,
+      ...(body?.theme || {}),
+    };
+    const safeSettings = {
+      ...defaultSettings,
+      ...(body?.settings || {}),
+    };
+    const safeFields = Array.isArray(body?.fields) ? body.fields : [];
+
     // Check if this is a new form (no existing form with this ID)
-    const supabaseAdmin = getSupabaseAdmin();
+    let supabaseAdmin;
+    try {
+      supabaseAdmin = getSupabaseAdmin();
+    } catch (err) {
+      console.error("Supabase admin init failed:", err);
+      return NextResponse.json(
+        { error: "Service configuration error" },
+        { status: 500 },
+      );
+    }
     const { data: existingForm } = await (supabaseAdmin as any)
       .from("forms")
       .select("id, user_id")
@@ -94,12 +134,12 @@ export async function PUT(
       .upsert({
         id: formId,
         user_id: user.id,
-        title: body.title,
-        header: body.header || body.title, // Use header if provided, else sync with title
-        description: body.description,
-        fields: body.fields,
-        settings: body.settings,
-        theme: body.theme,
+        title: body.title || "Untitled Form",
+        header: body.header || body.title || "Untitled Form", // Use header if provided, else sync with title
+        description: body.description || "",
+        fields: safeFields,
+        settings: safeSettings,
+        theme: safeTheme,
         status: body.status || "draft",
       })
       .select()

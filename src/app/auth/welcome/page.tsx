@@ -22,7 +22,7 @@ export default function WelcomePage() {
     // Send welcome email and check Google connection
     const initializeUser = async () => {
       try {
-        // Create trial subscription
+        // Create trial subscription - CRITICAL: wait for success
         // First, get the professional plan ID
         const { data: planData, error: planError } = await supabase
           .from("subscription_plans")
@@ -31,16 +31,29 @@ export default function WelcomePage() {
           .single<{ id: string }>();
 
         if (planError || !planData) {
-          console.error("Could not find professional plan to start trial.");
+          console.error("Could not find professional plan to start trial:", planError);
+          // Still allow user to proceed, but they'll need to subscribe manually
         } else {
-          // Create the trial
-          fetch("/api/subscriptions/create-trial", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ planId: planData.id }),
-          }).catch((error) => {
-            console.error("Failed to create trial subscription:", error);
-          });
+          // Create the trial and WAIT for it to complete
+          try {
+            const trialResponse = await fetch("/api/subscriptions/create-trial", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ planId: planData.id }),
+            });
+
+            const trialResult = await trialResponse.json();
+            
+            if (!trialResponse.ok) {
+              console.error("Failed to create trial subscription:", trialResult.error);
+              // User can still proceed, they'll need to subscribe manually
+            } else {
+              console.log("✅ Trial subscription created successfully for new user");
+            }
+          } catch (error) {
+            console.error("Error creating trial subscription:", error);
+            // User can still proceed, they'll need to subscribe manually
+          }
         }
 
         // Send welcome email (fire and forget - don't block user flow)
