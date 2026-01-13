@@ -1,0 +1,49 @@
+-- Migration: Storage Public Read Access
+-- This migration updates storage policies to allow public read access
+-- while maintaining authenticated-only write access
+
+-- ============================================================
+-- FORM-ASSETS BUCKET: PUBLIC READ, AUTHENTICATED WRITE
+-- ============================================================
+-- This allows:
+-- 1. Anyone (including anonymous) to read form assets (logos, backgrounds)
+-- 2. Only authenticated users to upload/update/delete their own assets
+
+-- Set role to storage admin to manage storage policies
+SET LOCAL ROLE supabase_storage_admin;
+
+-- Drop the existing restrictive read policy
+DROP POLICY IF EXISTS "Users can read their own form assets" ON storage.objects;
+
+-- Create new public read policy for form-assets bucket
+CREATE POLICY "Public can read form assets"
+ON storage.objects FOR SELECT
+TO anon, authenticated
+USING (bucket_id = 'form-assets');
+
+-- Reset role back to postgres
+RESET ROLE;
+
+-- The existing upload/update/delete policies remain (authenticated only, own folder)
+-- They were created in the previous migration (20250122_form_branding.sql)
+
+-- Add bucket creation SQL for reference (run manually if bucket doesn't exist)
+-- Note: This cannot be run in a migration, must be done via Supabase dashboard or Storage API
+
+-- SQL for bucket creation (for documentation purposes):
+/*
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'form-assets',
+  'form-assets',
+  true,
+  5242880, -- 5MB in bytes
+  ARRAY['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif']
+)
+ON CONFLICT (id) DO NOTHING;
+*/
+
+-- Add comment for documentation
+COMMENT ON POLICY "Public can read form assets" ON storage.objects IS 
+'Allows public read access to form assets so anonymous users can view published forms with logos and backgrounds';
+

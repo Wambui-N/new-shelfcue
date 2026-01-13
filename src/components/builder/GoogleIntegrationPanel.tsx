@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { IntegrationPanelSkeleton, CalendarListSkeleton } from "@/components/skeletons/AppLoadingStates";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 
@@ -198,13 +199,7 @@ export function GoogleIntegrationPanel({
   };
 
   if (loading) {
-    return (
-      <Card className="p-6">
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        </div>
-      </Card>
-    );
+    return <IntegrationPanelSkeleton />;
   }
 
   if (!isGoogleConnected) {
@@ -446,9 +441,7 @@ export function GoogleIntegrationPanel({
           </DialogHeader>
           <div className="py-4">
             {loadingCalendars ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-              </div>
+              <CalendarListSkeleton />
             ) : calendars.length > 0 ? (
               <div className="space-y-2">
                 {calendars.map((calendar) => (

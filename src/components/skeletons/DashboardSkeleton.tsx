@@ -474,7 +474,8 @@ export function BillingSkeleton() {
 
 export function FormEditSkeleton() {
   return (
-    <div className="h-screen flex flex-col animate-in fade-in duration-500">
+    <>
+      <div className="h-screen flex flex-col animate-in fade-in duration-500">
       {/* Header */}
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
         <div className="flex items-center justify-between px-6 py-4">
@@ -541,7 +542,17 @@ export function FormEditSkeleton() {
 
           {/* Preview Panel */}
           <div className="overflow-y-auto p-6 bg-muted/30">
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto space-y-6">
+              <div className="bg-card/70 border rounded-2xl p-4 flex items-center justify-between gap-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-3 w-32" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-9 w-24 rounded-full" />
+                  <Skeleton className="h-9 w-24 rounded-full" />
+                </div>
+              </div>
               <div className="bg-card rounded-2xl p-8 border-2 shadow-lg">
                 <Skeleton className="h-9 w-80 mb-3" />
                 <Skeleton className="h-5 w-full mb-8" />
@@ -559,7 +570,12 @@ export function FormEditSkeleton() {
           </div>
         </div>
       </div>
-    </div>
+      {/* Mobile toggle floating button */}
+      <div className="lg:hidden fixed bottom-5 right-5 z-20">
+        <Skeleton className="h-14 w-14 rounded-full shadow-2xl" />
+      </div>
+      </div>
+    </>
   );
 }
 

@@ -17,7 +17,7 @@ import {
   Share2,
   Smartphone,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,7 @@ interface FormBuilderProps {
 
 export function FormBuilder({ onBack }: FormBuilderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useAuth();
   const supabase = createClient();
   const { formData, isDirty, isSaving, updateForm, setDirty, setSaving } =
@@ -150,8 +151,11 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
         // If this was a new form (no ID before), redirect to the editor with the new ID
         if (!formData.id && formId) {
-          console.log(`📍 Redirecting to /editor/${formId}`);
-          router.push(`/editor/${formId}`);
+          const targetPath = `/editor/${formId}`;
+          if (pathname !== targetPath) {
+            console.log(`📍 Redirecting to ${targetPath}`);
+            router.push(targetPath);
+          }
           // Update the form store with the new ID
           updateForm({ id: formId });
         }
@@ -170,8 +174,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       user,
       setSaving,
       setDirty,
-      supabase.from,
-      router.push, // Update the form store with the new ID
+      pathname,
       updateForm,
     ],
   );
@@ -677,11 +680,10 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         {/* Left Side - Preview (Larger Width) */}
         <div
           className={cn(
-            "flex-1 border-r border-border overflow-y-auto bg-background-secondary/50",
-            // On mobile, show/hide based on view mode
+            "flex-1 border-r border-border overflow-y-auto bg-gradient-to-br from-background via-background to-muted/40",
             "lg:block",
             mobileViewMode === "preview" ? "block" : "hidden",
-            "smooth-scroll", // Better scrolling on mobile
+            "smooth-scroll",
           )}
         >
           <div className="p-0 min-h-full pb-20 lg:pb-6">
@@ -713,34 +715,27 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
             </div>
 
             {/* Preview Container */}
-            <div className="flex justify-center items-start w-full overflow-hidden px-4 sm:px-6">
+            <div className="flex justify-center items-start w-full overflow-hidden px-3 sm:px-6">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={deviceView}
-                  initial={{ opacity: 0, scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  className={
-                    deviceView === "mobile"
-                      ? "w-[320px] sm:w-[375px]"
-                      : "w-full max-w-full"
-                  }
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.18 }}
+                  className={deviceView === "mobile" ? "w-[340px] sm:w-[380px]" : "w-full max-w-6xl"}
                 >
-                  {deviceView === "mobile" && (
-                    <div className="w-[320px] sm:w-[375px] overflow-hidden border border-border rounded-lg">
-                      <FormPreview deviceView={deviceView} />
-                    </div>
-                  )}
-                  {deviceView === "desktop" && (
-                    <div className="w-full overflow-hidden">
-                      <div className="scale-[0.7] origin-top-left w-[142.86%]">
-                        <div className="w-full border border-border rounded-lg">
-                          <FormPreview deviceView={deviceView} />
-                        </div>
+                  <div className="w-full rounded-3xl border border-border/60 bg-card/80 shadow-2xl overflow-hidden">
+                    {deviceView === "mobile" ? (
+                      <div className="w-full">
+                        <FormPreview deviceView={deviceView} />
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="w-full">
+                        <FormPreview deviceView={deviceView} />
+                      </div>
+                    )}
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </div>

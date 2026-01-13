@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FontLoader } from "@/components/FontLoader";
 import { FormDisplay } from "@/components/forms/FormDisplay";
@@ -11,6 +11,7 @@ import type {
   FormLayout,
   FormTheme,
 } from "@/types/form-display";
+import { PublicFormSkeleton } from "@/components/skeletons/AppLoadingStates";
 
 interface PublicFormPageProps {
   params: Promise<{ formId: string }>;
@@ -147,14 +148,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading form...</p>
-        </div>
-      </div>
-    );
+    return <PublicFormSkeleton />;
   }
 
   if (error) {

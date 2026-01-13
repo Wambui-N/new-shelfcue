@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useSubscription } from "@/hooks/useSubscription";
+import { FullPageLoader } from "@/components/skeletons/AppLoadingStates";
 
 interface SubscriptionGuardProps {
   children: React.ReactNode;
@@ -18,14 +19,7 @@ export function SubscriptionGuard({
   const { hasAccess, loading, subscription } = useSubscription();
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Checking subscription...</p>
-        </div>
-      </div>
-    );
+    return <FullPageLoader label="Checking your subscription…" />;
   }
 
   // If user has no subscription at all, show billing prompt

@@ -24,6 +24,9 @@ ADD COLUMN IF NOT EXISTS header TEXT;
 -- 4. File size limit: 5 MB
 -- 5. Allowed MIME types: image/*
 
+-- Set role to storage admin to manage storage policies
+SET LOCAL ROLE supabase_storage_admin;
+
 -- Drop existing policies if they exist (to allow re-running this migration)
 DROP POLICY IF EXISTS "Users can upload form assets" ON storage.objects;
 DROP POLICY IF EXISTS "Users can read their own form assets" ON storage.objects;
@@ -65,4 +68,7 @@ USING (
   bucket_id = 'form-assets' AND
   (storage.foldername(name))[1] = auth.uid()::text
 );
+
+-- Reset role back to postgres
+RESET ROLE;
 

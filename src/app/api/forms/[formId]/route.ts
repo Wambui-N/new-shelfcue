@@ -4,12 +4,16 @@ import { createServerClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ formId: string }> },
 ) {
   try {
     const { formId } = await params;
+    const supabase = await createServerClient();
     const supabaseAdmin = getSupabaseAdmin();
+
+    // Get current user (if authenticated)
+    const { data: { user } } = await supabase.auth.getUser();
 
     const { data, error } = await supabaseAdmin
       .from("forms")
@@ -18,6 +22,11 @@ export async function GET(
       .maybeSingle();
 
     if (error || !data) {
+      return NextResponse.json({ error: "Form not found" }, { status: 404 });
+    }
+
+    // Security check: If user is not the owner, only return published forms
+    if (user?.id !== data.user_id && data.status !== "published") {
       return NextResponse.json({ error: "Form not found" }, { status: 404 });
     }
 
