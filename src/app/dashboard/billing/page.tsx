@@ -306,7 +306,7 @@ export default function BillingPage() {
                   {subscription.plan?.display_name || "Professional"}
                 </h3>
                 <p className="text-2xl font-bold text-primary">
-                  ${plan?.price_monthly || 29}
+                  ${plan?.price_monthly ?? 12}
                   <span className="text-sm font-normal text-muted-foreground">
                     /month
                   </span>

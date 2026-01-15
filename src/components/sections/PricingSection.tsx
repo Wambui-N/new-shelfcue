@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 export function PricingSection() {
   const plan = {
     name: "The Founders' Offer",
-    price: "$29",
+    price: "$12",
     period: "month",
     description: "Everything included",
     features: [

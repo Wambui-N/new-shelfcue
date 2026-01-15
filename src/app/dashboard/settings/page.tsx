@@ -60,7 +60,7 @@ export default function SettingsPage() {
                 Current Plan
               </h3>
               <p className="text-sm text-muted-foreground">
-                Professional Plan - $29/month
+                Professional Plan - $12/month
               </p>
             </div>
             <Button asChild variant="outline">
