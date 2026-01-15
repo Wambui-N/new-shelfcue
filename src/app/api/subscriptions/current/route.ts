@@ -1,14 +1,21 @@
-import { NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerClient();
+    const supabaseAdmin = getSupabaseAdmin();
 
+    // Get auth token from header
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -16,7 +23,7 @@ export async function GET() {
 
     // Get user's current subscription with plan details
     // Include "trial", "active", "expired", and "cancelled" to properly check trial expiration
-    const { data: subscription, error } = await supabase
+    const { data: subscription, error } = await supabaseAdmin
       .from("user_subscriptions")
       .select(
         `
@@ -43,7 +50,7 @@ export async function GET() {
     }
 
     // Get total forms count
-    const { count: formsCount, error: formsError } = await supabase
+    const { count: formsCount, error: formsError } = await supabaseAdmin
       .from("forms")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id);
