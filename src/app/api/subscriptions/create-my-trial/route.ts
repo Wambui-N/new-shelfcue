@@ -24,7 +24,7 @@ export async function POST(_request: NextRequest) {
       .from("user_subscriptions")
       .select("id, status, trial_end")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     // If subscription exists and is inactive or has null trial_end, fix it
     if (existingSubscription) {

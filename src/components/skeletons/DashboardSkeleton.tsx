@@ -48,7 +48,7 @@ export function DashboardSkeleton() {
         </div> */}
 
         {/* Your Forms */}
-        <div className="xl:col-span-3">
+        <div className="xl:col-span-4">
           <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border shadow-sm">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
               <Skeleton className="h-5 sm:h-6 w-28 sm:w-32" />

@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       .from("user_subscriptions")
       .select("id")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (existingSubscription) {
       return NextResponse.json(
