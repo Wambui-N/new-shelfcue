@@ -1,19 +1,26 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 
 /**
  * Create a trial subscription for a new user
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabaseAdmin = getSupabaseAdmin();
+    
+    // Get auth token from header
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+      error: authError,
+    } = await supabaseAdmin.auth.getUser(token);
 
-    if (!user) {
+    if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -25,8 +32,6 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-
-    const supabaseAdmin = getSupabaseAdmin();
 
     // Check if user already has a subscription
     const { data: existingSubscription } = await supabaseAdmin
