@@ -1,18 +1,25 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { canPerformAction } from "@/lib/subscriptionLimits";
-import { createServerClient } from "@/lib/supabase/server";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 /**
  * API endpoint to check if user can create a new form
  */
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = await createServerClient();
+    const supabaseAdmin = getSupabaseAdmin();
 
+    // Get auth token from header
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -65,11 +65,19 @@ export async function PUT(
   { params }: { params: Promise<{ formId: string }> },
 ) {
   try {
-    const supabase = await createServerClient();
+    const supabaseAdmin = getSupabaseAdmin();
+
+    // Get auth token from header
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -90,17 +98,7 @@ export async function PUT(
     const safeFields = Array.isArray(body?.fields) ? body.fields : [];
 
     // Check if this is a new form (no existing form with this ID)
-    let supabaseAdmin;
-    try {
-      supabaseAdmin = getSupabaseAdmin();
-    } catch (err) {
-      console.error("Supabase admin init failed:", err);
-      return NextResponse.json(
-        { error: "Service configuration error" },
-        { status: 500 },
-      );
-    }
-    const { data: existingForm } = await (supabaseAdmin as any)
+    const { data: existingForm } = await supabaseAdmin
       .from("forms")
       .select("id, user_id")
       .eq("id", formId)
@@ -129,7 +127,7 @@ export async function PUT(
     }
 
     // Update or create the form
-    const { data, error } = await (supabaseAdmin as any)
+    const { data, error } = await supabaseAdmin
       .from("forms")
       .upsert({
         id: formId,
