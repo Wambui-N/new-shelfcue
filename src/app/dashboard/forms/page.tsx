@@ -96,12 +96,19 @@ export default function FormsPage() {
         setCanCreateForm(false);
       } else {
         // Check with backend
-        const limitResponse = await fetch("/api/forms/check-limit");
-        if (limitResponse.ok) {
-          const limitData = await limitResponse.json();
-          setCanCreateForm(limitData.allowed);
-        } else {
-          setCanCreateForm(true); // Default to true if check fails
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          const limitResponse = await fetch("/api/forms/check-limit", {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          });
+          if (limitResponse.ok) {
+            const limitData = await limitResponse.json();
+            setCanCreateForm(limitData.allowed);
+          } else {
+            setCanCreateForm(true); // Default to true if check fails
+          }
         }
       }
 
@@ -407,9 +414,18 @@ export default function FormsPage() {
     const formId = crypto.randomUUID();
 
     try {
+      // Get session token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error("No active session");
+      }
+
       const response = await fetch(`/api/forms/${formId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({
           title: "Untitled Form",
           description: "",
