@@ -54,6 +54,48 @@ export function useSubscription() {
 
       if (response.ok) {
         const data = await response.json();
+        
+        // 🔧 FALLBACK: Auto-fix broken or missing trials
+        if (!data.subscription || data.subscription?.status === "inactive" || !data.subscription?.trial_end) {
+          console.log("⚠️ Detected broken/missing trial, attempting auto-fix...");
+          
+          const fixResponse = await fetch("/api/subscriptions/create-my-trial", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          });
+
+          if (fixResponse.ok) {
+            const fixData = await fixResponse.json();
+            console.log("✅ Trial auto-fixed:", fixData);
+            
+            // Refetch subscription after fix
+            const refetchResponse = await fetch("/api/subscriptions/current", {
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+              },
+            });
+
+            if (refetchResponse.ok) {
+              const refetchData = await refetchResponse.json();
+              setSubscription(refetchData.subscription);
+              setUsage(refetchData.usage);
+
+              // Calculate trial days
+              if (refetchData.subscription?.trial_end) {
+                const trialEnd = new Date(refetchData.subscription.trial_end);
+                const now = new Date();
+                const days = Math.ceil(
+                  (trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+                );
+                setTrialDaysRemaining(Math.max(0, days));
+              }
+              return;
+            }
+          }
+        }
+
         setSubscription(data.subscription);
         setUsage(data.usage);
 

@@ -80,6 +80,8 @@ export default function FormsPage() {
   const [_error, setError] = useState<string | null>(null);
   const [canCreateForm, setCanCreateForm] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [creatingForm, setCreatingForm] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const fetchForms = useCallback(async () => {
     try {
@@ -391,6 +393,53 @@ export default function FormsPage() {
     }
   };
 
+  const handleCreateForm = useCallback(async () => {
+    if (!canCreateForm || isExpired) {
+      setCreateError(
+        "You need an active subscription to create a new form. Subscribe to continue.",
+      );
+      return;
+    }
+
+    setCreateError(null);
+    setCreatingForm(true);
+
+    const formId = crypto.randomUUID();
+
+    try {
+      const response = await fetch(`/api/forms/${formId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "Untitled Form",
+          description: "",
+          fields: [],
+          status: "draft",
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        const message =
+          errorData?.message ||
+          errorData?.error ||
+          "We couldn't start your new form. Please try again.";
+        throw new Error(message);
+      }
+
+      router.push(`/editor/${formId}`);
+    } catch (error) {
+      console.error("Error creating new form:", error);
+      setCreateError(
+        error instanceof Error
+          ? error.message
+          : "We couldn't start your new form. Please try again.",
+      );
+    } finally {
+      setCreatingForm(false);
+    }
+  }, [router, canCreateForm, isExpired]);
+
   if (loading) {
     return <FormsListSkeleton />;
   }
@@ -468,15 +517,24 @@ export default function FormsPage() {
               </span>
             )}
           </p>
+          {createError && (
+            <p className="text-sm text-red-600 mt-2 max-w-2xl" role="alert">
+              {createError}
+            </p>
+          )}
         </div>
         <div className="flex justify-end">
           {canCreateForm && !isExpired ? (
-            <Button onClick={() => router.push("/editor/new")}>
+            <Button
+              onClick={handleCreateForm}
+              disabled={creatingForm}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm disabled:cursor-not-allowed"
+            >
               <Plus className="mr-2 h-4 w-4" />
-              Create Form
+              {creatingForm ? "Creating..." : "Create Form"}
             </Button>
           ) : (
-            <Button 
+            <Button
               onClick={handleSubscribe}
               disabled={paymentLoading}
               className="bg-primary hover:bg-primary/90"
@@ -655,23 +713,25 @@ export default function FormsPage() {
                 Clear search
               </Button>
             ) : (
-              <Button
-                onClick={isExpired ? handleSubscribe : () => router.push("/editor/new")}
-                disabled={paymentLoading}
-                className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                {isExpired ? (
-                  <>
-                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                    {paymentLoading ? "Processing..." : "Subscribe to Create Forms"}
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                    Create Your First Form
-                  </>
-                )}
-              </Button>
+              isExpired ? (
+                <Button
+                  onClick={handleSubscribe}
+                  disabled={paymentLoading}
+                  className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  {paymentLoading ? "Processing..." : "Subscribe to Create Forms"}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleCreateForm}
+                  disabled={creatingForm}
+                  className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm disabled:cursor-not-allowed"
+                >
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  {creatingForm ? "Creating..." : "Create Your First Form"}
+                </Button>
+              )
             )}
           </div>
         </Card>

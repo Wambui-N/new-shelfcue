@@ -22,13 +22,54 @@ export async function POST(_request: NextRequest) {
     // Check if user already has a subscription
     const { data: existingSubscription } = await supabaseAdmin
       .from("user_subscriptions")
-      .select("id")
+      .select("id, status, trial_end")
       .eq("user_id", user.id)
       .single();
 
+    // If subscription exists and is inactive or has null trial_end, fix it
     if (existingSubscription) {
+      const status = (existingSubscription as any).status;
+      const trialEnd = (existingSubscription as any).trial_end;
+
+      // Fix broken subscription: inactive or missing trial_end
+      if (status === "inactive" || !trialEnd) {
+        console.log("🔧 Fixing broken subscription for user:", user.id);
+        
+        const trialStartDate = new Date();
+        const trialEndDate = new Date(
+          trialStartDate.getTime() + 14 * 24 * 60 * 60 * 1000,
+        );
+
+        const { data: fixedSubscription, error: updateError } = await supabaseAdmin
+          .from("user_subscriptions")
+          .update({
+            status: "trial",
+            trial_start: trialStartDate.toISOString(),
+            trial_end: trialEndDate.toISOString(),
+            current_period_start: trialStartDate.toISOString(),
+            current_period_end: trialEndDate.toISOString(),
+          })
+          .eq("id", (existingSubscription as any).id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error("Error fixing subscription:", updateError);
+          throw updateError;
+        }
+
+        return NextResponse.json({
+          success: true,
+          message: "Your trial has been activated! You now have 14 days of full access.",
+          subscription: fixedSubscription,
+          trialEnd: trialEndDate.toISOString(),
+          fixed: true,
+        });
+      }
+
+      // Already has a valid subscription
       return NextResponse.json(
-        { message: "You already have a subscription", subscription: existingSubscription },
+        { message: "You already have an active subscription", subscription: existingSubscription },
         { status: 200 },
       );
     }

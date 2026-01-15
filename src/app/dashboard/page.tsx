@@ -414,10 +414,10 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 {canCreateForm ? (
-                  <Link href="/editor/new">
+                  <Link href="/dashboard/forms">
                     <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
                       <Plus className="w-4 h-4 mr-2" />
-                      Create New Form
+                      Go to Forms
                     </Button>
                   </Link>
                 ) : (
@@ -443,10 +443,10 @@ export default function DashboardPage() {
                     your lead generation system.
                   </p>
                   {canCreateForm ? (
-                    <Link href="/editor/new">
+                    <Link href="/dashboard/forms">
                       <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 px-6 sm:px-8 py-3 shadow-sm">
                         <Plus className="w-4 h-4 mr-2" />
-                        Create Your First Form
+                        Go to Forms
                       </Button>
                     </Link>
                   ) : (
