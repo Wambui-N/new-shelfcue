@@ -313,7 +313,7 @@ export default function DashboardPage() {
                 </div>
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
               </div>
-              <div className="text-lg sm:text-2xl lg:text-3xl xl:text-4xl font-bold mb-1 sm:mb-2">
+              <div className="text-md sm:text-lg lg:text-xl xl:text-2xl font-bold mb-1 sm:mb-2">
                 {dashboardStats.lastLeadTime
                   ? formatTimeAgo(dashboardStats.lastLeadTime)
                   : "No submissions"}
@@ -329,7 +329,7 @@ export default function DashboardPage() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 lg:gap-8">
         {/* Recent Activity */}
-        <motion.div
+        {/* <motion.div
           className="xl:col-span-1"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -393,7 +393,7 @@ export default function DashboardPage() {
               )}
             </div>
           </Card>
-        </motion.div>
+        </motion.div> */}
 
         {/* Your Forms Section */}
         <motion.div

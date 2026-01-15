@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { GoogleConnectPrompt } from "@/components/GoogleConnectPrompt";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
@@ -12,7 +12,7 @@ export default function WelcomePage() {
   const supabase = createClient();
   const [checking, setChecking] = useState(true);
   
-  const createDraftAndOpenEditor = async () => {
+  const createDraftAndOpenEditor = useCallback(async () => {
     const formId = crypto.randomUUID();
 
     const response = await fetch(`/api/forms/${formId}`, {
@@ -36,7 +36,7 @@ export default function WelcomePage() {
     }
 
     router.replace(`/editor/${formId}`);
-  };
+  }, [router]);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -147,13 +147,14 @@ export default function WelcomePage() {
 
         await createDraftAndOpenEditor();
         return;
-      } catch (_error) {
+      } catch (error) {
+        console.error("Error finishing welcome setup:", error);
         setChecking(false);
       }
     };
 
     initializeUser();
-  }, [user, router, supabase]);
+  }, [user, router, supabase, createDraftAndOpenEditor]);
 
   const handleConnect = () => {
     // Redirect to Google OAuth with return URL
