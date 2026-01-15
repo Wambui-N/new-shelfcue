@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { createServerClient } from "@/lib/supabase/server";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
 /**
  * Quick endpoint to manually create a trial subscription for current user
@@ -8,7 +9,7 @@ import { createServerClient } from "@/lib/supabase/server";
  */
 export async function POST(_request: NextRequest) {
   try {
-    const supabase = createServerClient();
+    const supabase = createRouteHandlerClient({ cookies });
     const {
       data: { user },
     } = await supabase.auth.getUser();
