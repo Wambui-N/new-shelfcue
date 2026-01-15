@@ -107,11 +107,20 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         );
         console.log("Form title:", formData.title);
 
+        // Get session token for authentication
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          console.error("❌ No session token available");
+          setSaveStatus("error");
+          return null;
+        }
+
         // Use API route which enforces subscription limits server-side
         const response = await fetch(`/api/forms/${formId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
             title: formData.title,

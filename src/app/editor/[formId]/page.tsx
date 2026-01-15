@@ -36,8 +36,20 @@ function EditorPage({ params }: EditorPageProps) {
     const fetchForm = async () => {
       setLoading(true);
       try {
+        // Get session token
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          console.error("No session token available");
+          router.push("/login");
+          return;
+        }
+
         // Check subscription status first
-        const subscriptionResponse = await fetch("/api/subscriptions/current");
+        const subscriptionResponse = await fetch("/api/subscriptions/current", {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
         if (subscriptionResponse.ok) {
           const subData = await subscriptionResponse.json();
           const subscription = subData.subscription;
