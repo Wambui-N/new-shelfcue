@@ -16,9 +16,18 @@ function WelcomePageContent() {
   const createDraftAndOpenEditor = useCallback(async () => {
     const formId = crypto.randomUUID();
 
+    // Get session token for Authorization
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      throw new Error("No session token available");
+    }
+
     const response = await fetch(`/api/forms/${formId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${session.access_token}`,
+      },
       body: JSON.stringify({
         title: "Untitled Form",
         description: "",
@@ -37,7 +46,7 @@ function WelcomePageContent() {
     }
 
     router.replace(`/editor/${formId}`);
-  }, [router]);
+  }, [router, supabase]);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -63,9 +72,13 @@ function WelcomePageContent() {
           // FALLBACK: Try using create-my-trial which doesn't need planId
           console.log("🔄 Attempting fallback trial creation...");
           try {
+            const { data: { session } } = await supabase.auth.getSession();
             const fallbackResponse = await fetch("/api/subscriptions/create-my-trial", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": session?.access_token ? `Bearer ${session.access_token}` : "",
+              },
             });
 
             const fallbackResult = await fallbackResponse.json();
@@ -82,9 +95,13 @@ function WelcomePageContent() {
           // Create the trial and WAIT for it to complete
           console.log("🔄 Creating trial subscription for new user...");
           try {
+            const { data: { session } } = await supabase.auth.getSession();
             const trialResponse = await fetch("/api/subscriptions/create-trial", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": session?.access_token ? `Bearer ${session.access_token}` : "",
+              },
               body: JSON.stringify({ planId: planData.id }),
             });
 
@@ -95,9 +112,13 @@ function WelcomePageContent() {
               
               // FALLBACK: Try the alternative endpoint
               console.log("🔄 Attempting fallback trial creation...");
+              const { data: { session: fallbackSession } } = await supabase.auth.getSession();
               const fallbackResponse = await fetch("/api/subscriptions/create-my-trial", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                  "Content-Type": "application/json",
+                  "Authorization": fallbackSession?.access_token ? `Bearer ${fallbackSession.access_token}` : "",
+                },
               });
 
               const fallbackResult = await fallbackResponse.json();
@@ -117,9 +138,13 @@ function WelcomePageContent() {
             // FALLBACK: Try the alternative endpoint
             console.log("🔄 Attempting fallback trial creation...");
             try {
+              const { data: { session: catchSession } } = await supabase.auth.getSession();
               const fallbackResponse = await fetch("/api/subscriptions/create-my-trial", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                  "Content-Type": "application/json",
+                  "Authorization": catchSession?.access_token ? `Bearer ${catchSession.access_token}` : "",
+                },
               });
 
               const fallbackResult = await fallbackResponse.json();
