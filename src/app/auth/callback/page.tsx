@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { generateGoogleOAuthUrl } from "@/lib/google-oauth-url";
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -100,135 +101,53 @@ function AuthCallbackContent() {
           }
         }
 
-        // Store Google tokens if available
-        console.log("🔍 Session data:", {
-          hasProviderToken: !!data.session.provider_token,
-          hasRefreshToken: !!data.session.provider_refresh_token,
-          expiresIn: data.session.expires_in,
-          userId: data.session.user.id,
-          provider: data.session.user.app_metadata?.provider,
-          providers: data.session.user.app_metadata?.providers,
-        });
-
-        // Check if we have Google tokens in the session
-        if (data.session?.provider_token) {
-          console.log(
-            "💾 Storing Google tokens for user:",
-            data.session.user.id,
-          );
-
-          // Securely send the session to our server-side API route to store tokens.
-          // This avoids using the admin client on the browser.
-          const response = await fetch("/api/auth/store-tokens", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ session: data.session }),
-          });
-
-          if (response.ok) {
-            console.log("✅ Google tokens stored successfully via API");
-          } else {
-            const result = await response.json();
-            console.error(
-              "❌ Error storing Google tokens via API:",
-              result.error,
-            );
-          }
-        } else {
-          console.log("❌ No provider token available in session to store.");
-          console.log(
-            "🔍 Full session object:",
-            JSON.stringify(data.session, null, 2),
-          );
-
-          // Try to get tokens from URL parameters (fallback)
-          const urlParams = new URLSearchParams(window.location.search);
-          const code = urlParams.get("code");
-          console.log("🔍 URL parameters:", {
-            hasCode: !!code,
-            codeLength: code?.length || 0,
-            allParams: Object.fromEntries(urlParams.entries()),
-          });
-
-          if (code) {
-            console.log(
-              "🔍 Found authorization code, exchanging for tokens...",
-            );
-            try {
-              const response = await fetch("/api/auth/google-tokens", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: data.session.user.id, code }),
-              });
-              const result = await response.json();
-              if (response.ok) {
-                console.log("✅ Tokens exchanged and stored successfully");
-              } else {
-                console.error("❌ Failed to exchange code for tokens:", result);
-              }
-            } catch (error) {
-              console.error("❌ Error exchanging code for tokens:", error);
-            }
-          } else {
-            console.log("❌ No authorization code found in URL");
-          }
-        }
-
-        // Check if user has a subscription
-        const { data: subscription } = await supabase
-          .from("user_subscriptions")
-          .select("id, status, created_at")
+        // Check if user has Google API tokens
+        const { data: existingTokens } = await supabase
+          .from("user_google_tokens")
+          .select("id")
           .eq("user_id", data.session.user.id)
           .maybeSingle();
 
-        // Determine if new user: created within last 5 minutes OR no subscription
-        const userCreatedAt = new Date(data.session.user.created_at);
-        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-        const isNewUser = !subscription || userCreatedAt > fiveMinutesAgo;
-        
-        console.log("🔍 User status:", {
-          userId: data.session.user.id,
-          userCreatedAt: userCreatedAt.toISOString(),
-          hasSubscription: !!subscription,
-          isNewUser,
-        });
-        
-        // For new users, check if they have Google API tokens (unless just stored)
-        if (isNewUser && !googleTokensStored) {
-          console.log("New user detected, checking for Google API tokens...");
-          
-          const { data: tokenData } = await supabase
-            .from("user_google_tokens")
-            .select("id")
-            .eq("user_id", data.session.user.id)
-            .maybeSingle();
+        const needsOAuth = !existingTokens && !googleTokensStored;
 
-          if (!tokenData) {
-            // No API tokens - redirect to Google OAuth to get them
-            console.log("No Google API tokens found, initiating OAuth flow...");
-            
-            try {
-              const authResponse = await fetch(
-                `/api/auth/google-connect?userId=${data.session.user.id}|from_signup`
-              );
-              
-              if (authResponse.ok) {
-                const { authUrl } = await authResponse.json();
-                console.log("Redirecting to Google OAuth for API token consent");
-                window.location.href = authUrl;
-                return;
-              } else {
-                console.warn("Could not initiate Google OAuth, continuing with setup");
-              }
-            } catch (error) {
-              console.error("Error initiating OAuth:", error);
-            }
-          } else {
-            console.log("Google API tokens already exist");
-          }
-        } else if (googleTokensStored) {
-          console.log("✅ Returned from OAuth - Google API tokens now stored");
+        console.log("🔍 Token status:", {
+          userId: data.session.user.id,
+          hasTokens: !!existingTokens,
+          googleTokensStored,
+          needsOAuth,
+        });
+
+        // If user doesn't have tokens and we haven't just stored them, redirect to OAuth
+        if (needsOAuth) {
+          console.log(
+            "No Google API tokens found, redirecting to OAuth consent...",
+          );
+
+          // Generate OAuth URL directly
+          const authUrl = generateGoogleOAuthUrl(
+            data.session.user.id,
+            "signup",
+          );
+
+          console.log("🔄 Redirecting to Google OAuth for API token consent");
+          window.location.href = authUrl;
+          return;
         }
+
+        if (googleTokensStored) {
+          console.log("✅ Returned from OAuth - Google API tokens now stored");
+        } else if (existingTokens) {
+          console.log("✅ User already has Google API tokens");
+        }
+
+        // Check if this is a new user (no subscription yet)
+        const { data: subscription } = await supabase
+          .from("user_subscriptions")
+          .select("id")
+          .eq("user_id", data.session.user.id)
+          .maybeSingle();
+
+        const isNewUser = !subscription;
 
         // Create trial subscription and first form for new users
         if (isNewUser) {
