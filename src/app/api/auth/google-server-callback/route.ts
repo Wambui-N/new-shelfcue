@@ -85,7 +85,6 @@ export async function GET(request: NextRequest) {
     // Redirect to the app
     // If from_welcome is in the state, redirect back to welcome to continue onboarding
     const isFromWelcome = state?.includes('|from_welcome');
-    const userId = isFromWelcome ? state.split('|')[0] : state;
     
     const redirectUrl =
       process.env.NODE_ENV === "production"

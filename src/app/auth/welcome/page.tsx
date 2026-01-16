@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, Suspense } from "react";
 import { GoogleConnectPrompt } from "@/components/GoogleConnectPrompt";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 
-export default function WelcomePage() {
+function WelcomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
@@ -214,4 +214,19 @@ export default function WelcomePage() {
   }
 
   return <GoogleConnectPrompt onConnect={handleConnect} onSkip={handleSkip} />;
+}
+
+export default function WelcomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Setting up your account...</p>
+        </div>
+      </div>
+    }>
+      <WelcomePageContent />
+    </Suspense>
+  );
 }
