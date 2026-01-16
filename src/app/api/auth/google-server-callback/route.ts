@@ -82,19 +82,23 @@ export async function GET(request: NextRequest) {
       console.log("❌ No state (user ID) provided, cannot store tokens");
     }
 
-    // Redirect to the app
-    // If from_welcome is in the state, redirect back to welcome to continue onboarding
-    const isFromWelcome = state?.includes('|from_welcome');
+    // Redirect to the app based on context
+    const isFromSignup = state?.includes('|from_signup');
     
-    const redirectUrl =
-      process.env.NODE_ENV === "production"
-        ? isFromWelcome
-          ? "https://www.shelfcue.com/auth/welcome?google_connected=true"
-          : "https://www.shelfcue.com/dashboard?google_connected=true"
-        : isFromWelcome
-          ? "http://localhost:3000/auth/welcome?google_connected=true"
-          : "http://localhost:3000/dashboard?google_connected=true";
+    let redirectUrl;
+    const baseUrl = process.env.NODE_ENV === "production" 
+      ? "https://www.shelfcue.com" 
+      : "http://localhost:3000";
+    
+    if (isFromSignup) {
+      // New signup - redirect back to auth callback to continue flow
+      redirectUrl = `${baseUrl}/auth/callback?google_tokens_stored=true`;
+    } else {
+      // Regular reconnect - go to dashboard
+      redirectUrl = `${baseUrl}/dashboard?google_connected=true`;
+    }
 
+    console.log("🔄 Redirecting to:", redirectUrl);
     return NextResponse.redirect(redirectUrl);
   } catch (error: any) {
     console.error("Error in server OAuth callback:", error);

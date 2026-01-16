@@ -18,6 +18,9 @@ function AuthCallbackContent() {
         Object.fromEntries(searchParams.entries()),
       );
 
+      // Check if returning from Google OAuth with tokens stored
+      const googleTokensStored = searchParams.get("google_tokens_stored");
+
       // Check for OAuth errors in URL params
       const error = searchParams.get("error");
       const errorDescription = searchParams.get("error_description");
@@ -178,17 +181,68 @@ function AuthCallbackContent() {
           .eq("user_id", data.session.user.id)
           .maybeSingle();
 
-        // If no subscription, auto-create a trial
-        if (!subscription) {
-          console.log(
-            "No subscription found, creating trial automatically...",
-          );
+        const isNewUser = !subscription;
+        
+        // For new users, check if they have Google API tokens (unless just stored)
+        if (isNewUser && !googleTokensStored) {
+          console.log("New user detected, checking for Google API tokens...");
+          
+          const { data: tokenData } = await supabase
+            .from("user_google_tokens")
+            .select("id")
+            .eq("user_id", data.session.user.id)
+            .maybeSingle();
 
+          if (!tokenData) {
+            // No API tokens - redirect to Google OAuth to get them
+            console.log("No Google API tokens found, initiating OAuth flow...");
+            
+            try {
+              const authResponse = await fetch(
+                `/api/auth/google-connect?userId=${data.session.user.id}|from_signup`
+              );
+              
+              if (authResponse.ok) {
+                const { authUrl } = await authResponse.json();
+                console.log("Redirecting to Google OAuth for API token consent");
+                window.location.href = authUrl;
+                return;
+              } else {
+                console.warn("Could not initiate Google OAuth, continuing with setup");
+              }
+            } catch (error) {
+              console.error("Error initiating OAuth:", error);
+            }
+          } else {
+            console.log("Google API tokens already exist");
+          }
+        } else if (googleTokensStored) {
+          console.log("✅ Returned from OAuth - Google API tokens now stored");
+        }
+
+        // Create trial subscription and first form for new users
+        if (isNewUser) {
+          // Send welcome email (fire and forget)
+          fetch("/api/auth/welcome-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: data.session.user.id }),
+          }).catch((error) => {
+            console.error("Failed to send welcome email:", error);
+          });
+
+          // Create trial subscription for new user
+          console.log("Creating trial subscription for new user...");
           try {
+            const { data: { session: authSession } } = await supabase.auth.getSession();
             const trialResponse = await fetch(
               "/api/subscriptions/create-my-trial",
               {
                 method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": authSession?.access_token ? `Bearer ${authSession.access_token}` : "",
+                },
               },
             );
 
@@ -199,6 +253,37 @@ function AuthCallbackContent() {
             }
           } catch (error) {
             console.error("❌ Error creating trial:", error);
+          }
+
+          // Create first draft form and redirect to editor
+          console.log("Creating first draft form for new user...");
+          try {
+            const formId = crypto.randomUUID();
+            const { data: { session: formSession } } = await supabase.auth.getSession();
+            
+            const formResponse = await fetch(`/api/forms/${formId}`, {
+              method: "PUT",
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": formSession?.access_token ? `Bearer ${formSession.access_token}` : "",
+              },
+              body: JSON.stringify({
+                title: "Untitled Form",
+                description: "",
+                fields: [],
+                status: "draft",
+              }),
+            });
+
+            if (formResponse.ok) {
+              console.log("✅ First form created, redirecting to editor");
+              router.replace(`/editor/${formId}`);
+              return;
+            } else {
+              console.error("❌ Failed to create first form");
+            }
+          } catch (error) {
+            console.error("❌ Error creating first form:", error);
           }
         }
 
