@@ -72,40 +72,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    // Check if user exists in database to determine OAuth prompt
-    const _checkUserExists = async (email: string) => {
-      try {
-        const { data, error } = await supabase
-          .from("users")
-          .select("id")
-          .eq("email", email)
-          .single();
-
-        if (error && error.code !== "PGRST116") {
-          // PGRST116 = no rows returned
-          console.error("Error checking user existence:", error);
-          return false;
-        }
-
-        return !!data;
-      } catch (error) {
-        console.error("Error checking user existence:", error);
-        return false;
-      }
-    };
-
-    // For sign-in, we need to check if user exists first
-    // This is a bit tricky since we don't have the email yet
-    // We'll use a different approach - check the callback URL parameter
+    // Use Supabase OAuth for sign-in
+    // The callback page will handle getting additional API tokens if needed
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         scopes:
           "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file",
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback?mode=signin`,
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
         queryParams: {
           access_type: "offline",
-          prompt: "select_account", // Default to select_account, will be overridden in callback if needed
+          prompt: "select_account",
         },
       },
     });

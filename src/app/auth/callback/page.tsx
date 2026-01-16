@@ -123,6 +123,14 @@ function AuthCallbackContent() {
             "No Google API tokens found, redirecting to OAuth consent...",
           );
 
+          // Show a friendly message before redirecting
+          setErrorMessage(
+            "🔄 Setting up Google Calendar and Sheets access... You'll be redirected to grant permissions.",
+          );
+
+          // Wait a moment so user can see the message
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
           try {
             // Generate OAuth URL directly
             const authUrl = generateGoogleOAuthUrl(
