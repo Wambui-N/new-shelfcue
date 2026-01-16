@@ -177,11 +177,21 @@ function AuthCallbackContent() {
         // Check if user has a subscription
         const { data: subscription } = await supabase
           .from("user_subscriptions")
-          .select("id, status")
+          .select("id, status, created_at")
           .eq("user_id", data.session.user.id)
           .maybeSingle();
 
-        const isNewUser = !subscription;
+        // Determine if new user: created within last 5 minutes OR no subscription
+        const userCreatedAt = new Date(data.session.user.created_at);
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+        const isNewUser = !subscription || userCreatedAt > fiveMinutesAgo;
+        
+        console.log("🔍 User status:", {
+          userId: data.session.user.id,
+          userCreatedAt: userCreatedAt.toISOString(),
+          hasSubscription: !!subscription,
+          isNewUser,
+        });
         
         // For new users, check if they have Google API tokens (unless just stored)
         if (isNewUser && !googleTokensStored) {
