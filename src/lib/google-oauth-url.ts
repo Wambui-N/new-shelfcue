@@ -14,6 +14,14 @@ export function generateGoogleOAuthUrl(
   userId: string,
   context: OAuthContext,
 ): string {
+  // Get client ID - must be available
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  
+  if (!clientId) {
+    console.error("❌ NEXT_PUBLIC_GOOGLE_CLIENT_ID is not defined!");
+    throw new Error("Google Client ID is not configured");
+  }
+
   const baseUrl =
     typeof window !== "undefined"
       ? window.location.origin
@@ -21,8 +29,15 @@ export function generateGoogleOAuthUrl(
 
   const redirectUri = `${baseUrl}/api/auth/google-server-callback`;
 
+  console.log("🔍 Generating OAuth URL:", {
+    clientId: clientId.substring(0, 20) + "...",
+    redirectUri,
+    userId: userId.substring(0, 8) + "...",
+    context,
+  });
+
   const params = new URLSearchParams({
-    client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+    client_id: clientId,
     redirect_uri: redirectUri,
     response_type: "code",
     scope:
@@ -32,5 +47,9 @@ export function generateGoogleOAuthUrl(
     state: `${userId}|from_${context}`,
   });
 
-  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  
+  console.log("✅ Generated OAuth URL:", authUrl.substring(0, 100) + "...");
+  
+  return authUrl;
 }

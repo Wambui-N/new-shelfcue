@@ -123,15 +123,26 @@ function AuthCallbackContent() {
             "No Google API tokens found, redirecting to OAuth consent...",
           );
 
-          // Generate OAuth URL directly
-          const authUrl = generateGoogleOAuthUrl(
-            data.session.user.id,
-            "signup",
-          );
+          try {
+            // Generate OAuth URL directly
+            const authUrl = generateGoogleOAuthUrl(
+              data.session.user.id,
+              "signup",
+            );
 
-          console.log("🔄 Redirecting to Google OAuth for API token consent");
-          window.location.href = authUrl;
-          return;
+            console.log("🔄 Redirecting to Google OAuth for API token consent");
+            window.location.href = authUrl;
+            return;
+          } catch (error) {
+            console.error("❌ Failed to generate OAuth URL:", error);
+            setErrorMessage(
+              "Failed to initialize Google integration. Please try again or contact support.",
+            );
+            setTimeout(() => {
+              router.push("/dashboard");
+            }, 3000);
+            return;
+          }
         }
 
         if (googleTokensStored) {
