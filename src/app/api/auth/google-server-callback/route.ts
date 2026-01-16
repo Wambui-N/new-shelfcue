@@ -47,23 +47,26 @@ export async function GET(request: NextRequest) {
       expiresIn: tokens.expiry_date,
     });
 
-    // If we have a state (user ID), store the tokens using our robust system
-    if (state) {
-      console.log("💾 Storing tokens for user:", state);
+    // Extract user ID from state (may include flags like |from_welcome)
+    const userId = state?.includes('|') ? state.split('|')[0] : state;
+    
+    // If we have a user ID, store the tokens using our robust system
+    if (userId) {
+      console.log("💾 Storing tokens for user:", userId);
 
       const expiresAtSeconds = Math.floor(
         (tokens.expiry_date || Date.now() + 3600000) / 1000,
       );
 
       console.log("🔍 Token data:", {
-        user_id: state,
+        user_id: userId,
         hasAccessToken: !!tokens.access_token,
         hasRefreshToken: !!tokens.refresh_token,
         expiresAtSeconds,
         expiresAtDate: new Date(expiresAtSeconds * 1000).toISOString(),
       });
 
-      const storeResult = await tokenStorage.storeTokens(state, {
+      const storeResult = await tokenStorage.storeTokens(userId, {
         access_token: tokens.access_token!,
         refresh_token: tokens.refresh_token || "",
         expires_at: expiresAtSeconds,
@@ -80,10 +83,18 @@ export async function GET(request: NextRequest) {
     }
 
     // Redirect to the app
+    // If from_welcome is in the state, redirect back to welcome to continue onboarding
+    const isFromWelcome = state?.includes('|from_welcome');
+    const userId = isFromWelcome ? state.split('|')[0] : state;
+    
     const redirectUrl =
       process.env.NODE_ENV === "production"
-        ? "https://www.shelfcue.com/dashboard?google_connected=true"
-        : "http://localhost:3000/dashboard?google_connected=true";
+        ? isFromWelcome
+          ? "https://www.shelfcue.com/auth/welcome?google_connected=true"
+          : "https://www.shelfcue.com/dashboard?google_connected=true"
+        : isFromWelcome
+          ? "http://localhost:3000/auth/welcome?google_connected=true"
+          : "http://localhost:3000/dashboard?google_connected=true";
 
     return NextResponse.redirect(redirectUrl);
   } catch (error: any) {

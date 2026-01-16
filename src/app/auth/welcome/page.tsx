@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { GoogleConnectPrompt } from "@/components/GoogleConnectPrompt";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function WelcomePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const supabase = createClient();
   const [checking, setChecking] = useState(true);
@@ -144,6 +145,41 @@ export default function WelcomePage() {
         }).catch((error) => {
           console.error("Failed to send welcome email:", error);
         });
+
+        // Check if returning from Google OAuth
+        const googleConnected = searchParams.get("google_connected");
+        
+        if (googleConnected) {
+          console.log("✅ Returned from Google OAuth - tokens should be stored");
+          await createDraftAndOpenEditor();
+          return;
+        }
+
+        // Check if user has Google tokens (for users who signed up with Google)
+        const { data: tokenData } = await (supabase as any)
+          .from("user_google_tokens")
+          .select("id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (!tokenData) {
+          console.log("🔑 No Google tokens found - initiating OAuth flow to get API tokens");
+          
+          // Get Google OAuth URL for API access with from_welcome flag
+          const authResponse = await fetch(
+            `/api/auth/google-connect?userId=${user.id}|from_welcome`
+          );
+          
+          if (authResponse.ok) {
+            const { authUrl } = await authResponse.json();
+            console.log("🔗 Redirecting to Google OAuth for API token consent");
+            // Redirect to Google OAuth to get API tokens
+            window.location.href = authUrl;
+            return;
+          } else {
+            console.warn("⚠️ Could not initiate Google OAuth, continuing without tokens");
+          }
+        }
 
         await createDraftAndOpenEditor();
         return;
