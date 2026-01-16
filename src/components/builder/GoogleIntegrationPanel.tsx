@@ -60,7 +60,7 @@ export function GoogleIntegrationPanel({
         .from("user_google_tokens")
         .select("id")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       setIsGoogleConnected(!!data && !error);
     } catch (_error) {
