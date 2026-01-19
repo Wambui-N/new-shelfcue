@@ -239,24 +239,15 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       fieldsCount: formData.fields.length,
     });
 
-    // Check if form has meeting fields without calendar configured
+    // Check if form has meeting fields - always show calendar picker if present
     const meetingFields = formData.fields.filter((f) => f.type === "meeting");
     console.log("📅 Meeting fields found:", meetingFields.length);
 
-    const hasMeetingWithoutCalendar = meetingFields.some(
-      (f) => !f.meetingSettings?.calendarId,
-    );
-    console.log("📅 Has meeting without calendar?", hasMeetingWithoutCalendar);
-
-    if (hasMeetingWithoutCalendar) {
-      // Show meeting config dialog first
-      console.log("📅 Showing meeting config dialog...");
-      console.log(
-        "📅 Setting state - pendingPublish: true, showMeetingConfigDialog: true",
-      );
+    if (meetingFields.length > 0) {
+      // Always show meeting config dialog so user can choose/change calendar
+      console.log("📅 Showing meeting config dialog for calendar selection...");
       setPendingPublish(true);
       setShowMeetingConfigDialog(true);
-      console.log("📅 State set, dialog should appear now");
       return;
     }
 
@@ -283,9 +274,10 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     });
 
     console.log("📅 Updating form fields with calendar...");
-    updateForm({ fields: updatedFields });
+    // Update both fields and default_calendar_id in the store
+    updateForm({ fields: updatedFields, default_calendar_id: calendarId });
 
-    // IMPORTANT: Save the calendar ID to the form's default_calendar_id
+    // IMPORTANT: Save the calendar ID to the form's default_calendar_id in database
     console.log("📅 Saving default_calendar_id to form...");
     if (formData.id && user) {
       try {
@@ -843,6 +835,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         onOpenChange={setShowMeetingConfigDialog}
         onConfirm={handleMeetingCalendarSelected}
         userId={user?.id || ""}
+        initialCalendarId={formData.default_calendar_id || null}
       />
 
       <PublishProgressDialog

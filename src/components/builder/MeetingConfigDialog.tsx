@@ -18,6 +18,7 @@ interface MeetingConfigDialogProps {
   onOpenChange: (open: boolean) => void;
   onConfirm: (calendarId: string) => void;
   userId: string;
+  initialCalendarId?: string | null; // Pre-select this calendar if provided
 }
 
 interface GoogleCalendar {
@@ -32,6 +33,7 @@ export function MeetingConfigDialog({
   onOpenChange,
   onConfirm,
   userId,
+  initialCalendarId,
 }: MeetingConfigDialogProps) {
   const [calendars, setCalendars] = useState<GoogleCalendar[]>([]);
   const [selectedCalendar, setSelectedCalendar] = useState<string>("");
@@ -77,12 +79,33 @@ export function MeetingConfigDialog({
       console.log("📅 Calendars fetched:", data.calendars?.length || 0);
       setCalendars(data.calendars || []);
 
-      // Auto-select primary calendar if available
-      const primaryCalendar = data.calendars?.find(
-        (cal: GoogleCalendar) => cal.primary,
-      );
-      if (primaryCalendar) {
-        setSelectedCalendar(primaryCalendar.id);
+      // Pre-select: use initialCalendarId if provided, otherwise primary calendar
+      if (initialCalendarId) {
+        const existingCalendar = data.calendars?.find(
+          (cal: GoogleCalendar) => cal.id === initialCalendarId,
+        );
+        if (existingCalendar) {
+          setSelectedCalendar(initialCalendarId);
+          console.log("📅 Pre-selected existing calendar:", initialCalendarId);
+        } else {
+          // If initial calendar not found, fall back to primary
+          const primaryCalendar = data.calendars?.find(
+            (cal: GoogleCalendar) => cal.primary,
+          );
+          if (primaryCalendar) {
+            setSelectedCalendar(primaryCalendar.id);
+            console.log("📅 Initial calendar not found, using primary");
+          }
+        }
+      } else {
+        // Auto-select primary calendar if available
+        const primaryCalendar = data.calendars?.find(
+          (cal: GoogleCalendar) => cal.primary,
+        );
+        if (primaryCalendar) {
+          setSelectedCalendar(primaryCalendar.id);
+          console.log("📅 Auto-selected primary calendar");
+        }
       }
     } catch (err: any) {
       if (err?.name === "AbortError") {
@@ -126,8 +149,8 @@ export function MeetingConfigDialog({
             Configure Meeting Booking
           </DialogTitle>
           <DialogDescription>
-            Select which Google Calendar should be used to check availability
-            and book meetings for this form.
+            Choose which Google Calendar meeting bookings will be created in.
+            You can change this anytime by republishing the form.
           </DialogDescription>
         </DialogHeader>
 

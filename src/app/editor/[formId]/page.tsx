@@ -153,6 +153,7 @@ function EditorPage({ params }: EditorPageProps) {
           settings: data.settings
             ? { ...defaultSettings, ...data.settings }
             : defaultSettings,
+          default_calendar_id: data.default_calendar_id || undefined,
           lastSaved: new Date(),
         } as FormData);
       } catch (error: any) {
