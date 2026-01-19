@@ -14,16 +14,34 @@ function isSchemaCacheError(
   );
 }
 
-async function reloadSchemaCache(client: ReturnType<typeof getSupabaseAdmin>) {
-  try {
-    console.log("♻️ Reloading Supabase schema cache...");
-    await (client as any).rpc("schema_cache_reload");
-    console.log("✅ Schema cache reload triggered");
-    return true;
-  } catch (error) {
-    console.error("❌ Failed to reload schema cache:", error);
-    return false;
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function withSchemaCacheRetry<T>(opts: {
+  label: string;
+  maxAttempts: number;
+  fn: () => Promise<{ data: T | null; error: any }>;
+}) {
+  let lastError: any = null;
+
+  for (let attempt = 1; attempt <= opts.maxAttempts; attempt++) {
+    const result = await opts.fn();
+    if (result.data) return result;
+    lastError = result.error;
+
+    if (!isSchemaCacheError(lastError)) {
+      return { data: null, error: lastError };
+    }
+
+    const delayMs = Math.min(2000 * attempt, 12000);
+    console.log(
+      `⚠️ [${opts.label}] Schema cache issue (attempt ${attempt}/${opts.maxAttempts}). Waiting ${delayMs}ms then retrying...`,
+    );
+    await sleep(delayMs);
   }
+
+  return { data: null, error: lastError };
 }
 
 export async function POST(request: NextRequest) {
@@ -220,53 +238,27 @@ export async function POST(request: NextRequest) {
           });
 
           // Try inserting with retry logic in case of schema cache issues
-          let connection = null;
-          let connectionError = null;
-          let insertRetries = 3;
-          let schemaCacheReloaded = false;
+          const insertResult = await withSchemaCacheRetry<any>({
+            label: "sheet_connections.insert",
+            maxAttempts: 8,
+            fn: async () =>
+              (supabaseAdmin as any)
+                .from("sheet_connections")
+                .insert({
+                  user_id: userId,
+                  form_id: formId,
+                  sheet_id: newSheet.spreadsheetId,
+                  sheet_name: `${(form as any).title} - Responses`,
+                  sheet_url: newSheet.spreadsheetUrl,
+                })
+                .select()
+                .single(),
+          });
 
-          while (insertRetries > 0 && !connection) {
-            const result = await (supabaseAdmin as any)
-              .from("sheet_connections")
-              .insert({
-                user_id: userId,
-                form_id: formId,
-                sheet_id: newSheet.spreadsheetId,
-                sheet_name: `${(form as any).title} - Responses`,
-                sheet_url: newSheet.spreadsheetUrl,
-              })
-              .select()
-              .single();
+          const connection = insertResult.data;
+          const connectionError = insertResult.error;
 
-            connection = result.data;
-            connectionError = result.error;
-
-            if (connection) {
-              console.log("✅ Sheet connection saved successfully");
-              break;
-            }
-
-            // If it's a schema cache error, wait and retry
-            if (isSchemaCacheError(connectionError)) {
-              if (!schemaCacheReloaded) {
-                schemaCacheReloaded = await reloadSchemaCache(
-                  supabaseAdmin as any,
-                );
-              }
-              insertRetries--;
-              if (insertRetries > 0) {
-                console.log(
-                  `⚠️ Schema cache issue, retrying... (${insertRetries} attempts left)`,
-                );
-                await new Promise((resolve) => setTimeout(resolve, 2000));
-              }
-            } else {
-              // Not a schema cache error, break immediately
-              break;
-            }
-          }
-
-          if (connectionError) {
+          if (connectionError || !connection) {
             console.error(
               "❌ Failed to save sheet connection:",
               connectionError,
@@ -280,6 +272,21 @@ export async function POST(request: NextRequest) {
 
             // Provide helpful error message for schema cache issues
             if (isSchemaCacheError(connectionError)) {
+              // Best-effort cleanup: avoid leaving orphan Sheets if DB write can't complete.
+              try {
+                console.log(
+                  "🧹 Cleaning up orphaned Google Sheet due to DB failure...",
+                );
+                const drive = googleClient.getDrive();
+                await drive.files.delete({ fileId: newSheet.spreadsheetId });
+                console.log("✅ Orphaned Google Sheet deleted");
+              } catch (cleanupError) {
+                console.warn(
+                  "⚠️ Failed to delete orphaned Google Sheet (continuing):",
+                  cleanupError,
+                );
+              }
+
               throw new Error(
                 "Database schema cache is out of sync. Please try again in a few moments, or contact support if the issue persists.",
               );
@@ -291,10 +298,19 @@ export async function POST(request: NextRequest) {
           console.log("✅ Sheet connection saved:", connection);
 
           console.log("📝 Updating form with sheet connection ID...");
-          const { error: formUpdateError } = await (supabaseAdmin as any)
-            .from("forms")
-            .update({ default_sheet_connection_id: (connection as any).id })
-            .eq("id", formId);
+          const formUpdateResult = await withSchemaCacheRetry<any>({
+            label: "forms.update.default_sheet_connection_id",
+            maxAttempts: 6,
+            fn: async () =>
+              (supabaseAdmin as any)
+                .from("forms")
+                .update({ default_sheet_connection_id: (connection as any).id })
+                .eq("id", formId)
+                .select("id")
+                .maybeSingle(),
+          });
+
+          const formUpdateError = formUpdateResult.error;
 
           if (formUpdateError) {
             console.error("❌ Failed to update form:", formUpdateError);
@@ -366,13 +382,22 @@ export async function POST(request: NextRequest) {
         timeSlots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"], // Default slots
       };
 
-      const { error: meetingUpdateError } = await (supabaseAdmin as any)
-        .from("forms")
-        .update({
-          meeting_settings: meetingSettings,
-          status: "published",
-        })
-        .eq("id", formId);
+      const meetingUpdateResult = await withSchemaCacheRetry<any>({
+        label: "forms.update.meeting_settings",
+        maxAttempts: 6,
+        fn: async () =>
+          (supabaseAdmin as any)
+            .from("forms")
+            .update({
+              meeting_settings: meetingSettings,
+              status: "published",
+            })
+            .eq("id", formId)
+            .select("id")
+            .maybeSingle(),
+      });
+
+      const meetingUpdateError = meetingUpdateResult.error;
 
       if (meetingUpdateError) {
         console.error(
@@ -391,10 +416,19 @@ export async function POST(request: NextRequest) {
 
     // 4. Update form status to published
     if (!hasMeetingField) {
-      const { error: statusUpdateError } = await (supabaseAdmin as any)
-        .from("forms")
-        .update({ status: "published" })
-        .eq("id", formId);
+      const statusUpdateResult = await withSchemaCacheRetry<any>({
+        label: "forms.update.status",
+        maxAttempts: 6,
+        fn: async () =>
+          (supabaseAdmin as any)
+            .from("forms")
+            .update({ status: "published" })
+            .eq("id", formId)
+            .select("id")
+            .maybeSingle(),
+      });
+
+      const statusUpdateError = statusUpdateResult.error;
 
       if (statusUpdateError) {
         console.error("❌ Failed to update form status:", statusUpdateError);
