@@ -11,6 +11,9 @@ interface FieldRendererProps {
   onChange: (value: any) => void;
   theme: FormTheme;
   isConversational?: boolean;
+  formId?: string;
+  calendarId?: string;
+  userId?: string;
 }
 
 export function FieldRenderer({
@@ -19,6 +22,9 @@ export function FieldRenderer({
   onChange,
   theme,
   isConversational = false,
+  formId,
+  calendarId,
+  userId,
 }: FieldRendererProps) {
   const baseClasses = cn(
     "w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-300",
@@ -161,6 +167,9 @@ export function FieldRenderer({
             duration={field.meetingSettings?.duration}
             bufferTime={field.meetingSettings?.bufferTime}
             placeholder={field.placeholder || "Select a date and time"}
+            formId={formId}
+            calendarId={calendarId}
+            userId={userId}
           />
         );
 

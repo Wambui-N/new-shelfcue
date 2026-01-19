@@ -43,6 +43,8 @@ interface FormDisplayProps {
   leftSectionLink?: string;
   showWatermark?: boolean;
   deviceView?: "desktop" | "mobile";
+  calendarId?: string;
+  userId?: string;
 }
 
 export function FormDisplay({
@@ -61,6 +63,8 @@ export function FormDisplay({
   leftSectionLink,
   showWatermark = true,
   deviceView = "desktop",
+  calendarId,
+  userId,
 }: FormDisplayProps) {
   const settings = useFormStore((state) => state.formData.settings);
   const [formData, setFormData] = useState<Record<string, any>>({});
@@ -142,6 +146,9 @@ export function FormDisplay({
       title={settings.showTitle ? displayTitle : undefined}
       description={settings.showDescription ? description : undefined}
       submitButtonText={settings.submitButtonText}
+      formId={formId}
+      calendarId={calendarId}
+      userId={userId}
     />
   );
 

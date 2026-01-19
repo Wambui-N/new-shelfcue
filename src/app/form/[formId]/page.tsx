@@ -26,6 +26,8 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
   const [displayMode, setDisplayMode] = useState<FormDisplayMode>("standalone");
   const [layout, setLayout] = useState<FormLayout>("simple");
   const [displayTheme, setDisplayTheme] = useState<FormTheme | null>(null);
+  const [userId, setUserId] = useState<string | undefined>(undefined);
+  const [calendarId, setCalendarId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const getFormId = async () => {
@@ -102,6 +104,10 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
         setDisplayMode(data.displayMode || "standalone");
         setLayout(data.layout || "simple");
         setDisplayTheme(newDisplayTheme);
+        
+        // Set user and calendar IDs for meeting availability
+        setUserId(data.user_id);
+        setCalendarId(data.default_calendar_id);
       } catch (error: any) {
         console.error("Error fetching form:", {
           message: error?.message,
@@ -260,6 +266,8 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
           leftSectionDescription={formData.settings.leftSectionDescription}
           leftSectionLink={formData.settings.leftSectionLink}
           showWatermark={formData.settings.showWatermark !== false}
+          userId={userId}
+          calendarId={calendarId}
         />
       </>
     );

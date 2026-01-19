@@ -15,6 +15,9 @@ interface MeetingTimePickerProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  formId?: string; // Form ID to fetch owner's calendar
+  calendarId?: string; // Calendar to check availability
+  userId?: string; // User ID for fetching calendar data
 }
 
 // Generate time slots for a given date
@@ -124,10 +127,18 @@ export function MeetingTimePicker({
   placeholder = "Select date and time",
   disabled = false,
   className,
+  formId,
+  calendarId,
+  userId,
 }: MeetingTimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [use24Hour, setUse24Hour] = useState(false);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
+  const [realAvailableSlots, setRealAvailableSlots] = useState<string[]>([]);
+  const [availabilityError, setAvailabilityError] = useState<string | null>(
+    null,
+  );
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -151,10 +162,71 @@ export function MeetingTimePicker({
   // Parse current value
   const currentDateTime = value ? new Date(value) : null;
 
+  // Fetch real availability from calendar when we have the required props
+  useEffect(() => {
+    if (userId && calendarId && selectedDate) {
+      const fetchAvailability = async () => {
+        setLoadingAvailability(true);
+        setAvailabilityError(null);
+
+        try {
+          // Check availability for 60 days ahead from selected date
+          const startDate = new Date(selectedDate);
+          startDate.setHours(0, 0, 0, 0);
+
+          const endDate = new Date(startDate);
+          endDate.setDate(endDate.getDate() + 60);
+          endDate.setHours(23, 59, 59, 999);
+
+          const params = new URLSearchParams({
+            userId,
+            calendarId,
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+            duration: duration.toString(),
+            bufferTime: bufferTime.toString(),
+          });
+
+          const response = await fetch(
+            `/api/google/calendar/availability?${params}`,
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch availability");
+          }
+
+          const data = await response.json();
+          setRealAvailableSlots(data.availableSlots || []);
+        } catch (error) {
+          console.error("Error fetching calendar availability:", error);
+          setAvailabilityError(
+            "Could not fetch calendar availability. Showing all slots.",
+          );
+          // Fall back to generated slots
+          setRealAvailableSlots([]);
+        } finally {
+          setLoadingAvailability(false);
+        }
+      };
+
+      fetchAvailability();
+    }
+  }, [userId, calendarId, selectedDate, duration, bufferTime]);
+
   // Generate available time slots for selected date
   const timeSlots = useMemo(() => {
+    // If we have real availability data, use it
+    if (realAvailableSlots.length > 0) {
+      // Filter to only show slots for the selected date
+      return realAvailableSlots.filter((slot) => {
+        const slotDate = new Date(slot);
+        return slotDate.toDateString() === selectedDate.toDateString();
+      });
+    }
+
+    // Otherwise, generate theoretical slots
     return generateTimeSlots(selectedDate, duration, bufferTime);
-  }, [selectedDate, duration, bufferTime]);
+  }, [selectedDate, duration, bufferTime, realAvailableSlots]);
 
   // Calendar data
   const calendarDays = useMemo(() => {
@@ -369,7 +441,24 @@ export function MeetingTimePicker({
 
                 {/* Time Slots */}
                 <div className="flex-1 overflow-y-auto">
-                  {timeSlots.length > 0 ? (
+                  {loadingAvailability ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-2"></div>
+                        <p className="text-sm text-gray-500">
+                          Checking availability...
+                        </p>
+                      </div>
+                    </div>
+                  ) : availabilityError ? (
+                    <div className="mb-2">
+                      <div className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 rounded p-2">
+                        {availabilityError}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {!loadingAvailability && timeSlots.length > 0 ? (
                     <div className="space-y-2">
                       {timeSlots.map((slot) => {
                         const isSelected = value === slot;
@@ -390,14 +479,14 @@ export function MeetingTimePicker({
                         );
                       })}
                     </div>
-                  ) : (
+                  ) : !loadingAvailability ? (
                     <div className="flex items-center justify-center h-full text-gray-500">
                       <div className="text-center">
                         <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">No available times</p>
                       </div>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>

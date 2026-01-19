@@ -446,11 +446,18 @@ export async function POST(request: NextRequest) {
 
     // 2. Enable meeting booking if meeting field exists
     if (hasMeetingField) {
+      // Get duration and bufferTime from the meeting field settings
+      const meetingField = (form.fields as any[])?.find(
+        (f: any) => f.type === "meeting",
+      );
+      const fieldDuration = meetingField?.meetingSettings?.duration || 60;
+      const fieldBufferTime = meetingField?.meetingSettings?.bufferTime || 0;
+
       const meetingSettings = {
         enabled: true,
         calendarId: (form as any).default_calendar_id || null,
-        duration: 60, // Default 60 minutes
-        bufferTime: 15, // Default 15 minutes buffer
+        duration: fieldDuration,
+        bufferTime: fieldBufferTime,
         timeSlots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"], // Default slots
       };
 

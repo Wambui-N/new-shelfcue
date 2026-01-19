@@ -62,6 +62,151 @@ export class GoogleCalendarService {
   }
 
   /**
+   * Check calendar availability and return free time slots
+   */
+  async checkAvailability(
+    calendarId: string,
+    startDate: Date,
+    endDate: Date,
+    duration: number = 60,
+    bufferTime: number = 0,
+    startHour: number = 9,
+    endHour: number = 17,
+  ): Promise<string[]> {
+    try {
+      const calendar = this.client.getCalendar();
+
+      console.log("📅 Querying FreeBusy API:", {
+        calendarId,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        duration,
+        bufferTime,
+      });
+
+      // Query FreeBusy API for existing events
+      const freebusyResponse = await calendar.freebusy.query({
+        requestBody: {
+          timeMin: startDate.toISOString(),
+          timeMax: endDate.toISOString(),
+          items: [{ id: calendarId }],
+        },
+      });
+
+      const busyPeriods =
+        freebusyResponse.data.calendars?.[calendarId]?.busy || [];
+
+      console.log("📅 Found busy periods:", busyPeriods.length);
+
+      // Generate candidate time slots
+      const candidateSlots = this.generateCandidateSlots(
+        startDate,
+        endDate,
+        duration,
+        startHour,
+        endHour,
+      );
+
+      console.log("📅 Generated candidate slots:", candidateSlots.length);
+
+      // Filter slots that don't conflict with busy periods
+      const availableSlots = candidateSlots.filter((slotStart) => {
+        const slotStartTime = new Date(slotStart);
+        const slotEndTime = new Date(slotStartTime.getTime() + duration * 60000);
+
+        // Check if slot overlaps with any busy period
+        for (const busy of busyPeriods) {
+          const busyStart = new Date(busy.start || "");
+          const busyEnd = new Date(busy.end || "");
+
+          // Apply buffer time: check if slot would conflict with busy period + buffer
+          const busyStartWithBuffer = new Date(
+            busyStart.getTime() - bufferTime * 60000,
+          );
+          const busyEndWithBuffer = new Date(
+            busyEnd.getTime() + bufferTime * 60000,
+          );
+
+          // Check for overlap
+          if (
+            slotStartTime < busyEndWithBuffer &&
+            slotEndTime > busyStartWithBuffer
+          ) {
+            return false; // Slot conflicts with busy period
+          }
+        }
+
+        return true; // Slot is available
+      });
+
+      console.log("📅 Available slots after filtering:", availableSlots.length);
+
+      return availableSlots;
+    } catch (error) {
+      console.error("❌ Error checking calendar availability:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Generate candidate time slots for a given date range
+   */
+  private generateCandidateSlots(
+    startDate: Date,
+    endDate: Date,
+    duration: number,
+    startHour: number,
+    endHour: number,
+  ): string[] {
+    const slots: string[] = [];
+    const currentDate = new Date(startDate);
+    const now = new Date();
+
+    // Iterate through each day in the range
+    while (currentDate <= endDate) {
+      // Skip weekends
+      if (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        continue;
+      }
+
+      // Set to start hour
+      const dayStart = new Date(currentDate);
+      dayStart.setHours(startHour, 0, 0, 0);
+
+      // If it's today, start from next available slot
+      let slotTime = new Date(dayStart);
+      if (dayStart.toDateString() === now.toDateString()) {
+        const nextSlot = new Date(now);
+        nextSlot.setMinutes(Math.ceil(now.getMinutes() / duration) * duration, 0, 0);
+        if (nextSlot.getHours() >= startHour && nextSlot.getHours() < endHour) {
+          slotTime = nextSlot;
+        } else {
+          // Move to next day if no slots available today
+          currentDate.setDate(currentDate.getDate() + 1);
+          continue;
+        }
+      }
+
+      // Generate slots for this day
+      while (slotTime.getHours() < endHour) {
+        // Make sure the entire meeting fits within working hours
+        const slotEnd = new Date(slotTime.getTime() + duration * 60000);
+        if (slotEnd.getHours() <= endHour) {
+          slots.push(slotTime.toISOString());
+        }
+        // Move to next slot (duration minutes ahead)
+        slotTime = new Date(slotTime.getTime() + duration * 60000);
+      }
+
+      // Move to next day
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return slots;
+  }
+
+  /**
    * Create calendar event from form submission
    */
   async createCalendarEventFromSubmission(

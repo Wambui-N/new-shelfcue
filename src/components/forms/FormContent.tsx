@@ -24,6 +24,9 @@ interface FormContentProps {
   title?: string;
   description?: string;
   submitButtonText?: string;
+  formId?: string;
+  calendarId?: string;
+  userId?: string;
 }
 
 export function FormContent({
@@ -39,6 +42,9 @@ export function FormContent({
   title,
   description,
   submitButtonText = "Submit",
+  formId,
+  calendarId,
+  userId,
 }: FormContentProps) {
   const layoutConfig = layoutPresets[layout];
   const isConversational = layout === "conversational";
@@ -151,6 +157,9 @@ export function FormContent({
                   onChange={(value) => onFieldChange(field.id, value)}
                   theme={theme}
                   isConversational={isConversational}
+                  formId={formId}
+                  calendarId={calendarId}
+                  userId={userId}
                 />
               </div>
             ))}
