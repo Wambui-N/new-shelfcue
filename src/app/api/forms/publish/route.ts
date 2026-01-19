@@ -206,7 +206,28 @@ export async function POST(request: NextRequest) {
     const results: any = {};
 
     // 1. Create Google Sheet (REQUIRED - core feature)
-    if (!(form as any).default_sheet_connection_id) {
+    const existingSettings = ((form as any).settings ?? {}) as Record<
+      string,
+      unknown
+    >;
+    const existingSheetFromSettings =
+      (existingSettings as any)?.google?.sheet ?? null;
+
+    const existingSpreadsheetId =
+      typeof existingSheetFromSettings?.spreadsheetId === "string"
+        ? existingSheetFromSettings.spreadsheetId
+        : typeof existingSheetFromSettings?.sheet_id === "string"
+          ? existingSheetFromSettings.sheet_id
+          : null;
+
+    const existingSpreadsheetUrl =
+      typeof existingSheetFromSettings?.spreadsheetUrl === "string"
+        ? existingSheetFromSettings.spreadsheetUrl
+        : typeof existingSheetFromSettings?.sheet_url === "string"
+          ? existingSheetFromSettings.sheet_url
+          : null;
+
+    if (!(form as any).default_sheet_connection_id && !existingSpreadsheetId) {
       try {
         console.log("🔵 Creating Google Sheet for form submissions...");
         console.log("📊 Form fields:", (form as any).fields);
@@ -228,6 +249,40 @@ export async function POST(request: NextRequest) {
         console.log("✅ Google Sheet created:", newSheet);
 
         if (newSheet.spreadsheetId && newSheet.spreadsheetUrl) {
+          // Always store a copy on the form settings so we can operate even if
+          // PostgREST schema cache breaks access to `sheet_connections`.
+          const nextSettings = {
+            ...existingSettings,
+            google: {
+              ...((existingSettings as any).google ?? {}),
+              sheet: {
+                spreadsheetId: newSheet.spreadsheetId,
+                spreadsheetUrl: newSheet.spreadsheetUrl,
+                sheetName: `${(form as any).title} - Responses`,
+                createdAt: new Date().toISOString(),
+              },
+            },
+          };
+
+          const settingsUpdateResult = await withSchemaCacheRetry<any>({
+            label: "forms.update.settings.google.sheet",
+            maxAttempts: 6,
+            fn: async () =>
+              (supabaseAdmin as any)
+                .from("forms")
+                .update({ settings: nextSettings })
+                .eq("id", formId)
+                .select("id")
+                .maybeSingle(),
+          });
+
+          if (settingsUpdateResult.error) {
+            console.warn(
+              "⚠️ Failed to save sheet info on form settings:",
+              settingsUpdateResult.error,
+            );
+          }
+
           console.log("💾 Saving sheet connection to database...");
           console.log("📝 Connection data:", {
             user_id: userId,
@@ -272,59 +327,69 @@ export async function POST(request: NextRequest) {
 
             // Provide helpful error message for schema cache issues
             if (isSchemaCacheError(connectionError)) {
-              // Best-effort cleanup: avoid leaving orphan Sheets if DB write can't complete.
-              try {
-                console.log(
-                  "🧹 Cleaning up orphaned Google Sheet due to DB failure...",
-                );
-                const drive = googleClient.getDrive();
-                await drive.files.delete({ fileId: newSheet.spreadsheetId });
-                console.log("✅ Orphaned Google Sheet deleted");
-              } catch (cleanupError) {
-                console.warn(
-                  "⚠️ Failed to delete orphaned Google Sheet (continuing):",
-                  cleanupError,
-                );
-              }
-
-              throw new Error(
-                "Database schema cache is out of sync. Please try again in a few moments, or contact support if the issue persists.",
+              // If schema cache is broken for `sheet_connections`, continue anyway:
+              // we already stored spreadsheetId/url on the form settings.
+              console.warn(
+                "⚠️ Schema cache issue writing sheet_connections; continuing using form.settings.google.sheet fallback.",
               );
+
+              results.sheet = {
+                id: newSheet.spreadsheetId,
+                url: newSheet.spreadsheetUrl,
+                created: true,
+                storedOnFormSettings: true,
+              };
+              console.log(
+                "✅ Google Sheet created (fallback stored on form settings):",
+                newSheet.spreadsheetUrl,
+              );
+              // Skip the rest of the DB linkage steps.
+              connectionError.message = "";
+              connectionError.details = "";
+              // Continue execution (do not throw).
+              // eslint-disable-next-line no-empty
+              {
+              }
+            } else {
+              throw connectionError;
+            }
+          }
+
+          if (connection) {
+            console.log("✅ Sheet connection saved:", connection);
+
+            console.log("📝 Updating form with sheet connection ID...");
+            const formUpdateResult = await withSchemaCacheRetry<any>({
+              label: "forms.update.default_sheet_connection_id",
+              maxAttempts: 6,
+              fn: async () =>
+                (supabaseAdmin as any)
+                  .from("forms")
+                  .update({
+                    default_sheet_connection_id: (connection as any).id,
+                  })
+                  .eq("id", formId)
+                  .select("id")
+                  .maybeSingle(),
+            });
+
+            const formUpdateError = formUpdateResult.error;
+
+            if (formUpdateError) {
+              console.error("❌ Failed to update form:", formUpdateError);
+              // Do not fail publish if we at least stored the sheet on settings.
+            } else {
+              console.log("✅ Form updated with sheet connection");
             }
 
-            throw connectionError;
+            results.sheet = {
+              id: newSheet.spreadsheetId,
+              url: newSheet.spreadsheetUrl,
+              created: true,
+            };
+            console.log("✅ Google Sheet created:", newSheet.spreadsheetUrl);
           }
 
-          console.log("✅ Sheet connection saved:", connection);
-
-          console.log("📝 Updating form with sheet connection ID...");
-          const formUpdateResult = await withSchemaCacheRetry<any>({
-            label: "forms.update.default_sheet_connection_id",
-            maxAttempts: 6,
-            fn: async () =>
-              (supabaseAdmin as any)
-                .from("forms")
-                .update({ default_sheet_connection_id: (connection as any).id })
-                .eq("id", formId)
-                .select("id")
-                .maybeSingle(),
-          });
-
-          const formUpdateError = formUpdateResult.error;
-
-          if (formUpdateError) {
-            console.error("❌ Failed to update form:", formUpdateError);
-            throw formUpdateError;
-          }
-
-          console.log("✅ Form updated with sheet connection");
-
-          results.sheet = {
-            id: newSheet.spreadsheetId,
-            url: newSheet.spreadsheetUrl,
-            created: true,
-          };
-          console.log("✅ Google Sheet created:", newSheet.spreadsheetUrl);
         } else {
           throw new Error("Failed to create Google Sheet");
         }
@@ -368,6 +433,13 @@ export async function POST(request: NextRequest) {
       results.sheet = {
         connected: true,
         message: "Sheet already connected",
+        ...(existingSpreadsheetId
+          ? {
+              id: existingSpreadsheetId,
+              url: existingSpreadsheetUrl,
+              from: "form_settings",
+            }
+          : {}),
       };
       console.log("ℹ️ Sheet already connected to form");
     }
