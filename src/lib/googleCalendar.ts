@@ -376,9 +376,22 @@ export async function createCalendarEventFromSubmission(
       (form.meeting_settings as any)?.duration ||
       60;
 
+    console.log("📅 [Calendar] Duration calculation:", {
+      fieldDuration: meetingField.meetingSettings?.duration,
+      formSettingsDuration: (form.meeting_settings as any)?.duration,
+      finalDuration: duration,
+      meetingFieldSettings: meetingField.meetingSettings,
+    });
+
     // Calculate end time
     const startDate = new Date(meetingDateTime);
     const endDate = new Date(startDate.getTime() + duration * 60000);
+
+    console.log("📅 [Calendar] Event times:", {
+      start: startDate.toISOString(),
+      end: endDate.toISOString(),
+      durationMinutes: duration,
+    });
 
     // Get attendee email from submission (look for email fields)
     const emailField = (form.fields as any[])?.find(
@@ -424,10 +437,12 @@ export async function createCalendarEventFromSubmission(
 
     let response: any;
     try {
+      console.log("📅 [Calendar] Attempting to create event in calendar:", form.default_calendar_id);
       response = await calendar.events.insert({
         calendarId: form.default_calendar_id,
         requestBody: event,
       });
+      console.log("✅ [Calendar] Event created successfully in calendar:", form.default_calendar_id);
     } catch (error: any) {
       const status = error?.response?.status;
       const isPermissionOrNotFound = status === 403 || status === 404;
@@ -443,13 +458,15 @@ export async function createCalendarEventFromSubmission(
       // Fallback: try primary calendar if selected calendar is invalid/unavailable.
       if (isPermissionOrNotFound && currentCalendarId !== "primary") {
         console.warn(
-          "⚠️ [Calendar] Retrying event insert using primary calendar...",
+          "⚠️ [Calendar] Retrying event insert using primary calendar (fallback)...",
         );
 
         response = await calendar.events.insert({
           calendarId: "primary",
           requestBody: event,
         });
+
+        console.log("✅ [Calendar] Event created in primary calendar as fallback");
 
         // Best-effort: update form to use primary calendar going forward.
         try {

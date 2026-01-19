@@ -450,8 +450,22 @@ export async function POST(request: NextRequest) {
       const meetingField = (form.fields as any[])?.find(
         (f: any) => f.type === "meeting",
       );
+      
+      console.log("📅 Meeting field found:", {
+        fieldId: meetingField?.id,
+        fieldType: meetingField?.type,
+        meetingSettings: meetingField?.meetingSettings,
+        fullField: JSON.stringify(meetingField, null, 2),
+      });
+      
       const fieldDuration = meetingField?.meetingSettings?.duration || 60;
       const fieldBufferTime = meetingField?.meetingSettings?.bufferTime || 0;
+
+      console.log("📅 Duration and buffer values:", {
+        fieldDuration,
+        fieldBufferTime,
+        usingDefaults: !meetingField?.meetingSettings,
+      });
 
       const meetingSettings = {
         enabled: true,
@@ -460,6 +474,8 @@ export async function POST(request: NextRequest) {
         bufferTime: fieldBufferTime,
         timeSlots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"], // Default slots
       };
+
+      console.log("📅 Saving meeting settings:", meetingSettings);
 
       const meetingUpdateResult = await withSchemaCacheRetry<any>({
         label: "forms.update.meeting_settings",

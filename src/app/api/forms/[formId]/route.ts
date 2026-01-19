@@ -159,6 +159,15 @@ export async function PUT(
     };
     const safeFields = Array.isArray(body?.fields) ? body.fields : [];
 
+    // Log meeting field settings for debugging
+    const meetingField = safeFields.find((f: any) => f.type === "meeting");
+    if (meetingField) {
+      console.log("💾 [Forms PUT] Saving meeting field with settings:", {
+        fieldId: meetingField.id,
+        meetingSettings: meetingField.meetingSettings,
+      });
+    }
+
     // Check if this is a new form (no existing form with this ID)
     const { data: existingForm } = await supabaseAdmin
       .from("forms")
