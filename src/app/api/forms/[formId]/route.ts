@@ -1,6 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { canPerformAction } from "@/lib/subscriptionLimits";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
@@ -49,11 +47,22 @@ export async function GET(
     const { formId } = await params;
     const supabaseAdmin = getSupabaseAdmin();
 
-    // Get current user (if authenticated)
-    const supabase = createRouteHandlerClient({ cookies });
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // Determine requester (optional). If a bearer token is provided, allow the
+    // owner to fetch drafts. Otherwise, only allow published forms.
+    const authHeader = request.headers.get("authorization");
+    let requesterUserId: string | null = null;
+
+    if (authHeader?.toLowerCase().startsWith("bearer ")) {
+      const token = authHeader.slice(7);
+      try {
+        const {
+          data: { user },
+        } = await (supabaseAdmin as any).auth.getUser(token);
+        requesterUserId = user?.id ?? null;
+      } catch (error) {
+        console.warn("⚠️ Failed to read requester from bearer token:", error);
+      }
+    }
 
     // Fetch form with retry if PostgREST schema cache is temporarily stale
     let data: any = null;
@@ -95,7 +104,7 @@ export async function GET(
     }
 
     // Security check: If user is not the owner, only return published forms
-    if (user?.id !== data.user_id && data.status !== "published") {
+    if (requesterUserId !== data.user_id && data.status !== "published") {
       return NextResponse.json({ error: "Form not found" }, { status: 404 });
     }
 
@@ -103,7 +112,11 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching form:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Internal server error",
+        message:
+          error instanceof Error ? error.message : "Unknown server exception",
+      },
       { status: 500 },
     );
   }
