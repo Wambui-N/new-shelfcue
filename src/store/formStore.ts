@@ -42,6 +42,10 @@ const defaultForm: FormData = {
     mode: "standalone",
     layout: "simple",
     leftSectionHeadline: "",
+    timezone:
+      typeof Intl !== "undefined"
+        ? Intl.DateTimeFormat().resolvedOptions().timeZone
+        : undefined,
   },
 };
 

@@ -71,6 +71,7 @@ export interface FormData {
     leftSectionHeadline?: string; // Optional headline for left branding section
     leftSectionDescription?: string; // Description text for left branding section
     leftSectionLink?: string; // Optional link/CTA for left section
+    timezone?: string; // IANA timezone, e.g. "America/New_York"
   };
   default_calendar_id?: string;
   lastSaved?: Date;

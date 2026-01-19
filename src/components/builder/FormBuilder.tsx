@@ -130,7 +130,12 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
             title: formData.title,
             description: formData.description,
             fields: formData.fields,
-            settings: formData.settings,
+            settings: {
+              ...formData.settings,
+              timezone:
+                formData.settings?.timezone ||
+                Intl.DateTimeFormat().resolvedOptions().timeZone,
+            },
             theme: formData.theme,
             status: status || "draft",
           }),
