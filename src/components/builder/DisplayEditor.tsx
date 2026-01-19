@@ -168,13 +168,21 @@ export function DisplayEditor() {
               <Input
                 id="description-color"
                 type="color"
-                value={formData.theme.descriptionColor || formData.theme.textColor}
-                onChange={(e) => handleThemeChange("descriptionColor", e.target.value)}
+                value={
+                  formData.theme.descriptionColor || formData.theme.textColor
+                }
+                onChange={(e) =>
+                  handleThemeChange("descriptionColor", e.target.value)
+                }
                 className="w-12 h-10 p-1 border rounded"
               />
               <Input
-                value={formData.theme.descriptionColor || formData.theme.textColor}
-                onChange={(e) => handleThemeChange("descriptionColor", e.target.value)}
+                value={
+                  formData.theme.descriptionColor || formData.theme.textColor
+                }
+                onChange={(e) =>
+                  handleThemeChange("descriptionColor", e.target.value)
+                }
                 placeholder="#52525b"
                 className="flex-1"
               />
@@ -208,9 +216,10 @@ export function DisplayEditor() {
             <Label>Background</Label>
             <div className="p-3 rounded-lg bg-muted/50 border border-border">
               <p className="text-xs text-muted-foreground">
-                The background automatically uses a beautiful gradient from your accent color. 
-                It transitions from a very light tint at the top to the full accent color at the bottom, 
-                with a subtle swirl effect for visual interest.
+                The background automatically uses a beautiful gradient from your
+                accent color. It transitions from a very light tint at the top
+                to the full accent color at the bottom, with a subtle swirl
+                effect for visual interest.
               </p>
             </div>
           </div>
@@ -232,7 +241,8 @@ export function DisplayEditor() {
               aspectRatio="16/9"
             />
             <p className="text-xs text-muted-foreground">
-              Upload a custom background image for the left section or enter a URL below
+              Upload a custom background image for the left section or enter a
+              URL below
             </p>
             <Input
               id="background-image-url"
@@ -272,7 +282,8 @@ export function DisplayEditor() {
               placeholder="Add a headline or title..."
             />
             <p className="text-xs text-muted-foreground">
-              A short title that appears at the top of the left branding section.
+              A short title that appears at the top of the left branding
+              section.
             </p>
           </div>
 

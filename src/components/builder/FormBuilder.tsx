@@ -46,7 +46,9 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     useFormStore();
   const [activeTab, setActiveTab] = useState("fields");
   const [deviceView, setDeviceView] = useState<"desktop" | "mobile">("desktop");
-  const [mobileViewMode, setMobileViewMode] = useState<"preview" | "edit">("preview"); // Mobile toggle between preview and edit
+  const [mobileViewMode, setMobileViewMode] = useState<"preview" | "edit">(
+    "preview",
+  ); // Mobile toggle between preview and edit
   const [saveStatus, setSaveStatus] = useState<
     "idle" | "saving" | "saved" | "error"
   >("idle");
@@ -108,7 +110,9 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         console.log("Form title:", formData.title);
 
         // Get session token for authentication
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (!session?.access_token) {
           console.error("❌ No session token available");
           setSaveStatus("error");
@@ -135,10 +139,16 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         if (!response.ok) {
           const errorData = await response.json();
           console.error("❌ Error saving form:", errorData);
-          
+
           // If it's a subscription limit error, redirect to billing
-          if (response.status === 403 && errorData.error === "Form limit reached") {
-            alert(errorData.message || "You've reached your form limit. Please upgrade your plan to create more forms.");
+          if (
+            response.status === 403 &&
+            errorData.error === "Form limit reached"
+          ) {
+            alert(
+              errorData.message ||
+                "You've reached your form limit. Please upgrade your plan to create more forms.",
+            );
             router.push("/dashboard/billing");
           } else {
             setSaveStatus("error");
@@ -178,14 +188,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         setSaving(false);
       }
     },
-    [
-      formData,
-      user,
-      setSaving,
-      setDirty,
-      pathname,
-      updateForm,
-    ],
+    [formData, user, setSaving, setDirty, pathname, updateForm],
   );
 
   useEffect(() => {
@@ -462,12 +465,12 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         }
 
         // Extract error message from response (check multiple possible fields)
-        const errorMessage = 
-          errorData.message || 
-          errorData.details || 
-          errorData.error || 
+        const errorMessage =
+          errorData.message ||
+          errorData.details ||
+          errorData.error ||
           `Failed to publish form (${publishResponse.status})`;
-        
+
         throw new Error(errorMessage);
       }
 
@@ -672,11 +675,17 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         <div className="lg:hidden fixed bottom-4 right-4 z-50 safe-bottom">
           <Button
             onClick={() =>
-              setMobileViewMode(mobileViewMode === "preview" ? "edit" : "preview")
+              setMobileViewMode(
+                mobileViewMode === "preview" ? "edit" : "preview",
+              )
             }
             size="lg"
             className="h-14 w-14 rounded-full shadow-lg touch-target"
-            aria-label={mobileViewMode === "preview" ? "Switch to Edit" : "Switch to Preview"}
+            aria-label={
+              mobileViewMode === "preview"
+                ? "Switch to Edit"
+                : "Switch to Preview"
+            }
           >
             {mobileViewMode === "preview" ? (
               <Edit className="w-6 h-6" />
@@ -732,7 +741,11 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.97 }}
                   transition={{ duration: 0.18 }}
-                  className={deviceView === "mobile" ? "w-[340px] sm:w-[380px]" : "w-full max-w-6xl"}
+                  className={
+                    deviceView === "mobile"
+                      ? "w-[340px] sm:w-[380px]"
+                      : "w-full max-w-6xl"
+                  }
                 >
                   <div className="w-full rounded-3xl border border-border/60 bg-card/80 shadow-2xl overflow-hidden">
                     {deviceView === "mobile" ? (

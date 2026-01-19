@@ -77,7 +77,11 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Unexpected error in /api/subscriptions/current:", error);
     return NextResponse.json(
-      { subscription: null, usage: { forms_count: 0 }, warning: "unexpected_error" },
+      {
+        subscription: null,
+        usage: { forms_count: 0 },
+        warning: "unexpected_error",
+      },
       { status: 200 },
     );
   }

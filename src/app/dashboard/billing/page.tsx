@@ -247,8 +247,9 @@ export default function BillingPage() {
                 You're on a <strong>14-Day Free Trial</strong>
               </h2>
               <p className="text-sm text-muted-foreground mb-4">
-                {trialDaysRemaining} {trialDaysRemaining === 1 ? "day" : "days"} remaining in your trial period. 
-                Enjoy full access to all features. Subscribe now to continue after your trial ends.
+                {trialDaysRemaining} {trialDaysRemaining === 1 ? "day" : "days"}{" "}
+                remaining in your trial period. Enjoy full access to all
+                features. Subscribe now to continue after your trial ends.
               </p>
             </div>
           </div>

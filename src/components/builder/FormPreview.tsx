@@ -35,6 +35,6 @@ export function FormPreview({ className, deviceView }: FormPreviewProps) {
         showWatermark={formData.settings.showWatermark !== false}
         deviceView={deviceView}
       />
-      </div>
+    </div>
   );
 }

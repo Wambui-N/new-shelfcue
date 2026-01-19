@@ -98,8 +98,16 @@ export default function FeaturesHubPage() {
               title: "Conditional logic (show/hide fields)",
               status: "in_progress",
             },
-            { id: "multi_step_forms", title: "Multi-step forms", status: "in_progress" },
-            { id: "file_uploads", title: "File uploads on forms", status: "in_progress" },
+            {
+              id: "multi_step_forms",
+              title: "Multi-step forms",
+              status: "in_progress",
+            },
+            {
+              id: "file_uploads",
+              title: "File uploads on forms",
+              status: "in_progress",
+            },
             {
               id: "custom_thank_you",
               title: "Custom thank you pages",
@@ -108,7 +116,11 @@ export default function FeaturesHubPage() {
             { id: "2", title: "Form visit analytics", status: "done" },
             { id: "3", title: "Question drop-off analytics", status: "done" },
             { id: "4", title: "Framer plugin", status: "done" },
-            { id: "template_forms", title: "Template forms section", status: "not_started" },
+            {
+              id: "template_forms",
+              title: "Template forms section",
+              status: "not_started",
+            },
           ]);
         }
       } finally {

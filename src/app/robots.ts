@@ -16,5 +16,3 @@ export default function robots(): MetadataRoute.Robots {
     sitemap: [`${baseUrl.replace(/\/$/, "")}/sitemap.xml`],
   };
 }
-
-

@@ -80,7 +80,14 @@ export function TrialBanner() {
           <div className="flex items-center gap-3">
             <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
-              Your trial has ended. <Link href="/dashboard/billing" className="underline hover:text-amber-700 dark:hover:text-amber-200">Subscribe</Link> to continue using all features.
+              Your trial has ended.{" "}
+              <Link
+                href="/dashboard/billing"
+                className="underline hover:text-amber-700 dark:hover:text-amber-200"
+              >
+                Subscribe
+              </Link>{" "}
+              to continue using all features.
             </p>
           </div>
           <Button
@@ -101,21 +108,26 @@ export function TrialBanner() {
   // Show banner for entire trial period, with different styling based on days remaining
   if (isOnTrial && trialDaysRemaining > 0) {
     const isUrgent = trialDaysRemaining <= 7;
-    
+
     return (
-      <div className={`${isUrgent ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground' : 'bg-blue-50 text-blue-900 dark:bg-blue-950 dark:text-blue-100'} p-3 border-b ${isUrgent ? 'border-primary/20' : 'border-blue-200 dark:border-blue-800'}`}>
+      <div
+        className={`${isUrgent ? "bg-gradient-to-r from-primary to-accent text-primary-foreground" : "bg-blue-50 text-blue-900 dark:bg-blue-950 dark:text-blue-100"} p-3 border-b ${isUrgent ? "border-primary/20" : "border-blue-200 dark:border-blue-800"}`}
+      >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Clock className="w-5 h-5" />
             <p className="text-sm font-medium">
               {isUrgent ? (
                 <>
-                  {trialDaysRemaining} {trialDaysRemaining === 1 ? "day" : "days"}{" "}
-                  left in your trial. Subscribe to continue using all features.
+                  {trialDaysRemaining}{" "}
+                  {trialDaysRemaining === 1 ? "day" : "days"} left in your
+                  trial. Subscribe to continue using all features.
                 </>
               ) : (
                 <>
-                  You're on a <strong>14-day free trial</strong>. {trialDaysRemaining} {trialDaysRemaining === 1 ? "day" : "days"} remaining.
+                  You're on a <strong>14-day free trial</strong>.{" "}
+                  {trialDaysRemaining}{" "}
+                  {trialDaysRemaining === 1 ? "day" : "days"} remaining.
                 </>
               )}
             </p>
@@ -123,12 +135,24 @@ export function TrialBanner() {
           <Button
             size="sm"
             variant={isUrgent ? "secondary" : "outline"}
-            className={isUrgent ? "bg-white text-primary hover:bg-gray-100" : "border-blue-300 text-blue-900 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-100 dark:hover:bg-blue-900"}
-            onClick={isUrgent ? handleSubscribe : () => router.push("/dashboard/billing")}
+            className={
+              isUrgent
+                ? "bg-white text-primary hover:bg-gray-100"
+                : "border-blue-300 text-blue-900 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-100 dark:hover:bg-blue-900"
+            }
+            onClick={
+              isUrgent
+                ? handleSubscribe
+                : () => router.push("/dashboard/billing")
+            }
             disabled={paymentLoading}
           >
             <Zap className="w-4 h-4 mr-1" />
-            {paymentLoading ? "Loading..." : isUrgent ? "Subscribe Now" : "View Plans"}
+            {paymentLoading
+              ? "Loading..."
+              : isUrgent
+                ? "Subscribe Now"
+                : "View Plans"}
           </Button>
         </div>
       </div>

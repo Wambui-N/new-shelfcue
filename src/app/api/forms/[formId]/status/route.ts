@@ -56,17 +56,11 @@ export async function PUT(
       .single();
 
     if (formError || !form) {
-      return NextResponse.json(
-        { error: "Form not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Form not found" }, { status: 404 });
     }
 
     if (form.user_id !== user.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 403 },
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     // Update form status
@@ -92,4 +86,3 @@ export async function PUT(
     );
   }
 }
-

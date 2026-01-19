@@ -146,8 +146,9 @@ export async function canPerformAction(
   const usage = await getUserUsage(userId);
 
   const limit = (limits as any)[limitType];
-  const currentUsage =
-    (usage as any)[`${limitType === "forms" ? "forms_count" : `${limitType.replace("_per_month", "")}_count`}`];
+  const currentUsage = (usage as any)[
+    `${limitType === "forms" ? "forms_count" : `${limitType.replace("_per_month", "")}_count`}`
+  ];
 
   // -1 means unlimited
   if (limit === -1) {

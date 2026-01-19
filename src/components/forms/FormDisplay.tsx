@@ -11,7 +11,10 @@ import type {
 } from "@/types/form-display";
 import { FormContent } from "./FormContent";
 import { StandaloneForm } from "./StandaloneForm";
-import { generateImageOverlay, generateAutoGradient } from "@/lib/gradient-generator";
+import {
+  generateImageOverlay,
+  generateAutoGradient,
+} from "@/lib/gradient-generator";
 import { useFormStore } from "@/store/formStore";
 
 interface FormDisplayProps {
@@ -22,15 +25,17 @@ interface FormDisplayProps {
   fields: FormField[];
   mode: FormDisplayMode;
   layout: FormLayout;
-  theme: FormTheme | {
-    primaryColor: string;
-    backgroundColor: string;
-    textColor: string;
-    borderRadius: number;
-    fontFamily: string;
-    logoUrl?: string;
-    backgroundImageUrl?: string;
-  };
+  theme:
+    | FormTheme
+    | {
+        primaryColor: string;
+        backgroundColor: string;
+        textColor: string;
+        borderRadius: number;
+        fontFamily: string;
+        logoUrl?: string;
+        backgroundImageUrl?: string;
+      };
   onSubmit: (data: Record<string, any>) => Promise<void>;
   isSubmitting?: boolean;
   leftSectionHeadline?: string;
@@ -57,8 +62,7 @@ export function FormDisplay({
   showWatermark = true,
   deviceView = "desktop",
 }: FormDisplayProps) {
-
-  const settings = useFormStore(state => state.formData.settings);
+  const settings = useFormStore((state) => state.formData.settings);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -76,22 +80,26 @@ export function FormDisplay({
 
   // Check if theme is simple theme object or FormTheme
   const isSimpleTheme = "primaryColor" in theme && !("background" in theme);
-  
+
   // Convert simple theme to FormTheme if needed
   const displayTheme: FormTheme = isSimpleTheme
     ? {
         primaryColor: theme.primaryColor,
         textColor: theme.textColor,
-        descriptionColor: "descriptionColor" in theme ? theme.descriptionColor : theme.textColor,
+        descriptionColor:
+          "descriptionColor" in theme
+            ? theme.descriptionColor
+            : theme.textColor,
         fontFamily: theme.fontFamily,
         borderRadius: theme.borderRadius,
         logoUrl: theme.logoUrl,
-        background: "backgroundImageUrl" in theme && theme.backgroundImageUrl
-          ? {
-              type: "image" as const,
-              image: theme.backgroundImageUrl,
-            }
-          : undefined,
+        background:
+          "backgroundImageUrl" in theme && theme.backgroundImageUrl
+            ? {
+                type: "image" as const,
+                image: theme.backgroundImageUrl,
+              }
+            : undefined,
       }
     : theme;
 
@@ -99,22 +107,24 @@ export function FormDisplay({
   const displayTitle = header || title;
 
   // Get background color and accent color from theme
-  const backgroundColor = isSimpleTheme && "backgroundColor" in theme
-    ? theme.backgroundColor
-    : "#fafafa";
+  const backgroundColor =
+    isSimpleTheme && "backgroundColor" in theme
+      ? theme.backgroundColor
+      : "#fafafa";
   const accentColor = displayTheme.primaryColor;
-  
+
   // Check for custom background image
-  const backgroundImageUrl = isSimpleTheme && "backgroundImageUrl" in theme
-    ? theme.backgroundImageUrl
-    : displayTheme.background?.image;
-  
+  const backgroundImageUrl =
+    isSimpleTheme && "backgroundImageUrl" in theme
+      ? theme.backgroundImageUrl
+      : displayTheme.background?.image;
+
   // Generate automatic gradient background (if no custom image)
   // This creates a beautiful gradient from very light accent to full accent color with swirl
   const autoGradient = !backgroundImageUrl
     ? generateAutoGradient(accentColor, backgroundColor)
     : undefined;
-  
+
   // Optional gradient overlay for background image (disabled to let custom images display true colors)
   const gradientOverlay = undefined;
 
@@ -167,12 +177,17 @@ export function FormDisplay({
 
   return (
     <StandaloneForm theme={displayTheme}>
-      <div className={cn("min-h-screen flex flex-col overflow-x-hidden w-full", deviceView === 'desktop' && 'md:flex-row')}>
+      <div
+        className={cn(
+          "min-h-screen flex flex-col overflow-x-hidden w-full",
+          deviceView === "desktop" && "md:flex-row",
+        )}
+      >
         {/* Left Section - Branding */}
         <div
           className={cn(
             "relative w-full flex flex-col justify-between flex-shrink-0 overflow-hidden",
-            deviceView === 'desktop' ? "md:w-1/2 md:min-h-screen" : "w-full",
+            deviceView === "desktop" ? "md:w-1/2 md:min-h-screen" : "w-full",
             "h-[250px]", // Shorter on mobile (250px), full height on desktop
             "p-4 md:p-12", // Reduced padding on mobile
           )}
@@ -220,7 +235,9 @@ export function FormDisplay({
                   className="text-white text-sm sm:text-base md:text-lg font-semibold mb-2 text-left"
                   style={{
                     fontFamily: displayTheme.fontFamily,
-                    color: displayTheme.descriptionColor || "rgba(255, 255, 255, 0.95)",
+                    color:
+                      displayTheme.descriptionColor ||
+                      "rgba(255, 255, 255, 0.95)",
                     textShadow: "0 2px 4px rgba(0,0,0,0.25)",
                   }}
                 >
@@ -232,7 +249,9 @@ export function FormDisplay({
                   className="text-white text-xs md:text-sm mb-2 md:mb-3 text-left" // Smaller text, left-aligned
                   style={{
                     fontFamily: displayTheme.fontFamily,
-                    color: displayTheme.descriptionColor || "rgba(255, 255, 255, 0.95)",
+                    color:
+                      displayTheme.descriptionColor ||
+                      "rgba(255, 255, 255, 0.95)",
                     textShadow: "0 2px 4px rgba(0,0,0,0.3)",
                   }}
                 >
@@ -247,7 +266,9 @@ export function FormDisplay({
                   className="text-white text-xs md:text-sm underline hover:no-underline text-left" // Smaller text, left-aligned
                   style={{
                     fontFamily: displayTheme.fontFamily,
-                    color: displayTheme.descriptionColor || "rgba(255, 255, 255, 0.95)",
+                    color:
+                      displayTheme.descriptionColor ||
+                      "rgba(255, 255, 255, 0.95)",
                     textShadow: "0 2px 4px rgba(0,0,0,0.3)",
                   }}
                 >
@@ -259,9 +280,15 @@ export function FormDisplay({
         </div>
 
         {/* Right Section - Form */}
-        <div 
-          className={cn("w-full flex flex-col flex-shrink-0 overflow-x-hidden", deviceView === 'desktop' && "md:w-1/2")}
-          style={{ backgroundColor: "backgroundColor" in theme ? theme.backgroundColor : "#ffffff" }}
+        <div
+          className={cn(
+            "w-full flex flex-col flex-shrink-0 overflow-x-hidden",
+            deviceView === "desktop" && "md:w-1/2",
+          )}
+          style={{
+            backgroundColor:
+              "backgroundColor" in theme ? theme.backgroundColor : "#ffffff",
+          }}
         >
           <div className="flex-1 overflow-y-auto overflow-x-hidden">
             {formContent}
@@ -269,9 +296,14 @@ export function FormDisplay({
 
           {/* Watermark */}
           {showWatermark && (
-            <div 
+            <div
               className="w-full text-center py-4 border-t border-border"
-              style={{ backgroundColor: "backgroundColor" in theme ? theme.backgroundColor : "#ffffff" }}
+              style={{
+                backgroundColor:
+                  "backgroundColor" in theme
+                    ? theme.backgroundColor
+                    : "#ffffff",
+              }}
             >
               <div className="flex items-center justify-center gap-2">
                 <img

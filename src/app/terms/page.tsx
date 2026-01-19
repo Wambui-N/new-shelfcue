@@ -13,7 +13,7 @@ export default function TermsAndConditions() {
           </h1>
 
           <p className="text-foreground-muted mb-8">
-          Last updated: November 19, 2025
+            Last updated: November 19, 2025
           </p>
 
           <section className="mb-12">

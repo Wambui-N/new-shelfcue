@@ -95,7 +95,7 @@ export default function DashboardPage() {
             (form) => ({
               ...form,
               submissions_count: Array.isArray(form.submissions)
-                ? form.submissions[0]?.count ?? 0
+                ? (form.submissions[0]?.count ?? 0)
                 : 0,
             }),
           );
@@ -112,17 +112,18 @@ export default function DashboardPage() {
         }
 
         // Fetch recent submissions
-        const { data: submissionsData, error: submissionsError } = await supabase
-          .from("submissions")
-          .select(`
+        const { data: submissionsData, error: submissionsError } =
+          await supabase
+            .from("submissions")
+            .select(`
             id, form_id, data, created_at,
             forms!inner (
               title
             )
           `)
-          .eq("forms.user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(7);
+            .eq("forms.user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(7);
 
         if (!submissionsError && submissionsData) {
           const normalizedSubmissions = submissionsData as SubmissionRecord[];
@@ -231,8 +232,9 @@ export default function DashboardPage() {
               </h3>
             </div>
             <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
-              {trialDaysRemaining} {trialDaysRemaining === 1 ? "day" : "days"} remaining. 
-              Enjoy full access to all features during your trial period.
+              {trialDaysRemaining} {trialDaysRemaining === 1 ? "day" : "days"}{" "}
+              remaining. Enjoy full access to all features during your trial
+              period.
             </p>
             <Link href="/dashboard/billing">
               <Button

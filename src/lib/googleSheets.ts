@@ -56,7 +56,9 @@ export class GoogleSheetsService {
       const spreadsheetUrl = response.data.spreadsheetUrl ?? null;
 
       if (!spreadsheetId || !spreadsheetUrl) {
-        throw new Error("Google Sheets API did not return spreadsheet identifiers.");
+        throw new Error(
+          "Google Sheets API did not return spreadsheet identifiers.",
+        );
       }
 
       console.log("✅ Google Sheet creation complete");
@@ -72,12 +74,17 @@ export class GoogleSheetsService {
         typeof error === "object" &&
         error !== null &&
         "response" in error &&
-        (error as { response?: { status?: number; statusText?: string; data?: unknown } })
-          .response
+        (
+          error as {
+            response?: { status?: number; statusText?: string; data?: unknown };
+          }
+        ).response
       ) {
-        const response = (error as {
-          response: { status?: number; statusText?: string; data?: unknown };
-        }).response;
+        const response = (
+          error as {
+            response: { status?: number; statusText?: string; data?: unknown };
+          }
+        ).response;
         console.error("Google API Error:", {
           status: response.status,
           statusText: response.statusText,

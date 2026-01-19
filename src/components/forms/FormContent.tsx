@@ -112,7 +112,10 @@ export function FormContent({
             {description && (
               <p
                 className="mt-1 text-sm sm:text-base"
-                style={{ fontFamily: theme.fontFamily, color: theme.descriptionColor || theme.textColor }}
+                style={{
+                  fontFamily: theme.fontFamily,
+                  color: theme.descriptionColor || theme.textColor,
+                }}
               >
                 {description}
               </p>

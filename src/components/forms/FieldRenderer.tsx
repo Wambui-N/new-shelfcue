@@ -110,7 +110,9 @@ export function FieldRenderer({
                   required={field.required}
                   className="w-4 h-4 text-[var(--shelf-primary)] border-gray-300 focus:ring-[var(--shelf-primary)]"
                 />
-                <span className="text-xs sm:text-sm text-gray-700">{option}</span>
+                <span className="text-xs sm:text-sm text-gray-700">
+                  {option}
+                </span>
               </label>
             ))}
           </div>
@@ -143,7 +145,9 @@ export function FieldRenderer({
                   }}
                   className="w-4 h-4 text-[var(--shelf-primary)] border-gray-300 rounded focus:ring-[var(--shelf-primary)]"
                 />
-                <span className="text-xs sm:text-sm text-gray-700">{option}</span>
+                <span className="text-xs sm:text-sm text-gray-700">
+                  {option}
+                </span>
               </label>
             ))}
           </div>

@@ -7,7 +7,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 export async function POST(request: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin();
-    
+
     // Get auth token from header
     const authHeader = request.headers.get("authorization");
     if (!authHeader) {

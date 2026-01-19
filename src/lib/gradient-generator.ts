@@ -122,7 +122,7 @@ export function generateAutoGradient(
   const lightAccent = hexToRgba(accentColor, 0.15); // Very transparent at top
   const mediumAccent = hexToRgba(accentColor, 0.4); // Medium in middle
   const fullAccent = accentColor; // Full color at bottom
-  
+
   // Create a multi-stop linear gradient with a radial swirl overlay effect
   // The gradient goes from very light (top) to full color (bottom)
   // We'll use a combination of linear and radial gradients for the swirl effect
@@ -132,4 +132,3 @@ export function generateAutoGradient(
     radial-gradient(ellipse at 70% 80%, ${hexToRgba(accentColor, 0.2)} 0%, transparent 50%)
   `.trim();
 }
-

@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { generateGoogleOAuthUrl } from "@/lib/google-oauth-url";
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -18,9 +17,6 @@ function AuthCallbackContent() {
         "🔍 Search Params:",
         Object.fromEntries(searchParams.entries()),
       );
-
-      // Check if returning from Google OAuth with tokens stored
-      const googleTokensStored = searchParams.get("google_tokens_stored");
 
       // Check for OAuth errors in URL params
       const error = searchParams.get("error");
@@ -101,64 +97,6 @@ function AuthCallbackContent() {
           }
         }
 
-        // Check if user has Google API tokens
-        const { data: existingTokens } = await supabase
-          .from("user_google_tokens")
-          .select("id")
-          .eq("user_id", data.session.user.id)
-          .maybeSingle();
-
-        const needsOAuth = !existingTokens && !googleTokensStored;
-
-        console.log("🔍 Token status:", {
-          userId: data.session.user.id,
-          hasTokens: !!existingTokens,
-          googleTokensStored,
-          needsOAuth,
-        });
-
-        // If user doesn't have tokens and we haven't just stored them, redirect to OAuth
-        if (needsOAuth) {
-          console.log(
-            "No Google API tokens found, redirecting to OAuth consent...",
-          );
-
-          // Show a friendly message before redirecting
-          setErrorMessage(
-            "🔄 Setting up Google Calendar and Sheets access... You'll be redirected to grant permissions.",
-          );
-
-          // Wait a moment so user can see the message
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-
-          try {
-            // Generate OAuth URL directly
-            const authUrl = generateGoogleOAuthUrl(
-              data.session.user.id,
-              "signup",
-            );
-
-            console.log("🔄 Redirecting to Google OAuth for API token consent");
-            window.location.href = authUrl;
-            return;
-          } catch (error) {
-            console.error("❌ Failed to generate OAuth URL:", error);
-            setErrorMessage(
-              "Failed to initialize Google integration. Please try again or contact support.",
-            );
-            setTimeout(() => {
-              router.push("/dashboard");
-            }, 3000);
-            return;
-          }
-        }
-
-        if (googleTokensStored) {
-          console.log("✅ Returned from OAuth - Google API tokens now stored");
-        } else if (existingTokens) {
-          console.log("✅ User already has Google API tokens");
-        }
-
         // Check if this is a new user (no subscription yet)
         const { data: subscription } = await supabase
           .from("user_subscriptions")
@@ -168,78 +106,16 @@ function AuthCallbackContent() {
 
         const isNewUser = !subscription;
 
-        // Create trial subscription and first form for new users
+        // Redirect new users to welcome page for setup
         if (isNewUser) {
-          // Send welcome email (fire and forget)
-          fetch("/api/auth/welcome-email", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: data.session.user.id }),
-          }).catch((error) => {
-            console.error("Failed to send welcome email:", error);
-          });
-
-          // Create trial subscription for new user
-          console.log("Creating trial subscription for new user...");
-          try {
-            const { data: { session: authSession } } = await supabase.auth.getSession();
-            const trialResponse = await fetch(
-              "/api/subscriptions/create-my-trial",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": authSession?.access_token ? `Bearer ${authSession.access_token}` : "",
-                },
-              },
-            );
-
-            if (trialResponse.ok) {
-              console.log("✅ Trial subscription created successfully");
-            } else {
-              console.error("❌ Failed to create trial subscription");
-            }
-          } catch (error) {
-            console.error("❌ Error creating trial:", error);
-          }
-
-          // Create first draft form and redirect to editor
-          console.log("Creating first draft form for new user...");
-          try {
-            const formId = crypto.randomUUID();
-            const { data: { session: formSession } } = await supabase.auth.getSession();
-            
-            const formResponse = await fetch(`/api/forms/${formId}`, {
-              method: "PUT",
-              headers: { 
-                "Content-Type": "application/json",
-                "Authorization": formSession?.access_token ? `Bearer ${formSession.access_token}` : "",
-              },
-              body: JSON.stringify({
-                title: "Untitled Form",
-                description: "",
-                fields: [],
-                status: "draft",
-              }),
-            });
-
-            if (formResponse.ok) {
-              console.log("✅ First form created, redirecting to editor");
-              router.replace(`/editor/${formId}`);
-              return;
-            } else {
-              console.error("❌ Failed to create first form");
-            }
-          } catch (error) {
-            console.error("❌ Error creating first form:", error);
-          }
+          console.log("🆕 New user detected, redirecting to welcome page");
+          router.push("/auth/welcome");
+          return;
         }
 
-        console.log("Redirecting to dashboard");
-        router.replace("/dashboard");
-        setTimeout(() => {
-          window.location.href = "/dashboard";
-        }, 1000);
+        // For returning users, continue to dashboard
+        console.log("✅ Returning user, redirecting to dashboard");
+        router.push("/dashboard");
       } else {
         router.push("/auth/signin?error=no_session");
       }

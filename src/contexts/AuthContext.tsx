@@ -78,11 +78,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       provider: "google",
       options: {
         scopes:
-          "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file",
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
+          "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file",
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/api/auth/callback`,
         queryParams: {
           access_type: "offline",
           prompt: "select_account",
+          include_granted_scopes: "true",
         },
       },
     });
@@ -95,16 +96,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUpWithGoogle = async () => {
-    // For sign-up, we need to force consent to get all required permissions
+    // For sign-up, use Supabase OAuth with consent
+    // The callback page will handle getting additional API tokens
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         scopes:
-          "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file",
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
+          "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file",
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/api/auth/callback`,
         queryParams: {
           access_type: "offline",
-          prompt: "consent", // Force consent for new users
+          prompt: "consent",
+          include_granted_scopes: "true",
         },
       },
     });

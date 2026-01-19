@@ -135,12 +135,11 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
       // Dispatch event to refresh dashboard counts
       window.dispatchEvent(new CustomEvent("submissionReceived"));
       setIsSubmitted(true);
-      
+
       // Handle redirect if URL is provided
       if (formData?.settings?.redirectUrl) {
         window.location.href = formData.settings.redirectUrl;
       }
-
     } catch (err: any) {
       console.error("Error submitting form:", err);
       throw err;
@@ -209,14 +208,20 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
 
           {/* Watermark */}
           {formData?.settings?.showWatermark !== false && (
-            <div className="mt-12 pt-6 border-t" style={{ borderColor: `${theme.primaryColor}20` }}>
+            <div
+              className="mt-12 pt-6 border-t"
+              style={{ borderColor: `${theme.primaryColor}20` }}
+            >
               <div className="flex items-center justify-center gap-2">
                 <img
                   src="/1.png"
                   alt="ShelfCue Logo"
                   className="h-4 w-auto opacity-70"
                 />
-                <p className="text-xs" style={{ color: theme.textColor, opacity: 0.6 }}>
+                <p
+                  className="text-xs"
+                  style={{ color: theme.textColor, opacity: 0.6 }}
+                >
                   Powered by{" "}
                   <a
                     href="https://shelfcue.com"
@@ -251,7 +256,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
           theme={formData.theme}
           onSubmit={handleSubmit}
           isSubmitting={false}
-        leftSectionHeadline={formData.settings.leftSectionHeadline}
+          leftSectionHeadline={formData.settings.leftSectionHeadline}
           leftSectionDescription={formData.settings.leftSectionDescription}
           leftSectionLink={formData.settings.leftSectionLink}
           showWatermark={formData.settings.showWatermark !== false}

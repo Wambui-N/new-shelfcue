@@ -31,7 +31,9 @@ export const defaultBackgrounds: DefaultBackground[] = [
 /**
  * Get a default background by ID
  */
-export function getDefaultBackground(id: string): DefaultBackground | undefined {
+export function getDefaultBackground(
+  id: string,
+): DefaultBackground | undefined {
   return defaultBackgrounds.find((bg) => bg.id === id);
 }
 
@@ -42,4 +44,3 @@ export function getDefaultBackgroundGradient(id: string): string | undefined {
   const bg = getDefaultBackground(id);
   return bg?.gradient;
 }
-

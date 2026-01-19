@@ -107,8 +107,8 @@ export default function PrivacyPolicy() {
               4. Google Services Integration
             </h2>
             <p className="text-foreground-muted mb-4">
-              When you connect your Google account, Shelfcue integrates with Google
-              Sheets and Google Calendar to provide core functionality:
+              When you connect your Google account, Shelfcue integrates with
+              Google Sheets and Google Calendar to provide core functionality:
             </p>
 
             <h3 className="text-xl font-semibold text-foreground mb-4 mt-6">
@@ -117,31 +117,33 @@ export default function PrivacyPolicy() {
             <ul className="list-disc pl-6 mb-6 text-foreground-muted space-y-2">
               <li>
                 <strong>What We Create:</strong> When you publish a form, we
-                automatically create a new Google Sheet in your Google Drive named
-                &quot;[Form Title] - Responses&quot;. This sheet is owned by you and
-                stored in your Google Drive.
+                automatically create a new Google Sheet in your Google Drive
+                named &quot;[Form Title] - Responses&quot;. This sheet is owned
+                by you and stored in your Google Drive.
               </li>
               <li>
-                <strong>What We Write:</strong> Each time someone submits your form,
-                we append a new row to your sheet containing:
+                <strong>What We Write:</strong> Each time someone submits your
+                form, we append a new row to your sheet containing:
                 <ul className="list-disc pl-6 mt-2 space-y-1">
                   <li>A timestamp of when the submission was received</li>
                   <li>All form field values (names, emails, messages, etc.)</li>
-                  <li>Meeting date/time (if your form includes meeting scheduling)</li>
+                  <li>
+                    Meeting date/time (if your form includes meeting scheduling)
+                  </li>
                   <li>Calendar event link (if a meeting was created)</li>
                 </ul>
               </li>
               <li>
-                <strong>What We Don&apos;t Do:</strong> We do not read, modify, or
-                delete existing Google Sheets that we did not create. We do not access
-                other files in your Google Drive. We do not share your sheets with
-                anyone.
+                <strong>What We Don&apos;t Do:</strong> We do not read, modify,
+                or delete existing Google Sheets that we did not create. We do
+                not access other files in your Google Drive. We do not share
+                your sheets with anyone.
               </li>
               <li>
-                <strong>Your Control:</strong> You own and fully control all Google
-                Sheets created by Shelfcue. You can view, edit, delete, or share them
-                at any time through Google Drive. You can revoke our access at any time
-                from your Google Account settings.
+                <strong>Your Control:</strong> You own and fully control all
+                Google Sheets created by Shelfcue. You can view, edit, delete,
+                or share them at any time through Google Drive. You can revoke
+                our access at any time from your Google Account settings.
               </li>
             </ul>
 
@@ -151,13 +153,13 @@ export default function PrivacyPolicy() {
             <ul className="list-disc pl-6 mb-6 text-foreground-muted space-y-2">
               <li>
                 <strong>What We Create:</strong> If your form includes meeting
-                scheduling, we create calendar events in your Google Calendar when
-                someone books a meeting through your form.
+                scheduling, we create calendar events in your Google Calendar
+                when someone books a meeting through your form.
               </li>
               <li>
-                <strong>Your Control:</strong> You own and control all calendar events
-                created by Shelfcue. You can view, edit, or delete them at any time
-                through Google Calendar.
+                <strong>Your Control:</strong> You own and control all calendar
+                events created by Shelfcue. You can view, edit, or delete them
+                at any time through Google Calendar.
               </li>
             </ul>
 
@@ -166,14 +168,14 @@ export default function PrivacyPolicy() {
             </h3>
             <ul className="list-disc pl-6 text-foreground-muted space-y-2">
               <li>
-                <strong>Create and manage Google Drive files:</strong> Required to
-                create new Google Sheets and write form submission data. This scope
-                only allows access to files that Shelfcue creates, not your existing
-                files.
+                <strong>Create and manage Google Drive files:</strong> Required
+                to create new Google Sheets and write form submission data. This
+                scope only allows access to files that Shelfcue creates, not
+                your existing files.
               </li>
               <li>
-                <strong>View and manage Google Calendar:</strong> Required to create
-                calendar events for meeting bookings
+                <strong>View and manage Google Calendar:</strong> Required to
+                create calendar events for meeting bookings
               </li>
             </ul>
             <p className="text-foreground-muted mt-4">
@@ -186,9 +188,9 @@ export default function PrivacyPolicy() {
               >
                 Google Account settings
               </a>
-              . Revoking access will prevent new form submissions from syncing to
-              Google Sheets, but existing sheets and data will remain in your Google
-              Drive.
+              . Revoking access will prevent new form submissions from syncing
+              to Google Sheets, but existing sheets and data will remain in your
+              Google Drive.
             </p>
           </section>
 
@@ -201,8 +203,8 @@ export default function PrivacyPolicy() {
             </p>
             <ul className="list-disc pl-6 text-foreground-muted space-y-2">
               <li>
-                <strong>Google Services:</strong> As described in Section 4 above,
-                when you connect your Google account
+                <strong>Google Services:</strong> As described in Section 4
+                above, when you connect your Google account
               </li>
               <li>
                 <strong>Paystack:</strong> For payment processing only
@@ -221,14 +223,15 @@ export default function PrivacyPolicy() {
               6. Supabase Authentication
             </h2>
             <p className="text-foreground-muted mb-4">
-              We use Supabase to securely manage user authentication and data storage.
+              We use Supabase to securely manage user authentication and data
+              storage.
             </p>
             <p className="text-foreground-muted">
               During Google Sign-In, you may briefly be redirected to a Supabase
-              domain (ending in <code>.supabase.co</code>) for verification. This process
-              is secure and required for login functionality. Supabase does not have
-              access to your personal data beyond what is necessary to authenticate
-              your account.
+              domain (ending in <code>.supabase.co</code>) for verification.
+              This process is secure and required for login functionality.
+              Supabase does not have access to your personal data beyond what is
+              necessary to authenticate your account.
             </p>
           </section>
 

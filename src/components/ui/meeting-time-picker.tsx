@@ -320,12 +320,9 @@ export function MeetingTimePicker({
                           !available &&
                             currentMonth &&
                             "text-gray-300 cursor-not-allowed",
-                          selected &&
-                            "bg-black text-white hover:bg-gray-900",
+                          selected && "bg-black text-white hover:bg-gray-900",
                           today && !selected && "bg-gray-100 text-black",
-                          hasValue &&
-                            !selected &&
-                            "bg-gray-200 text-black",
+                          hasValue && !selected && "bg-gray-200 text-black",
                         )}
                       >
                         {date.getDate()}

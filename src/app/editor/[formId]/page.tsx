@@ -37,7 +37,9 @@ function EditorPage({ params }: EditorPageProps) {
       setLoading(true);
       try {
         // Get session token
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (!session?.access_token) {
           console.error("No session token available");
           router.push("/login");
@@ -53,28 +55,29 @@ function EditorPage({ params }: EditorPageProps) {
         if (subscriptionResponse.ok) {
           const subData = await subscriptionResponse.json();
           const subscription = subData.subscription;
-          
+
           // Check if trial has expired
-          if (
-            subscription?.status === "trial" &&
-            subscription?.trial_end
-          ) {
+          if (subscription?.status === "trial" && subscription?.trial_end) {
             const trialEnd = new Date(subscription.trial_end);
             const now = new Date();
             if (trialEnd < now) {
               // Trial expired - redirect to billing
-              alert("Your trial has expired. Please subscribe to continue using the editor.");
+              alert(
+                "Your trial has expired. Please subscribe to continue using the editor.",
+              );
               router.push("/dashboard/billing");
               return;
             }
           }
-          
+
           // Check if subscription is expired or cancelled
           if (
             subscription?.status === "expired" ||
             subscription?.status === "cancelled"
           ) {
-            alert("Your subscription has expired. Please subscribe to continue using the editor.");
+            alert(
+              "Your subscription has expired. Please subscribe to continue using the editor.",
+            );
             router.push("/dashboard/billing");
             return;
           }

@@ -33,7 +33,9 @@ export async function GET(
     const supabaseAdmin = getSupabaseAdmin();
 
     // Get current user (if authenticated)
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     const { data, error } = await supabaseAdmin
       .from("forms")
@@ -111,7 +113,9 @@ export async function PUT(
         return NextResponse.json(
           {
             error: "Form limit reached",
-            message: limitCheck.message || "You've reached your form limit. Please upgrade your plan to create more forms.",
+            message:
+              limitCheck.message ||
+              "You've reached your form limit. Please upgrade your plan to create more forms.",
           },
           { status: 403 },
         );
@@ -119,10 +123,7 @@ export async function PUT(
     } else {
       // If it's an existing form, verify ownership
       if (existingForm.user_id !== user.id) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 403 },
-        );
+        return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
       }
     }
 

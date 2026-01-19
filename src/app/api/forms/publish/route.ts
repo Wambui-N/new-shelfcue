@@ -4,7 +4,9 @@ import { getGoogleClient } from "@/lib/google";
 import { GoogleSheetsService } from "@/lib/googleSheets";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
-function isSchemaCacheError(error: { message?: string; details?: string } | null) {
+function isSchemaCacheError(
+  error: { message?: string; details?: string } | null,
+) {
   if (!error) return false;
   return (
     error.message?.toLowerCase().includes("schema cache") ||
@@ -41,7 +43,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "Subscription required",
-          message: limitCheck.message || "Your trial has expired. Please subscribe to publish forms and receive submissions.",
+          message:
+            limitCheck.message ||
+            "Your trial has expired. Please subscribe to publish forms and receive submissions.",
         },
         { status: 403 },
       );
@@ -220,7 +224,7 @@ export async function POST(request: NextRequest) {
           let connectionError = null;
           let insertRetries = 3;
           let schemaCacheReloaded = false;
-          
+
           while (insertRetries > 0 && !connection) {
             const result = await (supabaseAdmin as any)
               .from("sheet_connections")
@@ -245,11 +249,15 @@ export async function POST(request: NextRequest) {
             // If it's a schema cache error, wait and retry
             if (isSchemaCacheError(connectionError)) {
               if (!schemaCacheReloaded) {
-                schemaCacheReloaded = await reloadSchemaCache(supabaseAdmin as any);
+                schemaCacheReloaded = await reloadSchemaCache(
+                  supabaseAdmin as any,
+                );
               }
               insertRetries--;
               if (insertRetries > 0) {
-                console.log(`⚠️ Schema cache issue, retrying... (${insertRetries} attempts left)`);
+                console.log(
+                  `⚠️ Schema cache issue, retrying... (${insertRetries} attempts left)`,
+                );
                 await new Promise((resolve) => setTimeout(resolve, 2000));
               }
             } else {
@@ -269,14 +277,14 @@ export async function POST(request: NextRequest) {
               hint: connectionError.hint,
               code: connectionError.code,
             });
-            
+
             // Provide helpful error message for schema cache issues
             if (isSchemaCacheError(connectionError)) {
               throw new Error(
-                "Database schema cache is out of sync. Please try again in a few moments, or contact support if the issue persists."
+                "Database schema cache is out of sync. Please try again in a few moments, or contact support if the issue persists.",
               );
             }
-            
+
             throw connectionError;
           }
 
@@ -367,7 +375,10 @@ export async function POST(request: NextRequest) {
         .eq("id", formId);
 
       if (meetingUpdateError) {
-        console.error("❌ Failed to update form with meeting settings:", meetingUpdateError);
+        console.error(
+          "❌ Failed to update form with meeting settings:",
+          meetingUpdateError,
+        );
         throw new Error(`Failed to update form: ${meetingUpdateError.message}`);
       }
 
@@ -387,7 +398,9 @@ export async function POST(request: NextRequest) {
 
       if (statusUpdateError) {
         console.error("❌ Failed to update form status:", statusUpdateError);
-        throw new Error(`Failed to update form status: ${statusUpdateError.message}`);
+        throw new Error(
+          `Failed to update form status: ${statusUpdateError.message}`,
+        );
       }
     }
 
@@ -400,14 +413,16 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error publishing form:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     const errorDetails = error instanceof Error ? error.stack : String(error);
     console.error("Error details:", errorDetails);
     return NextResponse.json(
-      { 
+      {
         error: "Internal server error",
         message: errorMessage,
-        details: process.env.NODE_ENV === "development" ? errorDetails : undefined,
+        details:
+          process.env.NODE_ENV === "development" ? errorDetails : undefined,
       },
       { status: 500 },
     );

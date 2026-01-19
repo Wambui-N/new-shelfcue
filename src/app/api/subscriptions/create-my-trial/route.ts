@@ -8,7 +8,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 export async function POST(request: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin();
-    
+
     // Get auth token from header
     const authHeader = request.headers.get("authorization");
     if (!authHeader) {
@@ -40,24 +40,25 @@ export async function POST(request: NextRequest) {
       // Fix broken subscription: inactive or missing trial_end
       if (status === "inactive" || !trialEnd) {
         console.log("🔧 Fixing broken subscription for user:", user.id);
-        
+
         const trialStartDate = new Date();
         const trialEndDate = new Date(
           trialStartDate.getTime() + 14 * 24 * 60 * 60 * 1000,
         );
 
-        const { data: fixedSubscription, error: updateError } = await supabaseAdmin
-          .from("user_subscriptions")
-          .update({
-            status: "trial",
-            trial_start: trialStartDate.toISOString(),
-            trial_end: trialEndDate.toISOString(),
-            current_period_start: trialStartDate.toISOString(),
-            current_period_end: trialEndDate.toISOString(),
-          })
-          .eq("id", (existingSubscription as any).id)
-          .select()
-          .single();
+        const { data: fixedSubscription, error: updateError } =
+          await supabaseAdmin
+            .from("user_subscriptions")
+            .update({
+              status: "trial",
+              trial_start: trialStartDate.toISOString(),
+              trial_end: trialEndDate.toISOString(),
+              current_period_start: trialStartDate.toISOString(),
+              current_period_end: trialEndDate.toISOString(),
+            })
+            .eq("id", (existingSubscription as any).id)
+            .select()
+            .single();
 
         if (updateError) {
           console.error("Error fixing subscription:", updateError);
@@ -66,7 +67,8 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
           success: true,
-          message: "Your trial has been activated! You now have 14 days of full access.",
+          message:
+            "Your trial has been activated! You now have 14 days of full access.",
           subscription: fixedSubscription,
           trialEnd: trialEndDate.toISOString(),
           fixed: true,
@@ -75,7 +77,10 @@ export async function POST(request: NextRequest) {
 
       // Already has a valid subscription
       return NextResponse.json(
-        { message: "You already have an active subscription", subscription: existingSubscription },
+        {
+          message: "You already have an active subscription",
+          subscription: existingSubscription,
+        },
         { status: 200 },
       );
     }
@@ -122,7 +127,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Trial created successfully! You now have 14 days of full access.",
+      message:
+        "Trial created successfully! You now have 14 days of full access.",
       subscription: newSubscription,
       trialEnd: trialEndDate.toISOString(),
     });
@@ -130,10 +136,10 @@ export async function POST(request: NextRequest) {
     console.error("Trial creation error:", error);
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Failed to create trial",
+        error:
+          error instanceof Error ? error.message : "Failed to create trial",
       },
       { status: 500 },
     );
   }
 }
-

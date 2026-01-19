@@ -143,7 +143,7 @@ export function FinalCTASection() {
               Setup in under 2 minutes
             </span>
           </motion.div>
-          
+
           <motion.div
             className="flex items-center gap-2 px-4 py-2 bg-light-gray/20 rounded-lg border border-light-gray"
             whileHover={{ scale: 1.05 }}

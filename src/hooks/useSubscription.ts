@@ -54,22 +54,31 @@ export function useSubscription() {
 
       if (response.ok) {
         const data = await response.json();
-        
+
         // 🔧 FALLBACK: Auto-fix broken or missing trials
-        if (!data.subscription || data.subscription?.status === "inactive" || !data.subscription?.trial_end) {
-          console.log("⚠️ Detected broken/missing trial, attempting auto-fix...");
-          
-          const fixResponse = await fetch("/api/subscriptions/create-my-trial", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${session.access_token}`,
+        if (
+          !data.subscription ||
+          data.subscription?.status === "inactive" ||
+          !data.subscription?.trial_end
+        ) {
+          console.log(
+            "⚠️ Detected broken/missing trial, attempting auto-fix...",
+          );
+
+          const fixResponse = await fetch(
+            "/api/subscriptions/create-my-trial",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+              },
             },
-          });
+          );
 
           if (fixResponse.ok) {
             const fixData = await fixResponse.json();
             console.log("✅ Trial auto-fixed:", fixData);
-            
+
             // Refetch subscription after fix
             const refetchResponse = await fetch("/api/subscriptions/current", {
               headers: {

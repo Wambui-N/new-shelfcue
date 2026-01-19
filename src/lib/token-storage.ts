@@ -37,10 +37,35 @@ export class TokenStorage {
       const expiresAt =
         tokens.expires_at || Math.floor(Date.now() / 1000) + 3600; // Default 1 hour
 
+      // Never clobber a previously stored refresh token with an empty one.
+      // Google often omits refresh_token on subsequent logins unless prompt=consent is used.
+      let refreshTokenToStore =
+        typeof tokens.refresh_token === "string" &&
+        tokens.refresh_token.length > 0
+          ? tokens.refresh_token
+          : undefined;
+
+      if (!refreshTokenToStore) {
+        const { data: existing, error: existingError } = await supabaseAdmin
+          .from("user_google_tokens")
+          .select("refresh_token")
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        if (existingError) {
+          console.warn(
+            "⚠️ Could not read existing refresh token (will store empty):",
+            existingError,
+          );
+        } else if (existing?.refresh_token) {
+          refreshTokenToStore = existing.refresh_token;
+        }
+      }
+
       const tokenData = {
         user_id: userId,
         access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token || "",
+        refresh_token: refreshTokenToStore || "",
         expires_at: expiresAt,
       };
 

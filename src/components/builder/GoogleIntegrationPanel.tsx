@@ -22,7 +22,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { IntegrationPanelSkeleton, CalendarListSkeleton } from "@/components/skeletons/AppLoadingStates";
+import {
+  IntegrationPanelSkeleton,
+  CalendarListSkeleton,
+} from "@/components/skeletons/AppLoadingStates";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 

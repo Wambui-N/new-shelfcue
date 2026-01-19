@@ -129,7 +129,9 @@ export function ImageUpload({
                 alt={type === "logo" ? "Logo" : "Background"}
                 className={cn(
                   "object-contain",
-                  type === "logo" ? "max-w-full max-h-full" : "w-full h-full object-cover",
+                  type === "logo"
+                    ? "max-w-full max-h-full"
+                    : "w-full h-full object-cover",
                 )}
               />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -175,7 +177,8 @@ export function ImageUpload({
                   </div>
                   <div className="text-center">
                     <p className="text-sm font-medium text-foreground">
-                      Click to upload {type === "logo" ? "logo" : "background image"}
+                      Click to upload{" "}
+                      {type === "logo" ? "logo" : "background image"}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       PNG, JPG up to {maxSizeMB}MB
@@ -187,11 +190,8 @@ export function ImageUpload({
           </div>
         )}
 
-        {error && (
-          <p className="text-sm text-destructive">{error}</p>
-        )}
+        {error && <p className="text-sm text-destructive">{error}</p>}
       </div>
     </div>
   );
 }
-

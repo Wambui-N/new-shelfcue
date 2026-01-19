@@ -86,7 +86,11 @@ function SignInForm() {
         onClick={handleGoogleSignIn}
         disabled={isLoading}
       >
-        <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" aria-label="Google logo">
+        <svg
+          className="w-5 h-5 mr-3"
+          viewBox="0 0 24 24"
+          aria-label="Google logo"
+        >
           <title>Google</title>
           <path
             fill="#4285F4"

@@ -16,7 +16,7 @@ export function generateGoogleOAuthUrl(
 ): string {
   // Get client ID - must be available
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-  
+
   if (!clientId) {
     console.error("❌ NEXT_PUBLIC_GOOGLE_CLIENT_ID is not defined!");
     throw new Error("Google Client ID is not configured");
@@ -30,9 +30,9 @@ export function generateGoogleOAuthUrl(
   const redirectUri = `${baseUrl}/api/auth/google-server-callback`;
 
   console.log("🔍 Generating OAuth URL:", {
-    clientId: clientId.substring(0, 20) + "...",
+    clientId: `${clientId.substring(0, 20)}...`,
     redirectUri,
-    userId: userId.substring(0, 8) + "...",
+    userId: `${userId.substring(0, 8)}...`,
     context,
   });
 
@@ -41,15 +41,16 @@ export function generateGoogleOAuthUrl(
     redirect_uri: redirectUri,
     response_type: "code",
     scope:
-      "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file openid email profile",
+      "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file",
     access_type: "offline",
     prompt: "consent",
+    include_granted_scopes: "true",
     state: `${userId}|from_${context}`,
   });
 
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-  
-  console.log("✅ Generated OAuth URL:", authUrl.substring(0, 100) + "...");
-  
+
+  console.log("✅ Generated OAuth URL:", `${authUrl.substring(0, 100)}...`);
+
   return authUrl;
 }

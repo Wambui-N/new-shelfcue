@@ -141,6 +141,3 @@ export function CalendarListSkeleton({ count = 4 }: { count?: number }) {
     </div>
   );
 }
-
-
-

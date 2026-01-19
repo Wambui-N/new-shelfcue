@@ -21,10 +21,7 @@ type FormRecord = {
   settings?: Record<string, unknown> | null;
   default_sheet_connection_id?: string | null;
   default_calendar_id?: string | null;
-  sheet_connections?:
-    | SheetConnectionRecord
-    | SheetConnectionRecord[]
-    | null;
+  sheet_connections?: SheetConnectionRecord | SheetConnectionRecord[] | null;
 };
 
 type SubmissionRecord = {
@@ -123,16 +120,17 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get("user-agent") || "unknown";
 
     // Save the submission
-    const { data: submission, error: submissionError } = await supabaseAdminClient
-      .from("submissions")
-      .insert({
-        form_id: formId,
-        data: data,
-        ip_address: ipAddress,
-        user_agent: userAgent,
-      })
-      .select()
-      .single();
+    const { data: submission, error: submissionError } =
+      await supabaseAdminClient
+        .from("submissions")
+        .insert({
+          form_id: formId,
+          data: data,
+          ip_address: ipAddress,
+          user_agent: userAgent,
+        })
+        .select()
+        .single();
 
     if (submissionError) {
       console.error("Error saving submission:", submissionError);
@@ -174,25 +172,29 @@ export async function POST(request: NextRequest) {
     try {
       // Get sheet connection - try from join first, then fallback to direct query
       let sheetConnection: { sheet_id: string | null } | null = null;
-      
+
       if (formRecord.sheet_connections) {
         const connection = Array.isArray(formRecord.sheet_connections)
           ? formRecord.sheet_connections[0]
           : formRecord.sheet_connections;
-        
+
         if (connection?.sheet_id) {
           sheetConnection = { sheet_id: connection.sheet_id };
         }
       }
-      
+
       // Fallback: Query directly using default_sheet_connection_id
-      if (!sheetConnection?.sheet_id && formRecord.default_sheet_connection_id) {
-        const { data: connectionData, error: connectionError } = await supabaseAdminClient
-          .from("sheet_connections")
-          .select("sheet_id")
-          .eq("id", formRecord.default_sheet_connection_id)
-          .single();
-        
+      if (
+        !sheetConnection?.sheet_id &&
+        formRecord.default_sheet_connection_id
+      ) {
+        const { data: connectionData, error: connectionError } =
+          await supabaseAdminClient
+            .from("sheet_connections")
+            .select("sheet_id")
+            .eq("id", formRecord.default_sheet_connection_id)
+            .single();
+
         if (!connectionError && connectionData?.sheet_id) {
           sheetConnection = { sheet_id: connectionData.sheet_id };
         }
@@ -222,10 +224,10 @@ export async function POST(request: NextRequest) {
 
           const rowData = formRecord.fields.map((field) => {
             const value = data[field.id as keyof typeof data];
-            
+
             // Handle different field types
             if (field.type === "checkbox") return value ? "Yes" : "No";
-            
+
             // Format date/time fields with timezone
             if (field.type === "meeting" && value) {
               try {
@@ -235,7 +237,7 @@ export async function POST(request: NextRequest) {
                 return value;
               }
             }
-            
+
             // Format date fields with timezone
             if (field.type === "date" && value) {
               try {
@@ -246,7 +248,7 @@ export async function POST(request: NextRequest) {
                 return value;
               }
             }
-            
+
             return value || "";
           });
 
@@ -276,7 +278,10 @@ export async function POST(request: NextRequest) {
           .eq("id", formRecord.user_id)
           .single();
 
-        const profileRecord = profile as { email?: string | null; full_name?: string | null };
+        const profileRecord = profile as {
+          email?: string | null;
+          full_name?: string | null;
+        };
 
         if (profileRecord?.email) {
           await EmailService.sendFormSubmissionNotification(

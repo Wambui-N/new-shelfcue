@@ -69,7 +69,8 @@ export function FormSettings() {
               placeholder="Enter form header (shown to users)"
             />
             <p className="text-xs text-muted-foreground">
-              This is displayed to users. Initially syncs with title, but can be customized independently.
+              This is displayed to users. Initially syncs with title, but can be
+              customized independently.
             </p>
           </div>
 
