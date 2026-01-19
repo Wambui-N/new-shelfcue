@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { canPerformAction } from "@/lib/subscriptionLimits";
-import { createServerClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function PUT(
@@ -8,7 +9,7 @@ export async function PUT(
   { params }: { params: Promise<{ formId: string }> },
 ) {
   try {
-    const supabase = await createServerClient();
+    const supabase = createRouteHandlerClient({ cookies });
     const {
       data: { user },
       error: authError,

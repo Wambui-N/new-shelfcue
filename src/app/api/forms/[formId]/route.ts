@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { canPerformAction } from "@/lib/subscriptionLimits";
-import { createServerClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 const defaultTheme = {
@@ -23,27 +24,73 @@ const defaultSettings = {
   layout: "simple",
 };
 
+function isSchemaCacheError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  const message =
+    "message" in error && typeof (error as any).message === "string"
+      ? (error as any).message
+      : "";
+  const details =
+    "details" in error && typeof (error as any).details === "string"
+      ? (error as any).details
+      : "";
+  return `${message} ${details}`.toLowerCase().includes("schema cache");
+}
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ formId: string }> },
 ) {
   try {
     const { formId } = await params;
-    const supabase = await createServerClient();
     const supabaseAdmin = getSupabaseAdmin();
 
     // Get current user (if authenticated)
+    const supabase = createRouteHandlerClient({ cookies });
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const { data, error } = await supabaseAdmin
-      .from("forms")
-      .select("*")
-      .eq("id", formId)
-      .maybeSingle();
+    // Fetch form with retry if PostgREST schema cache is temporarily stale
+    let data: any = null;
+    let error: any = null;
+    for (let attempt = 1; attempt <= 4; attempt++) {
+      const result = await (supabaseAdmin as any)
+        .from("forms")
+        .select("*")
+        .eq("id", formId)
+        .maybeSingle();
+
+      data = result.data;
+      error = result.error;
+
+      if (!error) break;
+      if (!isSchemaCacheError(error)) break;
+
+      const delayMs = 800 * attempt;
+      console.warn(
+        `⚠️ [forms.get] schema cache issue (attempt ${attempt}/4). Retrying in ${delayMs}ms...`,
+        { message: error.message, details: error.details, code: error.code },
+      );
+      await sleep(delayMs);
+    }
 
     if (error || !data) {
+      if (isSchemaCacheError(error)) {
+        return NextResponse.json(
+          {
+            error: "Temporary database issue",
+            message:
+              "The database schema cache is temporarily out of sync. Please try again in a moment.",
+            code: "SCHEMA_CACHE_OUT_OF_SYNC",
+          },
+          { status: 503 },
+        );
+      }
       return NextResponse.json({ error: "Form not found" }, { status: 404 });
     }
 
