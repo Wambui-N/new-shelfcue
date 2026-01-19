@@ -499,7 +499,7 @@ export function BillingSkeleton() {
       </div>
 
       {/* Trial Banner */}
-      <div className="rounded-xl p-4 sm:p-6 border-2 border-primary bg-primary/5">
+      {/* <div className="rounded-xl p-4 sm:p-6 border-2 border-primary bg-primary/5">
         <div className="flex items-start gap-3 sm:gap-4">
           <Skeleton className="h-10 w-10 sm:h-12 sm:w-12 rounded-full flex-shrink-0" />
           <div className="flex-1">
@@ -507,7 +507,7 @@ export function BillingSkeleton() {
             <Skeleton className="h-4 w-64 mb-4" />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Current Plan */}
       <div className="bg-card rounded-xl p-4 sm:p-6 border shadow-sm">
