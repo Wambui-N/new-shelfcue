@@ -256,10 +256,75 @@ export async function POST(request: NextRequest) {
             rowData.push(calendarEventLink);
           }
 
-          await sheetsService.append(sheetConnection.sheet_id, rowData, {
-            timeZone: formTimeZone,
-          });
-          console.log("✓ Synced to Google Sheets");
+          const tryAppend = async (spreadsheetId: string) => {
+            await sheetsService.append(spreadsheetId, rowData, {
+              timeZone: formTimeZone,
+            });
+          };
+
+          try {
+            await tryAppend(sheetConnection.sheet_id);
+            console.log("✓ Synced to Google Sheets");
+          } catch (appendError: any) {
+            const status = appendError?.response?.status;
+            const dataMsg =
+              typeof appendError?.response?.data === "object"
+                ? JSON.stringify(appendError.response.data)
+                : String(appendError?.response?.data ?? "");
+
+            console.error("❌ Sheets append failed:", {
+              status,
+              message: appendError?.message,
+              data: dataMsg,
+            });
+
+            // Self-heal: if the stored sheet id is invalid (e.g. sheet was deleted),
+            // create a new sheet and update form.settings.google.sheet, then retry once.
+            if (status === 404 || status === 410) {
+              console.warn(
+                "⚠️ Stored spreadsheet not found. Creating a new one and retrying append...",
+              );
+
+              const fieldsAny = Array.isArray(formRecord.fields)
+                ? (formRecord.fields as any[])
+                : [];
+              const headers = fieldsAny.map((f) =>
+                typeof f?.label === "string" && f.label.trim().length > 0
+                  ? f.label
+                  : typeof f?.id === "string"
+                    ? f.id
+                    : "Field",
+              );
+              const hasMeetingField = fieldsAny.some((f) => f?.type === "meeting");
+              if (hasMeetingField) headers.push("Meeting Link");
+
+              const created = await sheetsService.createSheet(
+                `${formRecord.title || "Form"} - Responses`,
+                headers,
+              );
+
+              const nextSettings = {
+                ...(formSettings ?? {}),
+                google: {
+                  ...((formSettings as any)?.google ?? {}),
+                  sheet: {
+                    spreadsheetId: created.spreadsheetId,
+                    spreadsheetUrl: created.spreadsheetUrl,
+                    sheetName: `${formRecord.title || "Form"} - Responses`,
+                    updatedAt: new Date().toISOString(),
+                  },
+                },
+              };
+
+              await supabaseAdminClient
+                .from("forms")
+                .update({ settings: nextSettings })
+                .eq("id", formId);
+
+              await tryAppend(created.spreadsheetId);
+              console.log("✓ Synced to Google Sheets (after repairing sheet link)");
+            }
+          }
         }
       }
     } catch (error) {

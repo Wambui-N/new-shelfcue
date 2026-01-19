@@ -277,10 +277,51 @@ export async function createCalendarEventFromSubmission(
       attendees: event.attendees,
     });
 
-    const response = await calendar.events.insert({
-      calendarId: form.default_calendar_id,
-      requestBody: event,
-    });
+    let response: any;
+    try {
+      response = await calendar.events.insert({
+        calendarId: form.default_calendar_id,
+        requestBody: event,
+      });
+    } catch (error: any) {
+      const status = error?.response?.status;
+      const isPermissionOrNotFound = status === 403 || status === 404;
+      const currentCalendarId = form.default_calendar_id;
+
+      console.error("❌ [Calendar] Primary insert failed:", {
+        status,
+        calendarId: currentCalendarId,
+        message: error?.message,
+        data: error?.response?.data,
+      });
+
+      // Fallback: try primary calendar if selected calendar is invalid/unavailable.
+      if (isPermissionOrNotFound && currentCalendarId !== "primary") {
+        console.warn(
+          "⚠️ [Calendar] Retrying event insert using primary calendar...",
+        );
+
+        response = await calendar.events.insert({
+          calendarId: "primary",
+          requestBody: event,
+        });
+
+        // Best-effort: update form to use primary calendar going forward.
+        try {
+          await (supabase as any)
+            .from("forms")
+            .update({ default_calendar_id: "primary" })
+            .eq("id", formId);
+        } catch (updateError) {
+          console.warn(
+            "⚠️ [Calendar] Failed to update form default_calendar_id:",
+            updateError,
+          );
+        }
+      } else {
+        throw error;
+      }
+    }
 
     console.log("✓ [Calendar] Event created successfully:", {
       eventId: response.data.id,
