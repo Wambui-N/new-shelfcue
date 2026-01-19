@@ -13,7 +13,7 @@ export default function PrivacyPolicy() {
           </h1>
 
           <p className="text-foreground-muted mb-8">
-            Last updated: November 19, 2025
+            Last updated: January 19, 2026
           </p>
 
           <section className="mb-12">
@@ -152,14 +152,48 @@ export default function PrivacyPolicy() {
             </h3>
             <ul className="list-disc pl-6 mb-6 text-foreground-muted space-y-2">
               <li>
-                <strong>What We Create:</strong> If your form includes meeting
-                scheduling, we create calendar events in your Google Calendar
-                when someone books a meeting through your form.
+                <strong>What We Read:</strong> When a prospect submits a form
+                requesting a meeting, we query your Google Calendar to check
+                existing events and identify available time slots. This prevents
+                scheduling conflicts and double-booking.
+              </li>
+              <li>
+                <strong>What We Create:</strong> When a meeting is successfully
+                booked through your form, we automatically create a calendar
+                event in your selected Google Calendar with the meeting details
+                (date, time, attendee information, and meeting notes). This
+                eliminates the need for manual calendar entry.
+              </li>
+              <li>
+                <strong>When We Access:</strong> Calendar access is only used
+                when:
+                <ul className="list-disc pl-6 mt-2 space-y-1">
+                  <li>
+                    You have explicitly enabled Google Calendar integration in
+                    your account settings
+                  </li>
+                  <li>
+                    A form submission contains a meeting booking request
+                  </li>
+                  <li>
+                    We need to verify availability and create the corresponding
+                    calendar event
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <strong>What We Don&apos;t Do:</strong> We do not read, modify,
+                or delete existing calendar events that we did not create. We do
+                not access calendar data for any purpose other than booking
+                automation. We do not store, share, or sell your calendar data.
               </li>
               <li>
                 <strong>Your Control:</strong> You own and control all calendar
-                events created by Shelfcue. You can view, edit, or delete them
-                at any time through Google Calendar.
+                events created by Shelfcue. You can view, edit, or delete them at
+                any time through Google Calendar. You can revoke our calendar
+                access at any time from your Google Account settings, which will
+                prevent new meeting bookings from being automatically added to
+                your calendar.
               </li>
             </ul>
 
@@ -174,8 +208,14 @@ export default function PrivacyPolicy() {
                 your existing files.
               </li>
               <li>
-                <strong>View and manage Google Calendar:</strong> Required to
-                create calendar events for meeting bookings
+                <strong>View and manage Google Calendar:</strong> Required to (1)
+                read your calendar events to check availability and prevent
+                double-booking conflicts, and (2) automatically create calendar
+                events when meetings are booked through form submissions. This
+                scope is essential for our scheduling automation feature and is
+                only used when you have explicitly enabled Google Calendar
+                integration and a form submission includes a meeting booking
+                request.
               </li>
             </ul>
             <p className="text-foreground-muted mt-4">

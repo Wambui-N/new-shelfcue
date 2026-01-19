@@ -13,7 +13,7 @@ export default function TermsAndConditions() {
           </h1>
 
           <p className="text-foreground-muted mb-8">
-            Last updated: November 19, 2025
+            Last updated: January 19, 2026
           </p>
 
           <section className="mb-12">
@@ -43,14 +43,17 @@ export default function TermsAndConditions() {
               3. Service Description
             </h2>
             <p className="text-foreground-muted mb-4">
-              Shelfcue provides lead capture forms that sync to Google Sheets.
-              We offer:
+              Shelfcue provides lead capture forms with integrated meeting
+              booking that sync to Google Sheets and Google Calendar. We offer:
             </p>
             <ul className="list-disc pl-6 text-foreground-muted space-y-2">
               <li>14-day free trial</li>
               <li>Subscription plans after trial period</li>
               <li>
                 "Unbreakable Pipeline" guarantee (best-effort lead backup)
+              </li>
+              <li>
+                Automated meeting scheduling with Google Calendar integration
               </li>
             </ul>
           </section>
@@ -121,7 +124,39 @@ export default function TermsAndConditions() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              7. Intellectual Property
+              7. Google Calendar Integration
+            </h2>
+            <p className="text-foreground-muted mb-4">
+              When you enable Google Calendar integration in your account
+              settings, Shelfcue will:
+            </p>
+            <ul className="list-disc pl-6 text-foreground-muted space-y-2">
+              <li>
+                <strong>Read your calendar:</strong> Query existing calendar
+                events to check availability and prevent scheduling conflicts
+                when prospects book meetings through your forms
+              </li>
+              <li>
+                <strong>Create calendar events:</strong> Automatically create
+                calendar events in your selected Google Calendar when meetings
+                are booked through form submissions, including date, time,
+                attendee details, and meeting information
+              </li>
+            </ul>
+            <p className="text-foreground-muted mt-4">
+              Calendar access is only used for booking automation when you have
+              explicitly enabled the integration and a form submission includes a
+              meeting booking request. We do not access, store, or share your
+              calendar data for any other purpose. You can revoke calendar
+              access at any time through your Google Account settings, which
+              will prevent new meeting bookings from being automatically added
+              to your calendar.
+            </p>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-foreground mb-6">
+              8. Intellectual Property
             </h2>
             <p className="text-foreground-muted">
               Shelfcue owns the platform and software. You own your form data
@@ -131,7 +166,7 @@ export default function TermsAndConditions() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              8. Service Level
+              9. Service Level
             </h2>
             <ul className="list-disc pl-6 text-foreground-muted space-y-2">
               <li>No guaranteed 100% uptime</li>
@@ -142,7 +177,7 @@ export default function TermsAndConditions() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              9. Limitation of Liability
+              10. Limitation of Liability
             </h2>
             <p className="text-foreground-muted mb-4">
               To the extent permitted by Kenyan law:
@@ -163,7 +198,7 @@ export default function TermsAndConditions() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              10. Termination
+              11. Termination
             </h2>
             <ul className="list-disc pl-6 text-foreground-muted space-y-2">
               <li>You can cancel anytime</li>
@@ -174,7 +209,7 @@ export default function TermsAndConditions() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              11. Governing Law
+              12. Governing Law
             </h2>
             <p className="text-foreground-muted">
               These terms are governed by Kenyan law. Disputes will be resolved
@@ -184,7 +219,7 @@ export default function TermsAndConditions() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              12. Changes to Terms
+              13. Changes to Terms
             </h2>
             <p className="text-foreground-muted">
               We'll notify you of material changes via email 30 days before they
