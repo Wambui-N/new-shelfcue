@@ -218,7 +218,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Trial Period Indicator */}
-        {isOnTrial && trialDaysRemaining > 0 && (
+        {/* {isOnTrial && trialDaysRemaining > 0 && (
           <motion.div
             className="mb-6 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 sm:p-6"
             initial={{ opacity: 0, y: 10 }}
@@ -246,13 +246,13 @@ export default function DashboardPage() {
               </Button>
             </Link>
           </motion.div>
-        )}
+        )} */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Active Forms */}
           <Link href="/dashboard/forms">
             <motion.div
-              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20"
+              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20 h-full flex flex-col"
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -262,10 +262,10 @@ export default function DashboardPage() {
                 </div>
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
               </div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 min-h-[2.5rem] sm:min-h-[3rem] lg:min-h-[3.5rem] flex items-end">
                 {dashboardStats.publishedForms}
               </div>
-              <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium">
+              <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium mt-auto">
                 Active Forms
               </div>
             </motion.div>
@@ -274,7 +274,7 @@ export default function DashboardPage() {
           {/* Leads This Week */}
           <Link href="/dashboard/submissions">
             <motion.div
-              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20"
+              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20 h-full flex flex-col"
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -293,10 +293,10 @@ export default function DashboardPage() {
                   </span>
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 min-h-[2.5rem] sm:min-h-[3rem] lg:min-h-[3.5rem] flex items-end">
                 {dashboardStats.leadsThisWeek}
               </div>
-              <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium">
+              <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium mt-auto">
                 Submissions This Week
               </div>
             </motion.div>
@@ -305,7 +305,7 @@ export default function DashboardPage() {
           {/* Last Lead */}
           <Link href="/dashboard/submissions">
             <motion.div
-              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20 sm:col-span-2 lg:col-span-1"
+              className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-primary-foreground/20 transition-all duration-300 group border border-primary-foreground/20 sm:col-span-2 lg:col-span-1 h-full flex flex-col"
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -315,12 +315,12 @@ export default function DashboardPage() {
                 </div>
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground/70 group-hover:translate-x-1 transition-transform" />
               </div>
-              <div className="text-md sm:text-lg lg:text-xl xl:text-2xl font-bold mb-1 sm:mb-2">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 min-h-[2.5rem] sm:min-h-[3rem] lg:min-h-[3.5rem] flex items-end">
                 {dashboardStats.lastLeadTime
                   ? formatTimeAgo(dashboardStats.lastLeadTime)
                   : "No submissions"}
               </div>
-              <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium">
+              <div className="text-primary-foreground/80 text-xs sm:text-sm font-medium mt-auto">
                 Last Submission
               </div>
             </motion.div>

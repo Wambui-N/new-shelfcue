@@ -46,10 +46,11 @@ export function PublicFormSkeleton() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex flex-col md:flex-row min-h-screen">
-        <div className="relative w-full md:w-2/5 lg:w-[42%] h-[260px] md:h-auto overflow-hidden">
+        {/* Left Section - Branding */}
+        <div className="relative w-full md:w-1/2 flex flex-col justify-between flex-shrink-0 overflow-hidden h-[250px] md:min-h-screen p-4 md:p-12">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.25),_transparent_50%),linear-gradient(135deg,var(--primary)_0%,var(--accent)_80%)] animate-pulse" />
           <div className="absolute inset-0 opacity-40 mix-blend-screen bg-[conic-gradient(from_90deg_at_50%_50%,rgba(255,255,255,0.15),transparent_70%)]" />
-          <div className="relative z-10 h-full w-full flex flex-col justify-between p-4 sm:p-8 lg:p-12 text-white">
+          <div className="relative z-10 h-full w-full flex flex-col justify-between text-white">
             <div className="flex justify-between items-start">
               <Skeleton className="h-8 w-24 sm:w-32 rounded-full bg-white/40" />
               <Skeleton className="h-6 w-12 rounded-full bg-white/30" />
@@ -61,6 +62,7 @@ export function PublicFormSkeleton() {
             </div>
           </div>
         </div>
+        {/* Right Section - Form */}
         <div className="flex-1 bg-card/40">
           <div className="min-h-[60vh] flex items-center justify-center px-4 sm:px-6 md:px-10 lg:px-16 py-8 sm:py-12">
             <div className="w-full max-w-2xl">
