@@ -47,7 +47,57 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (dbError) {
+      const message =
+        typeof dbError?.message === "string" ? dbError.message : "";
+      const details =
+        typeof dbError?.details === "string" ? dbError.details : "";
+      const isSchemaCacheIssue =
+        `${message} ${details}`.toLowerCase().includes("schema cache");
+
       console.error("Error saving sheet connection:", dbError);
+
+      // If PostgREST schema cache is broken, fall back to storing on the form settings.
+      if (isSchemaCacheIssue && formId) {
+        console.warn(
+          "⚠️ Schema cache issue saving sheet_connections; storing on form settings instead.",
+        );
+
+        const { data: form } = await supabaseAdmin
+          .from("forms")
+          .select("settings")
+          .eq("id", formId)
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        const existingSettings = (form?.settings ?? {}) as Record<string, unknown>;
+        const nextSettings = {
+          ...existingSettings,
+          google: {
+            ...((existingSettings as any).google ?? {}),
+            sheet: {
+              spreadsheetId,
+              spreadsheetUrl,
+              sheetName: title,
+              createdAt: new Date().toISOString(),
+            },
+          },
+        };
+
+        await supabaseAdmin
+          .from("forms")
+          .update({ settings: nextSettings })
+          .eq("id", formId)
+          .eq("user_id", userId);
+
+        return NextResponse.json({
+          success: true,
+          spreadsheetId,
+          spreadsheetUrl,
+          connectionId: null,
+          storedOnFormSettings: true,
+        });
+      }
+
       throw dbError;
     }
 

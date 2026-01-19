@@ -21,7 +21,6 @@ type FormRecord = {
   settings?: Record<string, unknown> | null;
   default_sheet_connection_id?: string | null;
   default_calendar_id?: string | null;
-  sheet_connections?: SheetConnectionRecord | SheetConnectionRecord[] | null;
 };
 
 type SubmissionRecord = {
@@ -55,10 +54,7 @@ export async function POST(request: NextRequest) {
         fields,
         settings,
         default_sheet_connection_id,
-        default_calendar_id,
-        sheet_connections!sheet_connections_form_id_fkey (
-          sheet_id
-        )
+        default_calendar_id
       `)
       .eq("id", formId)
       .eq("status", "published")
@@ -173,14 +169,17 @@ export async function POST(request: NextRequest) {
       // Get sheet connection - try from join first, then fallback to direct query
       let sheetConnection: { sheet_id: string | null } | null = null;
 
-      if (formRecord.sheet_connections) {
-        const connection = Array.isArray(formRecord.sheet_connections)
-          ? formRecord.sheet_connections[0]
-          : formRecord.sheet_connections;
+      // Primary: read from form settings (works even if PostgREST schema cache breaks sheet_connections)
+      const settingsSheet = (formSettings as any)?.google?.sheet ?? null;
+      const settingsSpreadsheetId =
+        typeof settingsSheet?.spreadsheetId === "string"
+          ? settingsSheet.spreadsheetId
+          : typeof settingsSheet?.sheet_id === "string"
+            ? settingsSheet.sheet_id
+            : null;
 
-        if (connection?.sheet_id) {
-          sheetConnection = { sheet_id: connection.sheet_id };
-        }
+      if (settingsSpreadsheetId) {
+        sheetConnection = { sheet_id: settingsSpreadsheetId };
       }
 
       // Fallback: Query directly using default_sheet_connection_id

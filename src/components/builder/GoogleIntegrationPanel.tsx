@@ -82,24 +82,40 @@ export function GoogleIntegrationPanel({
         .select(`
           default_sheet_connection_id,
           default_calendar_id,
-          sheet_connections (
-            id,
-            sheet_id,
-            sheet_name,
-            sheet_url
-          )
+          settings
         `)
         .eq("id", formId)
         .single();
 
       if (form) {
-        if (form.sheet_connections) {
-          setConnectedSheet(
-            Array.isArray(form.sheet_connections)
-              ? form.sheet_connections[0]
-              : form.sheet_connections,
-          );
+        // Primary: read from settings fallback
+        const settingsSheet = form?.settings?.google?.sheet;
+        if (settingsSheet?.spreadsheetId && settingsSheet?.spreadsheetUrl) {
+          setConnectedSheet({
+            sheet_id: settingsSheet.spreadsheetId,
+            sheet_name:
+              settingsSheet.sheetName ||
+              settingsSheet.sheet_name ||
+              "Connected Sheet",
+            sheet_url: settingsSheet.spreadsheetUrl,
+          });
         }
+
+        // Secondary: if DB linkage exists, use it (no join to avoid schema-cache failures)
+        if (!settingsSheet?.spreadsheetId && form.default_sheet_connection_id) {
+          try {
+            const { data: connection } = await (supabase as any)
+              .from("sheet_connections")
+              .select("id, sheet_id, sheet_name, sheet_url")
+              .eq("id", form.default_sheet_connection_id)
+              .maybeSingle();
+
+            if (connection) setConnectedSheet(connection);
+          } catch (error) {
+            console.warn("⚠️ Failed to fetch sheet connection:", error);
+          }
+        }
+
         if (form.default_calendar_id) {
           setConnectedCalendar({ id: form.default_calendar_id });
         }
