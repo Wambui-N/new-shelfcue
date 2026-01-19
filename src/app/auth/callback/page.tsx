@@ -97,6 +97,28 @@ function AuthCallbackContent() {
           }
         }
 
+        // Store provider tokens (Calendar/Sheets) from the current session.
+        // For returning users, Google may omit refresh_token; our storage layer preserves
+        // the previously stored refresh token to avoid breaking existing connections.
+        if (data.session.provider_token) {
+          try {
+            await fetch("/api/auth/store-google-tokens", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${data.session.access_token}`,
+              },
+              body: JSON.stringify({
+                provider_token: data.session.provider_token,
+                provider_refresh_token: data.session.provider_refresh_token,
+                expires_at: data.session.expires_at,
+              }),
+            });
+          } catch (tokenError) {
+            console.warn("⚠️ Failed to store Google tokens:", tokenError);
+          }
+        }
+
         // Check if this is a new user (no subscription yet)
         const { data: subscription } = await supabase
           .from("user_subscriptions")
