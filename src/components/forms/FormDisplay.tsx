@@ -149,6 +149,7 @@ export function FormDisplay({
       formId={formId}
       calendarId={calendarId}
       userId={userId}
+      isEmbedded={mode === "embed"}
     />
   );
 

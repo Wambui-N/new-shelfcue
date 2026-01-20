@@ -27,6 +27,7 @@ interface FormContentProps {
   formId?: string;
   calendarId?: string;
   userId?: string;
+  isEmbedded?: boolean;
 }
 
 export function FormContent({
@@ -45,6 +46,7 @@ export function FormContent({
   formId,
   calendarId,
   userId,
+  isEmbedded = false,
 }: FormContentProps) {
   const layoutConfig = layoutPresets[layout];
   const isConversational = layout === "conversational";
@@ -80,10 +82,13 @@ export function FormContent({
     <div
       className={cn(
         "w-full max-w-4xl mx-auto overflow-x-hidden",
-        "px-4 sm:px-6 md:px-8 lg:px-12", // Reduced padding on mobile
-        "py-6 sm:py-8 md:py-12", // Reduced padding on mobile
-        layoutConfig.spacing === "tight" && "py-4 sm:py-6 md:py-8",
-        layoutConfig.spacing === "loose" && "py-8 sm:py-12 md:py-16",
+        isEmbedded
+          ? "px-3 sm:px-4 py-4 sm:py-6"
+          : "px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 md:py-12", // Standalone
+        !isEmbedded && layoutConfig.spacing === "tight" && "py-4 sm:py-6 md:py-8",
+        !isEmbedded &&
+          layoutConfig.spacing === "loose" &&
+          "py-8 sm:py-12 md:py-16",
       )}
     >
       {/* Progress Indicator */}
