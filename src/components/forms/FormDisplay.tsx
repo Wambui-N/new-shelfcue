@@ -132,6 +132,8 @@ export function FormDisplay({
   // Optional gradient overlay for background image (disabled to let custom images display true colors)
   const gradientOverlay = undefined;
 
+  const isEmbedded = mode === "embed";
+
   const formContent = (
     <FormContent
       fields={fields}
@@ -149,41 +151,9 @@ export function FormDisplay({
       formId={formId}
       calendarId={calendarId}
       userId={userId}
-      isEmbedded={mode === "embed"}
+      isEmbedded={isEmbedded}
     />
   );
-
-  if (mode === "embed") {
-    return (
-      <div className="w-full flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto overflow-x-hidden max-h-[600px]">
-          {formContent}
-        </div>
-        {showWatermark && (
-          <div className="w-full text-center py-4 border-t border-border bg-background">
-            <div className="flex items-center justify-center gap-2">
-              <img
-                src="/1.png"
-                alt="ShelfCue Logo"
-                className="h-4 w-auto opacity-70"
-              />
-              <p className="text-xs text-muted-foreground">
-                Powered by{" "}
-                <a
-                  href="https://shelfcue.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  ShelfCue
-                </a>
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
 
   return (
     <StandaloneForm theme={displayTheme}>
