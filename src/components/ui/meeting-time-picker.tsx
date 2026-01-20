@@ -133,6 +133,7 @@ export function MeetingTimePicker({
 }: MeetingTimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [hasSelectedDate, setHasSelectedDate] = useState<boolean>(!!value);
   const [use24Hour, setUse24Hour] = useState(false);
   const [loadingAvailability, setLoadingAvailability] = useState(false);
   const [realAvailableSlots, setRealAvailableSlots] = useState<string[]>([]);
@@ -235,6 +236,7 @@ export function MeetingTimePicker({
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
+    setHasSelectedDate(true);
   };
 
   const handleTimeSelect = (timeSlot: string) => {
@@ -324,9 +326,9 @@ export function MeetingTimePicker({
             transition={{ duration: 0.2 }}
             className="absolute top-full left-0 right-0 z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
           >
-            <div className="flex h-96">
+            <div className="flex flex-col sm:flex-row h-auto sm:h-96">
               {/* Calendar Section */}
-              <div className="w-1/2 border-r border-gray-200 p-4">
+              <div className="w-full sm:w-1/2 border-b sm:border-b-0 sm:border-r border-gray-200 p-4">
                 {/* Calendar Header */}
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-900">
@@ -355,12 +357,12 @@ export function MeetingTimePicker({
                 </div>
 
                 {/* Day Headers */}
-                <div className="grid grid-cols-7 gap-1.5 sm:gap-2 mb-2 px-1">
+                <div className="grid grid-cols-7 gap-1 sm:gap-1.5 mb-2 px-1">
                   {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map(
                     (day) => (
                       <div
                         key={day}
-                        className="text-[10px] sm:text-xs font-medium text-gray-500 text-center py-1.5 sm:py-2"
+                        className="text-[9px] sm:text-[10px] font-medium text-gray-500 text-center py-1 sm:py-1.5"
                       >
                         {day}
                       </div>
@@ -369,7 +371,7 @@ export function MeetingTimePicker({
                 </div>
 
                 {/* Calendar Grid */}
-                <div className="grid grid-cols-7 gap-1.5 sm:gap-2 px-1">
+                <div className="grid grid-cols-7 gap-1 sm:gap-1.5 px-1">
                   {calendarDays.map((date, index) => {
                     const available = isDateAvailable(date);
                     const currentMonth = isCurrentMonth(date);
@@ -384,7 +386,7 @@ export function MeetingTimePicker({
                         onClick={() => available && handleDateSelect(date)}
                         disabled={!available}
                         className={cn(
-                          "h-9 sm:h-10 w-full min-w-[2.1rem] text-xs sm:text-sm rounded-md transition-colors flex items-center justify-center",
+                          "h-8 sm:h-9 w-full min-w-[2rem] text-[11px] sm:text-xs rounded-md transition-colors flex items-center justify-center",
                           !currentMonth && "text-gray-300",
                           currentMonth &&
                             available &&
@@ -405,7 +407,7 @@ export function MeetingTimePicker({
               </div>
 
               {/* Time Slots Section */}
-              <div className="w-1/2 p-4 flex flex-col">
+              <div className="w-full sm:w-1/2 p-4 flex flex-col">
                 {/* Time Header */}
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-900">
@@ -440,54 +442,62 @@ export function MeetingTimePicker({
                 </div>
 
                 {/* Time Slots */}
-                <div className="flex-1 overflow-y-auto">
-                  {loadingAvailability ? (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-2"></div>
-                        <p className="text-sm text-gray-500">
-                          Checking availability...
-                        </p>
+                {hasSelectedDate ? (
+                  <div className="flex-1 overflow-y-auto mt-1">
+                    {loadingAvailability ? (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-2"></div>
+                          <p className="text-sm text-gray-500">
+                            Checking availability...
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ) : availabilityError ? (
-                    <div className="mb-2">
-                      <div className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 rounded p-2">
-                        {availabilityError}
+                    ) : availabilityError ? (
+                      <div className="mb-2">
+                        <div className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 rounded p-2">
+                          {availabilityError}
+                        </div>
                       </div>
-                    </div>
-                  ) : null}
+                    ) : null}
 
-                  {!loadingAvailability && timeSlots.length > 0 ? (
-                    <div className="space-y-2">
-                      {timeSlots.map((slot) => {
-                        const isSelected = value === slot;
-                        return (
-                          <button
-                            key={slot}
-                            type="button"
-                            onClick={() => handleTimeSelect(slot)}
-                            className={cn(
-                              "w-full text-left px-2.5 sm:px-3 py-2 text-xs sm:text-sm rounded-md transition-colors",
-                              isSelected
-                                ? "bg-gray-900 text-white"
-                                : "text-gray-700 hover:bg-gray-100",
-                            )}
-                          >
-                            {formatTime(slot, use24Hour)}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : !loadingAvailability ? (
-                    <div className="flex items-center justify-center h-full text-gray-500">
-                      <div className="text-center">
-                        <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                        <p className="text-sm">No available times</p>
+                    {!loadingAvailability && timeSlots.length > 0 ? (
+                      <div className="space-y-2">
+                        {timeSlots.map((slot) => {
+                          const isSelected = value === slot;
+                          return (
+                            <button
+                              key={slot}
+                              type="button"
+                              onClick={() => handleTimeSelect(slot)}
+                              className={cn(
+                                "w-full text-left px-2.5 sm:px-3 py-2 text-xs sm:text-sm rounded-md transition-colors",
+                                isSelected
+                                  ? "bg-gray-900 text-white"
+                                  : "text-gray-700 hover:bg-gray-100",
+                              )}
+                            >
+                              {formatTime(slot, use24Hour)}
+                            </button>
+                          );
+                        })}
                       </div>
-                    </div>
-                  ) : null}
-                </div>
+                    ) : !loadingAvailability ? (
+                      <div className="flex items-center justify-center h-full text-gray-500">
+                        <div className="text-center">
+                          <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">No available times</p>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center mt-2">
+                    <p className="text-xs text-gray-500">
+                      Select a date to see available times.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

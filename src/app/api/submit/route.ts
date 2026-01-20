@@ -159,9 +159,25 @@ export async function POST(request: NextRequest) {
       } else {
         console.log("⚠️ Calendar not configured for this form.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("❌ Error creating calendar event:", error);
-      // Don't fail the submission if calendar creation fails
+
+      // If the selected slot is no longer available, surface a clear error
+      // so the user can pick a different time instead of silently failing.
+      if (error?.code === "TIME_SLOT_UNAVAILABLE") {
+        return NextResponse.json(
+          {
+            error: "Selected time slot is no longer available.",
+            message:
+              "Someone else just booked this time. Please go back and choose another available time.",
+            code: "TIME_SLOT_UNAVAILABLE",
+          },
+          { status: 409 },
+        );
+      }
+
+      // For other calendar issues, don't fail the submission itself
+      // (Sheets sync and notifications can still proceed).
     }
 
     // 2. Sync to Google Sheets

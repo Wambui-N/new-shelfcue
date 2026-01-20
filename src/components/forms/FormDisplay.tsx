@@ -211,7 +211,7 @@ export function FormDisplay({
           {backgroundImageUrl && (
             <>
               <div
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat h-full w-full"
                 style={{
                   backgroundImage: `url(${backgroundImageUrl})`,
                 }}

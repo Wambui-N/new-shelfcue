@@ -467,11 +467,21 @@ export async function POST(request: NextRequest) {
         usingDefaults: !meetingField?.meetingSettings,
       });
 
+      const formSettings = ((form as any).settings ?? {}) as Record<
+        string,
+        unknown
+      >;
+      const formTimezone =
+        (formSettings as any)?.timezone ||
+        (formSettings as any)?.time_zone ||
+        null;
+
       const meetingSettings = {
         enabled: true,
         calendarId: (form as any).default_calendar_id || null,
         duration: fieldDuration,
         bufferTime: fieldBufferTime,
+        timeZone: formTimezone,
         timeSlots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"], // Default slots
       };
 

@@ -11,14 +11,14 @@ export function DashboardSkeleton() {
         </div>
 
         {/* Trial Period Indicator Skeleton */}
-        <div className="mb-6 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 sm:p-6">
+        {/* <div className="mb-6 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 sm:p-6">
           <div className="flex items-center gap-3 mb-2">
             <Skeleton className="h-5 w-5 rounded bg-blue-600/20" />
             <Skeleton className="h-5 w-48 bg-blue-900/20 dark:bg-blue-100/20" />
           </div>
           <Skeleton className="h-4 w-64 mb-3 bg-blue-800/20 dark:bg-blue-200/20" />
           <Skeleton className="h-9 w-28 rounded-lg bg-blue-300/20 dark:bg-blue-700/20" />
-        </div>
+        </div> */}
 
         {/* Stats Cards Inside Banner */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

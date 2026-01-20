@@ -370,17 +370,25 @@ export async function createCalendarEventFromSubmission(
       return null;
     }
 
-    // Get meeting duration from field settings or form settings (default 60 minutes)
+    // Get meeting duration/buffer from field settings or form settings (default 60 minutes, 0 buffer)
     const duration =
       meetingField.meetingSettings?.duration ||
       (form.meeting_settings as any)?.duration ||
       60;
 
-    console.log("📅 [Calendar] Duration calculation:", {
+    const bufferTime =
+      meetingField.meetingSettings?.bufferTime ||
+      (form.meeting_settings as any)?.bufferTime ||
+      0;
+
+    console.log("📅 [Calendar] Duration & buffer calculation:", {
       fieldDuration: meetingField.meetingSettings?.duration,
       formSettingsDuration: (form.meeting_settings as any)?.duration,
       finalDuration: duration,
       meetingFieldSettings: meetingField.meetingSettings,
+      bufferFromField: meetingField.meetingSettings?.bufferTime,
+      bufferFromFormSettings: (form.meeting_settings as any)?.bufferTime,
+      finalBufferTime: bufferTime,
     });
 
     // Calculate end time
@@ -411,8 +419,51 @@ export async function createCalendarEventFromSubmission(
       Intl.DateTimeFormat().resolvedOptions().timeZone ||
       "UTC";
 
-    // Create the event
     const calendar = googleClient.getCalendar();
+
+    // Before creating the event, ensure the selected slot is still available
+    // by checking for any conflicting events (including buffer) via FreeBusy.
+    if (duration > 0) {
+      const checkStart = new Date(
+        startDate.getTime() - bufferTime * 60000,
+      ).toISOString();
+      const checkEnd = new Date(
+        endDate.getTime() + bufferTime * 60000,
+      ).toISOString();
+
+      console.log("📅 [Calendar] Verifying slot availability before booking:", {
+        calendarId: form.default_calendar_id,
+        checkStart,
+        checkEnd,
+        durationMinutes: duration,
+        bufferMinutes: bufferTime,
+      });
+
+      const freebusyResponse = await calendar.freebusy.query({
+        requestBody: {
+          timeMin: checkStart,
+          timeMax: checkEnd,
+          items: [{ id: form.default_calendar_id }],
+        },
+      });
+
+      const busy =
+        freebusyResponse.data.calendars?.[form.default_calendar_id]?.busy || [];
+
+      if (busy.length > 0) {
+        console.warn(
+          "⚠️ [Calendar] Selected time slot is no longer available",
+          { busy },
+        );
+        const error: any = new Error(
+          "Selected time slot is no longer available. Please pick another time.",
+        );
+        error.code = "TIME_SLOT_UNAVAILABLE";
+        throw error;
+      }
+    }
+
+    // Create the event
     const event: CalendarEvent = {
       summary: eventTitle,
       description: `Form submission for: ${form.title}`,
@@ -437,7 +488,10 @@ export async function createCalendarEventFromSubmission(
 
     let response: any;
     try {
-      console.log("📅 [Calendar] Attempting to create event in calendar:", form.default_calendar_id);
+      console.log(
+        "📅 [Calendar] Attempting to create event in calendar:",
+        form.default_calendar_id,
+      );
       response = await calendar.events.insert({
         calendarId: form.default_calendar_id,
         requestBody: event,
