@@ -103,6 +103,7 @@ export class GoogleCalendarService {
         startDate,
         endDate,
         duration,
+        bufferTime,
         startHour,
         endHour,
       );
@@ -155,6 +156,7 @@ export class GoogleCalendarService {
     startDate: Date,
     endDate: Date,
     duration: number,
+    bufferTime: number,
     startHour: number,
     endHour: number,
   ): string[] {
@@ -195,8 +197,10 @@ export class GoogleCalendarService {
         if (slotEnd.getHours() <= endHour) {
           slots.push(slotTime.toISOString());
         }
-        // Move to next slot (duration minutes ahead)
-        slotTime = new Date(slotTime.getTime() + duration * 60000);
+        // Move to next slot (duration + bufferTime minutes ahead)
+        slotTime = new Date(
+          slotTime.getTime() + (duration + bufferTime) * 60000,
+        );
       }
 
       // Move to next day
@@ -298,6 +302,24 @@ export class GoogleCalendarService {
   }
 }
 
+// Helper to consistently resolve meeting duration (in minutes)
+function getMeetingDuration(
+  meetingField: any | undefined,
+  form: any | undefined,
+  fallback: number = 60,
+): number {
+  const fieldDuration = meetingField?.meetingSettings?.duration;
+  const formDuration = form?.meeting_settings?.duration;
+
+  if (typeof fieldDuration === "number" && fieldDuration > 0) {
+    return fieldDuration;
+  }
+  if (typeof formDuration === "number" && formDuration > 0) {
+    return formDuration;
+  }
+  return fallback;
+}
+
 /**
  * Helper function to create calendar event from submission with meeting field
  */
@@ -370,15 +392,12 @@ export async function createCalendarEventFromSubmission(
       return null;
     }
 
-    // Get meeting duration/buffer from field settings or form settings (default 60 minutes, 0 buffer)
-    const duration =
-      meetingField.meetingSettings?.duration ||
-      (form.meeting_settings as any)?.duration ||
-      60;
+    // Get meeting duration/buffer from field settings or form settings
+    const duration = getMeetingDuration(meetingField, form, 60);
 
     const bufferTime =
-      meetingField.meetingSettings?.bufferTime ||
-      (form.meeting_settings as any)?.bufferTime ||
+      (meetingField.meetingSettings as any)?.bufferTime ??
+      (form.meeting_settings as any)?.bufferTime ??
       0;
 
     console.log("📅 [Calendar] Duration & buffer calculation:", {

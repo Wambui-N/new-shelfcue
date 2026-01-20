@@ -629,7 +629,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 size="sm"
                 className="bg-primary text-primary-foreground hover:bg-primary/80 text-xs sm:text-sm"
               >
-                {formData.status === "published" ? "Published" : "Publish"}
+                {formData.status === "published" ? "Update" : "Publish"}
               </Button>
             </div>
           </div>

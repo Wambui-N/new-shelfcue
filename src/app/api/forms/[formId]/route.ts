@@ -159,8 +159,34 @@ export async function PUT(
     };
     const safeFields = Array.isArray(body?.fields) ? body.fields : [];
 
+    // Normalize meeting fields to ensure meetingSettings are always complete
+    const normalizedFields = safeFields.map((field: any) => {
+      if (field.type === "meeting") {
+        const settings = field.meetingSettings || {};
+        const duration =
+          typeof settings.duration === "number" && settings.duration > 0
+            ? settings.duration
+            : 30; // Default to 30 minutes if missing/invalid
+        const bufferTime =
+          typeof settings.bufferTime === "number" && settings.bufferTime >= 0
+            ? settings.bufferTime
+            : 0;
+
+        return {
+          ...field,
+          meetingSettings: {
+            ...settings,
+            duration,
+            bufferTime,
+          },
+        };
+      }
+
+      return field;
+    });
+
     // Log meeting field settings for debugging
-    const meetingField = safeFields.find((f: any) => f.type === "meeting");
+    const meetingField = normalizedFields.find((f: any) => f.type === "meeting");
     if (meetingField) {
       console.log("💾 [Forms PUT] Saving meeting field with settings:", {
         fieldId: meetingField.id,
@@ -205,7 +231,7 @@ export async function PUT(
         title: body.title || "Untitled Form",
         header: body.header || body.title || "Untitled Form", // Use header if provided, else sync with title
         description: body.description || "",
-        fields: safeFields,
+        fields: normalizedFields,
         settings: safeSettings,
         theme: safeTheme,
         status: body.status || "draft",
