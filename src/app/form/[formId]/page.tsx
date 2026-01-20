@@ -118,7 +118,9 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
         // Set display settings
         const storedMode =
           (data.settings?.mode as FormDisplayMode | undefined) ?? undefined;
-        setDisplayMode(storedMode || (isInIframe ? "embed" : "standalone"));
+        // If we're in an iframe, always prefer embed mode so the layout
+        // is optimized for embedding, regardless of any stored mode.
+        setDisplayMode(isInIframe ? "embed" : storedMode || "standalone");
         setLayout(data.layout || "simple");
         setDisplayTheme(newDisplayTheme);
         
