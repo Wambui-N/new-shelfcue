@@ -165,6 +165,7 @@ export function FormContent({
                   formId={formId}
                   calendarId={calendarId}
                   userId={userId}
+                  isEmbedded={isEmbedded}
                 />
               </div>
             ))}

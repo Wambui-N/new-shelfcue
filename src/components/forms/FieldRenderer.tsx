@@ -14,6 +14,7 @@ interface FieldRendererProps {
   formId?: string;
   calendarId?: string;
   userId?: string;
+  isEmbedded?: boolean;
 }
 
 export function FieldRenderer({
@@ -25,19 +26,26 @@ export function FieldRenderer({
   formId,
   calendarId,
   userId,
+  isEmbedded = false,
 }: FieldRendererProps) {
   const baseClasses = cn(
-    "w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-300",
-    "min-h-[44px]", // Touch-friendly minimum height for inputs
+    "w-full rounded-lg border border-gray-300",
     "focus:outline-none focus:ring-2 focus:ring-[var(--shelf-primary)] focus:border-transparent",
     "transition-colors duration-200",
     "text-gray-900 placeholder-gray-500",
-    "text-sm sm:text-base", // Prevent zoom on iOS while keeping mobile size smaller
+    isEmbedded
+      ? "px-3 py-2 min-h-[38px] text-xs sm:text-sm"
+      : "px-3 py-2 sm:px-4 sm:py-3 min-h-[44px] text-sm sm:text-base",
   );
 
   const labelClasses = cn(
-    "block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2",
-    isConversational && "text-lg font-semibold text-gray-900",
+    "font-medium text-gray-700",
+    isEmbedded
+      ? "text-[11px] mb-1"
+      : "block text-xs sm:text-sm mb-1.5 sm:mb-2",
+    !isEmbedded &&
+      isConversational &&
+      "text-lg font-semibold text-gray-900",
   );
 
   const renderField = () => {
