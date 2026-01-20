@@ -36,7 +36,7 @@ export function FormSettings() {
   }, [formData.title, formData.header, updateForm]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-4">
       {/* Basic Settings */}
       <Card className="p-6">
         <h3 className="text-lg font-semibold text-foreground mb-4">
