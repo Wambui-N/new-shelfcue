@@ -155,10 +155,12 @@ export function FormDisplay({
 
   if (mode === "embed") {
     return (
-      <>
-        {formContent}
+      <div className="w-full flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden max-h-[600px]">
+          {formContent}
+        </div>
         {showWatermark && (
-          <div className="w-full text-center py-4">
+          <div className="w-full text-center py-4 border-t border-border bg-background">
             <div className="flex items-center justify-center gap-2">
               <img
                 src="/1.png"
@@ -179,7 +181,7 @@ export function FormDisplay({
             </div>
           </div>
         )}
-      </>
+      </div>
     );
   }
 
@@ -188,15 +190,17 @@ export function FormDisplay({
       <div
         className={cn(
           "flex flex-col overflow-x-hidden w-full",
-          deviceView === "desktop" && "md:flex-row",
+          deviceView === "desktop" && "md:flex-row min-h-screen",
         )}
       >
         {/* Left Section - Branding */}
         <div
           className={cn(
             "relative w-full flex flex-col justify-between flex-shrink-0 overflow-hidden",
-            deviceView === "desktop" ? "md:w-1/2 md:min-h-screen" : "w-full",
-            "h-[250px]", // Shorter on mobile (250px), full height on desktop
+            deviceView === "desktop"
+              ? "md:w-1/2 md:h-screen md:sticky md:top-0"
+              : "w-full h-[250px]",
+            deviceView === "desktop" ? "" : "h-[250px]",
             "p-4 md:p-12", // Reduced padding on mobile
           )}
           style={
