@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useFormStore } from "@/store/formStore";
-import { GoogleIntegrationPanel } from "./GoogleIntegrationPanel";
 
 export function FormSettings() {
   const { formData, updateForm } = useFormStore();
@@ -171,26 +170,6 @@ export function FormSettings() {
               rows={3}
             />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="redirect-url">Redirect URL (Optional)</Label>
-            <Input
-              id="redirect-url"
-              value={formData.settings.redirectUrl || ""}
-              onChange={(e) =>
-                updateForm({
-                  settings: {
-                    ...formData.settings,
-                    redirectUrl: e.target.value,
-                  },
-                })
-              }
-              placeholder="https://example.com/thank-you"
-            />
-            <p className="text-xs text-muted-foreground">
-              Users will be redirected to this URL after successful submission
-            </p>
-          </div>
         </div>
       </Card>
 
@@ -223,22 +202,6 @@ export function FormSettings() {
         </div>
       </Card>
 
-      {/* Google Integrations */}
-      {formData.id && (
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">
-            Google Integrations
-          </h3>
-          <GoogleIntegrationPanel
-            formId={formData.id}
-            formFields={formData.fields.map((f) => ({
-              id: f.id,
-              label: f.label,
-              type: f.type,
-            }))}
-          />
-        </div>
-      )}
     </div>
   );
 }

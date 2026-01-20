@@ -1,6 +1,6 @@
 "use client";
 
-import { Monitor, Palette, Sparkles } from "lucide-react";
+import { Palette, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -339,21 +339,16 @@ export function DisplayEditor() {
               onChange={(e) => handleThemeChange("fontFamily", e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-md bg-background"
             >
-              {availableFonts.map((font) => (
-                <option key={font.value} value={font.value}>
-                  {font.label} {font.value === "Satoshi" ? "(Default)" : ""}
-                </option>
-              ))}
+              {availableFonts
+                .filter((font) => font.value === "Satoshi")
+                .map((font) => (
+                  <option key={font.value} value={font.value}>
+                    {font.label} (Default)
+                  </option>
+                ))}
             </select>
             <p className="text-xs text-muted-foreground">
-              {availableFonts.find((f) => f.value === formData.theme.fontFamily)
-                ?.type === "google"
-                ? "✓ Loaded from Google Fonts"
-                : availableFonts.find(
-                      (f) => f.value === formData.theme.fontFamily,
-                    )?.type === "local"
-                  ? "✓ Custom font"
-                  : "✓ System font"}
+              Satoshi is the current default font. More fonts coming soon!
             </p>
           </div>
 
@@ -398,34 +393,7 @@ export function DisplayEditor() {
         </div>
       </Card>
 
-      {/* Display Mode */}
-      <Card className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Monitor className="w-5 h-5 text-primary" />
-          <h3 className="text-lg font-semibold text-foreground">
-            Display Mode
-          </h3>
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="standalone-mode">Standalone Mode</Label>
-              <p className="text-xs text-muted-foreground mt-1">
-                {formData.settings.mode === "standalone"
-                  ? "Full form with header (for links/QR codes)"
-                  : "Clean, minimal form (for embedding on a website)"}
-              </p>
-            </div>
-            <Switch
-              id="standalone-mode"
-              checked={formData.settings.mode === "standalone"}
-              onCheckedChange={(checked) =>
-                handleSettingsChange("mode", checked ? "standalone" : "embed")
-              }
-            />
-          </div>
-        </div>
-      </Card>
+      {/* Display Mode removed – mode now managed automatically */}
     </div>
   );
 }
