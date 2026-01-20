@@ -186,7 +186,7 @@ export function FormDisplay({
     <StandaloneForm theme={displayTheme}>
       <div
         className={cn(
-          "min-h-screen flex flex-col overflow-x-hidden w-full",
+          "flex flex-col overflow-x-hidden w-full",
           deviceView === "desktop" && "md:flex-row",
         )}
       >
