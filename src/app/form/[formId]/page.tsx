@@ -42,11 +42,13 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
   useEffect(() => {
     try {
       if (typeof window !== "undefined") {
-        setIsInIframe(window.self !== window.top);
+        const embedded = window.self !== window.top;
+        setIsInIframe(embedded);
       }
     } catch {
-      // Cross-origin access can throw; treat as not in iframe
-      setIsInIframe(false);
+      // Cross-origin access can throw; if we hit this, we *are* in an iframe
+      // on a different origin, so treat it as embedded.
+      setIsInIframe(true);
     }
   }, []);
 
