@@ -80,7 +80,7 @@ export function DisplayEditor() {
   ];
 
   return (
-    <div className="space-y-6 pb-4">
+    <div className="space-y-6 pb-12">
       {/* Branding & Colors */}
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-4">

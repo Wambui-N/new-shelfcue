@@ -108,7 +108,7 @@ export function FieldEditor() {
   };
 
   return (
-    <div className="space-y-6 pb-4">
+    <div className="space-y-6 pb-12">
       {/* Add Field Buttons */}
       <div className="grid grid-cols-3 gap-2">
         {fieldTypes.map((fieldType) => (
