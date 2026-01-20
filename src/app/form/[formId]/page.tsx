@@ -28,6 +28,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
   const [displayTheme, setDisplayTheme] = useState<FormTheme | null>(null);
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [calendarId, setCalendarId] = useState<string | undefined>(undefined);
+  const [isInIframe, setIsInIframe] = useState(false);
 
   useEffect(() => {
     const getFormId = async () => {
@@ -36,6 +37,18 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
     };
     getFormId();
   }, [params]);
+
+  // Detect if we're running inside an iframe (for auto-embed mode)
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined") {
+        setIsInIframe(window.self !== window.top);
+      }
+    } catch {
+      // Cross-origin access can throw; treat as not in iframe
+      setIsInIframe(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!formId) return;
@@ -101,7 +114,9 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
         } as FormData);
 
         // Set display settings
-        setDisplayMode(data.displayMode || "standalone");
+        const storedMode =
+          (data.settings?.mode as FormDisplayMode | undefined) ?? undefined;
+        setDisplayMode(storedMode || (isInIframe ? "embed" : "standalone"));
         setLayout(data.layout || "simple");
         setDisplayTheme(newDisplayTheme);
         
@@ -123,7 +138,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
     };
 
     fetchForm();
-  }, [formId]);
+  }, [formId, isInIframe]);
 
   const handleSubmit = async (submissionData: Record<string, any>) => {
     try {
