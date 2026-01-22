@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
     console.log("Using Supabase Admin Client:", !!supabaseAdmin);
 
     // Get form data with retry logic for database consistency and schema cache errors
+    const formFetchStartTime = Date.now();
     const formResult = await withSchemaCacheRetry<any>({
       label: "forms.get.for_publish",
       maxAttempts: 8,
