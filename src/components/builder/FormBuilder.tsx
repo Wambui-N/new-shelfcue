@@ -137,7 +137,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 Intl.DateTimeFormat().resolvedOptions().timeZone,
             },
             theme: formData.theme,
-            status: status || "draft",
+            status: status || formData.status || "draft",
           }),
         });
 
@@ -210,7 +210,8 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
       // Only save if data actually changed
       if (currentData !== lastSavedDataRef.current) {
-        handleSave();
+        // Preserve current status when autosaving
+        handleSave(formData.status as "draft" | "published" | undefined);
         lastSavedDataRef.current = currentData;
       }
     }, 2000);
@@ -352,14 +353,19 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     setSaving(true);
     setSaveStatus("saving");
 
+    const publishStartTime = Date.now();
     try {
       console.log("Publishing form:", formToPublish.id || "new form");
 
       // STEP 1: Saving form to database...
       setPublishProgress((prev) => ({ ...prev, saving: "loading" }));
+      const saveStartTime = Date.now();
 
       // Save as draft - publish API will set status to "published"
       const savedFormId = await handleSave();
+      
+      const saveEndTime = Date.now();
+      console.log(`⏱️ Step 1 (Save) took ${saveEndTime - saveStartTime}ms`);
 
       if (!savedFormId) {
         console.error("❌ Save failed - no form returned");
@@ -376,17 +382,27 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
       // STEP 2: Wait for database consistency
       console.log("Step 2: Waiting for database consistency...");
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Only wait if form was just created, otherwise shorter wait for existing forms
+      if (!formData.id) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } else {
+        // For existing forms, shorter wait
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
 
       // STEP 3: Create Google Sheet
       console.log("Step 3: Creating Google Sheet...");
       setPublishProgress((prev) => ({ ...prev, sheet: "loading" }));
+      const publishApiStartTime = Date.now();
 
       const publishResponse = await fetch("/api/forms/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ formId: savedFormId, userId: user.id }),
       });
+      
+      const publishApiEndTime = Date.now();
+      console.log(`⏱️ Step 3 (Publish API) took ${publishApiEndTime - publishApiStartTime}ms`);
 
       if (!publishResponse.ok) {
         const errorData = await publishResponse.json();
@@ -491,6 +507,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
       // Verify form is actually published
       console.log("🔍 Verifying form publish status...");
+      const verifyStartTime = Date.now();
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -501,6 +518,9 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       const verifyResponse = await fetch(`/api/forms/${savedFormId}`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
+      
+      const verifyEndTime = Date.now();
+      console.log(`⏱️ Verification took ${verifyEndTime - verifyStartTime}ms`);
 
       if (!verifyResponse.ok) {
         throw new Error("Failed to verify form status after publish.");
@@ -517,8 +537,21 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       console.log("✅ Form publish verified - status is published");
 
       setSaveStatus("saved");
-      setDirty(false);
+      setDirty(false); // Set dirty to false BEFORE updating status
+      
+      // Clear any pending autosave to prevent it from overwriting status
+      if (autosaveTimeoutRef.current) {
+        clearTimeout(autosaveTimeoutRef.current);
+        autosaveTimeoutRef.current = null;
+      }
+      
       updateForm({ status: "published" });
+      
+      // Update lastSavedDataRef to prevent autosave from triggering
+      lastSavedDataRef.current = JSON.stringify({ ...formData, status: "published" });
+
+      const publishEndTime = Date.now();
+      console.log(`⏱️ Total publish time: ${publishEndTime - publishStartTime}ms`);
 
       // Wait a moment to show all completed before redirecting
       await new Promise((resolve) => setTimeout(resolve, 1500));

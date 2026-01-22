@@ -45,6 +45,7 @@ async function withSchemaCacheRetry<T>(opts: {
 }
 
 export async function POST(request: NextRequest) {
+  const apiStartTime = Date.now();
   try {
     const { formId, userId } = await request.json();
 
@@ -135,9 +136,12 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("✓ Form found:", (form as any).title);
+    const formFetchEndTime = Date.now();
+    console.log(`⏱️ Form fetch took ${formFetchEndTime - formFetchStartTime}ms`);
 
     // Get Google client - REQUIRED for publishing
     console.log("🔍 Getting Google client for user:", userId);
+    const googleClientStartTime = Date.now();
     let googleClient: Awaited<ReturnType<typeof getGoogleClient>> | null = null;
     try {
       googleClient = await getGoogleClient(userId);
@@ -171,6 +175,8 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("✅ Google client obtained successfully");
+    const googleClientEndTime = Date.now();
+    console.log(`⏱️ Google client fetch took ${googleClientEndTime - googleClientStartTime}ms`);
 
     const sheetsService = new GoogleSheetsService(googleClient);
 
@@ -208,6 +214,7 @@ export async function POST(request: NextRequest) {
           : null;
 
     if (!(form as any).default_sheet_connection_id && !existingSpreadsheetId) {
+      const sheetCreationStartTime = Date.now();
       try {
         console.log("🔵 Creating Google Sheet for form submissions...");
         console.log("📊 Form fields:", (form as any).fields);
@@ -367,7 +374,9 @@ export async function POST(request: NextRequest) {
               url: newSheet.spreadsheetUrl,
               created: true,
             };
+            const sheetCreationEndTime = Date.now();
             console.log("✅ Google Sheet created:", newSheet.spreadsheetUrl);
+            console.log(`⏱️ Sheet creation took ${sheetCreationEndTime - sheetCreationStartTime}ms`);
           }
 
         } else {
@@ -535,6 +544,8 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("✓ Form status updated to published and verified");
+    const apiEndTime = Date.now();
+    console.log(`⏱️ Total publish API time: ${apiEndTime - apiStartTime}ms`);
 
     return NextResponse.json({
       success: true,
