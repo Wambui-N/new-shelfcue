@@ -31,6 +31,8 @@ export interface FormField {
     duration?: number; // minutes
     timeSlots?: string[]; // available time slots
     bufferTime?: number; // minutes between meetings
+    startHour?: number; // Start hour (0-23), default 9
+    endHour?: number; // End hour (0-23), default 17
   };
   // Country field specific
   countrySettings?: {

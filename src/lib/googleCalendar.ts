@@ -82,6 +82,8 @@ export class GoogleCalendarService {
         endDate: endDate.toISOString(),
         duration,
         bufferTime,
+        startHour,
+        endHour,
       });
 
       // Query FreeBusy API for existing events

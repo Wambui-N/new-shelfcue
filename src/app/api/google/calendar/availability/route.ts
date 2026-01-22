@@ -11,6 +11,8 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get("endDate");
     const duration = searchParams.get("duration");
     const bufferTime = searchParams.get("bufferTime");
+    const startHour = searchParams.get("startHour");
+    const endHour = searchParams.get("endHour");
 
     // Validate required parameters
     if (!userId) {
@@ -41,6 +43,8 @@ export async function GET(request: NextRequest) {
       endDate,
       duration,
       bufferTime,
+      startHour,
+      endHour,
     });
 
     // Get Google client
@@ -66,6 +70,8 @@ export async function GET(request: NextRequest) {
       new Date(endDate),
       duration ? parseInt(duration) : 60,
       bufferTime ? parseInt(bufferTime) : 0,
+      startHour ? parseInt(startHour) : 9,
+      endHour ? parseInt(endHour) : 17,
     );
 
     return NextResponse.json({ availableSlots });

@@ -178,6 +178,8 @@ export function FieldRenderer({
             formId={formId}
             calendarId={calendarId}
             userId={userId}
+            startHour={field.meetingSettings?.startHour ?? 9}
+            endHour={field.meetingSettings?.endHour ?? 17}
           />
         );
 

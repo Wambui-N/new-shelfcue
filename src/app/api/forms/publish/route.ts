@@ -440,10 +440,14 @@ export async function POST(request: NextRequest) {
       
       const fieldDuration = meetingField?.meetingSettings?.duration || 60;
       const fieldBufferTime = meetingField?.meetingSettings?.bufferTime || 0;
+      const fieldStartHour = meetingField?.meetingSettings?.startHour ?? 9;
+      const fieldEndHour = meetingField?.meetingSettings?.endHour ?? 17;
 
-      console.log("📅 Duration and buffer values:", {
+      console.log("📅 Duration, buffer, and time range values:", {
         fieldDuration,
         fieldBufferTime,
+        fieldStartHour,
+        fieldEndHour,
         usingDefaults: !meetingField?.meetingSettings,
       });
 
@@ -462,7 +466,8 @@ export async function POST(request: NextRequest) {
         duration: fieldDuration,
         bufferTime: fieldBufferTime,
         timeZone: formTimezone,
-        timeSlots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"], // Default slots
+        startHour: fieldStartHour,
+        endHour: fieldEndHour,
       };
 
       console.log("📅 Saving meeting settings:", meetingSettings);

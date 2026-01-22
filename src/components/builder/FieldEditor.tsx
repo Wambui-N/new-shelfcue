@@ -317,6 +317,105 @@ export function FieldEditor() {
                           </select>
                         </div>
 
+                        {/* Time Range */}
+                        <div className="space-y-3">
+                          <Label className="text-sm mb-2">
+                            Available Booking Hours
+                          </Label>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label className="text-xs text-muted-foreground mb-1">
+                                Start Time
+                              </Label>
+                              <select
+                                value={field.meetingSettings?.startHour ?? 9}
+                                onChange={(e) => {
+                                  const startHour = Number(e.target.value);
+                                  const endHour =
+                                    field.meetingSettings?.endHour ?? 17;
+                                  updateField(field.id, {
+                                    meetingSettings: {
+                                      ...field.meetingSettings,
+                                      startHour,
+                                      // Auto-adjust end hour if it's less than or equal to start hour
+                                      endHour:
+                                        endHour <= startHour
+                                          ? startHour + 1
+                                          : endHour,
+                                    },
+                                  });
+                                }}
+                                className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+                              >
+                                {Array.from({ length: 24 }, (_, i) => {
+                                  const hour = i;
+                                  const hour12 =
+                                    hour === 0
+                                      ? 12
+                                      : hour > 12
+                                        ? hour - 12
+                                        : hour;
+                                  const ampm = hour < 12 ? "AM" : "PM";
+                                  return (
+                                    <option key={hour} value={hour}>
+                                      {hour12}:00 {ampm} ({String(hour).padStart(2, "0")}:00)
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                            </div>
+                            <div>
+                              <Label className="text-xs text-muted-foreground mb-1">
+                                End Time
+                              </Label>
+                              <select
+                                value={field.meetingSettings?.endHour ?? 17}
+                                onChange={(e) => {
+                                  const endHour = Number(e.target.value);
+                                  const startHour =
+                                    field.meetingSettings?.startHour ?? 9;
+                                  updateField(field.id, {
+                                    meetingSettings: {
+                                      ...field.meetingSettings,
+                                      endHour,
+                                      // Auto-adjust start hour if it's greater than or equal to end hour
+                                      startHour:
+                                        startHour >= endHour
+                                          ? endHour - 1
+                                          : startHour,
+                                    },
+                                  });
+                                }}
+                                className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+                              >
+                                {Array.from({ length: 24 }, (_, i) => {
+                                  const hour = i;
+                                  const hour12 =
+                                    hour === 0
+                                      ? 12
+                                      : hour > 12
+                                        ? hour - 12
+                                        : hour;
+                                  const ampm = hour < 12 ? "AM" : "PM";
+                                  return (
+                                    <option key={hour} value={hour}>
+                                      {hour12}:00 {ampm} ({String(hour).padStart(2, "0")}:00)
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                            </div>
+                          </div>
+                          {field.meetingSettings?.startHour !== undefined &&
+                            field.meetingSettings?.endHour !== undefined &&
+                            field.meetingSettings.endHour <=
+                              field.meetingSettings.startHour && (
+                              <p className="text-xs text-destructive">
+                                End time must be after start time
+                              </p>
+                            )}
+                        </div>
+
                         {/* Calendar Selection - Will be populated during publish */}
                         <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
                           <p className="text-xs text-blue-600 dark:text-blue-400">

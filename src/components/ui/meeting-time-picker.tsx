@@ -18,6 +18,8 @@ interface MeetingTimePickerProps {
   formId?: string; // Form ID to fetch owner's calendar
   calendarId?: string; // Calendar to check availability
   userId?: string; // User ID for fetching calendar data
+  startHour?: number; // Start hour (0-23), default 9
+  endHour?: number; // End hour (0-23), default 17
 }
 
 // Generate time slots for a given date
@@ -130,6 +132,8 @@ export function MeetingTimePicker({
   formId,
   calendarId,
   userId,
+  startHour = 9,
+  endHour = 17,
 }: MeetingTimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -186,6 +190,8 @@ export function MeetingTimePicker({
             endDate: endDate.toISOString(),
             duration: duration.toString(),
             bufferTime: bufferTime.toString(),
+            startHour: startHour.toString(),
+            endHour: endHour.toString(),
           });
 
           const response = await fetch(
@@ -212,7 +218,7 @@ export function MeetingTimePicker({
 
       fetchAvailability();
     }
-  }, [userId, calendarId, selectedDate, duration, bufferTime]);
+  }, [userId, calendarId, selectedDate, duration, bufferTime, startHour, endHour]);
 
   // Generate available time slots for selected date
   const timeSlots = useMemo(() => {
@@ -226,8 +232,8 @@ export function MeetingTimePicker({
     }
 
     // Otherwise, generate theoretical slots
-    return generateTimeSlots(selectedDate, duration, bufferTime);
-  }, [selectedDate, duration, bufferTime, realAvailableSlots]);
+    return generateTimeSlots(selectedDate, duration, bufferTime, startHour, endHour);
+  }, [selectedDate, duration, bufferTime, startHour, endHour, realAvailableSlots]);
 
   // Calendar data
   const calendarDays = useMemo(() => {
