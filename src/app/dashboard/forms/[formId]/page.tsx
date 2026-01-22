@@ -51,6 +51,8 @@ function FormViewPage({ params }: FormViewPageProps) {
   useEffect(() => {
     if (!formId || !user) return;
 
+    let cancelled = false; // Add cancellation flag
+
     const fetchForm = async () => {
       setLoading(true);
       try {
@@ -59,6 +61,8 @@ function FormViewPage({ params }: FormViewPageProps) {
           .select("*")
           .eq("id", formId)
           .maybeSingle();
+
+        if (cancelled) return; // Check if cancelled
 
         if (error) {
           console.error("Supabase error:", error);
@@ -96,6 +100,8 @@ function FormViewPage({ params }: FormViewPageProps) {
           showWatermark: true,
         };
 
+        if (cancelled) return; // Check if cancelled before state updates
+
         setFormData({
           id: formId,
           title: data.title || "Untitled Form",
@@ -119,6 +125,7 @@ function FormViewPage({ params }: FormViewPageProps) {
             : defaultSettings,
         });
       } catch (error: any) {
+        if (cancelled) return; // Check if cancelled
         console.error("Error fetching form:", {
           message: error?.message,
           code: error?.code,
@@ -127,12 +134,18 @@ function FormViewPage({ params }: FormViewPageProps) {
         });
         setError("Form not found or an error occurred.");
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchForm();
-  }, [formId, user, supabase, loadForm]);
+
+    return () => {
+      cancelled = true; // Cleanup: mark as cancelled
+    };
+  }, [formId, user]); // Remove supabase and loadForm from dependencies
 
   const _handleSubmit = async (submissionData: Record<string, any>) => {
     try {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar, Clock, Loader2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,7 +28,7 @@ interface GoogleCalendar {
   primary?: boolean;
 }
 
-export function MeetingConfigDialog({
+export const MeetingConfigDialog = memo(function MeetingConfigDialog({
   open,
   onOpenChange,
   onConfirm,
@@ -137,8 +137,6 @@ export function MeetingConfigDialog({
       console.log("⚠️ No calendar selected");
     }
   };
-
-  console.log("📅 MeetingConfigDialog render - open:", open, "userId:", userId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -267,4 +265,4 @@ export function MeetingConfigDialog({
       </DialogContent>
     </Dialog>
   );
-}
+});
