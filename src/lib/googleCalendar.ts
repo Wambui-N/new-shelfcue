@@ -506,6 +506,8 @@ export async function createCalendarEventFromSubmission(
     });
 
     let response: any;
+    let eventCreated = false;
+
     try {
       console.log(
         "📅 [Calendar] Attempting to create event in calendar:",
@@ -515,31 +517,43 @@ export async function createCalendarEventFromSubmission(
         calendarId: form.default_calendar_id,
         requestBody: event,
       });
+      eventCreated = true;
       console.log("✅ [Calendar] Event created successfully in calendar:", form.default_calendar_id);
     } catch (error: any) {
       const status = error?.response?.status;
+      const errorCode = error?.response?.data?.error?.code;
       const isPermissionOrNotFound = status === 403 || status === 404;
       const currentCalendarId = form.default_calendar_id;
 
-      console.error("❌ [Calendar] Primary insert failed:", {
+      console.error("❌ [Calendar] Event insert failed:", {
         status,
+        errorCode,
         calendarId: currentCalendarId,
         message: error?.message,
         data: error?.response?.data,
+        eventCreated,
       });
 
-      // Fallback: try primary calendar if selected calendar is invalid/unavailable.
-      if (isPermissionOrNotFound && currentCalendarId !== "primary") {
+      // Only fallback to primary if:
+      // 1. The first insert actually failed (not if it succeeded but threw a different error)
+      // 2. It's a permission/not found error (403/404)
+      // 3. The selected calendar is not already "primary"
+      // 4. We haven't already created an event
+      if (!eventCreated && isPermissionOrNotFound && currentCalendarId !== "primary") {
         console.warn(
           "⚠️ [Calendar] Retrying event insert using primary calendar (fallback)...",
         );
 
-        response = await calendar.events.insert({
-          calendarId: "primary",
-          requestBody: event,
-        });
-
-        console.log("✅ [Calendar] Event created in primary calendar as fallback");
+        try {
+          response = await calendar.events.insert({
+            calendarId: "primary",
+            requestBody: event,
+          });
+          console.log("✅ [Calendar] Event created in primary calendar as fallback");
+        } catch (fallbackError: any) {
+          console.error("❌ [Calendar] Fallback to primary also failed:", fallbackError);
+          throw fallbackError; // Re-throw if fallback also fails
+        }
 
         // Best-effort: update form to use primary calendar going forward.
         try {
@@ -554,6 +568,13 @@ export async function createCalendarEventFromSubmission(
           );
         }
       } else {
+        // If event was created but there's still an error, log it but don't create duplicate
+        if (eventCreated) {
+          console.warn(
+            "⚠️ [Calendar] Event was created but an error occurred afterward. Not creating duplicate.",
+          );
+        }
+        // Re-throw the error if we're not handling it
         throw error;
       }
     }

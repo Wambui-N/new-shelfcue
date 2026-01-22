@@ -75,41 +75,21 @@ export async function POST(request: NextRequest) {
     console.log("Publishing form:", { formId, userId });
     console.log("Using Supabase Admin Client:", !!supabaseAdmin);
 
-    // Get form data with retry logic for database consistency
-    let form = null;
-    let formError = null;
-    let retries = 5; // Try 5 times
+    // Get form data with retry logic for database consistency and schema cache errors
+    const formResult = await withSchemaCacheRetry<any>({
+      label: "forms.get.for_publish",
+      maxAttempts: 8,
+      fn: async () =>
+        (supabaseAdmin as any)
+          .from("forms")
+          .select("*")
+          .eq("id", formId)
+          .eq("user_id", userId)
+          .maybeSingle(),
+    });
 
-    while (retries > 0 && !form) {
-      const result = await (supabaseAdmin as any)
-        .from("forms")
-        .select("*")
-        .eq("id", formId)
-        .eq("user_id", userId)
-        .maybeSingle();
-
-      form = result.data;
-      formError = result.error;
-
-      if (form) {
-        console.log("✓ Form found in database");
-        break;
-      }
-
-      if (formError && formError.code !== "PGRST116") {
-        // If it's not a "not found" error, break immediately
-        break;
-      }
-
-      // Wait before retry
-      retries--;
-      if (retries > 0) {
-        console.log(
-          `Form not found yet, retrying... (${retries} attempts left)`,
-        );
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
-    }
+    const form = formResult.data;
+    const formError = formResult.error;
 
     if (formError) {
       console.error("Database error finding form:", {
@@ -266,7 +246,7 @@ export async function POST(request: NextRequest) {
 
           const settingsUpdateResult = await withSchemaCacheRetry<any>({
             label: "forms.update.settings.google.sheet",
-            maxAttempts: 6,
+            maxAttempts: 8,
             fn: async () =>
               (supabaseAdmin as any)
                 .from("forms")
@@ -361,7 +341,7 @@ export async function POST(request: NextRequest) {
             console.log("📝 Updating form with sheet connection ID...");
             const formUpdateResult = await withSchemaCacheRetry<any>({
               label: "forms.update.default_sheet_connection_id",
-              maxAttempts: 6,
+              maxAttempts: 8,
               fn: async () =>
                 (supabaseAdmin as any)
                   .from("forms")
@@ -489,13 +469,12 @@ export async function POST(request: NextRequest) {
 
       const meetingUpdateResult = await withSchemaCacheRetry<any>({
         label: "forms.update.meeting_settings",
-        maxAttempts: 6,
+        maxAttempts: 8,
         fn: async () =>
           (supabaseAdmin as any)
             .from("forms")
             .update({
               meeting_settings: meetingSettings,
-              status: "published",
             })
             .eq("id", formId)
             .select("id")
@@ -519,31 +498,38 @@ export async function POST(request: NextRequest) {
       console.log("✓ Meeting booking enabled");
     }
 
-    // 4. Update form status to published
-    if (!hasMeetingField) {
-      const statusUpdateResult = await withSchemaCacheRetry<any>({
-        label: "forms.update.status",
-        maxAttempts: 6,
-        fn: async () =>
-          (supabaseAdmin as any)
-            .from("forms")
-            .update({ status: "published" })
-            .eq("id", formId)
-            .select("id")
-            .maybeSingle(),
-      });
+    // 4. Always update form status to published at the end (unified for all forms)
+    console.log("📝 Updating form status to published...");
+    const statusUpdateResult = await withSchemaCacheRetry<any>({
+      label: "forms.update.status.published",
+      maxAttempts: 8,
+      fn: async () =>
+        (supabaseAdmin as any)
+          .from("forms")
+          .update({ status: "published" })
+          .eq("id", formId)
+          .select("id, status")
+          .maybeSingle(),
+    });
 
-      const statusUpdateError = statusUpdateResult.error;
-
-      if (statusUpdateError) {
-        console.error("❌ Failed to update form status:", statusUpdateError);
-        throw new Error(
-          `Failed to update form status: ${statusUpdateError.message}`,
-        );
-      }
+    if (statusUpdateResult.error || !statusUpdateResult.data) {
+      const errorMsg = statusUpdateResult.error?.message || "Unknown error";
+      console.error("❌ Failed to update form status:", statusUpdateResult.error);
+      throw new Error(`Failed to update form status: ${errorMsg}`);
     }
 
-    console.log("✓ Form status updated to published");
+    // Verify status was actually updated
+    if (statusUpdateResult.data.status !== "published") {
+      console.error(
+        "❌ Form status verification failed:",
+        statusUpdateResult.data.status,
+      );
+      throw new Error(
+        "Form status verification failed after update. The form may not be fully published.",
+      );
+    }
+
+    console.log("✓ Form status updated to published and verified");
 
     return NextResponse.json({
       success: true,

@@ -358,7 +358,8 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       // STEP 1: Saving form to database...
       setPublishProgress((prev) => ({ ...prev, saving: "loading" }));
 
-      const savedFormId = await handleSave("published");
+      // Save as draft - publish API will set status to "published"
+      const savedFormId = await handleSave();
 
       if (!savedFormId) {
         console.error("❌ Save failed - no form returned");
@@ -487,6 +488,33 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       if (hasMeetingFields) {
         setPublishProgress((prev) => ({ ...prev, meeting: "completed" }));
       }
+
+      // Verify form is actually published
+      console.log("🔍 Verifying form publish status...");
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error("Session expired. Please refresh and try again.");
+      }
+
+      const verifyResponse = await fetch(`/api/forms/${savedFormId}`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (!verifyResponse.ok) {
+        throw new Error("Failed to verify form status after publish.");
+      }
+
+      const verifiedForm = await verifyResponse.json();
+      if (verifiedForm.status !== "published") {
+        console.error("❌ Form status verification failed:", verifiedForm.status);
+        throw new Error(
+          "Form publish verification failed. The form may not be fully published. Please try again.",
+        );
+      }
+
+      console.log("✅ Form publish verified - status is published");
 
       setSaveStatus("saved");
       setDirty(false);
