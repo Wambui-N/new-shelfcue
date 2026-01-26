@@ -15,6 +15,7 @@ interface FieldRendererProps {
   calendarId?: string;
   userId?: string;
   isEmbedded?: boolean;
+  timeZone?: string;
 }
 
 export function FieldRenderer({
@@ -180,6 +181,7 @@ export function FieldRenderer({
             userId={userId}
             startHour={field.meetingSettings?.startHour ?? 9}
             endHour={field.meetingSettings?.endHour ?? 17}
+            timeZone={timeZone}
           />
         );
 

@@ -20,6 +20,7 @@ interface MeetingTimePickerProps {
   userId?: string; // User ID for fetching calendar data
   startHour?: number; // Start hour (0-23), default 9
   endHour?: number; // End hour (0-23), default 17
+  timeZone?: string; // Timezone for slot generation (e.g., "America/New_York")
 }
 
 // Generate time slots for a given date
@@ -193,6 +194,11 @@ export function MeetingTimePicker({
             startHour: startHour.toString(),
             endHour: endHour.toString(),
           });
+          
+          // Add timezone if provided
+          if (timeZone) {
+            params.append("timeZone", timeZone);
+          }
 
           const response = await fetch(
             `/api/google/calendar/availability?${params}`,
@@ -218,7 +224,7 @@ export function MeetingTimePicker({
 
       fetchAvailability();
     }
-  }, [userId, calendarId, selectedDate, duration, bufferTime, startHour, endHour]);
+  }, [userId, calendarId, selectedDate, duration, bufferTime, startHour, endHour, timeZone]);
 
   // Generate available time slots for selected date
   const timeSlots = useMemo(() => {

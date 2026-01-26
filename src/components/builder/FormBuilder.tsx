@@ -382,12 +382,12 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
       // STEP 2: Wait for database consistency
       console.log("Step 2: Waiting for database consistency...");
-      // Only wait if form was just created, otherwise shorter wait for existing forms
+      // Optimized: Reduced wait times - rely on retry logic instead
       if (!formData.id) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 300));
       } else {
-        // For existing forms, shorter wait
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // For existing forms, minimal wait
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
 
       // STEP 3: Create Google Sheet
@@ -505,36 +505,43 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         setPublishProgress((prev) => ({ ...prev, meeting: "completed" }));
       }
 
-      // Verify form is actually published
+      // Verify form is actually published (optimized: only verify if publish result doesn't confirm)
       console.log("🔍 Verifying form publish status...");
       const verifyStartTime = Date.now();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        throw new Error("Session expired. Please refresh and try again.");
-      }
-
-      const verifyResponse = await fetch(`/api/forms/${savedFormId}`, {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
       
-      const verifyEndTime = Date.now();
-      console.log(`⏱️ Verification took ${verifyEndTime - verifyStartTime}ms`);
+      // Trust the publish API response first - only verify if needed
+      if (publishResult.success && publishResult.results?.status === "published") {
+        console.log("✅ Form publish confirmed by API response");
+      } else {
+        // Only verify if API response doesn't confirm status
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          throw new Error("Session expired. Please refresh and try again.");
+        }
 
-      if (!verifyResponse.ok) {
-        throw new Error("Failed to verify form status after publish.");
+        const verifyResponse = await fetch(`/api/forms/${savedFormId}`, {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        
+        const verifyEndTime = Date.now();
+        console.log(`⏱️ Verification took ${verifyEndTime - verifyStartTime}ms`);
+
+        if (!verifyResponse.ok) {
+          throw new Error("Failed to verify form status after publish.");
+        }
+
+        const verifiedForm = await verifyResponse.json();
+        if (verifiedForm.status !== "published") {
+          console.error("❌ Form status verification failed:", verifiedForm.status);
+          throw new Error(
+            "Form publish verification failed. The form may not be fully published. Please try again.",
+          );
+        }
+
+        console.log("✅ Form publish verified - status is published");
       }
-
-      const verifiedForm = await verifyResponse.json();
-      if (verifiedForm.status !== "published") {
-        console.error("❌ Form status verification failed:", verifiedForm.status);
-        throw new Error(
-          "Form publish verification failed. The form may not be fully published. Please try again.",
-        );
-      }
-
-      console.log("✅ Form publish verified - status is published");
 
       setSaveStatus("saved");
       setDirty(false); // Set dirty to false BEFORE updating status

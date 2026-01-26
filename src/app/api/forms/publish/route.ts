@@ -34,7 +34,9 @@ async function withSchemaCacheRetry<T>(opts: {
       return { data: null, error: lastError };
     }
 
-    const delayMs = Math.min(2000 * attempt, 12000);
+    // Optimized: Use shorter delays and fewer attempts for better performance
+    // Reduced from 2000 * attempt to 1000 * attempt, max from 12000 to 6000
+    const delayMs = Math.min(1000 * attempt, 6000);
     console.log(
       `⚠️ [${opts.label}] Schema cache issue (attempt ${attempt}/${opts.maxAttempts}). Waiting ${delayMs}ms then retrying...`,
     );
@@ -80,7 +82,7 @@ export async function POST(request: NextRequest) {
     const formFetchStartTime = Date.now();
     const formResult = await withSchemaCacheRetry<any>({
       label: "forms.get.for_publish",
-      maxAttempts: 8,
+      maxAttempts: 5,
       fn: async () =>
         (supabaseAdmin as any)
           .from("forms")
@@ -254,7 +256,7 @@ export async function POST(request: NextRequest) {
 
           const settingsUpdateResult = await withSchemaCacheRetry<any>({
             label: "forms.update.settings.google.sheet",
-            maxAttempts: 8,
+            maxAttempts: 5,
             fn: async () =>
               (supabaseAdmin as any)
                 .from("forms")
@@ -283,7 +285,7 @@ export async function POST(request: NextRequest) {
           // Try inserting with retry logic in case of schema cache issues
           const insertResult = await withSchemaCacheRetry<any>({
             label: "sheet_connections.insert",
-            maxAttempts: 8,
+            maxAttempts: 5,
             fn: async () =>
               (supabaseAdmin as any)
                 .from("sheet_connections")
@@ -349,7 +351,7 @@ export async function POST(request: NextRequest) {
             console.log("📝 Updating form with sheet connection ID...");
             const formUpdateResult = await withSchemaCacheRetry<any>({
               label: "forms.update.default_sheet_connection_id",
-              maxAttempts: 8,
+              maxAttempts: 5,
               fn: async () =>
                 (supabaseAdmin as any)
                   .from("forms")
@@ -484,7 +486,7 @@ export async function POST(request: NextRequest) {
 
       const meetingUpdateResult = await withSchemaCacheRetry<any>({
         label: "forms.update.meeting_settings",
-        maxAttempts: 8,
+        maxAttempts: 5,
         fn: async () =>
           (supabaseAdmin as any)
             .from("forms")
@@ -517,7 +519,7 @@ export async function POST(request: NextRequest) {
     console.log("📝 Updating form status to published...");
     const statusUpdateResult = await withSchemaCacheRetry<any>({
       label: "forms.update.status.published",
-      maxAttempts: 8,
+      maxAttempts: 5,
       fn: async () =>
         (supabaseAdmin as any)
           .from("forms")

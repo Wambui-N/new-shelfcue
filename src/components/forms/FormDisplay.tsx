@@ -152,6 +152,7 @@ export function FormDisplay({
       calendarId={calendarId}
       userId={userId}
       isEmbedded={isEmbedded}
+      timeZone={settings.timezone}
     />
   );
 

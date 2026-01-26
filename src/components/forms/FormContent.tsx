@@ -28,6 +28,7 @@ interface FormContentProps {
   calendarId?: string;
   userId?: string;
   isEmbedded?: boolean;
+  timeZone?: string;
 }
 
 export function FormContent({
@@ -47,6 +48,7 @@ export function FormContent({
   calendarId,
   userId,
   isEmbedded = false,
+  timeZone,
 }: FormContentProps) {
   const layoutConfig = layoutPresets[layout];
   const isConversational = layout === "conversational";
@@ -166,6 +168,7 @@ export function FormContent({
                   calendarId={calendarId}
                   userId={userId}
                   isEmbedded={isEmbedded}
+                  timeZone={timeZone}
                 />
               </div>
             ))}

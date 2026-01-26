@@ -72,6 +72,7 @@ export class GoogleCalendarService {
     bufferTime: number = 0,
     startHour: number = 9,
     endHour: number = 17,
+    timeZone?: string,
   ): Promise<string[]> {
     try {
       const calendar = this.client.getCalendar();
@@ -108,6 +109,7 @@ export class GoogleCalendarService {
         bufferTime,
         startHour,
         endHour,
+        timeZone,
       );
 
       console.log("📅 Generated candidate slots:", candidateSlots.length);
@@ -153,6 +155,7 @@ export class GoogleCalendarService {
 
   /**
    * Generate candidate time slots for a given date range
+   * Uses timezone-aware date manipulation to ensure hours are in the correct timezone
    */
   private generateCandidateSlots(
     startDate: Date,
@@ -161,10 +164,76 @@ export class GoogleCalendarService {
     bufferTime: number,
     startHour: number,
     endHour: number,
+    timeZone?: string,
   ): string[] {
     const slots: string[] = [];
     const currentDate = new Date(startDate);
     const now = new Date();
+    
+    // Use provided timezone or fallback to UTC
+    const tz = timeZone || "UTC";
+
+    // Helper function to create a UTC date that represents a specific hour in the target timezone
+    const createDateInTimezone = (year: number, month: number, day: number, hour: number, minute: number): Date => {
+      // Start with midnight UTC for this date
+      const baseDate = new Date(Date.UTC(year, month, day, 0, 0, 0));
+      
+      // Find the UTC hour that, when displayed in target timezone, shows the desired hour
+      // We'll search through UTC hours to find the right one
+      for (let utcHour = 0; utcHour < 24; utcHour++) {
+        const testDate = new Date(Date.UTC(year, month, day, utcHour, minute, 0));
+        const hourInTz = parseInt(new Intl.DateTimeFormat('en-US', {
+          timeZone: tz,
+          hour: '2-digit',
+          hour12: false,
+        }).format(testDate));
+        
+        if (hourInTz === hour) {
+          // Also verify the date components match (handle day rollover)
+          const dateParts = new Intl.DateTimeFormat('en-US', {
+            timeZone: tz,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }).formatToParts(testDate);
+          
+          const tzYear = parseInt(dateParts.find(p => p.type === 'year')!.value);
+          const tzMonth = parseInt(dateParts.find(p => p.type === 'month')!.value) - 1;
+          const tzDay = parseInt(dateParts.find(p => p.type === 'day')!.value);
+          
+          if (tzYear === year && tzMonth === month && tzDay === day) {
+            return testDate;
+          }
+        }
+      }
+      
+      // Fallback: try with day adjustments for edge cases
+      for (let dayOffset = -1; dayOffset <= 1; dayOffset++) {
+        const adjustedDate = new Date(Date.UTC(year, month, day + dayOffset, 12, 0, 0));
+        const dateParts = new Intl.DateTimeFormat('en-US', {
+          timeZone: tz,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          hour12: false,
+        }).formatToParts(adjustedDate);
+        
+        const tzYear = parseInt(dateParts.find(p => p.type === 'year')!.value);
+        const tzMonth = parseInt(dateParts.find(p => p.type === 'month')!.value) - 1;
+        const tzDay = parseInt(dateParts.find(p => p.type === 'day')!.value);
+        const tzHour = parseInt(dateParts.find(p => p.type === 'hour')!.value);
+        
+        if (tzYear === year && tzMonth === month && tzDay === day && tzHour === hour) {
+          // Calculate the correct UTC time
+          const offset = adjustedDate.getTime() - new Date(Date.UTC(tzYear, tzMonth, tzDay, hour, minute, 0)).getTime();
+          return new Date(adjustedDate.getTime() - offset);
+        }
+      }
+      
+      // Final fallback: use local timezone (shouldn't happen)
+      return new Date(year, month, day, hour, minute);
+    };
 
     // Iterate through each day in the range
     while (currentDate <= endDate) {
@@ -174,17 +243,59 @@ export class GoogleCalendarService {
         continue;
       }
 
-      // Set to start hour
-      const dayStart = new Date(currentDate);
-      dayStart.setHours(startHour, 0, 0, 0);
+      // Get date components in target timezone
+      const dateInTz = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).formatToParts(currentDate);
+      
+      const year = parseInt(dateInTz.find(p => p.type === 'year')!.value);
+      const month = parseInt(dateInTz.find(p => p.type === 'month')!.value) - 1;
+      const day = parseInt(dateInTz.find(p => p.type === 'day')!.value);
+
+      // Create start of day in target timezone
+      const dayStart = createDateInTimezone(year, month, day, startHour, 0);
 
       // If it's today, start from next available slot
       let slotTime = new Date(dayStart);
-      if (dayStart.toDateString() === now.toDateString()) {
-        const nextSlot = new Date(now);
-        nextSlot.setMinutes(Math.ceil(now.getMinutes() / duration) * duration, 0, 0);
-        if (nextSlot.getHours() >= startHour && nextSlot.getHours() < endHour) {
-          slotTime = nextSlot;
+      
+      // Check if this is today in the target timezone
+      const todayInTz = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(now);
+      const slotDayStr = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(dayStart);
+      
+      if (todayInTz === slotDayStr) {
+        // Get current time in target timezone
+        const nowInTz = new Intl.DateTimeFormat('en-US', {
+          timeZone: tz,
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        }).format(now);
+        const [nowHour, nowMinute] = nowInTz.split(':').map(Number);
+        
+        // Calculate next slot
+        const nextMinute = Math.ceil(nowMinute / duration) * duration;
+        let nextHour = nowHour;
+        let finalMinute = nextMinute;
+        if (nextMinute >= 60) {
+          nextHour = nowHour + 1;
+          finalMinute = 0;
+        }
+        
+        if (nextHour >= startHour && nextHour < endHour) {
+          slotTime = createDateInTimezone(year, month, day, nextHour, finalMinute);
         } else {
           // Move to next day if no slots available today
           currentDate.setDate(currentDate.getDate() + 1);
@@ -193,15 +304,32 @@ export class GoogleCalendarService {
       }
 
       // Generate slots for this day
-      while (slotTime.getHours() < endHour) {
+      let currentSlotTime = new Date(slotTime);
+      while (true) {
+        // Get hour in target timezone
+        const slotHourInTz = parseInt(new Intl.DateTimeFormat('en-US', {
+          timeZone: tz,
+          hour: '2-digit',
+          hour12: false,
+        }).format(currentSlotTime));
+        
+        if (slotHourInTz >= endHour) break;
+        
         // Make sure the entire meeting fits within working hours
-        const slotEnd = new Date(slotTime.getTime() + duration * 60000);
-        if (slotEnd.getHours() <= endHour) {
-          slots.push(slotTime.toISOString());
+        const slotEnd = new Date(currentSlotTime.getTime() + duration * 60000);
+        const slotEndHourInTz = parseInt(new Intl.DateTimeFormat('en-US', {
+          timeZone: tz,
+          hour: '2-digit',
+          hour12: false,
+        }).format(slotEnd));
+        
+        if (slotEndHourInTz <= endHour) {
+          slots.push(currentSlotTime.toISOString());
         }
+        
         // Move to next slot (duration + bufferTime minutes ahead)
-        slotTime = new Date(
-          slotTime.getTime() + (duration + bufferTime) * 60000,
+        currentSlotTime = new Date(
+          currentSlotTime.getTime() + (duration + bufferTime) * 60000,
         );
       }
 

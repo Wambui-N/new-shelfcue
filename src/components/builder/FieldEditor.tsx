@@ -254,18 +254,6 @@ export function FieldEditor() {
                       />
                     ) : field.type === "meeting" ? (
                       <div className="space-y-4">
-                        <Input
-                          placeholder={
-                            field.placeholder || "Select meeting time..."
-                          }
-                          onChange={(e) =>
-                            updateField(field.id, {
-                              placeholder: e.target.value,
-                            })
-                          }
-                          className="text-sm"
-                        />
-
                         {/* Meeting Duration */}
                         <div>
                           <Label className="text-sm mb-2">

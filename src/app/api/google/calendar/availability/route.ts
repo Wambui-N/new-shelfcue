@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     const bufferTime = searchParams.get("bufferTime");
     const startHour = searchParams.get("startHour");
     const endHour = searchParams.get("endHour");
+    const timeZone = searchParams.get("timeZone");
 
     // Validate required parameters
     if (!userId) {
@@ -45,6 +46,7 @@ export async function GET(request: NextRequest) {
       bufferTime,
       startHour,
       endHour,
+      timeZone,
     });
 
     // Get Google client
@@ -72,6 +74,7 @@ export async function GET(request: NextRequest) {
       bufferTime ? parseInt(bufferTime) : 0,
       startHour ? parseInt(startHour) : 9,
       endHour ? parseInt(endHour) : 17,
+      timeZone || undefined,
     );
 
     return NextResponse.json({ availableSlots });
