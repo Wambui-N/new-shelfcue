@@ -16,49 +16,48 @@ export class GoogleSheetsService {
       console.log("📝 Sheet title:", title);
       console.log("📊 Headers:", headers);
 
-      const sheets = this.client.getSheets();
-      console.log("✅ Google Sheets API client initialized");
+      const drive = this.client.getDrive();
+      console.log("✅ Google Drive API client initialized");
 
-      // Create a new spreadsheet
-      console.log("🚀 Creating spreadsheet...");
-      const response = await sheets.spreadsheets.create({
+      // Create a new spreadsheet using Drive API
+      console.log("🚀 Creating spreadsheet with Drive API...");
+      const response = await drive.files.create({
         requestBody: {
-          properties: {
-            title: title,
-          },
-          sheets: [
-            {
-              properties: {
-                title: "Form Responses",
-              },
-            },
-          ],
+          name: title,
+          mimeType: "application/vnd.google-apps.spreadsheet",
         },
+        fields: "id, name, webViewLink",
       });
 
-      console.log("✅ Spreadsheet created:", response.data.spreadsheetId);
-      const spreadsheetId = response.data.spreadsheetId ?? null;
+      const spreadsheetId = response.data.id ?? null;
+      const spreadsheetUrl =
+        response.data.webViewLink ??
+        (spreadsheetId
+          ? `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`
+          : null);
 
-      // If headers provided, add them as the first row
+      console.log("✅ Spreadsheet created:", spreadsheetId);
+
+      if (!spreadsheetId || !spreadsheetUrl) {
+        throw new Error(
+          "Google Drive API did not return spreadsheet identifiers.",
+        );
+      }
+
+      // If headers provided, add them as the first row using Sheets API
+      // This works on files created with drive.file scope
       if (headers && headers.length > 0 && spreadsheetId) {
         console.log("📝 Adding headers to sheet...");
+        const sheets = this.client.getSheets();
         await sheets.spreadsheets.values.update({
           spreadsheetId,
-          range: "Form Responses!A1",
+          range: "Sheet1!A1",
           valueInputOption: "RAW",
           requestBody: {
             values: [["Submitted at", ...headers]],
           },
         });
         console.log("✅ Headers added successfully");
-      }
-
-      const spreadsheetUrl = response.data.spreadsheetUrl ?? null;
-
-      if (!spreadsheetId || !spreadsheetUrl) {
-        throw new Error(
-          "Google Sheets API did not return spreadsheet identifiers.",
-        );
       }
 
       console.log("✅ Google Sheet creation complete");
@@ -106,27 +105,6 @@ export class GoogleSheetsService {
   }
 
   /**
-   * Get list of user's spreadsheets
-   */
-  async getSheets() {
-    try {
-      const drive = this.client.getDrive();
-
-      const response = await drive.files.list({
-        q: "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
-        fields: "files(id, name, createdTime, modifiedTime, webViewLink)",
-        orderBy: "modifiedTime desc",
-        pageSize: 50,
-      });
-
-      return response.data.files || [];
-    } catch (error) {
-      console.error("Error fetching Google Sheets:", error);
-      throw error;
-    }
-  }
-
-  /**
    * Append data to a Google Sheet
    */
   async append(
@@ -139,7 +117,7 @@ export class GoogleSheetsService {
   ) {
     try {
       const sheets = this.client.getSheets();
-      const sheetName = options.sheetName ?? "Form Responses";
+      const sheetName = options.sheetName ?? "Sheet1";
       const timeZone =
         options.timeZone ??
         process.env.FORM_SUBMISSION_TIMEZONE ??
@@ -202,7 +180,7 @@ export class GoogleSheetsService {
   async updateHeaders(
     spreadsheetId: string,
     headers: string[],
-    sheetName: string = "Form Responses",
+    sheetName: string = "Sheet1",
   ) {
     try {
       const sheets = this.client.getSheets();
