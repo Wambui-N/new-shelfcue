@@ -60,6 +60,13 @@ export async function POST(request: NextRequest) {
       .eq("status", "published")
       .single();
 
+    console.log("📋 Form fetched for submission:", {
+      id: form?.id,
+      hasSettings: !!form?.settings,
+      default_sheet_connection_id: form?.default_sheet_connection_id,
+      settingsGoogleSheet: (form?.settings as any)?.google?.sheet,
+    });
+
     if (formError || !form) {
       return NextResponse.json(
         { error: "Form not found or not published" },
@@ -182,11 +189,17 @@ export async function POST(request: NextRequest) {
 
     // 2. Sync to Google Sheets
     try {
+      console.log("📊 Starting Sheets sync...");
+      console.log("📋 Form settings:", JSON.stringify(formSettings, null, 2));
+      console.log("🔗 default_sheet_connection_id:", formRecord.default_sheet_connection_id);
+
       // Get sheet connection - try from form settings first, then fallback to direct query
       let sheetConnection: { sheet_id: string | null } | null = null;
 
       // Primary: read from form settings (works even if PostgREST schema cache breaks sheet_connections)
       const settingsSheet = (formSettings as any)?.google?.sheet ?? null;
+      console.log("📄 Settings sheet object:", settingsSheet);
+      
       const settingsSpreadsheetId =
         typeof settingsSheet?.spreadsheetId === "string"
           ? settingsSheet.spreadsheetId
@@ -194,8 +207,11 @@ export async function POST(request: NextRequest) {
             ? settingsSheet.sheet_id
             : null;
 
+      console.log("🆔 Settings spreadsheet ID:", settingsSpreadsheetId);
+
       if (settingsSpreadsheetId) {
         sheetConnection = { sheet_id: settingsSpreadsheetId };
+        console.log("✅ Found sheet connection from form settings");
       }
 
       // Fallback: Query directly using default_sheet_connection_id
@@ -203,6 +219,7 @@ export async function POST(request: NextRequest) {
         !sheetConnection?.sheet_id &&
         formRecord.default_sheet_connection_id
       ) {
+        console.log("🔍 Trying to fetch from sheet_connections table...");
         const { data: connectionData, error: connectionError } =
           await supabaseAdminClient
             .from("sheet_connections")
@@ -212,12 +229,20 @@ export async function POST(request: NextRequest) {
 
         if (!connectionError && connectionData?.sheet_id) {
           sheetConnection = { sheet_id: connectionData.sheet_id };
+          console.log("✅ Found sheet connection from database");
+        } else {
+          console.log("❌ Error fetching sheet connection:", connectionError);
         }
       }
 
+      console.log("📊 Final sheet connection:", sheetConnection);
+      console.log("👤 User ID:", formRecord.user_id);
+
       if (sheetConnection?.sheet_id && formRecord.user_id) {
+        console.log("🚀 Attempting to get Google client...");
         const googleClient = await getGoogleClient(formRecord.user_id);
         if (googleClient) {
+          console.log("✅ Google client obtained");
           const sheetsService = new GoogleSheetsService(googleClient);
 
           // Create formatters for date/time fields with user's timezone
@@ -279,8 +304,10 @@ export async function POST(request: NextRequest) {
           };
 
           try {
+            console.log("📝 Attempting to append to sheet:", sheetConnection.sheet_id);
+            console.log("📊 Row data:", rowData);
             await tryAppend(sheetConnection.sheet_id);
-            console.log("✓ Synced to Google Sheets");
+            console.log("✅ Synced to Google Sheets successfully");
           } catch (appendError: any) {
             const status = appendError?.response?.status;
             const dataMsg =
@@ -343,9 +370,15 @@ export async function POST(request: NextRequest) {
           }
         } else {
           console.warn("⚠️ Google client not available for Sheets sync");
+          console.log("💡 User may need to reconnect Google account");
         }
       } else {
-        console.log("ℹ️ No sheet connection found, skipping Sheets sync");
+        if (!sheetConnection?.sheet_id) {
+          console.log("ℹ️ No sheet connection found in form settings or database");
+          console.log("💡 Form may not have been published with Google Sheets integration");
+        } else if (!formRecord.user_id) {
+          console.log("ℹ️ No user_id found, skipping Sheets sync");
+        }
       }
     } catch (sheetsError: any) {
       console.error("❌ Error syncing to Google Sheets:", sheetsError?.message || sheetsError);
