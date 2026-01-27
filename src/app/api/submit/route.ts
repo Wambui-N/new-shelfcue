@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
       hasSettings: !!form?.settings,
       default_sheet_connection_id: form?.default_sheet_connection_id,
       settingsGoogleSheet: (form?.settings as any)?.google?.sheet,
+      fullSettings: form?.settings ? JSON.stringify(form.settings, null, 2) : "null",
     });
 
     if (formError || !form) {
@@ -375,7 +376,112 @@ export async function POST(request: NextRequest) {
       } else {
         if (!sheetConnection?.sheet_id) {
           console.log("ℹ️ No sheet connection found in form settings or database");
-          console.log("💡 Form may not have been published with Google Sheets integration");
+          console.log("💡 Attempting to create sheet on first submission...");
+          
+          // Self-heal: Create sheet if it doesn't exist (form may have been published without one)
+          if (formRecord.user_id) {
+            try {
+              const googleClient = await getGoogleClient(formRecord.user_id);
+              if (googleClient) {
+                console.log("✅ Google client available, creating sheet...");
+                const sheetsService = new GoogleSheetsService(googleClient);
+                
+                const fieldsAny = Array.isArray(formRecord.fields)
+                  ? (formRecord.fields as any[])
+                  : [];
+                const headers = fieldsAny.map((f) =>
+                  typeof f?.label === "string" && f.label.trim().length > 0
+                    ? f.label
+                    : typeof f?.id === "string"
+                      ? f.id
+                      : "Field",
+                );
+                const hasMeetingField = fieldsAny.some((f) => f?.type === "meeting");
+                if (hasMeetingField) headers.push("Meeting Link");
+
+                const created = await sheetsService.createSheet(
+                  `${formRecord.title || "Form"} - Responses`,
+                  headers,
+                );
+
+                if (created.spreadsheetId && created.spreadsheetUrl) {
+                  // Update form settings with new sheet
+                  const nextSettings = {
+                    ...(formSettings ?? {}),
+                    google: {
+                      ...((formSettings as any)?.google ?? {}),
+                      sheet: {
+                        spreadsheetId: created.spreadsheetId,
+                        spreadsheetUrl: created.spreadsheetUrl,
+                        sheetName: `${formRecord.title || "Form"} - Responses`,
+                        createdAt: new Date().toISOString(),
+                      },
+                    },
+                  };
+
+                  await supabaseAdminClient
+                    .from("forms")
+                    .update({ settings: nextSettings })
+                    .eq("id", formId);
+
+                  console.log("✅ Created new sheet and updated form settings");
+                  
+                  // Now append the current submission
+                  const dateTimeFormatter = new Intl.DateTimeFormat("en-GB", {
+                    timeZone: formTimeZone,
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+
+                  const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+                    timeZone: formTimeZone,
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  });
+
+                  const rowData = formRecord.fields.map((field) => {
+                    const value = data[field.id as keyof typeof data];
+                    if (field.type === "checkbox") return value ? "Yes" : "No";
+                    if (field.type === "meeting" && value) {
+                      try {
+                        const date = new Date(value);
+                        return dateTimeFormatter.format(date);
+                      } catch {
+                        return value;
+                      }
+                    }
+                    if (field.type === "date" && value) {
+                      try {
+                        const date = new Date(value);
+                        return dateFormatter.format(date);
+                      } catch {
+                        return value;
+                      }
+                    }
+                    return value || "";
+                  });
+
+                  if (calendarEventLink) {
+                    rowData.push(calendarEventLink);
+                  }
+
+                  await sheetsService.append(created.spreadsheetId, rowData, {
+                    timeZone: formTimeZone,
+                  });
+                  
+                  console.log("✅ Synced to newly created Google Sheet");
+                }
+              } else {
+                console.warn("⚠️ Google client not available to create sheet");
+              }
+            } catch (createError: any) {
+              console.error("❌ Error creating sheet on submission:", createError?.message || createError);
+            }
+          }
         } else if (!formRecord.user_id) {
           console.log("ℹ️ No user_id found, skipping Sheets sync");
         }

@@ -262,15 +262,30 @@ export async function POST(request: NextRequest) {
                 .from("forms")
                 .update({ settings: nextSettings })
                 .eq("id", formId)
-                .select("id")
+                .select("id, settings")
                 .maybeSingle(),
           });
 
           if (settingsUpdateResult.error) {
-            console.warn(
-              "⚠️ Failed to save sheet info on form settings:",
+            console.error(
+              "❌ Failed to save sheet info on form settings:",
               settingsUpdateResult.error,
             );
+          } else if (settingsUpdateResult.data) {
+            // Verify the settings were actually saved
+            const savedSettings = settingsUpdateResult.data.settings as any;
+            const savedSheet = savedSettings?.google?.sheet;
+            console.log("✅ Settings update result:", {
+              formId: settingsUpdateResult.data.id,
+              hasGoogleSheet: !!savedSheet,
+              spreadsheetId: savedSheet?.spreadsheetId || savedSheet?.sheet_id,
+            });
+            
+            if (!savedSheet?.spreadsheetId && !savedSheet?.sheet_id) {
+              console.error("❌ WARNING: Settings update succeeded but sheet info not found in saved data!");
+              console.error("Expected settings:", JSON.stringify(nextSettings, null, 2));
+              console.error("Actual saved settings:", JSON.stringify(savedSettings, null, 2));
+            }
           }
 
           console.log("💾 Saving sheet connection to database...");
@@ -370,6 +385,21 @@ export async function POST(request: NextRequest) {
               // Do not fail publish if we at least stored the sheet on settings.
             } else {
               console.log("✅ Form updated with sheet connection");
+              
+              // Verify the update was successful
+              const verifyResult = await (supabaseAdmin as any)
+                .from("forms")
+                .select("id, default_sheet_connection_id, settings")
+                .eq("id", formId)
+                .maybeSingle();
+              
+              if (verifyResult.data) {
+                console.log("🔍 Verification - Form data after update:", {
+                  default_sheet_connection_id: verifyResult.data.default_sheet_connection_id,
+                  hasSettingsGoogleSheet: !!(verifyResult.data.settings as any)?.google?.sheet,
+                  settingsGoogleSheetId: (verifyResult.data.settings as any)?.google?.sheet?.spreadsheetId,
+                });
+              }
             }
 
             results.sheet = {
@@ -547,6 +577,40 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("✓ Form status updated to published and verified");
+    
+    // Final verification: Fetch the complete form to verify all data is saved
+    const finalVerifyResult = await withSchemaCacheRetry<any>({
+      label: "forms.get.final_verification",
+      maxAttempts: 3,
+      fn: async () =>
+        (supabaseAdmin as any)
+          .from("forms")
+          .select("id, status, default_sheet_connection_id, settings")
+          .eq("id", formId)
+          .maybeSingle(),
+    });
+    
+    if (finalVerifyResult.data) {
+      const finalForm = finalVerifyResult.data;
+      const finalSettings = (finalForm.settings as any) ?? {};
+      const finalSheet = finalSettings?.google?.sheet;
+      
+      console.log("🔍 Final verification - Complete form data:", {
+        id: finalForm.id,
+        status: finalForm.status,
+        default_sheet_connection_id: finalForm.default_sheet_connection_id,
+        hasGoogleSheetInSettings: !!finalSheet,
+        spreadsheetId: finalSheet?.spreadsheetId || finalSheet?.sheet_id || "NOT FOUND",
+        spreadsheetUrl: finalSheet?.spreadsheetUrl || finalSheet?.sheet_url || "NOT FOUND",
+      });
+      
+      if (!finalSheet?.spreadsheetId && !finalSheet?.sheet_id && !finalForm.default_sheet_connection_id) {
+        console.error("❌ CRITICAL: No sheet connection found in final verification!");
+        console.error("This means the sheet was not properly saved to the database.");
+      }
+    } else {
+      console.error("❌ Failed to verify form data after publish:", finalVerifyResult.error);
+    }
     const apiEndTime = Date.now();
     console.log(`⏱️ Total publish API time: ${apiEndTime - apiStartTime}ms`);
 
