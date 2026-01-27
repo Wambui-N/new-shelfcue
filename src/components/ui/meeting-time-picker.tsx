@@ -135,6 +135,7 @@ export function MeetingTimePicker({
   userId,
   startHour = 9,
   endHour = 17,
+  timeZone,
 }: MeetingTimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());

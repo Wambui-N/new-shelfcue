@@ -28,6 +28,7 @@ export function FieldRenderer({
   calendarId,
   userId,
   isEmbedded = false,
+  timeZone,
 }: FieldRendererProps) {
   const baseClasses = cn(
     "w-full rounded-lg border border-gray-300",
