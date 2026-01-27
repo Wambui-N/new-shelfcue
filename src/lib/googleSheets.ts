@@ -44,24 +44,8 @@ export class GoogleSheetsService {
         );
       }
 
-      // Explicitly access the file through Drive API to establish access relationship
-      // This ensures the file is "opened" and accessible for subsequent Sheets API operations
-      try {
-        await drive.files.get({
-          fileId: spreadsheetId,
-          fields: "id, name",
-        });
-        console.log("✅ File access established through Drive API");
-      } catch (accessError: any) {
-        console.warn(
-          "⚠️ Could not establish file access through Drive API:",
-          accessError?.message,
-        );
-        // Continue anyway - file was created, access might still work
-      }
-
       // If headers provided, add them as the first row using Sheets API
-      // This works on files created with drive.file scope after establishing access
+      // Files created by the app are automatically accessible with drive.file scope
       if (headers && headers.length > 0 && spreadsheetId) {
         console.log("📝 Adding headers to sheet...");
         try {
@@ -141,24 +125,8 @@ export class GoogleSheetsService {
     } = {},
   ) {
     try {
-      // Ensure file is accessible through Drive API first
-      // This establishes the access relationship needed for drive.file scope
-      try {
-        const drive = this.client.getDrive();
-        await drive.files.get({
-          fileId: spreadsheetId,
-          fields: "id",
-        });
-        console.log("✅ File access verified through Drive API before append");
-      } catch (driveError: any) {
-        // If Drive API access fails, log but continue
-        // The file might still be accessible for Sheets API operations
-        console.warn(
-          "⚠️ Could not verify file access through Drive API:",
-          driveError?.message || driveError,
-        );
-      }
-
+      // Files created by the app are automatically accessible with drive.file scope
+      // No need to verify access - directly use Sheets API
       const sheets = this.client.getSheets();
       const sheetName = options.sheetName ?? "Sheet1";
       const timeZone =

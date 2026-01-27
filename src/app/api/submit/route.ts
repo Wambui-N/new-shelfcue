@@ -294,35 +294,12 @@ export async function POST(request: NextRequest) {
               data: dataMsg,
             });
 
-            // If permission error (403) or not found (404), try accessing file through Drive API first
-            // This establishes the access relationship needed for drive.file scope
-            if (status === 403 || status === 404) {
-              console.log(
-                "🔄 Attempting to establish file access through Drive API and retry...",
+            // If 403 (Permission Denied), it's likely a scope issue
+            // Files created by the app should be automatically accessible with drive.file scope
+            if (status === 403) {
+              console.error(
+                "🔒 Permission denied (403) - This may indicate a scope issue. Files created by the app should be automatically accessible with drive.file scope.",
               );
-              try {
-                const drive = googleClient.getDrive();
-                await drive.files.get({
-                  fileId: sheetConnection.sheet_id,
-                  fields: "id",
-                });
-                console.log(
-                  "✅ File access established through Drive API, retrying append...",
-                );
-                // Retry append after establishing access
-                await tryAppend(sheetConnection.sheet_id);
-                console.log(
-                  "✓ Synced to Google Sheets (after establishing Drive API access)",
-                );
-                // Success - exit error handling
-                return;
-              } catch (retryError: any) {
-                console.error(
-                  "❌ Retry after Drive API access also failed:",
-                  retryError?.message || retryError,
-                );
-                // Continue with existing error handling below
-              }
             }
 
             // Self-heal: if the stored sheet id is invalid (e.g. sheet was deleted),
