@@ -181,9 +181,6 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Sync to Google Sheets
-    let sheetsSyncSuccess = false;
-    let sheetsSyncError: string | null = null;
-    
     try {
       // Get sheet connection - try from join first, then fallback to direct query
       let sheetConnection: { sheet_id: string | null } | null = null;
@@ -284,9 +281,7 @@ export async function POST(request: NextRequest) {
           try {
             await tryAppend(sheetConnection.sheet_id);
             console.log("✓ Synced to Google Sheets");
-            sheetsSyncSuccess = true;
           } catch (appendError: any) {
-            sheetsSyncError = appendError?.message || "Failed to sync to Google Sheets";
             const status = appendError?.response?.status;
             const dataMsg =
               typeof appendError?.response?.data === "object"
@@ -319,12 +314,9 @@ export async function POST(request: NextRequest) {
                 console.log(
                   "✓ Synced to Google Sheets (after establishing Drive API access)",
                 );
-                sheetsSyncSuccess = true;
-                sheetsSyncError = null;
-                // Success - continue to response
+                // Success - exit error handling
+                return;
               } catch (retryError: any) {
-                // Retry also failed
-                sheetsSyncError = retryError?.message || "Failed to sync after Drive API access";
                 console.error(
                   "❌ Retry after Drive API access also failed:",
                   retryError?.message || retryError,
@@ -378,30 +370,12 @@ export async function POST(request: NextRequest) {
 
               await tryAppend(created.spreadsheetId);
               console.log("✓ Synced to Google Sheets (after repairing sheet link)");
-              sheetsSyncSuccess = true;
-              sheetsSyncError = null;
-            } else {
-              // Error was not 404/410, so we couldn't self-heal
-              sheetsSyncError = appendError?.message || "Failed to sync to Google Sheets";
             }
           }
-        } else {
-          // No sheet connection found
-          console.log("ℹ️ No sheet connection configured for this form");
         }
-      } else {
-        // No Google client available
-        console.log("ℹ️ Google client not available for Sheets sync");
       }
-    } catch (error: any) {
-      console.error("❌ Error syncing to Google Sheets - Full Error Details:", {
-        error: error?.message || error,
-        stack: error?.stack,
-        response: error?.response,
-        status: error?.response?.status,
-        data: error?.response?.data,
-      });
-      sheetsSyncError = error?.message || "Error syncing to Google Sheets";
+    } catch (error) {
+      console.error("Error syncing to Google Sheets:", error);
       // Don't fail the submission if Sheets sync fails
     }
 
@@ -446,8 +420,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       submissionId: submissionRecord.id,
-      sheetsSynced: sheetsSyncSuccess,
-      sheetsError: sheetsSyncError,
     });
   } catch (error) {
     console.error("Error in submit API:", error);

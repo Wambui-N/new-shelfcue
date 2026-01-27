@@ -41,7 +41,7 @@ export function generateGoogleOAuthUrl(
     redirect_uri: redirectUri,
     response_type: "code",
     scope:
-      "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file",
+      "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file",
     access_type: "offline",
     prompt: "consent",
     include_granted_scopes: "true",
