@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
 
     // 2. Sync to Google Sheets
     try {
-      // Get sheet connection - try from join first, then fallback to direct query
+      // Get sheet connection - try from form settings first, then fallback to direct query
       let sheetConnection: { sheet_id: string | null } | null = null;
 
       // Primary: read from form settings (works even if PostgREST schema cache breaks sheet_connections)
@@ -294,14 +294,6 @@ export async function POST(request: NextRequest) {
               data: dataMsg,
             });
 
-            // If 403 (Permission Denied), it's likely a scope issue
-            // Files created by the app should be automatically accessible with drive.file scope
-            if (status === 403) {
-              console.error(
-                "🔒 Permission denied (403) - This may indicate a scope issue. Files created by the app should be automatically accessible with drive.file scope.",
-              );
-            }
-
             // Self-heal: if the stored sheet id is invalid (e.g. sheet was deleted),
             // create a new sheet and update form.settings.google.sheet, then retry once.
             if (status === 404 || status === 410) {
@@ -349,10 +341,14 @@ export async function POST(request: NextRequest) {
               console.log("✓ Synced to Google Sheets (after repairing sheet link)");
             }
           }
+        } else {
+          console.warn("⚠️ Google client not available for Sheets sync");
         }
+      } else {
+        console.log("ℹ️ No sheet connection found, skipping Sheets sync");
       }
-    } catch (error) {
-      console.error("Error syncing to Google Sheets:", error);
+    } catch (sheetsError: any) {
+      console.error("❌ Error syncing to Google Sheets:", sheetsError?.message || sheetsError);
       // Don't fail the submission if Sheets sync fails
     }
 

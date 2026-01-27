@@ -62,7 +62,7 @@ export class GoogleSheetsService {
         } catch (headerError: any) {
           // Log but don't fail - spreadsheet is created, headers can be added later
           console.warn(
-            "⚠️ Failed to write headers (may need spreadsheets scope or file access):",
+            "⚠️ Failed to write headers:",
             headerError?.message || headerError,
           );
           // Continue - spreadsheet is still usable, headers can be added manually if needed
@@ -115,6 +115,7 @@ export class GoogleSheetsService {
 
   /**
    * Append data to a Google Sheet
+   * Uses Sheets API with drive.file scope (works for app-created files)
    */
   async append(
     spreadsheetId: string,
@@ -168,6 +169,7 @@ export class GoogleSheetsService {
 
   /**
    * Get spreadsheet details
+   * Uses Sheets API with drive.file scope (works for app-created files)
    */
   async getSpreadsheetDetails(spreadsheetId: string) {
     try {
@@ -187,6 +189,7 @@ export class GoogleSheetsService {
 
   /**
    * Update sheet headers based on form fields
+   * Uses Sheets API with drive.file scope (works for app-created files)
    */
   async updateHeaders(
     spreadsheetId: string,

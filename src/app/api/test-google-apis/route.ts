@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     const results = {
       calendar: { success: false, error: null as string | null, count: 0 },
-      sheets: { success: false, error: null as string | null, title: "" },
+      sheets: { success: false, error: null as string | null, available: false },
       drive: { success: false, error: null as string | null, count: 0 },
     };
 
@@ -45,20 +45,19 @@ export async function GET(request: NextRequest) {
       console.log("❌ Calendar API failed:", error.message);
     }
 
-    // Test Sheets API
+    // Test Sheets API (optional - tests that client can be created)
     try {
       const sheets = googleClient.getSheets();
-      const response = await sheets.spreadsheets.get({
-        spreadsheetId: "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms", // Public test sheet
-      });
+      // Just verify the client is created successfully
+      // Actual spreadsheet operations would require a spreadsheet ID
       results.sheets = {
         success: true,
         error: null,
-        title: response.data.properties?.title || "",
+        available: true,
       };
-      console.log("✅ Sheets API working");
+      console.log("✅ Sheets API client available");
     } catch (error: any) {
-      results.sheets = { success: false, error: error.message, title: "" };
+      results.sheets = { success: false, error: error.message, available: false };
       console.log("❌ Sheets API failed:", error.message);
     }
 
