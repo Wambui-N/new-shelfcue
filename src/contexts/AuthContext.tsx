@@ -4,6 +4,7 @@ import type { AuthError, Session, User } from "@supabase/supabase-js";
 import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { GOOGLE_OAUTH_SCOPES } from "@/lib/google-oauth-url";
 
 interface AuthContextType {
   user: User | null;
@@ -77,8 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        scopes:
-          "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file",
+        scopes: GOOGLE_OAUTH_SCOPES,
         redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
         queryParams: {
           access_type: "offline",
@@ -101,8 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        scopes:
-          "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file",
+        scopes: GOOGLE_OAUTH_SCOPES,
         redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback`,
         queryParams: {
           access_type: "offline",

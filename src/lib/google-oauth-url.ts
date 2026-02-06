@@ -1,8 +1,16 @@
 /**
  * Utility to generate Google OAuth URLs for different contexts
+ *
+ * IMPORTANT: We do NOT request the spreadsheets scope.
+ * We use only calendar + drive.file. Sheets API methods work with drive.file
+ * for files the app creates.
  */
 
 export type OAuthContext = "signup" | "reconnect";
+
+/** Google OAuth scopes - only calendar and drive.file (no spreadsheets scope) */
+export const GOOGLE_OAUTH_SCOPES =
+  "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file";
 
 /**
  * Generate a Google OAuth URL for requesting Calendar and Drive API access
@@ -40,8 +48,7 @@ export function generateGoogleOAuthUrl(
     client_id: clientId,
     redirect_uri: redirectUri,
     response_type: "code",
-    scope:
-      "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file",
+    scope: GOOGLE_OAUTH_SCOPES,
     access_type: "offline",
     prompt: "consent",
     include_granted_scopes: "true",
