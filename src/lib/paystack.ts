@@ -13,6 +13,7 @@ interface InitializeTransactionParams {
   amount: number; // Amount in cents (1 Dollar = 100 cents)
   reference?: string;
   callback_url?: string;
+  currency?: string; // e.g. "USD" so amount is interpreted as cents
   plan?: string; // Paystack plan code
   metadata?: Record<string, unknown>;
   channels?: string[];

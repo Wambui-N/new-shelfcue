@@ -45,13 +45,18 @@ export async function POST(request: Request) {
       is_trial ? "(trial)" : "(full)",
     );
 
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
+    const callbackUrl = `${baseUrl}/dashboard/billing/verify`;
+
     console.log("🚀 Initializing Paystack transaction...");
     const initResponse = await paystack.initializeTransaction({
       email: user.email!,
       amount: chargeAmount,
       reference,
       plan: plan_code,
-      callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing/verify`,
+      currency: "USD",
+      callback_url: callbackUrl,
       metadata: {
         user_id: user.id,
         subscription_type: "professional",

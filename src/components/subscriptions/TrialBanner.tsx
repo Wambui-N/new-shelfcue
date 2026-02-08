@@ -54,8 +54,17 @@ export function TrialBanner() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to initialize payment");
+        let errorMessage = "Failed to initialize payment";
+        try {
+          const errorData = await response.json();
+          errorMessage =
+            errorData.error ||
+            errorData.details ||
+            errorMessage;
+        } catch {
+          // response body may not be JSON
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -63,7 +72,11 @@ export function TrialBanner() {
       window.location.href = data.authorization_url;
     } catch (error) {
       console.error("Error initiating payment:", error);
-      alert("Failed to initiate payment. Please try again.");
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to initiate payment. Please try again.",
+      );
     } finally {
       setPaymentLoading(false);
     }
