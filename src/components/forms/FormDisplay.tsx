@@ -170,8 +170,8 @@ export function FormDisplay({
             "relative w-full flex flex-col justify-between flex-shrink-0 overflow-hidden",
             deviceView === "desktop"
               ? "md:w-1/2 md:min-h-screen md:sticky md:top-0"
-              : "w-full min-h-[200px] max-h-[35vh]",
-            deviceView === "desktop" ? "" : "min-h-[200px] max-h-[35vh]",
+              : "w-full min-h-[250px] max-h-[35vh]",
+            deviceView === "desktop" ? "" : "min-h-[250px] max-h-[35vh]",
             "p-4 md:p-12",
           )}
           style={
@@ -274,7 +274,9 @@ export function FormDisplay({
           }}
         >
           <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
-            {formContent}
+            <div className="min-h-full">
+              {formContent}
+            </div>
           </div>
 
           {/* Watermark */}

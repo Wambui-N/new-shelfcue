@@ -110,7 +110,7 @@ export function DemoSection() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.8 }}
                 >
                   <motion.div
                     className="relative w-full h-full max-w-2xl mx-auto rounded-lg overflow-hidden border border-light-gray shadow-sm bg-white"

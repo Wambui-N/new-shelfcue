@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -148,21 +149,14 @@ export function MeetingTimePicker({
   );
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
+  // Close overlay on Escape
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
     };
-
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
     }
   }, [isOpen]);
 
@@ -329,17 +323,32 @@ export function MeetingTimePicker({
         </motion.div>
       </Button>
 
-      {/* Dropdown Content */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
-          >
-            <div className="flex flex-col sm:flex-row h-auto sm:h-96">
+      {/* Calendar overlay (portal to body so it overlays everything) */}
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4"
+              >
+                <div
+                  className="absolute inset-0 bg-black/50"
+                  onClick={() => setIsOpen(false)}
+                  aria-hidden
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.2 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white border border-gray-200 rounded-t-xl sm:rounded-lg shadow-lg flex flex-col sm:flex-row"
+                >
+                  <div className="flex flex-col sm:flex-row h-auto sm:h-96 flex-1 min-h-0">
               {/* Calendar Section */}
               <div className="w-full sm:w-1/2 border-b sm:border-b-0 sm:border-r border-gray-200 p-4">
                 {/* Calendar Header */}
@@ -420,7 +429,7 @@ export function MeetingTimePicker({
               </div>
 
               {/* Time Slots Section */}
-              <div className="w-full sm:w-1/2 p-4 flex flex-col">
+              <div className="w-full sm:w-1/2 p-4 flex flex-col min-h-0">
                 {/* Time Header */}
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-900">
@@ -456,7 +465,7 @@ export function MeetingTimePicker({
 
                 {/* Time Slots */}
                 {hasSelectedDate ? (
-                  <div className="flex-1 overflow-y-auto mt-1">
+                  <div className="flex-1 overflow-y-auto mt-1 min-h-0">
                     {loadingAvailability ? (
                       <div className="flex items-center justify-center h-full">
                         <div className="text-center">
@@ -512,10 +521,13 @@ export function MeetingTimePicker({
                   </div>
                 )}
               </div>
-            </div>
-          </motion.div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>
     </div>
   );
 }

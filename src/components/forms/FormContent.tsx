@@ -83,7 +83,7 @@ export function FormContent({
   return (
     <div
       className={cn(
-        "w-full max-w-full md:max-w-4xl mx-auto overflow-x-hidden",
+        "w-full max-w-full md:max-w-4xl mx-auto overflow-x-hidden min-h-full",
         isEmbedded
           ? "px-3 sm:px-4 py-4 sm:py-6"
           : "px-3 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 md:py-12",
