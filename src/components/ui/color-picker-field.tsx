@@ -147,9 +147,16 @@ export function ColorPickerField({
             <DialogTitle>Pick color</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-2">
+            {/* Large preview: current color so users can see what they're picking */}
+            <div
+              className="w-full h-24 sm:h-28 rounded-lg border-2 border-border shrink-0"
+              style={{
+                backgroundColor: hsvToHex(hsv.h, hsv.s, hsv.v),
+              }}
+            />
             <div className="flex items-center gap-3">
               <div
-                className="w-14 h-14 rounded-lg border-2 border-border flex-shrink-0"
+                className="w-12 h-10 rounded-lg border border-border flex-shrink-0"
                 style={{ backgroundColor: hsvToHex(hsv.h, hsv.s, hsv.v) }}
               />
               <Input
@@ -165,6 +172,27 @@ export function ColorPickerField({
                   <span>Hue</span>
                   <span>{hsv.h} / {H_MAX}</span>
                 </div>
+                {/* Hue strip: full spectrum so users see all colors */}
+                <div
+                  className="w-full h-3 rounded-full border border-border overflow-hidden"
+                  style={{
+                    background: `linear-gradient(to right, ${[
+                      "#ff0000",
+                      "#ff8000",
+                      "#ffff00",
+                      "#80ff00",
+                      "#00ff00",
+                      "#00ff80",
+                      "#00ffff",
+                      "#0080ff",
+                      "#0000ff",
+                      "#8000ff",
+                      "#ff00ff",
+                      "#ff0080",
+                      "#ff0000",
+                    ].join(", ")})`,
+                  }}
+                />
                 <Slider
                   min={0}
                   max={H_MAX}
