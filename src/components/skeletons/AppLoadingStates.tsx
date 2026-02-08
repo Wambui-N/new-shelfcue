@@ -47,7 +47,7 @@ export function PublicFormSkeleton() {
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex flex-col md:flex-row min-h-screen">
         {/* Left Section - Branding */}
-        <div className="relative w-full md:w-1/2 flex flex-col justify-between flex-shrink-0 overflow-hidden h-[250px] md:min-h-screen p-4 md:p-12">
+        <div className="relative w-full md:w-1/2 flex flex-col justify-between flex-shrink-0 overflow-hidden h-[300px] md:min-h-screen p-4 md:p-12">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.25),_transparent_50%),linear-gradient(135deg,var(--primary)_0%,var(--accent)_80%)] animate-pulse" />
           <div className="absolute inset-0 opacity-40 mix-blend-screen bg-[conic-gradient(from_90deg_at_50%_50%,rgba(255,255,255,0.15),transparent_70%)]" />
           <div className="relative z-10 h-full w-full flex flex-col justify-between text-white">
