@@ -296,6 +296,7 @@ export default function SubmissionsPage() {
             </DropdownMenu>
           </div>
         </div>
+      </div>
       </Card>
 
       {/* Submissions Content */}
