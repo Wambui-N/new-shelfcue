@@ -73,6 +73,7 @@ export class GoogleCalendarService {
     startHour: number = 9,
     endHour: number = 17,
     timeZone?: string,
+    allowedDays?: number[], // 0=Sun .. 6=Sat; when absent, weekdays only
   ): Promise<string[]> {
     try {
       const calendar = this.client.getCalendar();
@@ -110,6 +111,7 @@ export class GoogleCalendarService {
         startHour,
         endHour,
         timeZone,
+        allowedDays,
       );
 
       console.log("📅 Generated candidate slots:", candidateSlots.length);
@@ -165,6 +167,7 @@ export class GoogleCalendarService {
     startHour: number,
     endHour: number,
     timeZone?: string,
+    allowedDays?: number[], // 0=Sun .. 6=Sat; when absent, weekdays only
   ): string[] {
     const slots: string[] = [];
     const currentDate = new Date(startDate);
@@ -237,8 +240,12 @@ export class GoogleCalendarService {
 
     // Iterate through each day in the range
     while (currentDate <= endDate) {
-      // Skip weekends
-      if (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+      const day = currentDate.getDay();
+      const skip =
+        allowedDays != null && allowedDays.length > 0
+          ? !allowedDays.includes(day)
+          : day === 0 || day === 6;
+      if (skip) {
         currentDate.setDate(currentDate.getDate() + 1);
         continue;
       }

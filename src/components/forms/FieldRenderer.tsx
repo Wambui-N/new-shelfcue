@@ -183,6 +183,7 @@ export function FieldRenderer({
             startHour={field.meetingSettings?.startHour ?? 9}
             endHour={field.meetingSettings?.endHour ?? 17}
             timeZone={timeZone}
+            availableDays={field.meetingSettings?.availableDays}
           />
         );
 

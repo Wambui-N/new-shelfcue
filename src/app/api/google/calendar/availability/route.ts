@@ -14,6 +14,11 @@ export async function GET(request: NextRequest) {
     const startHour = searchParams.get("startHour");
     const endHour = searchParams.get("endHour");
     const timeZone = searchParams.get("timeZone");
+    const availableDaysParam = searchParams.get("availableDays");
+    const availableDays =
+      availableDaysParam != null && availableDaysParam !== ""
+        ? availableDaysParam.split(",").map((s) => parseInt(s.trim(), 10)).filter((n) => !Number.isNaN(n) && n >= 0 && n <= 6)
+        : undefined;
 
     // Validate required parameters
     if (!userId) {
@@ -47,6 +52,7 @@ export async function GET(request: NextRequest) {
       startHour,
       endHour,
       timeZone,
+      availableDays,
     });
 
     // Get Google client
@@ -75,6 +81,7 @@ export async function GET(request: NextRequest) {
       startHour ? parseInt(startHour) : 9,
       endHour ? parseInt(endHour) : 17,
       timeZone || undefined,
+      availableDays,
     );
 
     return NextResponse.json({ availableSlots });

@@ -33,6 +33,7 @@ export interface FormField {
     bufferTime?: number; // minutes between meetings
     startHour?: number; // Start hour (0-23), default 9
     endHour?: number; // End hour (0-23), default 17
+    availableDays?: number[]; // 0=Sun .. 6=Sat; when absent/empty, treat as weekdays [1,2,3,4,5]
   };
   // Country field specific
   countrySettings?: {

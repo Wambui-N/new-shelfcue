@@ -27,6 +27,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -402,6 +403,55 @@ export function FieldEditor() {
                                 End time must be after start time
                               </p>
                             )}
+                        </div>
+
+                        {/* Available days */}
+                        <div className="space-y-3">
+                          <Label className="text-sm mb-2">
+                            Available days
+                          </Label>
+                          <div className="flex flex-wrap gap-3">
+                            {[
+                              { d: 0, label: "Sun" },
+                              { d: 1, label: "Mon" },
+                              { d: 2, label: "Tue" },
+                              { d: 3, label: "Wed" },
+                              { d: 4, label: "Thu" },
+                              { d: 5, label: "Fri" },
+                              { d: 6, label: "Sat" },
+                            ].map(({ d, label }) => {
+                              const current =
+                                field.meetingSettings?.availableDays ??
+                                [1, 2, 3, 4, 5];
+                              const checked = current.includes(d);
+                              return (
+                                <label
+                                  key={d}
+                                  className="flex items-center gap-2 cursor-pointer text-sm"
+                                >
+                                  <Checkbox
+                                    checked={checked}
+                                    onCheckedChange={(checked) => {
+                                      const prev =
+                                        field.meetingSettings?.availableDays ??
+                                        [1, 2, 3, 4, 5];
+                                      const next = checked
+                                        ? [...prev, d].sort((a, b) => a - b)
+                                        : prev.filter((x) => x !== d);
+                                      updateField(field.id, {
+                                        meetingSettings: {
+                                          ...field.meetingSettings,
+                                          availableDays:
+                                            next.length > 0 ? next : [1, 2, 3, 4, 5],
+                                        },
+                                      });
+                                    }}
+                                  />
+                                  {label}
+                                </label>
+                              );
+                            })}
+                          </div>
                         </div>
 
                         {/* Calendar Selection - Will be populated during publish */}

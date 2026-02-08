@@ -22,6 +22,7 @@ interface MeetingTimePickerProps {
   startHour?: number; // Start hour (0-23), default 9
   endHour?: number; // End hour (0-23), default 17
   timeZone?: string; // Timezone for slot generation (e.g., "America/New_York")
+  availableDays?: number[]; // 0=Sun .. 6=Sat; when absent/empty, treat as weekdays [1,2,3,4,5]
 }
 
 // Generate time slots for a given date
@@ -31,6 +32,7 @@ const generateTimeSlots = (
   bufferTime: number = 0,
   startHour: number = 9,
   endHour: number = 17,
+  allowedDays?: number[], // 0=Sun .. 6=Sat; when absent, weekdays only (skip 0, 6)
 ): string[] => {
   const slots: string[] = [];
   const currentDate = new Date();
@@ -57,8 +59,12 @@ const generateTimeSlots = (
 
   // Generate slots until end hour
   while (selectedDate.getHours() < endHour) {
-    // Skip weekends (optional - you can make this configurable)
-    if (selectedDate.getDay() === 0 || selectedDate.getDay() === 6) {
+    const day = selectedDate.getDay();
+    const skip =
+      allowedDays != null && allowedDays.length > 0
+        ? !allowedDays.includes(day)
+        : day === 0 || day === 6;
+    if (skip) {
       selectedDate.setHours(selectedDate.getHours() + 1, 0, 0, 0);
       continue;
     }
@@ -137,7 +143,12 @@ export function MeetingTimePicker({
   startHour = 9,
   endHour = 17,
   timeZone,
+  availableDays,
 }: MeetingTimePickerProps) {
+  const effectiveDays =
+    availableDays != null && availableDays.length > 0
+      ? availableDays
+      : [1, 2, 3, 4, 5];
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [hasSelectedDate, setHasSelectedDate] = useState<boolean>(!!value);
@@ -194,6 +205,9 @@ export function MeetingTimePicker({
           if (timeZone) {
             params.append("timeZone", timeZone);
           }
+          if (effectiveDays.length > 0) {
+            params.append("availableDays", effectiveDays.join(","));
+          }
 
           const response = await fetch(
             `/api/google/calendar/availability?${params}`,
@@ -219,7 +233,7 @@ export function MeetingTimePicker({
 
       fetchAvailability();
     }
-  }, [userId, calendarId, selectedDate, duration, bufferTime, startHour, endHour, timeZone]);
+  }, [userId, calendarId, selectedDate, duration, bufferTime, startHour, endHour, timeZone, effectiveDays]);
 
   // Generate available time slots for selected date
   const timeSlots = useMemo(() => {
@@ -233,8 +247,15 @@ export function MeetingTimePicker({
     }
 
     // Otherwise, generate theoretical slots
-    return generateTimeSlots(selectedDate, duration, bufferTime, startHour, endHour);
-  }, [selectedDate, duration, bufferTime, startHour, endHour, realAvailableSlots]);
+    return generateTimeSlots(
+      selectedDate,
+      duration,
+      bufferTime,
+      startHour,
+      endHour,
+      effectiveDays,
+    );
+  }, [selectedDate, duration, bufferTime, startHour, endHour, realAvailableSlots, effectiveDays]);
 
   // Calendar data
   const calendarDays = useMemo(() => {
@@ -268,8 +289,8 @@ export function MeetingTimePicker({
     // Must be today or future
     if (date < today) return false;
 
-    // Must be weekday (you can make this configurable)
-    if (date.getDay() === 0 || date.getDay() === 6) return false;
+    const day = date.getDay();
+    if (!effectiveDays.includes(day)) return false;
 
     return true;
   };
