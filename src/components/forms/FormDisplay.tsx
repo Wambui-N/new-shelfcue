@@ -169,10 +169,9 @@ export function FormDisplay({
         <div
           className={cn(
             "relative w-full flex flex-col justify-between flex-shrink-0 overflow-hidden",
-            deviceView === "desktop"
-              ? "md:w-1/2 md:min-h-screen md:sticky md:top-0"
-              : "w-full h-[25vh]",
-            deviceView === "desktop" ? "" : "h-[25vh]",
+            "w-full min-h-[40vh]",
+            deviceView === "desktop" &&
+              "md:w-1/2 md:min-h-screen md:sticky md:top-0",
             "p-4 md:p-12",
           )}
           style={
