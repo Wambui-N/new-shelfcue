@@ -1,9 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { hexToHsv, hsvToHex } from "@/lib/color-utils";
 
@@ -23,10 +30,9 @@ interface ColorPickerFieldProps {
   value: string;
   onChange: (hex: string) => void;
   label?: string;
-  /** Shown on desktop: native color swatch + hex input. On mobile: only custom HSV sliders (no presets). */
   className?: string;
-  /** Force custom HSV picker even on desktop (e.g. for consistency) */
-  forceCustom?: boolean;
+  /** On desktop: false = native color input + hex. true or mobile = click swatch opens modal with H/S/V. */
+  forceModal?: boolean;
 }
 
 export function ColorPickerField({
@@ -35,9 +41,10 @@ export function ColorPickerField({
   onChange,
   label,
   className,
-  forceCustom = false,
+  forceModal = false,
 }: ColorPickerFieldProps) {
   const hex = parseHex(value || "#000000");
+  const [open, setOpen] = useState(false);
   const [hsv, setHsv] = useState(() => hexToHsv(hex));
   const [hexInput, setHexInput] = useState(hex);
   const [isMobile, setIsMobile] = useState(false);
@@ -50,21 +57,13 @@ export function ColorPickerField({
     return () => mq.removeEventListener("change", set);
   }, []);
 
-  const syncFromHex = useCallback((newHex: string) => {
-    const h = parseHex(newHex);
-    setHsv(hexToHsv(h));
-    setHexInput(h);
-  }, []);
-
   useEffect(() => {
     const h = parseHex(value || "#000000");
-    if (h !== hexInput) {
-      setHexInput(h);
-      setHsv(hexToHsv(h));
-    }
-  }, [value]);
+    setHexInput(h);
+    setHsv(hexToHsv(h));
+  }, [value, open]);
 
-  const showCustom = forceCustom || isMobile;
+  const showModal = forceModal || isMobile;
 
   const handleHsvChange = (h: number, s: number, v: number) => {
     setHsv({ h, s, v });
@@ -73,16 +72,22 @@ export function ColorPickerField({
     onChange(newHex);
   };
 
-  const handleHexChange = (raw: string) => {
+  const handleHexChangeInModal = (raw: string) => {
     setHexInput(raw);
     const h = parseHex(raw);
-    if (h !== parseHex(value || "#000000")) {
-      setHsv(hexToHsv(h));
-      onChange(h);
+    if (/^#[0-9A-Fa-f]{6}$/.test(h) || /^[0-9A-Fa-f]{6}$/.test(h.trim())) {
+      const next = parseHex(raw);
+      setHsv(hexToHsv(next));
+      onChange(next);
     }
   };
 
-  if (!showCustom) {
+  const applyAndClose = () => {
+    onChange(parseHex(hexInput));
+    setOpen(false);
+  };
+
+  if (!showModal) {
     return (
       <div className={cn("space-y-2", className)}>
         {label && <Label htmlFor={id}>{label}</Label>}
@@ -96,7 +101,11 @@ export function ColorPickerField({
           />
           <Input
             value={hexInput}
-            onChange={(e) => handleHexChange(e.target.value)}
+            onChange={(e) => {
+              setHexInput(e.target.value);
+              const h = parseHex(e.target.value);
+              if (h !== hex) onChange(h);
+            }}
             placeholder="#000000"
             className="flex-1 font-mono text-sm"
           />
@@ -106,63 +115,97 @@ export function ColorPickerField({
   }
 
   return (
-    <div className={cn("space-y-3", className)}>
+    <div className={cn("space-y-2", className)}>
       {label && <Label htmlFor={id}>{label}</Label>}
       <div className="flex items-center gap-2">
-        <div
-          className="w-12 h-10 rounded border border-border flex-shrink-0"
+        <button
+          type="button"
+          id={id}
+          onClick={() => setOpen(true)}
+          className={cn(
+            "w-12 h-10 rounded border border-border flex-shrink-0 cursor-pointer",
+            "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          )}
           style={{ backgroundColor: hex }}
-          aria-hidden
+          aria-label="Pick color"
         />
         <Input
-          id={id}
           value={hexInput}
-          onChange={(e) => handleHexChange(e.target.value)}
+          onChange={(e) => {
+            setHexInput(e.target.value);
+            const h = parseHex(e.target.value);
+            if (h !== hex) onChange(h);
+          }}
           placeholder="#000000"
           className="flex-1 font-mono text-sm"
         />
       </div>
-      <div className="space-y-3 pt-1">
-        <div className="space-y-1.5">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Hue</span>
-            <span>{hsv.h} / {H_MAX}</span>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Pick color</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-14 h-14 rounded-lg border-2 border-border flex-shrink-0"
+                style={{ backgroundColor: hsvToHex(hsv.h, hsv.s, hsv.v) }}
+              />
+              <Input
+                value={hexInput}
+                onChange={(e) => handleHexChangeInModal(e.target.value)}
+                placeholder="#000000"
+                className="flex-1 font-mono text-sm"
+              />
+            </div>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Hue</span>
+                  <span>{hsv.h} / {H_MAX}</span>
+                </div>
+                <Slider
+                  min={0}
+                  max={H_MAX}
+                  step={1}
+                  value={[hsv.h]}
+                  onValueChange={([v]) => handleHsvChange(v, hsv.s, hsv.v)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Saturation</span>
+                  <span>{hsv.s} / {S_MAX}</span>
+                </div>
+                <Slider
+                  min={0}
+                  max={S_MAX}
+                  step={1}
+                  value={[hsv.s]}
+                  onValueChange={([v]) => handleHsvChange(hsv.h, v, hsv.v)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Value</span>
+                  <span>{hsv.v} / {V_MAX}</span>
+                </div>
+                <Slider
+                  min={0}
+                  max={V_MAX}
+                  step={1}
+                  value={[hsv.v]}
+                  onValueChange={([v]) => handleHsvChange(hsv.h, hsv.s, v)}
+                />
+              </div>
+            </div>
+            <Button type="button" onClick={applyAndClose} className="w-full">
+              Done
+            </Button>
           </div>
-          <Slider
-            min={0}
-            max={H_MAX}
-            step={1}
-            value={[hsv.h]}
-            onValueChange={([v]) => handleHsvChange(v, hsv.s, hsv.v)}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Saturation</span>
-            <span>{hsv.s} / {S_MAX}</span>
-          </div>
-          <Slider
-            min={0}
-            max={S_MAX}
-            step={1}
-            value={[hsv.s]}
-            onValueChange={([v]) => handleHsvChange(hsv.h, v, hsv.v)}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Value</span>
-            <span>{hsv.v} / {V_MAX}</span>
-          </div>
-          <Slider
-            min={0}
-            max={V_MAX}
-            step={1}
-            value={[hsv.v]}
-            onValueChange={([v]) => handleHsvChange(hsv.h, hsv.s, v)}
-          />
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
