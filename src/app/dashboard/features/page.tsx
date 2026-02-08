@@ -173,7 +173,7 @@ export default function FeaturesHubPage() {
   }, [roadmap]);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl w-full min-w-0 mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
           <ListChecks className="w-6 h-6 text-primary" /> Features Hub

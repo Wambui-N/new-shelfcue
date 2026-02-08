@@ -12,7 +12,7 @@ import { SolutionSection } from "@/components/sections/SolutionSection";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Navigation />
       <HeroSection />
       <DemoSection />

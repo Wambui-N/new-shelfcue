@@ -240,11 +240,11 @@ export class GoogleCalendarService {
 
     // Iterate through each day in the range
     while (currentDate <= endDate) {
-      const day = currentDate.getDay();
+      const dayOfWeek = currentDate.getDay();
       const skip =
         allowedDays != null && allowedDays.length > 0
-          ? !allowedDays.includes(day)
-          : day === 0 || day === 6;
+          ? !allowedDays.includes(dayOfWeek)
+          : dayOfWeek === 0 || dayOfWeek === 6;
       if (skip) {
         currentDate.setDate(currentDate.getDate() + 1);
         continue;

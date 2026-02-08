@@ -260,23 +260,23 @@ function FormViewPage({ params }: FormViewPageProps) {
 
   if (formData) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 min-w-0">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 min-w-0">
             <Button
               variant="outline"
               onClick={() => router.push("/dashboard/forms")}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-fit"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Forms
             </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
                 {formData.title}
               </h1>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
                 <Badge
                   variant={
                     formData.status === "published" ? "default" : "secondary"
@@ -292,7 +292,7 @@ function FormViewPage({ params }: FormViewPageProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
               onClick={() => router.push(`/editor/${formId}`)}
@@ -320,12 +320,12 @@ function FormViewPage({ params }: FormViewPageProps) {
         </div>
 
         {/* Form Preview */}
-        <div className="flex justify-center items-start min-h-[calc(100vh-200px)]">
+        <div className="flex justify-center items-start min-h-[calc(100vh-200px)] overflow-x-hidden">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="w-full max-w-2xl"
+            className="w-full max-w-2xl min-w-0"
           >
             <Card className="p-6">
               <FormPreview />

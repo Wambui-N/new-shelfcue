@@ -32,8 +32,8 @@ export default function DashboardNotFound() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            <h1 className="text-4xl font-bold text-foreground mb-3">404</h1>
-            <h2 className="text-xl font-semibold text-foreground mb-3">
+            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">404</h1>
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-3">
               Page Not Found
             </h2>
             <p className="text-muted-foreground mb-6">

@@ -24,10 +24,10 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-8 w-full">
+    <div className="space-y-6 sm:space-y-8 w-full min-w-0">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Settings</h1>
         <p className="text-muted-foreground mt-1">
           Manage your account, billing, and notifications
         </p>
@@ -54,7 +54,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h3 className="text-lg font-medium text-foreground">
                 Current Plan
@@ -63,7 +63,7 @@ export default function SettingsPage() {
                 Professional Plan - $17/month
               </p>
             </div>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" className="w-full sm:w-auto">
               <Link href="/dashboard/billing">
                 <CreditCard className="w-4 h-4 mr-2" />
                 Manage Billing

@@ -212,20 +212,20 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8 min-w-0">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Analytics</h1>
-        <p className="text-muted-foreground mt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Analytics</h1>
+        <p className="text-muted-foreground mt-1 text-sm sm:text-base">
           Track your form performance and understand your audience
         </p>
       </div>
 
       {/* Time Range Selector */}
       <Card className="p-4 border-border shadow-sm">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <h3 className="font-semibold text-foreground">Overview</h3>
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-2">
             {["Last 7 days", "Last 30 days", "Last 3 months"].map(
               (range, index) => (
                 <Badge
@@ -320,7 +320,7 @@ export default function AnalyticsPage() {
                           <ArrowDownRight className="w-4 h-4 text-red-500" />
                         )}
                       </div>
-                      <div className="grid grid-cols-3 gap-4 text-sm text-muted-foreground">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm text-muted-foreground">
                         <div>
                           <span className="font-medium text-foreground">
                             {form.submissions}

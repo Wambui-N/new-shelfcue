@@ -26,9 +26,9 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       </div>
 
       {/* Main Container */}
-      <div className="w-full max-w-md mx-auto">
+      <div className="w-full max-w-md min-w-0 mx-auto">
         {/* Logo */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-6 sm:mb-8">
           <div className="flex items-center gap-2">
             <Image
               src="/1.png"
@@ -37,12 +37,12 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
               height={40}
               className="object-contain"
             />
-            <span className="text-2xl font-bold text-foreground">ShelfCue</span>
+            <span className="text-xl sm:text-2xl font-bold text-foreground">ShelfCue</span>
           </div>
         </div>
 
         {/* Auth Form */}
-        <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
+        <div className="bg-card border border-border rounded-2xl p-4 sm:p-8 shadow-sm">
           {children}
         </div>
 

@@ -224,7 +224,7 @@ export default function BillingPage() {
   const isTrialExpired = isOnTrial && trialDaysRemaining === 0;
 
   return (
-    <div className="space-y-6 sm:space-y-8 max-w-4xl">
+    <div className="space-y-6 sm:space-y-8 max-w-4xl w-full min-w-0">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
@@ -324,7 +324,7 @@ export default function BillingPage() {
             </div>
 
             {/* Usage Stats */}
-            <div className="grid grid-cols-2 gap-4 pt-6 border-t">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <FileText className="w-4 h-4" />

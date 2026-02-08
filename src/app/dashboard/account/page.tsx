@@ -119,10 +119,10 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-4xl">
+    <div className="space-y-6 sm:space-y-8 w-full max-w-4xl min-w-0">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Account Settings</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Account Settings</h1>
         <p className="text-muted-foreground mt-1">
           Manage your account information and preferences
         </p>

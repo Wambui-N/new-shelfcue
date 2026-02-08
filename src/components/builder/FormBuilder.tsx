@@ -49,6 +49,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   const [mobileViewMode, setMobileViewMode] = useState<"preview" | "edit">(
     "preview",
   ); // Mobile toggle between preview and edit
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [saveStatus, setSaveStatus] = useState<
     "idle" | "saving" | "saved" | "error"
   >("idle");
@@ -63,6 +64,15 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   }>({});
   const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedDataRef = useRef<string>("");
+
+  // Detect mobile viewport (match Tailwind lg: 1024px)
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const handler = () => setIsMobileViewport(mq.matches);
+    handler();
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   // Ensure email field exists if a meeting field is present
   useEffect(() => {
@@ -770,58 +780,56 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
           )}
         >
           <div className="p-0 min-h-full pb-20 lg:pb-6">
-            {/* Device Toggle */}
-            <div className="flex items-center justify-between mb-4 sm:mb-6 px-3 sm:px-6 pt-3 sm:pt-6">
-              <h3 className="text-base sm:text-lg font-semibold text-foreground">
-                Live Preview
-              </h3>
-              <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
-                <Button
-                  variant={deviceView === "desktop" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setDeviceView("desktop")}
-                  className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm min-w-[44px] min-h-[44px] touch-target"
-                >
-                  <Monitor className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                  <span className="hidden sm:inline">Desktop</span>
-                </Button>
-                <Button
-                  variant={deviceView === "mobile" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setDeviceView("mobile")}
-                  className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm min-w-[44px] min-h-[44px] touch-target"
-                >
-                  <Smartphone className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                  <span className="hidden sm:inline">Mobile</span>
-                </Button>
+            {/* Device Toggle - hidden on phone so only phone preview is shown */}
+            {!isMobileViewport && (
+              <div className="flex items-center justify-between mb-4 sm:mb-6 px-3 sm:px-6 pt-3 sm:pt-6">
+                <h3 className="text-base sm:text-lg font-semibold text-foreground">
+                  Live Preview
+                </h3>
+                <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+                  <Button
+                    variant={deviceView === "desktop" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setDeviceView("desktop")}
+                    className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm min-w-[44px] min-h-[44px] touch-target"
+                  >
+                    <Monitor className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                    <span className="hidden sm:inline">Desktop</span>
+                  </Button>
+                  <Button
+                    variant={deviceView === "mobile" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setDeviceView("mobile")}
+                    className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm min-w-[44px] min-h-[44px] touch-target"
+                  >
+                    <Smartphone className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                    <span className="hidden sm:inline">Mobile</span>
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Preview Container */}
+            {/* Preview Container - on phone always use mobile view */}
             <div className="flex justify-center items-start w-full overflow-hidden px-3 sm:px-6">
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={deviceView}
+                  key={isMobileViewport ? "mobile" : deviceView}
                   initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.97 }}
                   transition={{ duration: 0.18 }}
                   className={
-                    deviceView === "mobile"
+                    isMobileViewport || deviceView === "mobile"
                       ? "w-[340px] sm:w-[380px]"
                       : "w-full max-w-6xl"
                   }
                 >
                   <div className="w-full rounded-3xl border border-border/60 bg-card/80 shadow-2xl overflow-hidden">
-                    {deviceView === "mobile" ? (
-                      <div className="w-full">
-                        <FormPreview deviceView={deviceView} />
-                      </div>
-                    ) : (
-                      <div className="w-full">
-                        <FormPreview deviceView={deviceView} />
-                      </div>
-                    )}
+                    <div className="w-full">
+                      <FormPreview
+                        deviceView={isMobileViewport ? "mobile" : deviceView}
+                      />
+                    </div>
                   </div>
                 </motion.div>
               </AnimatePresence>
@@ -832,7 +840,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         {/* Right Side - Editor Tabs (Smaller Width) */}
         <div
           className={cn(
-            "w-full lg:w-[420px] flex flex-col bg-background border-t lg:border-t-0 lg:border-l border-border",
+            "w-full lg:w-[420px] flex-1 lg:flex-none min-h-0 flex flex-col bg-background border-t lg:border-t-0 lg:border-l border-border",
             // On mobile, show/hide based on view mode
             "lg:block",
             mobileViewMode === "edit" ? "block" : "hidden",
@@ -878,10 +886,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
           </div>
 
           {/* Tab Content - Scrollable */}
-          <div
-            className="flex-1 p-4 overflow-y-auto"
-            style={{ maxHeight: "100%" }}
-          >
+          <div className="flex-1 min-h-0 p-4 overflow-y-auto">
             {activeTab === "fields" && <FieldEditor />}
             {activeTab === "settings" && <FormSettings />}
             {activeTab === "display" && <DisplayEditor />}

@@ -36,10 +36,10 @@ function SignInForm() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       {/* Header */}
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-foreground mb-2">
+      <div className="text-center mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
           Welcome Back
         </h1>
         <p className="text-sm text-muted-foreground">

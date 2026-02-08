@@ -475,7 +475,7 @@ export default function FormsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       {/* Expired Trial Alert */}
       {isExpired && (
         <Card className="border-2 border-red-500 bg-red-50 dark:bg-red-950/20">

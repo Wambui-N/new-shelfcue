@@ -132,16 +132,16 @@ export default function WelcomePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/20 p-4">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/20 p-4 overflow-x-hidden">
+      <div className="w-full max-w-md min-w-0 space-y-6 sm:space-y-8">
         <div className="text-center space-y-4">
           {/* Logo or Brand */}
-          <div className="flex justify-center mb-8">
-            <div className="text-4xl font-bold text-primary">ShelfCue</div>
+          <div className="flex justify-center mb-6 sm:mb-8">
+            <div className="text-3xl sm:text-4xl font-bold text-primary">ShelfCue</div>
           </div>
 
           {/* Welcome Message */}
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Welcome to ShelfCue!
           </h1>
 

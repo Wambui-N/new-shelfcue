@@ -359,7 +359,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
           {/* Mobile Header */}
           <div className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/95 backdrop-blur-sm px-4 sm:hidden">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <Image src="/sc-logo.png" alt="ShelfCue" width={24} height={24} />
+              <Image src="/1.png" alt="ShelfCue Logo" width={24} height={24} className="object-contain" />
               <span className="text-sm font-bold text-foreground">
                 ShelfCue
               </span>
@@ -451,7 +451,7 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
           <TrialBanner />
 
           {/* Page Content */}
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+          <main className="flex-1 min-w-0 overflow-x-hidden p-4 sm:p-6 lg:p-8">{children}</main>
         </div>
       </div>
     </ProtectedRoute>
