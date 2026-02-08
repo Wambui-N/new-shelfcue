@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { ColorPickerField } from "@/components/ui/color-picker-field";
 import { cn } from "@/lib/utils";
 import { availableFonts } from "@/lib/fonts";
 import { useFormStore } from "@/store/formStore";
@@ -90,104 +91,42 @@ export function DisplayEditor() {
           </h3>
         </div>
         <div className="space-y-4">
-          {/* Primary Color */}
-          <div className="space-y-2">
-            <Label htmlFor="primary-color">Primary Color</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="primary-color"
-                type="color"
-                value={formData.theme.primaryColor}
-                onChange={(e) =>
-                  handleThemeChange("primaryColor", e.target.value)
-                }
-                className="w-12 h-10 p-1 border rounded"
-              />
-              <Input
-                value={formData.theme.primaryColor}
-                onChange={(e) =>
-                  handleThemeChange("primaryColor", e.target.value)
-                }
-                placeholder="#151419"
-                className="flex-1"
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Used for buttons, links, and accents
-            </p>
-          </div>
+          {/* Primary Color - on phone: custom HSV only (no presets), H/S/V at full range */}
+          <ColorPickerField
+            id="primary-color"
+            label="Primary Color"
+            value={formData.theme.primaryColor}
+            onChange={(v) => handleThemeChange("primaryColor", v)}
+          />
+          <p className="text-xs text-muted-foreground -mt-1">
+            Used for buttons, links, and accents
+          </p>
 
           {/* Background Color */}
-          <div className="space-y-2">
-            <Label htmlFor="background-color">Background Color</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="background-color"
-                type="color"
-                value={formData.theme.backgroundColor}
-                onChange={(e) =>
-                  handleThemeChange("backgroundColor", e.target.value)
-                }
-                className="w-12 h-10 p-1 border rounded"
-              />
-              <Input
-                value={formData.theme.backgroundColor}
-                onChange={(e) =>
-                  handleThemeChange("backgroundColor", e.target.value)
-                }
-                placeholder="#fafafa"
-                className="flex-1"
-              />
-            </div>
-          </div>
+          <ColorPickerField
+            id="background-color"
+            label="Background Color"
+            value={formData.theme.backgroundColor}
+            onChange={(v) => handleThemeChange("backgroundColor", v)}
+          />
 
           {/* Text Color */}
-          <div className="space-y-2">
-            <Label htmlFor="text-color">Text Color</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="text-color"
-                type="color"
-                value={formData.theme.textColor}
-                onChange={(e) => handleThemeChange("textColor", e.target.value)}
-                className="w-12 h-10 p-1 border rounded"
-              />
-              <Input
-                value={formData.theme.textColor}
-                onChange={(e) => handleThemeChange("textColor", e.target.value)}
-                placeholder="#151419"
-                className="flex-1"
-              />
-            </div>
-          </div>
+          <ColorPickerField
+            id="text-color"
+            label="Text Color"
+            value={formData.theme.textColor}
+            onChange={(v) => handleThemeChange("textColor", v)}
+          />
 
           {/* Description Color */}
-          <div className="space-y-2">
-            <Label htmlFor="description-color">Branding Text Color</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="description-color"
-                type="color"
-                value={
-                  formData.theme.descriptionColor || formData.theme.textColor
-                }
-                onChange={(e) =>
-                  handleThemeChange("descriptionColor", e.target.value)
-                }
-                className="w-12 h-10 p-1 border rounded"
-              />
-              <Input
-                value={
-                  formData.theme.descriptionColor || formData.theme.textColor
-                }
-                onChange={(e) =>
-                  handleThemeChange("descriptionColor", e.target.value)
-                }
-                placeholder="#52525b"
-                className="flex-1"
-              />
-            </div>
-          </div>
+          <ColorPickerField
+            id="description-color"
+            label="Branding Text Color"
+            value={
+              formData.theme.descriptionColor || formData.theme.textColor
+            }
+            onChange={(v) => handleThemeChange("descriptionColor", v)}
+          />
 
           {/* Logo Upload */}
           <div className="space-y-2">

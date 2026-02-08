@@ -45,7 +45,7 @@ export function PublishProgressDialog({
     {
       key: "sheet",
       icon: <Sheet className="w-5 h-5" />,
-      label: "Creating Google Sheet",
+      label: "Connecting Google Sheet",
       description: "Setting up automatic data sync...",
     },
     ...(steps.meeting

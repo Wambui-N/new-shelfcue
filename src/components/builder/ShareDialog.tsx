@@ -25,6 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ColorPickerField } from "@/components/ui/color-picker-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -321,49 +322,22 @@ export function ShareDialog({
                   </p>
                 </div>
 
-                {/* Color Controls */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm">QR Color</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="color"
-                        value={qrColor}
-                        onChange={(e) => setQrColor(e.target.value)}
-                        className="w-16 h-10 p-1 cursor-pointer"
-                      />
-                      <Input
-                        type="text"
-                        value={qrColor}
-                        onChange={(e) => setQrColor(e.target.value)}
-                        className="flex-1 font-mono text-sm"
-                        placeholder="#151419"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-sm">Background</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="color"
-                        value={qrBgColor}
-                        onChange={(e) => setQrBgColor(e.target.value)}
-                        className="w-16 h-10 p-1 cursor-pointer"
-                      />
-                      <Input
-                        type="text"
-                        value={qrBgColor}
-                        onChange={(e) => setQrBgColor(e.target.value)}
-                        className="flex-1 font-mono text-sm"
-                        placeholder="#FFFFFF"
-                      />
-                    </div>
-                  </div>
+                {/* Color Controls - on phone: custom HSV only (no presets), H/S/V at full range */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <ColorPickerField
+                    label="QR Color"
+                    value={qrColor}
+                    onChange={setQrColor}
+                  />
+                  <ColorPickerField
+                    label="Background"
+                    value={qrBgColor}
+                    onChange={setQrBgColor}
+                  />
                 </div>
 
-                {/* Preset Colors */}
-                <div className="space-y-2">
+                {/* Preset Colors - hidden on phone so users go straight to custom */}
+                <div className="hidden sm:block space-y-2">
                   <Label className="text-sm">Brand Presets</Label>
                   <div className="flex gap-2">
                     <Button
