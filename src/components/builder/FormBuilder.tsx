@@ -885,8 +885,8 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
             </div>
           </div>
 
-          {/* Tab Content - Scrollable */}
-          <div className="flex-1 min-h-0 p-4 overflow-y-auto">
+          {/* Tab Content - Scrollable (smooth-scroll enables touch scroll on iOS) */}
+          <div className="flex-1 min-h-0 p-4 overflow-y-auto overflow-x-hidden smooth-scroll">
             {activeTab === "fields" && <FieldEditor />}
             {activeTab === "settings" && <FormSettings />}
             {activeTab === "display" && <DisplayEditor />}

@@ -169,16 +169,17 @@ export function ShareDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">Share & Embed Form</DialogTitle>
-          <DialogDescription>
-            Share your form with others or embed it on your website
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="fixed inset-0 z-50 w-full h-full max-w-none translate-x-0 translate-y-0 top-0 left-0 rounded-none flex flex-col gap-0 overflow-hidden p-0 data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100">
+        <div className="flex flex-col h-full min-h-0 overflow-hidden">
+          <DialogHeader className="flex-shrink-0 p-4 sm:p-6 pb-2">
+            <DialogTitle className="text-2xl">Share & Embed Form</DialogTitle>
+            <DialogDescription>
+              Share your form with others or embed it on your website
+            </DialogDescription>
+          </DialogHeader>
 
-        <Tabs defaultValue="link" className="mt-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <Tabs defaultValue="link" className="flex flex-col flex-1 min-h-0 overflow-hidden px-4 sm:px-6">
+            <TabsList className="flex-shrink-0 grid w-full grid-cols-4">
             <TabsTrigger value="link" className="flex items-center gap-2">
               <LinkIcon className="w-4 h-4" />
               <span className="hidden sm:inline">Link</span>
@@ -197,8 +198,9 @@ export function ShareDialog({
             </TabsTrigger>
           </TabsList>
 
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden smooth-scroll mt-4 pb-6">
           {/* Link Tab */}
-          <TabsContent value="link" className="space-y-4 mt-4">
+          <TabsContent value="link" className="space-y-4 mt-0">
             <div>
               <Label
                 htmlFor="form-url"
@@ -209,12 +211,12 @@ export function ShareDialog({
               <p className="text-sm text-muted-foreground mb-3">
                 Share this link with anyone to collect responses
               </p>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 min-w-0">
                 <Input
                   id="form-url"
                   value={formUrl}
                   readOnly
-                  className="font-mono text-sm"
+                  className="font-mono text-sm min-w-0"
                 />
                 <Button
                   type="button"
@@ -446,10 +448,12 @@ export function ShareDialog({
               <p className="text-sm text-muted-foreground mb-3">
                 Copy this code and paste it into your website's HTML
               </p>
-              <div className="relative">
-                <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto border border-border">
-                  <code>{embedCode}</code>
-                </pre>
+              <div className="relative min-w-0">
+                <div className="min-w-0 overflow-hidden rounded-lg border border-border">
+                  <pre className="bg-muted p-4 text-xs overflow-x-auto overflow-y-hidden">
+                    <code>{embedCode}</code>
+                  </pre>
+                </div>
                 <Button
                   onClick={() => copyToClipboard(embedCode, "html")}
                   size="sm"
@@ -479,10 +483,12 @@ export function ShareDialog({
               <p className="text-sm text-muted-foreground mb-3">
                 For React or Next.js applications
               </p>
-              <div className="relative">
-                <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto border border-border">
-                  <code>{embedCodeReact}</code>
-                </pre>
+              <div className="relative min-w-0">
+                <div className="min-w-0 overflow-hidden rounded-lg border border-border">
+                  <pre className="bg-muted p-4 text-xs overflow-x-auto overflow-y-hidden">
+                    <code>{embedCodeReact}</code>
+                  </pre>
+                </div>
                 <Button
                   onClick={() => copyToClipboard(embedCodeReact, "react")}
                   size="sm"
@@ -512,10 +518,12 @@ export function ShareDialog({
               <p className="text-sm text-muted-foreground mb-3">
                 For WordPress sites (use in HTML block)
               </p>
-              <div className="relative">
-                <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto border border-border">
-                  <code>{embedCodeWordPress}</code>
-                </pre>
+              <div className="relative min-w-0">
+                <div className="min-w-0 overflow-hidden rounded-lg border border-border">
+                  <pre className="bg-muted p-4 text-xs overflow-x-auto overflow-y-hidden">
+                    <code>{embedCodeWordPress}</code>
+                  </pre>
+                </div>
                 <Button
                   onClick={() =>
                     copyToClipboard(embedCodeWordPress, "wordpress")
@@ -659,249 +667,9 @@ export function ShareDialog({
               </div>
             </Card>
           </TabsContent>
-
-          {/* Embed Tab */}
-          <TabsContent value="embed" className="space-y-6 mt-4">
-            <div className="space-y-6">
-              {/* Embed Codes */}
-              <div className="space-y-6">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <Label className="text-sm font-semibold">HTML</Label>
-                    <Badge variant="secondary" className="text-xs">
-                      Most Common
-                    </Badge>
-                  </div>
-                  <div className="relative">
-                    <pre className="bg-muted p-3 rounded-lg text-xs overflow-x-auto border border-border">
-                      <code>{embedCode}</code>
-                    </pre>
-                    <Button
-                      type="button"
-                      onClick={() => copyToClipboard(embedCode, "embed-html")}
-                      size="sm"
-                      variant="outline"
-                      className="absolute top-2 right-2"
-                    >
-                      {copied === "embed-html" ? (
-                        <CheckCircle className="w-3 h-3 text-green-600" />
-                      ) : (
-                        <Copy className="w-3 h-3" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-sm font-semibold mb-2 block">
-                    React/Next.js
-                  </Label>
-                  <div className="relative">
-                    <pre className="bg-muted p-3 rounded-lg text-xs overflow-x-auto border border-border">
-                      <code>{embedCodeReact}</code>
-                    </pre>
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        copyToClipboard(embedCodeReact, "embed-react")
-                      }
-                      size="sm"
-                      variant="outline"
-                      className="absolute top-2 right-2"
-                    >
-                      {copied === "embed-react" ? (
-                        <CheckCircle className="w-3 h-3 text-green-600" />
-                      ) : (
-                        <Copy className="w-3 h-3" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-sm font-semibold mb-2 block">
-                    WordPress
-                  </Label>
-                  <div className="relative">
-                    <pre className="bg-muted p-3 rounded-lg text-xs overflow-x-auto border border-border">
-                      <code>{embedCodeWordPress}</code>
-                    </pre>
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        copyToClipboard(embedCodeWordPress, "embed-wp")
-                      }
-                      size="sm"
-                      variant="outline"
-                      className="absolute top-2 right-2"
-                    >
-                      {copied === "embed-wp" ? (
-                        <CheckCircle className="w-3 h-3 text-green-600" />
-                      ) : (
-                        <Copy className="w-3 h-3" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <Card className="p-4 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Code className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-1">
-                    Customization
-                  </h4>
-                  <ul className="text-sm text-purple-700 dark:text-purple-300 space-y-1">
-                    <li>
-                      • Change{" "}
-                      <code className="bg-purple-200 dark:bg-purple-800 px-1 rounded">
-                        height
-                      </code>{" "}
-                      to adjust form size
-                    </li>
-                    <li>
-                      • Set{" "}
-                      <code className="bg-purple-200 dark:bg-purple-800 px-1 rounded">
-                        width="600"
-                      </code>{" "}
-                      for fixed width
-                    </li>
-                    <li>
-                      • Add{" "}
-                      <code className="bg-purple-200 dark:bg-purple-800 px-1 rounded">
-                        loading="lazy"
-                      </code>{" "}
-                      for better performance
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </Card>
-          </TabsContent>
-
-          {/* Social Tab */}
-          <TabsContent value="social" className="mt-4">
-            <div className="space-y-4">
-              <div>
-                <Label className="text-base font-semibold mb-3 block">
-                  Quick Share
-                </Label>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Share your form directly on social platforms
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-3">
-                <motion.button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    shareViaEmail();
-                  }}
-                  className="flex items-center gap-4 p-4 border border-border rounded-lg hover:bg-accent transition-colors text-left"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="w-12 h-12 bg-gray-600 rounded-xl flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-foreground">
-                      Share via Email
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Send form link to your contacts
-                    </div>
-                  </div>
-                  <ExternalLink className="w-5 h-5 text-muted-foreground" />
-                </motion.button>
-
-                <motion.button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    shareViaTwitter();
-                  }}
-                  className="flex items-center gap-4 p-4 border border-border rounded-lg hover:bg-accent transition-colors text-left"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-foreground">
-                      Share on X (Twitter)
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Post to your X timeline
-                    </div>
-                  </div>
-                  <ExternalLink className="w-5 h-5 text-muted-foreground" />
-                </motion.button>
-
-                <motion.button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    shareViaLinkedIn();
-                  }}
-                  className="flex items-center gap-4 p-4 border border-border rounded-lg hover:bg-accent transition-colors text-left"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="w-12 h-12 bg-blue-700 rounded-xl flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-foreground">
-                      Share on LinkedIn
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Post to your network
-                    </div>
-                  </div>
-                  <ExternalLink className="w-5 h-5 text-muted-foreground" />
-                </motion.button>
-              </div>
-            </div>
-
-            <Card className="p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Share2 className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
-                    Maximize Reach
-                  </h4>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
-                    Share your form across multiple platforms to reach more
-                    people. Each platform has its own audience, so diversifying
-                    your sharing strategy can significantly increase response
-                    rates.
-                  </p>
-                </div>
-              </div>
-            </Card>
-          </TabsContent>
+          </div>
         </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -161,6 +161,7 @@
   .smooth-scroll {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    touch-action: pan-y;
   }
 
   /* Safe area insets for devices with notches */
