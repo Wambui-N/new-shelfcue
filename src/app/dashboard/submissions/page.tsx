@@ -243,7 +243,7 @@ export default function SubmissionsPage() {
             </div>
 
             {/* Search + Form Filter row */}
-            <div className="flex flex-col xs:flex-row gap-3 flex-1 min-w-0 w-full sm:max-w-md lg:max-w-none">
+            <div className="flex flex-col sm:flex-row gap-3 flex-1 min-w-0 w-full sm:max-w-md lg:max-w-none">
               <div className="relative flex-1 min-w-0">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3 h-3 sm:w-4 sm:h-4 pointer-events-none" />
                 <Input
@@ -268,7 +268,7 @@ export default function SubmissionsPage() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="h-9 sm:h-10 px-3 text-xs sm:text-sm w-full xs:w-auto min-w-0"
+                    className="h-9 sm:h-10 px-3 text-xs sm:text-sm w-full sm:w-auto min-w-0"
                   >
                     <Filter className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
                     <span className="truncate max-w-[120px] sm:max-w-[180px]">
@@ -360,28 +360,28 @@ export default function SubmissionsPage() {
           ))}
         </div>
       ) : (
-        // Table View
+        // Table View - horizontal scroll on small screens
         <Card className="border-border shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[640px]">
               <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="w-12 px-4 py-3 text-left">
+                  <th className="w-10 sm:w-12 px-2 sm:px-4 py-3 text-left">
                     <Checkbox />
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-foreground min-w-[100px]">
                     Name
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-foreground min-w-[120px]">
                     Email
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-foreground min-w-[80px]">
                     Form
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-foreground whitespace-nowrap">
                     Submitted
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">
+                  <th className="w-20 sm:w-24 px-2 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-foreground">
                     Actions
                   </th>
                 </tr>
@@ -392,7 +392,7 @@ export default function SubmissionsPage() {
                     key={submission.id}
                     className="hover:bg-accent/50 transition-colors"
                   >
-                    <td className="px-4 py-4">
+                    <td className="px-2 sm:px-4 py-3 sm:py-4">
                       <Checkbox
                         checked={selectedIds.has(submission.id)}
                         onCheckedChange={() =>
@@ -400,32 +400,32 @@ export default function SubmissionsPage() {
                         }
                       />
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground text-xs font-semibold">
+                    <td className="px-2 sm:px-4 py-3 sm:py-4">
+                      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground text-xs font-semibold flex-shrink-0">
                           {getName(submission).slice(0, 2).toUpperCase()}
                         </div>
-                        <span className="text-sm font-medium text-foreground">
+                        <span className="text-sm font-medium text-foreground truncate">
                           {getName(submission)}
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <span className="text-sm text-muted-foreground">
+                    <td className="px-2 sm:px-4 py-3 sm:py-4 max-w-[140px] sm:max-w-none">
+                      <span className="text-xs sm:text-sm text-muted-foreground truncate block">
                         {getEmail(submission)}
                       </span>
                     </td>
-                    <td className="px-4 py-4">
-                      <Badge variant="secondary" className="text-xs">
+                    <td className="px-2 sm:px-4 py-3 sm:py-4">
+                      <Badge variant="secondary" className="text-xs truncate max-w-[100px] sm:max-w-none inline-block">
                         {getFormTitle(submission)}
                       </Badge>
                     </td>
-                    <td className="px-4 py-4">
-                      <span className="text-sm text-muted-foreground">
+                    <td className="px-2 sm:px-4 py-3 sm:py-4 whitespace-nowrap">
+                      <span className="text-xs sm:text-sm text-muted-foreground">
                         {getTimeAgo(submission.created_at)}
                       </span>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-2 sm:px-4 py-3 sm:py-4">
                       <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
@@ -481,7 +481,7 @@ export default function SubmissionsPage() {
         open={detailSubmission !== null}
         onOpenChange={() => setDetailSubmission(null)}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-2xl w-full mx-2">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-foreground">
               Submission Details
@@ -492,18 +492,18 @@ export default function SubmissionsPage() {
               {detailSubmission && getFormTitle(detailSubmission)}
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
+          <div className="py-4 overflow-x-hidden">
             {detailSubmission && (
-              <div className="space-y-4">
+              <div className="space-y-4 min-w-0">
                 {Object.entries(detailSubmission.data).map(([key, value]) => (
                   <div
                     key={key}
-                    className="border-b border-border pb-3 last:border-0"
+                    className="border-b border-border pb-3 last:border-0 min-w-0"
                   >
                     <p className="text-sm font-medium text-foreground capitalize">
                       {key.replace(/_/g, " ")}
                     </p>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-sm text-muted-foreground mt-1 break-words">
                       {String(value)}
                     </p>
                   </div>
