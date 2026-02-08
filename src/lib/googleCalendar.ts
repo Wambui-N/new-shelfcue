@@ -176,6 +176,24 @@ export class GoogleCalendarService {
     // Use provided timezone or fallback to UTC
     const tz = timeZone || "UTC";
 
+    // Day of week in target timezone: 0=Sun, 1=Mon, ... 6=Sat (matches JS getDay())
+    const getDayOfWeekInTimezone = (date: Date, timezone: string): number => {
+      const weekday = new Intl.DateTimeFormat("en-US", {
+        timeZone: timezone,
+        weekday: "short",
+      }).format(date);
+      const map: Record<string, number> = {
+        Sun: 0,
+        Mon: 1,
+        Tue: 2,
+        Wed: 3,
+        Thu: 4,
+        Fri: 5,
+        Sat: 6,
+      };
+      return map[weekday] ?? 0;
+    };
+
     // Helper function to create a UTC date that represents a specific hour in the target timezone
     const createDateInTimezone = (year: number, month: number, day: number, hour: number, minute: number): Date => {
       // Start with midnight UTC for this date
@@ -240,7 +258,8 @@ export class GoogleCalendarService {
 
     // Iterate through each day in the range
     while (currentDate <= endDate) {
-      const dayOfWeek = currentDate.getDay();
+      // Use day of week in form timezone so Mon–Fri means Mon–Fri in that zone, not server/local
+      const dayOfWeek = getDayOfWeekInTimezone(currentDate, tz);
       const skip =
         allowedDays != null && allowedDays.length > 0
           ? !allowedDays.includes(dayOfWeek)
