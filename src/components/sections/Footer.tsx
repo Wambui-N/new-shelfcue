@@ -79,33 +79,22 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Company Info */}
           <motion.div className="lg:col-span-2" variants={itemVariants}>
-            <motion.div
-              className="flex items-center mb-6"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
+            <Link
+              href="/"
+              className="flex items-center mb-6 w-fit"
+              aria-label="Shelfcue home"
             >
-              <motion.div
-                className="w-10 h-10 mr-4 relative"
-                whileHover={{ rotate: 5 }}
-                transition={{ duration: 0.3 }}
-              >
-                <motion.img
+              <div className="w-10 h-10 mr-4 relative flex-shrink-0">
+                <img
                   src="/1.png"
-                  alt="ShelfCue Logo"
+                  alt=""
                   className="w-full h-full object-contain"
-                  animate={{
-                    scale: [1, 1.05, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                  }}
                 />
-              </motion.div>
+              </div>
               <span className="text-2xl font-bold text-foreground">
-                ShelfCue
+                Shelfcue
               </span>
-            </motion.div>
+            </Link>
 
             <p className="text-muted-foreground mb-6 leading-relaxed max-w-md">
               Shelfcue is here to relieve you of admin tasks using professional forms that capture data into your Google Sheets, and books meetings directly into your Google Calendar.

@@ -83,10 +83,10 @@ export function FormContent({
   return (
     <div
       className={cn(
-        "w-full max-w-4xl mx-auto overflow-x-hidden",
+        "w-full max-w-full md:max-w-4xl mx-auto overflow-x-hidden",
         isEmbedded
           ? "px-3 sm:px-4 py-4 sm:py-6"
-          : "px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 md:py-12", // Standalone
+          : "px-3 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 md:py-12",
         !isEmbedded && layoutConfig.spacing === "tight" && "py-4 sm:py-6 md:py-8",
         !isEmbedded &&
           layoutConfig.spacing === "loose" &&
@@ -105,8 +105,8 @@ export function FormContent({
       {/* Form Container */}
       <div
         className={cn(
-          "p-4 sm:p-6 md:p-8",
-          layout === "hero" && "max-w-2xl mx-auto",
+          "p-3 sm:p-6 md:p-8",
+          layout === "hero" && "md:max-w-2xl mx-auto",
           layout === "conversational" &&
             "min-h-[300px] sm:min-h-[400px] flex flex-col justify-center",
         )}

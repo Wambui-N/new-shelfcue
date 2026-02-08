@@ -160,8 +160,8 @@ export function FormDisplay({
     <StandaloneForm theme={displayTheme}>
       <div
         className={cn(
-          "flex flex-col overflow-x-hidden w-full",
-          deviceView === "desktop" && "md:flex-row min-h-screen",
+          "flex flex-col overflow-x-hidden w-full min-h-screen",
+          deviceView === "desktop" && "md:flex-row",
         )}
       >
         {/* Left Section - Branding */}
@@ -169,10 +169,10 @@ export function FormDisplay({
           className={cn(
             "relative w-full flex flex-col justify-between flex-shrink-0 overflow-hidden",
             deviceView === "desktop"
-              ? "md:w-1/2 md:h-screen md:sticky md:top-0"
-              : "w-full h-[250px]",
-            deviceView === "desktop" ? "" : "h-[250px]",
-            "p-4 md:p-12", // Reduced padding on mobile
+              ? "md:w-1/2 md:min-h-screen md:sticky md:top-0"
+              : "w-full min-h-[200px] max-h-[35vh]",
+            deviceView === "desktop" ? "" : "min-h-[200px] max-h-[35vh]",
+            "p-4 md:p-12",
           )}
           style={
             autoGradient
@@ -265,7 +265,7 @@ export function FormDisplay({
         {/* Right Section - Form */}
         <div
           className={cn(
-            "w-full flex flex-col flex-shrink-0 overflow-x-hidden",
+            "w-full flex flex-col flex-1 min-h-0 overflow-x-hidden",
             deviceView === "desktop" && "md:w-1/2",
           )}
           style={{
@@ -273,7 +273,7 @@ export function FormDisplay({
               "backgroundColor" in theme ? theme.backgroundColor : "#ffffff",
           }}
         >
-          <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
             {formContent}
           </div>
 
