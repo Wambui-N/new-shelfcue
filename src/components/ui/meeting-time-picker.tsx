@@ -25,6 +25,8 @@ interface MeetingTimePickerProps {
   availableDays?: number[]; // 0=Sun .. 6=Sat; when absent/empty, treat as weekdays [1,2,3,4,5]
 }
 
+const DEFAULT_WEEKDAYS = [1, 2, 3, 4, 5] as const;
+
 // Generate time slots for a given date
 const generateTimeSlots = (
   date: Date,
@@ -145,10 +147,13 @@ export function MeetingTimePicker({
   timeZone,
   availableDays,
 }: MeetingTimePickerProps) {
-  const effectiveDays =
-    availableDays != null && availableDays.length > 0
-      ? availableDays
-      : [1, 2, 3, 4, 5];
+  const effectiveDays = useMemo(
+    () =>
+      availableDays != null && availableDays.length > 0
+        ? availableDays
+        : (DEFAULT_WEEKDAYS as unknown as number[]),
+    [availableDays],
+  );
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [hasSelectedDate, setHasSelectedDate] = useState<boolean>(!!value);
@@ -174,9 +179,9 @@ export function MeetingTimePicker({
   // Parse current value
   const currentDateTime = value ? new Date(value) : null;
 
-  // Fetch real availability from calendar when we have the required props
+  // Fetch real availability from calendar when we have the required props (only when picker is open)
   useEffect(() => {
-    if (userId && calendarId && selectedDate) {
+    if (userId && calendarId && selectedDate && isOpen) {
       const fetchAvailability = async () => {
         setLoadingAvailability(true);
         setAvailabilityError(null);
@@ -233,16 +238,46 @@ export function MeetingTimePicker({
 
       fetchAvailability();
     }
-  }, [userId, calendarId, selectedDate, duration, bufferTime, startHour, endHour, timeZone, effectiveDays]);
+  }, [userId, calendarId, selectedDate, isOpen, duration, bufferTime, startHour, endHour, timeZone, effectiveDays]);
+
+  // Format date as YYYY-MM-DD in a given timezone for comparison
+  const getDateKey = (date: Date, tz?: string): string => {
+    if (tz) {
+      const keyParts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: tz,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+        .formatToParts(date)
+        .reduce(
+          (acc, p) => {
+            if (p.type === "year") acc.y = p.value;
+            if (p.type === "month") acc.m = p.value;
+            if (p.type === "day") acc.d = p.value;
+            return acc;
+          },
+          {} as Record<string, string>,
+        );
+      return `${keyParts.y}-${keyParts.m}-${keyParts.d}`;
+    }
+    return date.toDateString();
+  };
 
   // Generate available time slots for selected date
   const timeSlots = useMemo(() => {
     // If we have real availability data, use it
     if (realAvailableSlots.length > 0) {
-      // Filter to only show slots for the selected date
+      // Filter to only show slots for the selected date (in form timezone when set)
+      const selectedKey = timeZone
+        ? getDateKey(selectedDate, timeZone)
+        : selectedDate.toDateString();
       return realAvailableSlots.filter((slot) => {
         const slotDate = new Date(slot);
-        return slotDate.toDateString() === selectedDate.toDateString();
+        const slotKey = timeZone
+          ? getDateKey(slotDate, timeZone)
+          : slotDate.toDateString();
+        return slotKey === selectedKey;
       });
     }
 
@@ -255,7 +290,7 @@ export function MeetingTimePicker({
       endHour,
       effectiveDays,
     );
-  }, [selectedDate, duration, bufferTime, startHour, endHour, realAvailableSlots, effectiveDays]);
+  }, [selectedDate, duration, bufferTime, startHour, endHour, realAvailableSlots, effectiveDays, timeZone]);
 
   // Calendar data
   const calendarDays = useMemo(() => {

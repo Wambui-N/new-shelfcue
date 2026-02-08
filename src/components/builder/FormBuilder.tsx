@@ -841,7 +841,8 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         <div
           className={cn(
             "w-full lg:w-[420px] flex-1 lg:flex-none min-h-0 flex flex-col bg-background border-t lg:border-t-0 lg:border-l border-border",
-            // On mobile, show/hide based on view mode
+            // On mobile, cap height so tab content scroll container gets a definite height for touch scroll
+            "max-h-[calc(100dvh-6rem)] lg:max-h-none",
             "lg:block",
             mobileViewMode === "edit" ? "block" : "hidden",
           )}
