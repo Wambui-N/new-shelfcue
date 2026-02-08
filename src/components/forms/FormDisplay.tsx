@@ -153,6 +153,7 @@ export function FormDisplay({
       userId={userId}
       isEmbedded={isEmbedded}
       timeZone={settings.timezone}
+      showWatermark={showWatermark}
     />
   );
 
@@ -278,39 +279,6 @@ export function FormDisplay({
               {formContent}
             </div>
           </div>
-
-          {/* Watermark */}
-          {showWatermark && (
-            <div
-              className="w-full text-center py-4 border-t border-border"
-              style={{
-                backgroundColor:
-                  "backgroundColor" in theme
-                    ? theme.backgroundColor
-                    : "#ffffff",
-              }}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <img
-                  src="/1.png"
-                  alt="ShelfCue Logo"
-                  className="h-4 w-auto opacity-70"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Powered by{" "}
-                  <a
-                    href="https://shelfcue.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                    style={{ color: displayTheme.primaryColor }}
-                  >
-                    ShelfCue
-                  </a>
-                </p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </StandaloneForm>

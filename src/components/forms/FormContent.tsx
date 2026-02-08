@@ -29,6 +29,7 @@ interface FormContentProps {
   userId?: string;
   isEmbedded?: boolean;
   timeZone?: string;
+  showWatermark?: boolean;
 }
 
 export function FormContent({
@@ -49,6 +50,7 @@ export function FormContent({
   userId,
   isEmbedded = false,
   timeZone,
+  showWatermark = false,
 }: FormContentProps) {
   const layoutConfig = layoutPresets[layout];
   const isConversational = layout === "conversational";
@@ -235,6 +237,30 @@ export function FormContent({
             )}
           </div>
         </form>
+
+        {showWatermark && (
+          <div className="w-full text-center pt-6 mt-6 border-t border-border">
+            <div className="flex items-center justify-center gap-2">
+              <img
+                src="/1.png"
+                alt="ShelfCue Logo"
+                className="h-4 w-auto opacity-70"
+              />
+              <p className="text-xs text-muted-foreground">
+                Powered by{" "}
+                <a
+                  href="https://shelfcue.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                  style={{ color: theme.primaryColor }}
+                >
+                  ShelfCue
+                </a>
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
