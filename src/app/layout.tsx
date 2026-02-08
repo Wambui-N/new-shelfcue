@@ -179,7 +179,7 @@ export default function RootLayout({
               operatingSystem: "Web",
               offers: {
                 "@type": "Offer",
-                price: "29",
+                price: "17",
                 priceCurrency: "USD",
                 availability: "https://schema.org/InStock",
               },

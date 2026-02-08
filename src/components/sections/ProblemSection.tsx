@@ -1,29 +1,39 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowRight, Check } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export function ProblemSection() {
-  const problems = [
+  const items = [
     {
-      title: "Outdated Design",
-      description: "Forms look unprofessional and hurt your brand",
-      icon: AlertCircle,
+      headline: "Booking a call shouldn't take five emails",
+      frustratingNow:
+        "You email. They reply late. You suggest new times. Something clashes. Before you know it, scheduling has turned into a mini project.",
+      shelfcueFixes:
+        "With Shelfcue, clients book directly from your form. They choose an available time that's already synced with your calendar. No emails, no chasing, no double-booking.",
     },
     {
-      title: "No Branding",
-      description: "Can't match your website or upload logos",
-      icon: AlertCircle,
+      headline: "Your intake and scheduling are scattered",
+      frustratingNow:
+        "One tool for forms. Another for booking. Another to connect everything. Your data ends up in different places, and you're left stitching it together.",
+      shelfcueFixes:
+        "Shelfcue brings intake and booking into one simple flow. Every submission and booking is saved automatically to Google Sheets and Google Calendar.",
     },
     {
-      title: "Poor Mobile",
-      description: "Forms don't work well on mobile devices",
-      icon: AlertCircle,
+      headline: "Admin work is stealing time from real work",
+      frustratingNow:
+        "Copy-pasting details. Fixing incomplete info. Organizing bookings. It's necessary, but it's not what clients pay you for.",
+      shelfcueFixes:
+        "Shelfcue handles intake, booking, and record-keeping automatically. Once it's set up, it works quietly in the background so you can focus on consulting.",
     },
     {
-      title: "Manual Work",
-      description: "Hours wasted on manual data exports",
-      icon: AlertCircle,
+      headline: "A messy intake makes you look unprepared",
+      frustratingNow:
+        "Generic forms, inconsistent information, and a disjointed onboarding experience can make even great consultants feel less polished than they are.",
+      shelfcueFixes:
+        "Shelfcue gives you clean, customizable forms that work on any device. Clients get a smooth, professional experience, and you get organized, reliable data every time.",
     },
   ];
 
@@ -51,91 +61,76 @@ export function ProblemSection() {
     },
   };
 
-  const iconVariants = {
-    hover: {
-      scale: 1.1,
-      rotate: [0, -5, 5, 0],
-      transition: {
-        duration: 0.4,
-      },
-    },
-  };
-
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-background">
+    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-background/50">
       {/* Background Elements */}
-      <div className="absolute inset-0 opacity-5">
+      <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-dark-gray rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-light-gray rounded-full blur-3xl" />
       </div>
 
       <motion.div
-        className="container mx-auto max-w-5xl relative z-10"
+        className="container mx-auto max-w-5xl"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
       >
         {/* Header */}
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-20"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
-            The Frustration Behind{" "}
-            <span className="text-dark-gray">Every Form</span>
+            The Problem With Your Current Intake and Booking Process
           </h2>
 
           <p className="text-base md:text-lg text-foreground-muted max-w-3xl mx-auto leading-relaxed">
-            Most form tools look outdated, feel rigid, and trap your data behind
-            paywalls or confusing dashboards. You want something that just
-            works, that looks good on your website, matches your brand, and
-            sends data exactly where you need it.
+            See what you have now versus what you gain when intake, booking, and
+            data live in one place.
           </p>
         </motion.div>
 
-        {/* Problems Grid */}
+        {/* Column headers */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-16 mb-8"
           variants={containerVariants}
         >
-          {problems.map((problem, index) => (
+          <p className="text-base font-semibold text-foreground-muted uppercase tracking-wide flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 shrink-0 text-destructive" />
+            What&apos;s frustrating now
+          </p>
+          <p className="text-base font-semibold text-foreground uppercase tracking-wide flex items-center gap-2 md:justify-start">
+            <Check className="w-5 h-5 shrink-0 text-green-600" />
+            How Shelfcue fixes it
+          </p>
+        </motion.div>
+
+        {/* Rows: each row = one frustration (left) + corresponding fix (right) */}
+        <motion.div
+          className="space-y-10"
+          variants={containerVariants}
+        >
+          {items.map((item, index) => (
             <motion.div
               key={index}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-16 items-start"
               variants={itemVariants}
-              whileHover={{
-                y: -8,
-                transition: { duration: 0.3 },
-              }}
-              className="group"
             >
-              <div className="relative p-6 rounded-2xl bg-card border border-border hover:border-dark-gray transition-all duration-500 h-full hover:shadow-lg hover:shadow-dark-gray/10">
-                {/* Icon */}
-                <motion.div
-                  className="w-12 h-12 bg-light-gray/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-light-gray/50 transition-colors duration-300"
-                  variants={iconVariants}
-                  whileHover="hover"
-                >
-                  <problem.icon className="w-6 h-6 text-dark-gray" />
-                </motion.div>
-
-                {/* Content */}
-                <h3 className="text-lg font-bold text-foreground mb-3 group-hover:text-dark-gray transition-colors duration-300">
-                  {problem.title}
+              <div>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  {item.headline}
                 </h3>
-
-                <p className="text-sm text-foreground-muted leading-relaxed group-hover:text-foreground/80 transition-colors duration-300">
-                  {problem.description}
+                <p className="text-base text-foreground-muted leading-relaxed">
+                  {item.frustratingNow}
                 </p>
-
-                {/* Decorative Element */}
-                <motion.div
-                  className="absolute top-6 right-6 w-2 h-2 bg-dark-gray rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  whileHover={{ scale: [1, 1.5, 1] }}
-                  transition={{ duration: 0.6 }}
-                />
+              </div>
+              <div>
+                <p className="text-base text-foreground leading-relaxed">
+                  {item.shelfcueFixes}
+                </p>
               </div>
             </motion.div>
           ))}
@@ -143,12 +138,43 @@ export function ProblemSection() {
 
         {/* Bottom CTA */}
         <motion.div
-          className="text-center mt-16"
+          className="text-center mt-24"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-        ></motion.div>
+        >
+          <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+            Ready to fix this?
+          </h3>
+          <p className="text-base text-foreground-muted max-w-xl mx-auto mb-6">
+            Bring intake and booking into one place and get back to the work
+            that matters.
+          </p>
+          <Link href="/auth/signup">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button
+                size="default"
+                className="group bg-black text-white hover:bg-dark-gray shadow-md hover:shadow-lg transition-all duration-300 text-sm sm:text-base px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-medium w-full sm:w-auto"
+              >
+                <span className="mr-2">Start free with Shelfcue</span>
+                <motion.div
+                  className="inline-block"
+                  whileHover={{ x: 2 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </motion.div>
+              </Button>
+            </motion.div>
+          </Link>
+          <p className="text-xs text-center text-muted-foreground mt-3">
+            No credit card required
+          </p>
+        </motion.div>
       </motion.div>
     </section>
   );

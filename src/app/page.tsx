@@ -15,12 +15,12 @@ export default function HomePage() {
     <div className="min-h-screen bg-background">
       <Navigation />
       <HeroSection />
-      <ProblemSection />
-      <SolutionSection />
-      <FeaturesSection />
-      <HowItWorksSection />
-      {/* <TestimonialsSection /> */}
       <DemoSection />
+      <ProblemSection />
+      {/* <SolutionSection /> */}
+      <FeaturesSection />
+      {/* <HowItWorksSection /> */}
+      {/* <TestimonialsSection /> */}
       <PricingSection />
       <FAQSection />
       <FinalCTASection />

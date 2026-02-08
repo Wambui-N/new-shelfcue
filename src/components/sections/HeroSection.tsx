@@ -30,7 +30,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-20">
+    <section className="relative min-h-96 flex items-center justify-center overflow-hidden bg-background pt-36">
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <video
@@ -47,7 +47,7 @@ export function HeroSection() {
       </div>
 
       <motion.div
-        className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 py-12 sm:py-16 max-w-4xl"
+        className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 py-6 sm:py-8 max-w-4xl"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -55,13 +55,13 @@ export function HeroSection() {
         {/* Main Heading */}
         <motion.h1
           variants={itemVariants}
-          className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight mb-3 sm:mb-4 leading-tight px-2"
+          className="text-md sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold tracking-tight mb-3 sm:mb-4 leading-tight px-2"
         >
           <span className="block text-foreground">
-            The Beautiful Form Builder
+          Handle Client Intake & Scheduling in One Motion, 
           </span>
           <span className="block text-dark-gray">
-            That Automatically Fills Your Google Sheets
+          Using Professional and Branded Forms
           </span>
         </motion.h1>
 
@@ -70,10 +70,9 @@ export function HeroSection() {
           variants={itemVariants}
           className="text-sm sm:text-base md:text-lg lg:text-xl text-foreground-muted mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4"
         >
-          Finally, a form builder that does the work for you.{" "}
+          Shelfcue is here to relieve you of admin tasks using professional {" "}
           <span className="text-foreground font-medium">
-            Beautiful forms that capture leads while automatically organizing
-            them in Google Sheets.
+           forms that capture data into your Google Sheets, and books meetings directly into your Google Calendar.
           </span>
         </motion.p>
 
@@ -88,7 +87,7 @@ export function HeroSection() {
                 size="default"
                 className="group bg-black text-white hover:bg-dark-gray shadow-md hover:shadow-lg transition-all duration-300 text-sm sm:text-base px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-medium w-full sm:w-auto"
               >
-                <span className="mr-2">Build Your First Form in Minutes</span>
+                <span className="mr-2">Build Your First Form Now</span>
                 <motion.div
                   className="inline-block"
                   whileHover={{ x: 2 }}
@@ -119,7 +118,7 @@ export function HeroSection() {
         </motion.div>
 
         {/* Social Proof */}
-        <motion.p
+        {/* <motion.p
           variants={itemVariants}
           className="text-xs sm:text-sm text-foreground-muted max-w-xl mx-auto px-4"
         >
@@ -132,7 +131,7 @@ export function HeroSection() {
             small businesses
           </span>{" "}
           who want beautiful, branded forms
-        </motion.p>
+        </motion.p> */}
       </motion.div>
     </section>
   );

@@ -1,33 +1,35 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
+import Image from "next/image";
 import { Pause, Play, RotateCcw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function DemoSection() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+  const inView = useInView(sectionRef, { once: true, amount: 0.3 });
+
+  useEffect(() => {
+    if (inView) setIsPlaying(true);
+  }, [inView]);
 
   const demoSteps = [
     {
-      title: "Create Form",
-      description: "Design your lead capture form in seconds",
-      content: "Newsletter Signup Form",
+      title: "Create",
+      description: "Start with a template or from scratch to launch your form.",
+      image: "/Create.png",
     },
     {
-      title: "Add Fields",
-      description: "Drag and drop form fields with ease",
-      content: "Name, Email, Company, Message",
+      title: "Customize",
+      description: "Adjust fields and match the design to your branding.",
+      image: "/Customize.png",
     },
     {
-      title: "Customize Design",
-      description: "Match your brand colors and styling",
-      content: "Modern, Clean Interface",
-    },
-    {
-      title: "Integrate & Publish",
-      description: "Connect to Google Sheets and go live",
-      content: "Live Form Ready!",
+      title: "Publish & Capture",
+      description: "Publish your form and start capturing leads.",
+      image: "/Publish.png",
     },
   ];
 
@@ -41,7 +43,11 @@ export function DemoSection() {
   }, [isPlaying]);
 
   return (
-    <section id="demo" className="py-16 px-4 sm:px-6 lg:px-8 bg-background">
+    <section
+      ref={sectionRef}
+      id="demo"
+      className="py-16 px-4 sm:px-6 lg:px-8 bg-background"
+    >
       <div className="container mx-auto max-w-7xl">
         {/* Section Intro */}
         <motion.div
@@ -73,9 +79,9 @@ export function DemoSection() {
         </motion.div>
 
         <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-center min-h-[60vh] lg:min-h-[80vh]">
-          {/* Left Side - Demo Preview (Takes up more than half width) */}
+          {/* Left Side - Demo Preview (Just over half screen height) */}
           <motion.div
-            className="lg:col-span-7 relative lg:sticky lg:top-0 lg:h-screen lg:flex lg:items-center lg:justify-center mb-8 lg:mb-0"
+            className="lg:col-span-7 relative lg:sticky lg:top-0 lg:min-h-[55vh] lg:flex lg:items-center lg:justify-center mb-8 lg:mb-0"
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -86,12 +92,12 @@ export function DemoSection() {
               {/* Browser Header */}
               <div className="flex items-center gap-2 mb-2 lg:mb-3 pb-2 border-b border-light-gray/50">
                 <div className="flex gap-1.5">
-                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-light-gray"></div>
-                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-light-gray"></div>
-                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-light-gray"></div>
+                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-[#ff5f57]" aria-hidden />
+                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-[#febc2e]" aria-hidden />
+                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-[#28c840]" aria-hidden />
                 </div>
                 <div className="flex-1 bg-background rounded-md px-2 lg:px-3 py-1 lg:py-1.5 text-xs text-foreground-muted">
-                  shelfcue.com/demo
+                  {`shelfcue.com/${demoSteps[currentStep].title.toLowerCase().replace(/\s+/g, "-")}`}
                 </div>
               </div>
 
@@ -99,44 +105,15 @@ export function DemoSection() {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentStep}
-                  className="h-[300px] sm:h-[400px] lg:h-[600px] flex flex-col items-center justify-center text-center p-4 sm:p-6 lg:p-8 bg-background/95"
+                  className="h-[220px] sm:h-[275px] lg:h-[380px] flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-background/95 overflow-hidden"
+                  style={{ minHeight: "55vh" }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5 }}
                 >
                   <motion.div
-                    className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-light-gray/30 rounded-xl lg:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 lg:mb-8 text-black"
-                    animate={{
-                      scale: [1, 1.05, 1],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                    }}
-                  >
-                    <span className="text-2xl sm:text-3xl lg:text-4xl">
-                      {currentStep === 0 && "📝"}
-                      {currentStep === 1 && "📋"}
-                      {currentStep === 2 && "🎨"}
-                      {currentStep === 3 && "🚀"}
-                    </span>
-                  </motion.div>
-
-                  <motion.h3
-                    className="text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground mb-2 sm:mb-3 lg:mb-4"
-                    animate={{ opacity: [0.8, 1, 0.8] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    {demoSteps[currentStep].title}
-                  </motion.h3>
-
-                  <motion.p className="text-foreground-muted text-sm sm:text-base leading-relaxed mb-4 sm:mb-6 lg:mb-8 max-w-lg px-4">
-                    {demoSteps[currentStep].description}
-                  </motion.p>
-
-                  <motion.div
-                    className="w-full max-w-lg bg-white rounded-lg p-4 sm:p-6 lg:p-8 border border-light-gray shadow-sm mx-4"
+                    className="relative w-full h-full max-w-2xl mx-auto rounded-lg overflow-hidden border border-light-gray shadow-sm bg-white"
                     animate={{
                       boxShadow: [
                         "0 2px 8px rgba(0,0,0,0.05)",
@@ -149,11 +126,14 @@ export function DemoSection() {
                       repeat: Infinity,
                     }}
                   >
-                    <div className="text-left space-y-4">
-                      <div className="h-3 bg-light-gray rounded animate-pulse"></div>
-                      <div className="h-3 bg-light-gray rounded w-3/4 animate-pulse"></div>
-                      <div className="h-12 bg-light-gray/50 rounded"></div>
-                    </div>
+                    <Image
+                      src={demoSteps[currentStep].image}
+                      alt={demoSteps[currentStep].title}
+                      fill
+                      className="object-contain object-center"
+                      sizes="(max-width: 1024px) 100vw, 672px"
+                      priority={currentStep === 0}
+                    />
                   </motion.div>
                 </motion.div>
               </AnimatePresence>

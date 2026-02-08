@@ -44,12 +44,12 @@ export function FinalCTASection() {
           transition={{ duration: 0.6 }}
         >
           {/* Headline */}
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
-            Start Free. Build Fast. Stay in Control.
+          <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground mb-4 leading-tight">
+          Schedule calls, capture client info, and organize everything automatically. All in one place.
           </h2>
 
           {/* Sub-headline */}
-          <motion.p
+          {/* <motion.p
             className="text-sm sm:text-base md:text-lg text-foreground-muted mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -59,7 +59,7 @@ export function FinalCTASection() {
             Try Shelfcue free for 14 days. Build a form, connect your Google
             Sheet, and see how effortless it can be to manage leads, bookings,
             and submissions all in one place.
-          </motion.p>
+          </motion.p> */}
 
           {/* CTA Button */}
           <motion.div
@@ -140,7 +140,7 @@ export function FinalCTASection() {
           >
             <div className="w-2 h-2 bg-black rounded-full"></div>
             <span className="text-sm font-semibold text-foreground">
-              Setup in under 2 minutes
+            Works with your Google Calendar and Sheets
             </span>
           </motion.div>
 

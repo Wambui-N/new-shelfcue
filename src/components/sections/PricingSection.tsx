@@ -1,25 +1,36 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Crown, Sparkles } from "lucide-react";
+import { Check } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 export function PricingSection() {
-  const plan = {
-    name: "The Founders' Offer",
-    price: "$12",
-    period: "month",
-    description: "Everything included",
-    features: [
-      "Unlimited forms & submissions",
-      "All features included",
-      "Priority support",
-      "14-day free trial",
+  const priceMonthly = 17;
+
+  const alternatives = [
+    { name: "Zapier", price: 20 },
+    { name: "Typeform", price: 39 },
+    { name: "Calendly", price: 12 },
+  ];
+  const totalAlternatives = alternatives.reduce((sum, a) => sum + a.price, 0);
+  const savings = totalAlternatives - priceMonthly;
+
+  const pricing = {
+    headline: "One Simple Plan, Everything You Need",
+    subhead: "No tiers. No surprises. Just one price and everything included.",
+    benefits: [
+      "Clients book calls without back-and-forth",
+      "Submissions organized automatically in Google Sheets",
+      "Works quietly in the background",
+      "Professional, customizable forms for every client",
+      "All future updates and improvements included",
     ],
-    cta: "Start Your 14-Day Free Trial",
-    color: "text-black",
+    simplicityLine:
+      "No extra tools. No fragile automations. Just one system that works.",
+    ctaText: "Start your 14-day free trial",
+    trialLine: "Start your 14-day free trial, no credit card required",
   };
 
   const containerVariants = {
@@ -87,184 +98,176 @@ export function PricingSection() {
         whileInView="visible"
         viewport={{ once: true }}
       >
+        {/* Headline */}
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-10"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <motion.div
-            className="inline-flex items-center gap-2 px-3 py-1 bg-light-gray/30 text-black rounded-full text-xs font-medium mb-6 border border-light-gray"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Sparkles className="w-3 h-3" />
-            <span>Pricing That Scales</span>
-          </motion.div>
-
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
-            Affordable{" "}
-            <span className="text-dark-gray">
-              Form Builder for Small Business
-            </span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 leading-tight">
+            {pricing.headline}
           </h2>
-
-          <p className="text-base md:text-lg text-foreground-muted max-w-3xl mx-auto leading-relaxed">
-            Get everything you need to replace Google Forms.{" "}
-            <span className="text-foreground font-medium">
-              One price, unlimited forms.
-            </span>
+          <p className="text-base md:text-lg text-foreground-muted max-w-2xl mx-auto">
+            {pricing.subhead}
           </p>
         </motion.div>
 
-        <div className="max-w-md mx-auto">
+
+
+        <div className="max-w-2xl mx-auto">
           <motion.div
             variants={cardVariants}
             whileHover={{
-              y: -12,
+              y: -8,
               scale: 1.02,
               transition: { duration: 0.3 },
             }}
             className="relative group"
           >
             <Card className="relative p-6 sm:p-8 border-2 border-primary shadow-xl bg-card/95 backdrop-blur-sm transition-all duration-500 group-hover:shadow-2xl">
-              {/* Popular Badge */}
+              {/* Price block */}
               <motion.div
-                className="absolute -top-3 left-1/2 transform -translate-x-1/2"
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-              >
-                <div className="bg-black text-white px-4 sm:px-6 py-2 rounded-full text-xs font-bold flex items-center shadow-lg">
-                  <Crown className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  Most Popular
-                </div>
-              </motion.div>
-
-              {/* Header */}
-              <motion.div
-                className="text-center mb-6 sm:mb-8 mt-2"
+                className="text-center mb-6"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
               >
-                <motion.h3
-                  className="text-xl sm:text-2xl font-bold text-foreground mb-3 sm:mb-4"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  {plan.name}
-                </motion.h3>
-
-                <motion.div
-                  className="mb-3 sm:mb-4"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <span
-                    className={`text-3xl sm:text-4xl md:text-5xl font-bold ${plan.color}`}
-                  >
-                    {plan.price}
+                <div className="mb-2">
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-black">
+                    ${priceMonthly}
                   </span>
                   <span className="text-foreground-muted ml-2 text-base sm:text-lg">
-                    /{plan.period}
+                    /month
                   </span>
-                </motion.div>
-
-                <p className="text-sm sm:text-base text-foreground-muted leading-relaxed">
-                  {plan.description}
+                </div>
+                <p className="text-sm font-medium text-foreground">
+                  {pricing.trialLine}
                 </p>
               </motion.div>
 
-              {/* Features List */}
+              {/* Benefits */}
               <motion.ul
-                className="space-y-3 mb-8"
+                className="space-y-3 mb-6"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.3, duration: 0.6 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
               >
-                {plan.features.map((feature, featureIndex) => (
+                {pricing.benefits.map((benefit, i) => (
                   <motion.li
-                    key={featureIndex}
+                    key={i}
                     className="flex items-start group/feature"
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{
-                      delay: featureIndex * 0.1 + 0.4,
+                      delay: i * 0.08 + 0.3,
                       duration: 0.5,
                     }}
                   >
-                    <motion.div
-                      className="w-5 h-5 text-primary mr-3 mt-0.5 flex-shrink-0"
-                      whileHover={{ scale: 1.2, rotate: 5 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Check className="w-5 h-5" />
-                    </motion.div>
+                    <div className="w-5 h-5 text-primary mr-3 mt-0.5 flex-shrink-0">
+                      <Check className="w-5 h-5 text-green-500" />
+                    </div>
                     <span className="text-sm text-foreground-muted group-hover/feature:text-foreground transition-colors duration-300">
-                      {feature}
+                      {benefit}
                     </span>
                   </motion.li>
                 ))}
               </motion.ul>
 
-              {/* CTA Button */}
+              {/* Simplicity line */}
+              <motion.p
+                className="text-sm text-foreground-muted text-center mb-4"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+              >
+                {pricing.simplicityLine}
+              </motion.p>
+
+              {/* CTA */}
               <motion.div
                 className="text-center"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.8, duration: 0.6 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
               >
                 <Link href="/auth/signup">
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                  <Button
+                    size="default"
+                    className="w-full bg-black text-white hover:bg-dark-gray hover:shadow-xl transition-all duration-300 text-sm sm:text-base py-3 sm:py-4 font-semibold"
                   >
-                    <Button
-                      size="default"
-                      className="w-full bg-black text-white hover:bg-dark-gray hover:shadow-xl transition-all duration-300 text-sm sm:text-base py-3 sm:py-4 font-semibold"
-                    >
-                      {plan.cta}
-                    </Button>
-                  </motion.div>
+                    {pricing.ctaText}
+                  </Button>
                 </Link>
                 <p className="text-xs text-center text-muted-foreground mt-3">
                   No credit card required
                 </p>
               </motion.div>
-
-              {/* Decorative Corner */}
-              <motion.div
-                className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-primary/10 to-transparent rounded-tl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                initial={false}
-              />
             </Card>
           </motion.div>
         </div>
 
-        {/* Guarantee */}
+        {/* Trust strip */}
         <motion.div
-          className="text-center mt-16"
-          initial={{ opacity: 0, y: 30 }}
+          className="text-center mt-12"
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <motion.div
-            className="inline-flex flex-wrap items-center justify-center gap-6 px-8 py-4 bg-light-gray/30 text-black rounded-2xl border border-light-gray"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
+          <div className="inline-flex flex-wrap items-center justify-center gap-4 sm:gap-6 px-6 py-3 text-sm text-foreground-muted">
+            <span>Cancel anytime</span>
+            <span className="hidden sm:inline">·</span>
+            <span>14-day free trial</span>
+            <span className="hidden sm:inline">·</span>
+            <span>5-minute setup</span>
+          </div>
+        </motion.div>
+        {/* Comparison: alternatives vs Shelfcue */}
+        <motion.div
+          className="max-w-2xl mx-auto my-4"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <div
+            className="rounded-xl border border-border bg-muted/50 px-4 py-4 sm:px-6 sm:py-5"
+            role="region"
+            aria-label="Compare cost"
           >
-            <span className="font-semibold">Cancel anytime</span>
-            <div className="w-px h-6 bg-light-gray" />
-            <span className="font-semibold">14-Day Free Trial</span>
-            <div className="w-px h-6 bg-light-gray" />
-            <span className="font-semibold">5-minute setup</span>
-          </motion.div>
+            <p className="text-xs text-foreground-muted text-center mb-3 sm:mb-4">
+              Forms + scheduling + automation elsewhere can cost 3–4x more.
+            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-3 sm:gap-4 flex-wrap">
+              <div className="flex items-center justify-center gap-2 sm:gap-4 text-sm text-foreground-muted">
+                {alternatives.map((alt, i) => (
+                  <span key={alt.name}>
+                    {alt.name} ${alt.price}
+                    {i < alternatives.length - 1 && (
+                      <span className="hidden sm:inline mx-1">·</span>
+                    )}
+                  </span>
+                ))}
+              </div>
+              <span className="text-sm text-foreground-muted text-center sm:text-left">
+                = ${totalAlternatives}/mo elsewhere
+              </span>
+              <span className="text-sm font-semibold text-foreground text-center sm:text-left">
+                Shelfcue ${priceMonthly}/mo — Save ${savings}/mo
+              </span>
+            </div>
+            <p className="text-xs text-foreground-muted text-center mt-3">
+              Based on entry-level plan pricing. Check each provider for current
+              pricing.
+            </p>
+          </div>
         </motion.div>
       </motion.div>
     </section>

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { CreditCard, HelpCircle, Shield, Zap } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 export function FAQSection() {
@@ -9,55 +9,25 @@ export function FAQSection() {
 
   const faqs = [
     {
-      category: "Setup & Getting Started",
-      icon: <Zap className="w-6 h-6" />,
-      color: "text-black",
-      questions: [
-        {
-          question: "How is this different from Google Forms?",
-          answer:
-            "ShelfCue creates beautiful, branded forms that match your website design. Unlike Google Forms, you can customize colors, add your logo, and embed forms without ugly borders. Plus, data flows directly into Google Sheets without any setup.",
-        },
-        {
-          question: "Do I need Zapier or coding skills?",
-          answer:
-            "No! ShelfCue connects directly to Google Sheets with one click. No Zapier needed. No coding required. Everything works automatically once you connect your Google account.",
-        },
-      ],
+      question: "Is it secure?",
+      answer:
+        "When someone submits a form it's written directly to a Google Sheet file. That means your data lives in your Google account and you control access. Shelfcue uses secure authentication to connect to Google and follows standard security practices. We do not sell your data. See our full Privacy & Security page for details.",
+      answerLink: { href: "/privacy", label: "Privacy Policy" },
     },
     {
-      category: "Google Sheets Integration",
-      icon: <Shield className="w-6 h-6" />,
-      color: "text-dark-gray",
-      questions: [
-        {
-          question: "How does the Google Sheets connection work?",
-          answer:
-            "Simply connect your Google account once. Every form submission automatically appears in your Google Sheets spreadsheet. You can choose which sheet and columns to use. It's that simple.",
-        },
-        {
-          question: "Can I use existing Google Sheets?",
-          answer:
-            "Yes! You can connect to any existing Google Sheets spreadsheet. Choose which columns to use, and form data will flow right into your existing workflow.",
-        },
-      ],
+      question: "Can I use the forms on my phone?",
+      answer:
+        "Yes! All Shelfcue forms are mobile-responsive and work perfectly on phones, tablets, and computers. Your forms will look great and work smoothly on any device.",
     },
     {
-      category: "Form Building & Customization",
-      icon: <CreditCard className="w-6 h-6" />,
-      color: "text-black",
-      questions: [
-        {
-          question: "Can I make forms that match my brand?",
-          answer:
-            "Absolutely! Add your logo, choose your brand colors, and customize fonts. Make forms that look like they belong on your website, not generic Google Forms.",
-        },
-        {
-          question: "Do the forms work on mobile devices?",
-          answer:
-            "Yes! All ShelfCue forms are mobile-responsive and work perfectly on phones, tablets, and computers. Your forms will look great and work smoothly on any device.",
-        },
-      ],
+      question: "Do I need a Google account?",
+      answer:
+        "Yes. Shelfcue connects to your Google Sheets and uses Google sign-in, so you need a Google account to create forms, store submissions, and manage your data. If you already use Gmail or Google Workspace, you're all set.",
+    },
+    {
+      question: "What skills do I need?",
+      answer:
+        "Shelfcue connects directly to Google Sheets with one click. No Zapier needed. No coding required. Everything works automatically once you connect your Google account.",
     },
   ];
 
@@ -76,20 +46,18 @@ export function FAQSection() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: 0.1,
         delayChildren: 0.1,
       },
     },
   };
 
-  const categoryVariants = {
-    hidden: { opacity: 0, y: 30 },
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.6,
-      },
+      transition: { duration: 0.5 },
     },
   };
 
@@ -102,16 +70,14 @@ export function FAQSection() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            mainEntity: faqs.flatMap((category) =>
-              category.questions.map((faq) => ({
-                "@type": "Question",
-                name: faq.question,
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: faq.answer,
-                },
-              })),
-            ),
+            mainEntity: faqs.map((faq) => ({
+              "@type": "Question",
+              name: faq.question,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: faq.answer,
+              },
+            })),
           }),
         }}
       />
@@ -148,15 +114,6 @@ export function FAQSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <motion.div
-              className="inline-flex items-center gap-2 px-3 py-1 bg-light-gray/30 text-black rounded-full text-xs font-medium mb-6 border border-light-gray"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-            >
-              <HelpCircle className="w-3 h-3" />
-              <span>Got Questions?</span>
-            </motion.div>
-
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
               Questions?{" "}
               <span className="text-dark-gray">We Have Answers.</span>
@@ -167,112 +124,80 @@ export function FAQSection() {
             </p>
           </motion.div>
 
-          <div className="space-y-8">
-            {faqs.map((category, categoryIndex) => (
-              <motion.div
-                key={category.category}
-                variants={categoryVariants}
-                className="bg-card rounded-xl p-6 border border-border shadow-sm"
-              >
-                <motion.h3
-                  className="text-lg font-bold text-foreground mb-6 flex items-center gap-3"
-                  whileHover={{ x: 2 }}
-                  transition={{ duration: 0.2 }}
+          <div className="space-y-3 max-w-3xl mx-auto">
+            {faqs.map((faq, index) => {
+              const isOpen = openItems.has(index);
+
+              return (
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  className="border border-border rounded-lg overflow-hidden bg-card"
                 >
-                  <motion.div
-                    className={`p-2 rounded-lg bg-light-gray/30 ${category.color}`}
-                    animate={{
-                      rotate: [0, 3, -3, 0],
-                      scale: [1, 1.02, 1],
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                    }}
+                  <motion.button
+                    onClick={() => toggleItem(index)}
+                    className="w-full text-left p-4 sm:p-5 bg-background hover:bg-background-secondary transition-all duration-300 group"
+                    whileTap={{ scale: 0.99 }}
                   >
-                    {category.icon}
-                  </motion.div>
-                  {category.category}
-                </motion.h3>
-
-                <div className="space-y-3">
-                  {category.questions.map((faq, faqIndex) => {
-                    const globalIndex = categoryIndex * 10 + faqIndex;
-                    const isOpen = openItems.has(globalIndex);
-
-                    return (
-                      <motion.div
-                        key={faqIndex}
-                        className="border border-border rounded-lg overflow-hidden"
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: faqIndex * 0.1, duration: 0.5 }}
-                        whileHover={{ scale: 1.005 }}
+                    <div className="flex items-center justify-between gap-4">
+                      <h4
+                        className={`font-semibold text-sm sm:text-base transition-colors duration-300 ${
+                          isOpen ? "text-primary" : "text-foreground"
+                        } group-hover:text-primary`}
                       >
-                        <motion.button
-                          onClick={() => toggleItem(globalIndex)}
-                          className="w-full text-left p-4 bg-background hover:bg-background-secondary transition-all duration-300 group"
-                          whileHover={{
-                            backgroundColor: "rgba(20, 20, 25, 0.02)",
-                          }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <div className="flex items-center justify-between">
-                            <h4
-                              className={`font-semibold text-sm transition-colors duration-300 group-hover:text-primary ${
-                                isOpen ? "text-primary" : "text-foreground"
-                              }`}
-                            >
-                              {faq.question}
-                            </h4>
-                            <motion.div
-                              animate={{ rotate: isOpen ? 45 : 0 }}
-                              transition={{ duration: 0.3 }}
-                              className={`w-4 h-4 flex items-center justify-center ml-3 transition-colors duration-300 ${
-                                isOpen
-                                  ? "text-primary"
-                                  : "text-muted-foreground"
-                              }`}
-                            >
-                              <span className="text-lg font-bold">+</span>
-                            </motion.div>
-                          </div>
-                        </motion.button>
-
-                        <AnimatePresence>
-                          {isOpen && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.3 }}
-                              className="overflow-hidden"
-                            >
-                              <div className="px-4 pb-4 pt-2">
-                                <div className="w-full h-px bg-border mb-3"></div>
-                                <motion.p
-                                  className="text-sm text-muted-foreground leading-relaxed"
-                                  initial={{ opacity: 0, y: -10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: 0.1, duration: 0.3 }}
-                                >
-                                  {faq.answer}
-                                </motion.p>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                        {faq.question}
+                      </h4>
+                      <motion.div
+                        animate={{ rotate: isOpen ? 45 : 0 }}
+                        transition={{ duration: 0.3 }}
+                        className={`w-8 h-8 flex items-center justify-center shrink-0 rounded-full border border-border transition-colors duration-300 ${
+                          isOpen
+                            ? "text-primary border-primary"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        <span className="text-lg font-bold leading-none">+</span>
                       </motion.div>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            ))}
+                    </div>
+                  </motion.button>
+
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-0">
+                          <div className="w-full h-px bg-border mb-4" />
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {faq.answer}
+                            {"answerLink" in faq && faq.answerLink && (
+                              <>
+                                {" "}
+                                <Link
+                                  href={faq.answerLink.href}
+                                  className="text-foreground font-medium underline hover:no-underline"
+                                >
+                                  {faq.answerLink.label}
+                                </Link>
+                                .
+                              </>
+                            )}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
           </div>
 
           {/* Contact CTA */}
-          <motion.div
+          {/* <motion.div
             className="text-center mt-12"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -300,7 +225,7 @@ export function FAQSection() {
                 Contact Support
               </motion.button>
             </motion.div>
-          </motion.div>
+          </motion.div> */}
         </motion.div>
       </section>
     </>

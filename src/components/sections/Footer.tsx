@@ -108,8 +108,7 @@ export function Footer() {
             </motion.div>
 
             <p className="text-muted-foreground mb-6 leading-relaxed max-w-md">
-              The effortless lead capture system for founders who hate complex
-              tech. Built for scale, designed for simplicity.
+              Shelfcue is here to relieve you of admin tasks using professional forms that capture data into your Google Sheets, and books meetings directly into your Google Calendar.
             </p>
 
             <div className="flex space-x-4">
