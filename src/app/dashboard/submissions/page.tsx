@@ -191,18 +191,18 @@ export default function SubmissionsPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 min-w-0">
+    <div className="space-y-4 sm:space-y-6 min-w-0 w-full max-w-full overflow-x-hidden">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate">
             Submissions
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1">
             View and manage all form submissions
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <Button
             variant="outline"
             className="border-border w-full sm:w-auto text-sm"
@@ -214,73 +214,72 @@ export default function SubmissionsPage() {
       </div>
 
       {/* Toolbar */}
-      <Card className="p-4 sm:p-6 border-border shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          {/* View Toggle */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground mr-2">
-              View:
-            </span>
-            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
-              <Button
-                variant={viewMode === "card" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("card")}
-                className="h-7 sm:h-8 px-2 sm:px-3"
-              >
-                <LayoutGrid className="w-3 h-3 sm:w-4 sm:h-4" />
-              </Button>
-              <Button
-                variant={viewMode === "table" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("table")}
-                className="h-7 sm:h-8 px-2 sm:px-3"
-              >
-                <TableIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            {/* Search */}
-            <div className="relative flex-1 min-w-0">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3 h-3 sm:w-4 sm:h-4" />
-              <Input
-                placeholder="Search submissions..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 sm:pl-10 pr-10 h-9 sm:h-10 text-sm"
-              />
-              {searchQuery && (
+      <Card className="p-4 sm:p-6 border-border shadow-sm overflow-hidden">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+            {/* View Toggle */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap">
+                View:
+              </span>
+              <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
                 <Button
-                  variant="ghost"
+                  variant={viewMode === "card" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 sm:h-8 w-7 sm:w-8 p-0"
+                  onClick={() => setViewMode("card")}
+                  className="h-7 sm:h-8 px-2 sm:px-3"
                 >
-                  <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <LayoutGrid className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
-              )}
+                <Button
+                  variant={viewMode === "table" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("table")}
+                  className="h-7 sm:h-8 px-2 sm:px-3"
+                >
+                  <TableIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                </Button>
+              </div>
             </div>
 
-            {/* Form Filter */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="h-9 sm:h-10 px-3 text-xs sm:text-sm"
-                >
-                  <Filter className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                  <span className="truncate max-w-[100px] sm:max-w-none">
-                    {selectedFormId
-                      ? forms.find((f) => f.id === selectedFormId)?.title ||
-                        "Form"
-                      : "All Forms"}
-                  </span>
-                  <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
-                </Button>
-              </DropdownMenuTrigger>
+            {/* Search + Form Filter row */}
+            <div className="flex flex-col xs:flex-row gap-3 flex-1 min-w-0 w-full sm:max-w-md lg:max-w-none">
+              <div className="relative flex-1 min-w-0">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3 h-3 sm:w-4 sm:h-4 pointer-events-none" />
+                <Input
+                  placeholder="Search submissions..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 sm:pl-10 pr-10 h-9 sm:h-10 text-sm w-full min-w-0"
+                />
+                {searchQuery && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 sm:h-8 w-7 sm:w-8 p-0"
+                  >
+                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                  </Button>
+                )}
+              </div>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="h-9 sm:h-10 px-3 text-xs sm:text-sm w-full xs:w-auto min-w-0"
+                  >
+                    <Filter className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+                    <span className="truncate max-w-[120px] sm:max-w-[180px]">
+                      {selectedFormId
+                        ? forms.find((f) => f.id === selectedFormId)?.title ||
+                          "Form"
+                        : "All Forms"}
+                    </span>
+                    <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-2 flex-shrink-0" />
+                  </Button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuItem onClick={() => setSelectedFormId(null)}>
                   All Forms
