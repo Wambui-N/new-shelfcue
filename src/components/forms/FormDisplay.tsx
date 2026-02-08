@@ -171,8 +171,8 @@ export function FormDisplay({
             "relative w-full flex flex-col justify-between flex-shrink-0 overflow-hidden",
             deviceView === "desktop"
               ? "md:w-1/2 md:min-h-screen md:sticky md:top-0"
-              : "w-full min-h-[300px] max-h-[42vh]",
-            deviceView === "desktop" ? "" : "min-h-[300px] max-h-[42vh]",
+              : "w-full h-[25vh]",
+            deviceView === "desktop" ? "" : "h-[25vh]",
             "p-4 md:p-12",
           )}
           style={
