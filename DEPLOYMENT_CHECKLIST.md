@@ -275,11 +275,15 @@ Once all steps are done:
 - **Supabase schema:** `docs/SUPABASE.md`
 - **SQL migration:** `supabase/migrations/expire_trial_subscriptions.sql`
 
+## Resend and trial emails
+
+- **Resend setup:** See `docs/RESEND_SETUP.md` for API key, domain verification, and optional `RESEND_FROM_EMAIL`. Ensure your sending domain is verified in the Resend dashboard.
+- **Trial email cron:** Sends trial reminder (day 7), trial ending soon (day 12), and trial expired emails. Endpoint: `GET` or `POST` `/api/cron/trial-emails`. Call it daily (e.g. 01:00 UTC) from your host’s cron (e.g. Vercel Cron). Set `CRON_SECRET` in your environment and send `Authorization: Bearer <CRON_SECRET>` or header `x-cron-secret: <CRON_SECRET>` so only the scheduler can call the route.
+- **Migration:** Run `supabase/migrations/trial_email_sent.sql` in the Supabase SQL Editor to create the `trial_email_sent` table (used to send each trial email type at most once per user).
+
 ## 🚀 Next Steps (Optional)
 
 Consider adding:
 
-1. **Email notifications** when trials expire (using Resend)
-2. **Grace period** (expire at day 15 instead of day 14)
-3. **Metrics dashboard** showing trial-to-paid conversion
-4. **Automated reminders** at day 10, 13, and 14 of trial
+1. **Grace period** (expire at day 15 instead of day 14)
+2. **Metrics dashboard** showing trial-to-paid conversion

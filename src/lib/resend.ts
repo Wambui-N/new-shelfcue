@@ -247,6 +247,120 @@ export class EmailService {
     }
   }
 
+  /**
+   * Send trial reminder (e.g. day 7 - halfway)
+   */
+  static async sendTrialReminder(
+    recipientEmail: string,
+    {
+      userName,
+      trialEndDate,
+      dashboardUrl,
+    }: {
+      userName: string;
+      trialEndDate: string;
+      dashboardUrl: string;
+    },
+  ) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: DEFAULT_FROM_EMAIL,
+        to: recipientEmail,
+        subject: "You're halfway through your ShelfCue trial",
+        html: EmailService.getTrialReminderHtml({
+          userName,
+          trialEndDate,
+          dashboardUrl,
+        }),
+      });
+
+      if (error) {
+        console.error("Error sending trial reminder email:", error);
+        return { success: false, error };
+      }
+
+      console.log("✓ Trial reminder email sent:", data?.id);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Error sending trial reminder email:", error);
+      return { success: false, error };
+    }
+  }
+
+  /**
+   * Send trial ending soon (e.g. 2 days before end)
+   */
+  static async sendTrialEndingSoon(
+    recipientEmail: string,
+    {
+      userName,
+      trialEndDate,
+      billingUrl,
+    }: {
+      userName: string;
+      trialEndDate: string;
+      billingUrl: string;
+    },
+  ) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: DEFAULT_FROM_EMAIL,
+        to: recipientEmail,
+        subject: "Your ShelfCue trial ends in 2 days",
+        html: EmailService.getTrialEndingSoonHtml({
+          userName,
+          trialEndDate,
+          billingUrl,
+        }),
+      });
+
+      if (error) {
+        console.error("Error sending trial ending soon email:", error);
+        return { success: false, error };
+      }
+
+      console.log("✓ Trial ending soon email sent:", data?.id);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Error sending trial ending soon email:", error);
+      return { success: false, error };
+    }
+  }
+
+  /**
+   * Send trial expired notification
+   */
+  static async sendTrialExpired(
+    recipientEmail: string,
+    {
+      userName,
+      billingUrl,
+    }: {
+      userName: string;
+      billingUrl: string;
+    },
+  ) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: DEFAULT_FROM_EMAIL,
+        to: recipientEmail,
+        subject: "Your ShelfCue trial has ended",
+        html: EmailService.getTrialExpiredHtml({ userName, billingUrl }),
+      });
+
+      if (error) {
+        console.error("Error sending trial expired email:", error);
+        return { success: false, error };
+      }
+
+      console.log("✓ Trial expired email sent:", data?.id);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Error sending trial expired email:", error);
+      return { success: false, error };
+    }
+  }
+
   // ========== HTML Templates ==========
 
   private static getBaseEmailStyle() {
@@ -426,7 +540,7 @@ export class EmailService {
             
             <p>Hi ${userName},</p>
             
-            <p>We're thrilled to have you on board! ShelfCue makes it easy to create beautiful forms with seamless Google Calendar and Sheets integration.</p>
+            <p>You're in — here's how to create your first form and connect Google. You have 14 days to try everything.</p>
             
             <div class="info-box">
               <h3 style="margin-top: 0; color: #1f2937;">Getting Started</h3>
@@ -665,6 +779,122 @@ export class EmailService {
             <a href="${billingUrl}" class="button">Reactivate Subscription</a>
             
             <p>If you have any feedback about your experience with ShelfCue, we'd love to hear from you.</p>
+            
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} ShelfCue. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  private static getTrialReminderHtml({
+    userName,
+    trialEndDate,
+    dashboardUrl,
+  }: {
+    userName: string;
+    trialEndDate: string;
+    dashboardUrl: string;
+  }) {
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          ${EmailService.getBaseEmailStyle()}
+        </head>
+        <body>
+          <div class="email-container">
+            <div class="logo">
+              <h1>ShelfCue</h1>
+            </div>
+            
+            <h2>You're halfway through your trial</h2>
+            
+            <p>Hi ${userName},</p>
+            
+            <p>You're halfway through your trial. Here's what you can do before it ends.</p>
+            
+            <div class="info-box">
+              <p style="margin: 0;">Your trial ends on <strong>${new Date(trialEndDate).toLocaleDateString()}</strong>. Create forms, connect Google Calendar and Sheets, and explore all features.</p>
+            </div>
+            
+            <a href="${dashboardUrl}" class="button">Go to Dashboard</a>
+            
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} ShelfCue. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  private static getTrialEndingSoonHtml({
+    userName,
+    trialEndDate,
+    billingUrl,
+  }: {
+    userName: string;
+    trialEndDate: string;
+    billingUrl: string;
+  }) {
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          ${EmailService.getBaseEmailStyle()}
+        </head>
+        <body>
+          <div class="email-container">
+            <div class="logo">
+              <h1>ShelfCue</h1>
+            </div>
+            
+            <h2>Your trial ends in 2 days</h2>
+            
+            <p>Hi ${userName},</p>
+            
+            <p>Your trial ends on <strong>${new Date(trialEndDate).toLocaleDateString()}</strong>. Subscribe to keep your forms and data.</p>
+            
+            <a href="${billingUrl}" class="button">Subscribe Now</a>
+            
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} ShelfCue. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  private static getTrialExpiredHtml({
+    userName,
+    billingUrl,
+  }: {
+    userName: string;
+    billingUrl: string;
+  }) {
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          ${EmailService.getBaseEmailStyle()}
+        </head>
+        <body>
+          <div class="email-container">
+            <div class="logo">
+              <h1>ShelfCue</h1>
+            </div>
+            
+            <h2>Your trial has ended</h2>
+            
+            <p>Hi ${userName},</p>
+            
+            <p>Your trial has ended. Subscribe to reactivate your forms and keep receiving submissions.</p>
+            
+            <a href="${billingUrl}" class="button">Subscribe to ShelfCue</a>
             
             <div class="footer">
               <p>© ${new Date().getFullYear()} ShelfCue. All rights reserved.</p>

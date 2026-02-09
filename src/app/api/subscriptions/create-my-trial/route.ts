@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { EmailService } from "@/lib/resend";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 /**
@@ -126,6 +127,20 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("Error creating trial subscription:", error);
       throw error;
+    }
+
+    // Send welcome email (only for newly created trials)
+    const { data: profile } = await (supabaseAdmin as any)
+      .from("profiles")
+      .select("email, full_name")
+      .eq("id", user.id)
+      .single();
+
+    if ((profile as any)?.email) {
+      await EmailService.sendWelcomeEmail(
+        (profile as any).email,
+        (profile as any).full_name || "there",
+      );
     }
 
     return NextResponse.json({
