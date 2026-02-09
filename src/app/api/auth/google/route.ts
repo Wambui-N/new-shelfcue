@@ -11,7 +11,7 @@ import { generateGoogleOAuthUrl } from "@/lib/google-oauth-url";
 export async function GET(_request: NextRequest) {
   const cookieStore = await cookies();
   const supabase = createRouteHandlerClient({
-    cookies: (() => cookieStore) as () => ReturnType<typeof cookies>,
+    cookies: (() => cookieStore) as unknown as () => ReturnType<typeof cookies>,
   });
   const {
     data: { user },

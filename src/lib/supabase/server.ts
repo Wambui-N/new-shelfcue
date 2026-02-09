@@ -5,6 +5,6 @@ import type { Database } from "./database.types";
 export async function createServerClient() {
   const cookieStore = await cookies();
   return createServerComponentClient<Database>({
-    cookies: (() => cookieStore) as () => ReturnType<typeof cookies>,
+    cookies: (() => cookieStore) as unknown as () => ReturnType<typeof cookies>,
   });
 }
