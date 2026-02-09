@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin();
 
     // Get user's current subscription with plan details.
-    // Order by updated_at desc so we get the most recent row (e.g. "active" after payment, not an old "trial").
+    // Prefer "active" over "trial" over "expired"/"cancelled" (status asc: active < cancelled < expired < trial).
     const { data: rows, error } = await supabaseAdmin
       .from("user_subscriptions")
       .select(
@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
       )
       .eq("user_id", user.id)
       .in("status", ["trial", "active", "expired", "cancelled"])
+      .order("status", { ascending: true })
       .order("updated_at", { ascending: false })
       .limit(1);
 
