@@ -171,7 +171,7 @@ export function TrialBanner() {
             {paymentLoading
               ? "Loading..."
               : isUrgent
-                ? "Subscribe Now"
+                ? "Upgrade to paid"
                 : "View Plans"}
           </Button>
         </div>

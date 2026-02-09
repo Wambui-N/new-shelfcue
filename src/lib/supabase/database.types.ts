@@ -305,6 +305,90 @@ export type Database = {
         };
         Relationships: [];
       };
+      subscription_cancellations: {
+        Row: {
+          id: string;
+          user_id: string;
+          subscription_id: string;
+          reason: string;
+          feedback: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          subscription_id: string;
+          reason: string;
+          feedback?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          subscription_id?: string;
+          reason?: string;
+          feedback?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "subscription_cancellations_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscription_cancellations_subscription_id_fkey";
+            columns: ["subscription_id"];
+            isOneToOne: false;
+            referencedRelation: "user_subscriptions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      subscription_plans: {
+        Row: {
+          id: string;
+          name: string;
+          display_name: string;
+          description: string | null;
+          price_monthly: number;
+          is_active: boolean;
+          features: Json | null;
+          limits: Json | null;
+          paystack_plan_code: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          display_name: string;
+          description?: string | null;
+          price_monthly: number;
+          is_active?: boolean;
+          features?: Json | null;
+          limits?: Json | null;
+          paystack_plan_code?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          display_name?: string;
+          description?: string | null;
+          price_monthly?: number;
+          is_active?: boolean;
+          features?: Json | null;
+          limits?: Json | null;
+          paystack_plan_code?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       projects: {
         Row: {
           created_at: string;
@@ -499,47 +583,59 @@ export type Database = {
       };
       user_subscriptions: {
         Row: {
-          created_at: string;
-          current_period_end: string | null;
           id: string;
-          is_trial: boolean;
+          user_id: string;
           plan_id: string;
           status: string;
-          trial_end: string | null;
           trial_start: string | null;
+          trial_end: string | null;
+          current_period_start: string | null;
+          current_period_end: string | null;
+          billing_cycle: string | null;
+          paystack_subscription_code: string | null;
+          cancel_at_period_end: boolean | null;
+          is_trial: boolean;
+          created_at: string;
           updated_at: string;
-          user_id: string;
         };
         Insert: {
-          created_at?: string;
-          current_period_end?: string | null;
           id?: string;
-          is_trial?: boolean;
+          user_id: string;
           plan_id: string;
           status: string;
-          trial_end?: string | null;
           trial_start?: string | null;
+          trial_end?: string | null;
+          current_period_start?: string | null;
+          current_period_end?: string | null;
+          billing_cycle?: string | null;
+          paystack_subscription_code?: string | null;
+          cancel_at_period_end?: boolean | null;
+          is_trial?: boolean;
+          created_at?: string;
           updated_at?: string;
-          user_id: string;
         };
         Update: {
-          created_at?: string;
-          current_period_end?: string | null;
           id?: string;
-          is_trial?: boolean;
+          user_id?: string;
           plan_id?: string;
           status?: string;
-          trial_end?: string | null;
           trial_start?: string | null;
+          trial_end?: string | null;
+          current_period_start?: string | null;
+          current_period_end?: string | null;
+          billing_cycle?: string | null;
+          paystack_subscription_code?: string | null;
+          cancel_at_period_end?: boolean | null;
+          is_trial?: boolean;
+          created_at?: string;
           updated_at?: string;
-          user_id?: string;
         };
         Relationships: [
           {
             foreignKeyName: "user_subscriptions_plan_id_fkey";
             columns: ["plan_id"];
             isOneToOne: false;
-            referencedRelation: "plans";
+            referencedRelation: "subscription_plans";
             referencedColumns: ["id"];
           },
           {

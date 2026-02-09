@@ -364,7 +364,11 @@ export default function FormsPage() {
 
       // If the subscription hook reports access and not expired, avoid re-subscribing
       if (!isExpired && hasAccess) {
-        alert("You already have an active subscription.");
+        alert(
+          isOnTrial
+            ? "You're on a trial. Go to Billing to upgrade to paid when ready."
+            : "You already have an active subscription.",
+        );
         return;
       }
 

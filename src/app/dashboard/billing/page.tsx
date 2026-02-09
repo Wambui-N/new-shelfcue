@@ -394,7 +394,7 @@ export default function BillingPage() {
                   ) : (
                     <>
                       <Zap className="w-4 h-4 mr-2" />
-                      Subscribe Now
+                      Upgrade to paid
                     </>
                   )}
                 </Button>

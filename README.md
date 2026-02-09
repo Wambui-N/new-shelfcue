@@ -56,6 +56,33 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Database Setup
+
+### Supabase Configuration
+
+The app uses Supabase for database, authentication, and storage. See [`docs/SUPABASE.md`](docs/SUPABASE.md) for:
+- Required tables and schema
+- Environment variables setup
+- TypeScript type generation
+- Paystack integration setup
+
+### Trial Expiration (Important!)
+
+The app includes automatic trial expiration after 14 days. To enable this feature:
+
+1. Run the SQL migration in your Supabase project:
+   ```
+   supabase/migrations/expire_trial_subscriptions.sql
+   ```
+2. Follow the step-by-step guide in [`docs/SETUP_TRIAL_EXPIRATION.md`](docs/SETUP_TRIAL_EXPIRATION.md)
+
+**What it does:**
+- Automatically marks trial subscriptions as `expired` after 14 days
+- Unpublishes all forms for expired users (sets them back to `draft`)
+- Users must subscribe to reactivate publishing
+
+Without this migration, trials will never expire automatically.
+
 ## Email Notifications Setup
 
 ShelfCue uses Resend for transactional email notifications. To set up email functionality:

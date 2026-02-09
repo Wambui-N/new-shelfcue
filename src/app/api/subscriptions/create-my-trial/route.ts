@@ -75,10 +75,13 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Already has a valid subscription
+      // Already has a valid subscription (trial or paid)
+      const isTrial = status === "trial";
       return NextResponse.json(
         {
-          message: "You already have an active subscription",
+          message: isTrial
+            ? "You already have an active trial"
+            : "You already have an active subscription",
           subscription: existingSubscription,
         },
         { status: 200 },
