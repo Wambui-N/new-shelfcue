@@ -19,9 +19,9 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin();
 
-    // Get user's current subscription with plan details
-    // Include "trial", "active", "expired", and "cancelled" to properly check trial expiration
-    const { data: subscription, error } = await supabaseAdmin
+    // Get user's current subscription with plan details.
+    // Order by updated_at desc so we get the most recent row (e.g. "active" after payment, not an old "trial").
+    const { data: rows, error } = await supabaseAdmin
       .from("user_subscriptions")
       .select(
         `
@@ -31,10 +31,10 @@ export async function GET(request: NextRequest) {
       )
       .eq("user_id", user.id)
       .in("status", ["trial", "active", "expired", "cancelled"])
-      .maybeSingle();
+      .order("updated_at", { ascending: false })
+      .limit(1);
 
-    if (error && error.code !== "PGRST116") {
-      // PGRST116 means no rows found, which is not an error here.
+    if (error) {
       console.error("Error fetching subscription:", error);
       return NextResponse.json(
         {
@@ -46,6 +46,8 @@ export async function GET(request: NextRequest) {
         { status: 200 },
       );
     }
+
+    const subscription = rows?.[0] ?? null;
 
     // Get total forms count
     const { count: formsCount, error: formsError } = await supabaseAdmin
