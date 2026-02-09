@@ -1,23 +1,33 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { createServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin();
 
-    // Get auth token from header
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Prefer cookie-based session (same as payments/initialize) so we get a refreshed session
+    const supabase = createServerClient();
+    const {
+      data: { user: cookieUser },
+    } = await supabase.auth.getUser();
+
+    let user = cookieUser;
+
+    // Fallback: Authorization Bearer token (e.g. when client sends token explicitly)
+    if (!user) {
+      const authHeader = request.headers.get("authorization");
+      if (authHeader) {
+        const token = authHeader.replace("Bearer ", "");
+        const {
+          data: { user: tokenUser },
+          error: authError,
+        } = await supabaseAdmin.auth.getUser(token);
+        if (!authError && tokenUser) user = tokenUser;
+      }
     }
 
-    const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user },
-      error: authError,
-    } = await supabaseAdmin.auth.getUser(token);
-
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

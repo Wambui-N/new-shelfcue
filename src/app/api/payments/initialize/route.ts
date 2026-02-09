@@ -71,9 +71,14 @@ export async function POST(request: Request) {
     });
 
     if (!initResponse.status || !initResponse.data) {
-      console.error("❌ Paystack initialization failed:", initResponse.message);
+      const paystackMessage =
+        initResponse.message || "Failed to initialize payment";
+      console.error("❌ Paystack initialization failed:", paystackMessage);
       return NextResponse.json(
-        { error: initResponse.message || "Failed to initialize payment" },
+        {
+          error: paystackMessage,
+          details: paystackMessage,
+        },
         { status: 500 },
       );
     }
@@ -130,11 +135,13 @@ export async function POST(request: Request) {
       access_code: initResponse.data.access_code,
     });
   } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Unknown error";
     console.error("❌ Payment initialization error:", error);
     return NextResponse.json(
       {
         error: "Failed to initialize payment",
-        details: error instanceof Error ? error.message : "Unknown error",
+        details: message,
       },
       { status: 500 },
     );
