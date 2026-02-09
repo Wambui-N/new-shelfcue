@@ -1,15 +1,47 @@
 import { NextResponse } from "next/server";
 import { generatePaymentReference, getPaystackService } from "@/lib/paystack";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { createServerClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   console.log("🔵 Payment initialization started");
 
-  const supabase = createServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Get auth from cookies (parse manually since this is an API route)
+  const supabaseAdmin = getSupabaseAdmin();
+  const cookieHeader = request.headers.get("cookie");
+  let user = null;
+
+  if (cookieHeader) {
+    const cookies = cookieHeader.split(";").reduce(
+      (acc, cookie) => {
+        const [key, value] = cookie.trim().split("=");
+        acc[key] = value;
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+
+    // Look for supabase auth token in cookies
+    const authCookieKeys = Object.keys(cookies).filter((k) =>
+      k.includes("auth-token"),
+    );
+    for (const key of authCookieKeys) {
+      try {
+        const token = cookies[key];
+        if (token) {
+          const {
+            data: { user: cookieUser },
+            error: cookieError,
+          } = await supabaseAdmin.auth.getUser(token);
+          if (!cookieError && cookieUser) {
+            user = cookieUser;
+            break;
+          }
+        }
+      } catch {
+        // Continue to next cookie
+      }
+    }
+  }
 
   if (!user) {
     console.log("❌ No authenticated user");
@@ -93,7 +125,6 @@ export async function POST(request: Request) {
       status: "pending",
     });
 
-    const supabaseAdmin = getSupabaseAdmin();
     const { data: transactionData, error: transactionError } =
       await supabaseAdmin
         .from("payment_transactions")

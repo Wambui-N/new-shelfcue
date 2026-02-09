@@ -1,20 +1,49 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { createServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin();
 
-    // Prefer cookie-based session (same as payments/initialize) so we get a refreshed session
-    const supabase = createServerClient();
-    const {
-      data: { user: cookieUser },
-    } = await supabase.auth.getUser();
+    // Try to get session from cookies first (for same-origin requests)
+    const cookieHeader = request.headers.get("cookie");
+    let user = null;
 
-    let user = cookieUser;
+    if (cookieHeader) {
+      // Extract access token from supabase auth cookie
+      const cookies = cookieHeader.split(";").reduce(
+        (acc, cookie) => {
+          const [key, value] = cookie.trim().split("=");
+          acc[key] = value;
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
 
-    // Fallback: Authorization Bearer token (e.g. when client sends token explicitly)
+      // Look for supabase auth token in cookies (name varies by config)
+      const authCookieKeys = Object.keys(cookies).filter((k) =>
+        k.includes("auth-token"),
+      );
+      for (const key of authCookieKeys) {
+        try {
+          const token = cookies[key];
+          if (token) {
+            const {
+              data: { user: cookieUser },
+              error: cookieError,
+            } = await supabaseAdmin.auth.getUser(token);
+            if (!cookieError && cookieUser) {
+              user = cookieUser;
+              break;
+            }
+          }
+        } catch {
+          // Continue to next cookie
+        }
+      }
+    }
+
+    // Fallback: Authorization Bearer token (for explicit token auth)
     if (!user) {
       const authHeader = request.headers.get("authorization");
       if (authHeader) {
