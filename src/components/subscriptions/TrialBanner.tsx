@@ -19,6 +19,11 @@ export function TrialBanner() {
     try {
       setPaymentLoading(true);
 
+      if (subscription?.status === "active") {
+        alert("You already have an active subscription.");
+        return;
+      }
+
       if (!user?.email) {
         alert("Please sign in to subscribe");
         return;

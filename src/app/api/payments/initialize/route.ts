@@ -19,8 +19,6 @@ export async function POST(request: Request) {
 
   console.log("👤 User:", user.email);
 
-  const supabaseAdmin = getSupabaseAdmin();
-
   try {
     const body = await request.json();
     const { amount, is_trial = false, plan_code } = body;
@@ -32,6 +30,18 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Plan code is required for payment initialization" },
         { status: 400 },
+      );
+    }
+
+    // Validate Paystack configuration early so we can return a clear error
+    if (!process.env.PAYSTACK_SECRET_KEY) {
+      console.error("❌ PAYSTACK_SECRET_KEY is not set");
+      return NextResponse.json(
+        {
+          error: "Payment provider not configured",
+          details: "PAYSTACK_SECRET_KEY is not set in environment variables",
+        },
+        { status: 500 },
       );
     }
 
@@ -95,6 +105,8 @@ export async function POST(request: Request) {
       currency: "USD",
       status: "pending",
     });
+
+    const supabaseAdmin = getSupabaseAdmin();
 
     const { data: transactionData, error: transactionError } =
       await supabaseAdmin

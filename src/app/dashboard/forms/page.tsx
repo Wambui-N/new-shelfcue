@@ -362,6 +362,12 @@ export default function FormsPage() {
     try {
       setPaymentLoading(true);
 
+      // If the subscription hook reports access and not expired, avoid re-subscribing
+      if (!isExpired && hasAccess) {
+        alert("You already have an active subscription.");
+        return;
+      }
+
       if (!user?.email) {
         alert("Please sign in to subscribe");
         return;
