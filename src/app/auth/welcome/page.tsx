@@ -108,6 +108,20 @@ export default function WelcomePage() {
           console.log("✅ Subscription already exists, skipping trial create");
         }
 
+        // Ensure welcome email is sent (idempotent: only sends if not already sent)
+        try {
+          await fetch("/api/auth/welcome-email", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ userId: session.user.id }),
+          });
+        } catch (e) {
+          console.warn("Welcome email request failed:", e);
+        }
+
         setStatus("success");
 
         // Wait a moment then redirect

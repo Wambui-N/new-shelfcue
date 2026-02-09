@@ -7,6 +7,11 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
  */
 export async function POST(request: NextRequest) {
   try {
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { userId } = await request.json();
 
     if (!userId) {
@@ -17,26 +22,54 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = getSupabaseAdmin();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
 
-    // Get user profile
+    if (authError || !user || user.id !== userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Get user profile (and whether we already sent welcome email)
     const { data: profile, error } = await (supabase as any)
       .from("profiles")
-      .select("email, full_name")
+      .select("email, full_name, welcome_email_sent_at")
       .eq("id", userId)
       .single();
 
-    if (error || !profile?.email) {
+    if (error) {
       console.error("Error fetching user profile:", error);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Idempotent: already sent
+    if ((profile as any)?.welcome_email_sent_at) {
+      return NextResponse.json({
+        success: true,
+        message: "Welcome email already sent",
+      });
+    }
+
+    const email = (profile as any)?.email;
+    if (!email) {
+      return NextResponse.json(
+        { error: "User has no email" },
+        { status: 400 },
+      );
+    }
+
     // Send welcome email
     const result = await EmailService.sendWelcomeEmail(
-      profile.email,
-      profile.full_name || "there",
+      email,
+      (profile as any).full_name || "there",
     );
 
     if (result.success) {
+      await (supabase as any)
+        .from("profiles")
+        .update({ welcome_email_sent_at: new Date().toISOString() })
+        .eq("id", userId);
       return NextResponse.json({
         success: true,
         message: "Welcome email sent successfully",

@@ -129,18 +129,24 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    // Send welcome email (only for newly created trials)
+    // Send welcome email (only for newly created trials). Use profile email or auth user email.
     const { data: profile } = await (supabaseAdmin as any)
       .from("profiles")
-      .select("email, full_name")
+      .select("email, full_name, welcome_email_sent_at")
       .eq("id", user.id)
       .single();
 
-    if ((profile as any)?.email) {
-      await EmailService.sendWelcomeEmail(
-        (profile as any).email,
-        (profile as any).full_name || "there",
-      );
+    const email = (profile as any)?.email ?? (user as any).email;
+    const userName = (profile as any)?.full_name || "there";
+
+    if (email) {
+      const result = await EmailService.sendWelcomeEmail(email, userName);
+      if (result.success) {
+        await (supabaseAdmin as any)
+          .from("profiles")
+          .update({ welcome_email_sent_at: new Date().toISOString() })
+          .eq("id", user.id);
+      }
     }
 
     return NextResponse.json({
