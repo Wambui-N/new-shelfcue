@@ -195,33 +195,44 @@ export async function GET(request: NextRequest) {
     // Check if this is a trial signup from Paystack metadata
     const isTrial = txData.metadata?.is_trial === true;
 
-    // Activate subscription
+    // Activate subscription: update existing row(s) by user_id so trial becomes active
     const now = new Date();
     const trialEnd = new Date(now);
     trialEnd.setDate(trialEnd.getDate() + 14); // 14 days trial
     const periodEnd = new Date(now);
     periodEnd.setMonth(periodEnd.getMonth() + 1);
 
-    await (supabase as any).from("user_subscriptions").upsert(
-      {
+    const updatePayload = {
+      plan_id: plan.id,
+      paystack_customer_code: txData.customer.customer_code,
+      status: isTrial ? "trial" : "active",
+      billing_cycle: "monthly",
+      trial_start: isTrial ? now.toISOString() : null,
+      trial_end: isTrial ? trialEnd.toISOString() : null,
+      current_period_start: now.toISOString(),
+      current_period_end: isTrial
+        ? trialEnd.toISOString()
+        : periodEnd.toISOString(),
+      cancel_at_period_end: false,
+      cancelled_at: null,
+    } as any;
+
+    const { data: existingRows } = await (supabase as any)
+      .from("user_subscriptions")
+      .select("id")
+      .eq("user_id", user.id);
+
+    if (existingRows?.length) {
+      await (supabase as any)
+        .from("user_subscriptions")
+        .update(updatePayload)
+        .eq("user_id", user.id);
+    } else {
+      await (supabase as any).from("user_subscriptions").insert({
         user_id: user.id,
-        plan_id: plan.id,
-        paystack_customer_code: txData.customer.customer_code,
-        status: isTrial ? "trial" : "active",
-        billing_cycle: "monthly",
-        trial_start: isTrial ? now.toISOString() : null,
-        trial_end: isTrial ? trialEnd.toISOString() : null,
-        current_period_start: now.toISOString(),
-        current_period_end: isTrial
-          ? trialEnd.toISOString()
-          : periodEnd.toISOString(),
-        cancel_at_period_end: false,
-        cancelled_at: null,
-      } as any,
-      {
-        onConflict: "user_id",
-      },
-    );
+        ...updatePayload,
+      } as any);
+    }
 
     console.log(
       `✅ Subscription ${isTrial ? "trial started" : "activated"} for user:`,

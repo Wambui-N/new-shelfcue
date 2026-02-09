@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
         const data = event.data;
         const metadata = data.metadata || {};
         const userId = metadata.user_id;
+        const isTrial = metadata.is_trial === true;
 
         if (!userId) {
           console.error("No user_id in charge.success metadata");
@@ -75,6 +76,23 @@ export async function POST(request: NextRequest) {
               onConflict: "paystack_authorization_code",
             },
           );
+        }
+
+        // If this was a paid subscription (not trial), set subscription to active
+        // so the user sees "active" even if they never hit the verify page
+        if (!isTrial) {
+          const now = new Date();
+          const periodEnd = new Date(now);
+          periodEnd.setMonth(periodEnd.getMonth() + 1);
+          await (supabase as any)
+            .from("user_subscriptions")
+            .update({
+              status: "active",
+              current_period_start: now.toISOString(),
+              current_period_end: periodEnd.toISOString(),
+              paystack_customer_code: data.customer?.customer_code ?? undefined,
+            })
+            .eq("user_id", userId);
         }
 
         console.log(`✅ Charge successful for user ${userId}`);
