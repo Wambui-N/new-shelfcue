@@ -11,7 +11,7 @@ export async function PUT(
   try {
     const cookieStore = await cookies();
     const supabase = createRouteHandlerClient({
-      cookies: () => cookieStore,
+      cookies: (() => cookieStore) as () => ReturnType<typeof cookies>,
     });
     const {
       data: { user },
