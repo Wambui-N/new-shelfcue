@@ -121,7 +121,7 @@ export async function getUserUsage(userId: string): Promise<UsageData> {
     .select("*", { count: "exact", head: true })
     .eq("user_id", userId);
 
-  // Get current period usage
+  // Get current period usage (.maybeSingle() - no row is valid for new users)
   const now = new Date();
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
@@ -132,13 +132,13 @@ export async function getUserUsage(userId: string): Promise<UsageData> {
     .eq("user_id", userId)
     .gte("period_start", periodStart.toISOString())
     .lt("period_end", periodEnd.toISOString())
-    .single();
+    .maybeSingle();
 
   return {
     forms_count: formsCount || 0,
-    submissions_count: usage?.submissions_count || 0,
-    storage_used_mb: usage?.storage_used_mb || 0,
-    api_calls_count: usage?.api_calls_count || 0,
+    submissions_count: (usage as any)?.submissions_count ?? 0,
+    storage_used_mb: (usage as any)?.storage_used_mb ?? 0,
+    api_calls_count: (usage as any)?.api_calls_count ?? 0,
   };
 }
 
