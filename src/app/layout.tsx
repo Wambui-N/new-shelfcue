@@ -61,6 +61,12 @@ const satoshi = localFont({
   display: "swap",
 });
 
+const BASE_URL =
+  (typeof process.env.NEXT_PUBLIC_APP_URL !== "undefined"
+    ? process.env.NEXT_PUBLIC_APP_URL
+    : "https://www.shelfcue.com"
+  ).replace(/\/$/, "");
+
 export const metadata: Metadata = {
   title:
     "ShelfCue - Beautiful Google Sheets Form Builder | The Best Google Forms Alternative",
@@ -86,7 +92,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://shelfcue.com"),
+  metadataBase: new URL(BASE_URL),
   alternates: {
     canonical: "/",
   },
@@ -94,7 +100,7 @@ export const metadata: Metadata = {
     title: "ShelfCue - Beautiful Google Sheets Form Builder",
     description:
       "Create branded, responsive forms that connect directly to Google Sheets. No Zapier needed. The perfect Google Forms alternative for small businesses.",
-    url: "https://shelfcue.com",
+    url: BASE_URL,
     siteName: "ShelfCue",
     images: [
       {
@@ -174,7 +180,7 @@ export default function RootLayout({
               name: "ShelfCue",
               description:
                 "Beautiful Google Sheets form builder. Create branded, responsive forms that connect directly to Google Sheets without Zapier.",
-              url: "https://shelfcue.com",
+              url: BASE_URL,
               applicationCategory: "BusinessApplication",
               operatingSystem: "Web",
               offers: {

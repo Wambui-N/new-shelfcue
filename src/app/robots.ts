@@ -3,7 +3,9 @@ import type { MetadataRoute } from "next";
 const DEFAULT_BASE_URL = "https://www.shelfcue.com";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? DEFAULT_BASE_URL;
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_APP_URL ?? DEFAULT_BASE_URL
+  ).replace(/\/$/, "");
 
   return {
     rules: [
@@ -13,6 +15,6 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     host: baseUrl,
-    sitemap: [`${baseUrl.replace(/\/$/, "")}/sitemap.xml`],
+    sitemap: [`${baseUrl}/sitemap.xml`],
   };
 }

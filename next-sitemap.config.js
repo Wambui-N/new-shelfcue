@@ -1,9 +1,13 @@
 /** @type {import("next-sitemap").IConfig} */
+const siteUrl = (
+  process.env.NEXT_PUBLIC_APP_URL || "https://www.shelfcue.com"
+).replace(/\/$/, "");
+
 module.exports = {
-  siteUrl: "https://www.shelfcue.com", // ← replace with your live domain
-  generateRobotsTxt: true, // generates robots.txt automatically
-  sitemapSize: 7000, // splits large sitemaps if needed
-  exclude: ["/server-sitemap.xml"], // optional, skip internal routes
+  siteUrl,
+  generateRobotsTxt: true,
+  sitemapSize: 7000,
+  exclude: ["/server-sitemap.xml"],
   robotsTxtOptions: {
     policies: [{ userAgent: "*", allow: "/" }],
   },
