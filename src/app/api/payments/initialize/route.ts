@@ -7,19 +7,18 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 export async function POST(request: Request) {
   console.log("🔵 Payment initialization started");
 
-  const supabase = createRouteHandlerClient({ cookies });
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    console.log("❌ No authenticated user");
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  console.log("👤 User:", user.email);
-
   try {
+    const supabase = createRouteHandlerClient({ cookies });
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      console.log("❌ No authenticated user");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    console.log("👤 User:", user.email);
     const body = await request.json();
     const { amount, is_trial = false, plan_code } = body;
 
@@ -150,12 +149,12 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Unknown error";
+      error instanceof Error ? error.message : String(error);
     console.error("❌ Payment initialization error:", error);
     return NextResponse.json(
       {
         error: "Failed to initialize payment",
-        details: message,
+        details: message || "Unknown error",
       },
       { status: 500 },
     );
