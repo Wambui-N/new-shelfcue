@@ -1,47 +1,16 @@
 import { NextResponse } from "next/server";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { generatePaymentReference, getPaystackService } from "@/lib/paystack";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(request: Request) {
   console.log("🔵 Payment initialization started");
 
-  // Get auth from cookies (parse manually since this is an API route)
-  const supabaseAdmin = getSupabaseAdmin();
-  const cookieHeader = request.headers.get("cookie");
-  let user = null;
-
-  if (cookieHeader) {
-    const cookies = cookieHeader.split(";").reduce(
-      (acc, cookie) => {
-        const [key, value] = cookie.trim().split("=");
-        acc[key] = value;
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
-
-    // Look for supabase auth token in cookies
-    const authCookieKeys = Object.keys(cookies).filter((k) =>
-      k.includes("auth-token"),
-    );
-    for (const key of authCookieKeys) {
-      try {
-        const token = cookies[key];
-        if (token) {
-          const {
-            data: { user: cookieUser },
-            error: cookieError,
-          } = await supabaseAdmin.auth.getUser(token);
-          if (!cookieError && cookieUser) {
-            user = cookieUser;
-            break;
-          }
-        }
-      } catch {
-        // Continue to next cookie
-      }
-    }
-  }
+  const supabase = createRouteHandlerClient({ cookies });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     console.log("❌ No authenticated user");
