@@ -19,8 +19,10 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin();
 
-    // Get user's current subscription with plan details.
-    // Prefer "active" over "trial" over "expired"/"cancelled" (status asc: active < cancelled < expired < trial).
+    // Get user's current subscription(s) with plan details.
+    // We may have multiple rows over time (e.g. old trial + new active), so we
+    // load a few and pick the best match in code: prefer `active`, then `trial`,
+    // then `expired`, then `cancelled`.
     const { data: rows, error } = await supabaseAdmin
       .from("user_subscriptions")
       .select(
@@ -31,9 +33,8 @@ export async function GET(request: NextRequest) {
       )
       .eq("user_id", user.id)
       .in("status", ["trial", "active", "expired", "cancelled"])
-      .order("status", { ascending: true })
       .order("updated_at", { ascending: false })
-      .limit(1);
+      .limit(5);
 
     if (error) {
       console.error("Error fetching subscription:", error);
@@ -48,7 +49,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const subscription = rows?.[0] ?? null;
+    let subscription = rows?.[0] ?? null;
+
+    if (rows && rows.length > 0) {
+      // Prefer an active subscription first, then trial, then expired, then cancelled
+      const active = rows.find((r: any) => r.status === "active");
+      const trial = rows.find((r: any) => r.status === "trial");
+      const expired = rows.find((r: any) => r.status === "expired");
+      const cancelled = rows.find((r: any) => r.status === "cancelled");
+
+      subscription = (active || trial || expired || cancelled || rows[0]) as any;
+    }
 
     // Get total forms count
     const { count: formsCount, error: formsError } = await supabaseAdmin

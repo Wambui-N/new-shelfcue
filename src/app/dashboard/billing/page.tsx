@@ -256,7 +256,7 @@ export default function BillingPage() {
       </div>
 
       {/* Trial Banner */}
-      {isOnTrial && trialDaysRemaining > 0 && (
+      {isOnTrial && !isActive && trialDaysRemaining > 0 && (
         <Card className="p-4 sm:p-6 border-2 border-primary bg-primary/5">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
@@ -277,7 +277,7 @@ export default function BillingPage() {
       )}
 
       {/* Trial Expired Banner */}
-      {isTrialExpired && (
+      {isTrialExpired && !isActive && (
         <Card className="p-4 sm:p-6 border-2 border-destructive bg-destructive/10">
           <div className="flex items-start gap-3 sm:gap-4">
             <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-destructive flex-shrink-0 mt-0.5" />

@@ -60,6 +60,7 @@ export default function FormsPage() {
   const supabase = createClient();
   const {
     isOnTrial,
+    isActive,
     isExpired,
     trialDaysRemaining,
     hasAccess,
@@ -552,7 +553,7 @@ export default function FormsPage() {
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
               Forms
             </h1>
-            {isOnTrial && trialDaysRemaining > 0 && (
+            {isOnTrial && !isActive && trialDaysRemaining > 0 && (
               <Badge
                 variant="outline"
                 className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800"
@@ -572,9 +573,9 @@ export default function FormsPage() {
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Manage all your forms and view performance
-            {isOnTrial && trialDaysRemaining > 0 && (
+            {isOnTrial && !isActive && trialDaysRemaining > 0 && (
               <span className="ml-2 text-blue-600 dark:text-blue-400">
                 • You're on a 14-day free trial
               </span>

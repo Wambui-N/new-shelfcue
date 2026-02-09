@@ -56,6 +56,15 @@ export function useSubscription() {
       if (response.ok) {
         const data = await response.json();
 
+        // If user already has an active paid subscription, never run the trial auto-fix.
+        if (data.subscription?.status === "active") {
+          setSubscription(data.subscription);
+          setUsage(data.usage);
+          setTrialDaysRemaining(0);
+          setLoading(false);
+          return;
+        }
+
         // 🔧 FALLBACK: Auto-fix broken or missing trials (never "fix" expired – they must subscribe)
         if (
           data.subscription?.status === "expired" ||
