@@ -400,10 +400,12 @@ export default function FormsPage() {
         let errorMessage = "Failed to initialize payment";
         try {
           const errorData = await response.json();
+          // Prefer backend `details` (real cause), then `error`
           errorMessage =
-            errorData.error ||
             errorData.details ||
+            errorData.error ||
             errorMessage;
+          console.error("Payment initialization failed:", errorData);
         } catch {
           // response body may not be JSON
         }
