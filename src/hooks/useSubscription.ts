@@ -55,7 +55,18 @@ export function useSubscription() {
       if (response.ok) {
         const data = await response.json();
 
-        // 🔧 FALLBACK: Auto-fix broken or missing trials
+        // 🔧 FALLBACK: Auto-fix broken or missing trials (never "fix" expired – they must subscribe)
+        if (
+          data.subscription?.status === "expired" ||
+          data.subscription?.status === "cancelled"
+        ) {
+          // Expired/cancelled: no auto-fix, use API data as-is
+          setSubscription(data.subscription);
+          setUsage(data.usage);
+          setTrialDaysRemaining(0);
+          setLoading(false);
+          return;
+        }
         if (
           !data.subscription ||
           data.subscription?.status === "inactive" ||

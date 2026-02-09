@@ -33,8 +33,8 @@ export async function getUserLimits(
 ): Promise<SubscriptionLimits> {
   const supabase = getSupabaseAdmin();
 
-  // Get user's subscription with plan details
-  const { data: subscription } = await (supabase as any)
+  // Get user's subscription with plan details (.maybeSingle() avoids throw when no row)
+  const { data: subscription, error: subError } = await (supabase as any)
     .from("user_subscriptions")
     .select(
       `
@@ -43,7 +43,19 @@ export async function getUserLimits(
     `,
     )
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
+
+  if (subError) {
+    console.error("getUserLimits subscription fetch error:", subError);
+    return {
+      forms: 0,
+      submissions_per_month: 0,
+      storage_mb: 0,
+      team_members: 0,
+      analytics: "none",
+      support: "none",
+    };
+  }
 
   if ((subscription as any)?.plan) {
     // Check if trial has expired
