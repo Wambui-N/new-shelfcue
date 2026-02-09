@@ -81,8 +81,16 @@ export async function PUT(
     return NextResponse.json({ success: true, status });
   } catch (error) {
     console.error("Error in PUT /api/forms/[formId]/status:", error);
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Something went wrong while updating your form status.";
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Failed to update form status. Please try again or contact support.",
+        details: message,
+      },
       { status: 500 },
     );
   }
