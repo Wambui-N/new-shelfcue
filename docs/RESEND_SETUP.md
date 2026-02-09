@@ -34,10 +34,25 @@ Use a verified domain or Resend’s test domain so sends don’t fail.
 
 ## 3. Environment variables
 
-| Variable           | Required | Description                                      |
-| ----------------- | -------- | ------------------------------------------------ |
-| `RESEND_API_KEY`  | Yes      | API key from Resend dashboard.                   |
-| `RESEND_FROM_EMAIL` | No     | From address. Default: `ShelfCue <noreply@shelfcue.com>`. |
+| Variable              | Required | Description                                                                 |
+| --------------------- | -------- | --------------------------------------------------------------------------- |
+| `RESEND_API_KEY`      | Yes      | API key from Resend dashboard.                                              |
+| `RESEND_FROM_EMAIL`   | No       | From address. Default: `ShelfCue <noreply@shelfcue.com>`.                   |
+| `RESEND_AUDIENCE_ID`  | No       | Audience ID for Broadcasts. If set, new signups are added as contacts.     |
+
+### Syncing signups to an audience (for Broadcasts)
+
+To use **Broadcasts** in Resend, contacts must be in an **Audience**.
+
+1. In Resend dashboard go to **Audiences** and create an audience (e.g. “ShelfCue Users”).
+2. Copy the audience **ID** (UUID).
+3. Add to your environment:
+
+   ```env
+   RESEND_AUDIENCE_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   ```
+
+New users who complete signup (and get a welcome email) are then added to this audience automatically. You can send Broadcasts to that audience in the Resend dashboard. If `RESEND_AUDIENCE_ID` is not set, the app still sends transactional emails but does not add contacts anywhere.
 
 ## 4. Database (welcome email)
 

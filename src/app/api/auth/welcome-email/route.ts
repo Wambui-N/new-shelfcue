@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { EmailService } from "@/lib/resend";
+import { addContactToResendAudience, EmailService } from "@/lib/resend";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 /**
@@ -70,6 +70,12 @@ export async function POST(request: NextRequest) {
         .from("profiles")
         .update({ welcome_email_sent_at: new Date().toISOString() })
         .eq("id", userId);
+      const fullName = (profile as any).full_name || "";
+      const [first = "", ...rest] = fullName.split(/\s+/);
+      await addContactToResendAudience(email, {
+        firstName: first || undefined,
+        lastName: rest.length ? rest.join(" ") : undefined,
+      });
       return NextResponse.json({
         success: true,
         message: "Welcome email sent successfully",

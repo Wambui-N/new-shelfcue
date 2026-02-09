@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { EmailService } from "@/lib/resend";
+import { addContactToResendAudience, EmailService } from "@/lib/resend";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 /**
@@ -147,6 +147,11 @@ export async function POST(request: NextRequest) {
           .update({ welcome_email_sent_at: new Date().toISOString() })
           .eq("id", user.id);
       }
+      const [first = "", ...rest] = (userName || "").split(/\s+/);
+      await addContactToResendAudience(email, {
+        firstName: first || undefined,
+        lastName: rest.length ? rest.join(" ") : undefined,
+      });
     }
 
     return NextResponse.json({

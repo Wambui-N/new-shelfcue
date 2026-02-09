@@ -7,6 +7,40 @@ export const resend = new Resend(process.env.RESEND_API_KEY);
 export const DEFAULT_FROM_EMAIL =
   process.env.RESEND_FROM_EMAIL || "ShelfCue <noreply@shelfcue.com>";
 
+const RESEND_AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
+
+/**
+ * Add a contact to the Resend audience so they appear in Broadcasts.
+ * No-op if RESEND_AUDIENCE_ID is not set. Safe to call multiple times for the same email.
+ */
+export async function addContactToResendAudience(
+  email: string,
+  options: { firstName?: string; lastName?: string } = {},
+): Promise<{ success: boolean; error?: unknown }> {
+  if (!RESEND_AUDIENCE_ID) {
+    return { success: true };
+  }
+  try {
+    const { firstName, lastName } = options;
+    const { data, error } = await resend.contacts.create({
+      audienceId: RESEND_AUDIENCE_ID,
+      email,
+      firstName: firstName ?? undefined,
+      lastName: lastName ?? undefined,
+      unsubscribed: false,
+    });
+    if (error) {
+      console.warn("Resend audience add contact:", error);
+      return { success: false, error };
+    }
+    console.log("✓ Contact added to Resend audience:", data?.id);
+    return { success: true };
+  } catch (err) {
+    console.warn("Resend audience add contact error:", err);
+    return { success: false, error: err };
+  }
+}
+
 /**
  * Email service for sending transactional emails
  */
