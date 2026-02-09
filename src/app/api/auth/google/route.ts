@@ -9,7 +9,10 @@ import { generateGoogleOAuthUrl } from "@/lib/google-oauth-url";
  * Used by in-app flows (e.g. publishing a form) when tokens are missing/expired.
  */
 export async function GET(_request: NextRequest) {
-  const supabase = createRouteHandlerClient({ cookies });
+  const cookieStore = await cookies();
+  const supabase = createRouteHandlerClient({
+    cookies: () => cookieStore,
+  });
   const {
     data: { user },
   } = await supabase.auth.getUser();

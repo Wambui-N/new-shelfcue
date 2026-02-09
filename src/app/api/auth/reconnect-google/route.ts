@@ -9,7 +9,10 @@ import { generateGoogleOAuthUrl } from "@/lib/google-oauth-url";
  */
 export async function POST(_request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({
+      cookies: () => cookieStore,
+    });
 
     const {
       data: { user },

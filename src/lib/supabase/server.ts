@@ -2,7 +2,9 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import type { Database } from "./database.types";
 
-export const createServerClient = () =>
-  createServerComponentClient<Database>({
-    cookies: () => cookies(),
+export async function createServerClient() {
+  const cookieStore = await cookies();
+  return createServerComponentClient<Database>({
+    cookies: () => cookieStore,
   });
+}
