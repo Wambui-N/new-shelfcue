@@ -59,6 +59,44 @@ export async function GET(request: NextRequest) {
       const cancelled = rows.find((r: any) => r.status === "cancelled");
 
       subscription = (active || trial || expired || cancelled || rows[0]) as any;
+
+      // Self-heal: if we're showing "trial" but user has a successful paid transaction,
+      // upgrade their subscription to active so the banner and limits are correct
+      if ((subscription as any)?.status === "trial") {
+        const { data: paidTx } = await supabaseAdmin
+          .from("payment_transactions")
+          .select("id, metadata")
+          .eq("user_id", user.id)
+          .eq("status", "success")
+          .limit(1)
+          .maybeSingle();
+
+        const metadata = (paidTx as any)?.metadata as
+          | { is_trial?: boolean }
+          | undefined;
+        const isTrialPayment = metadata?.is_trial === true;
+
+        if (paidTx && !isTrialPayment) {
+          const now = new Date();
+          const periodEnd = new Date(now);
+          periodEnd.setMonth(periodEnd.getMonth() + 1);
+          await supabaseAdmin
+            .from("user_subscriptions")
+            .update({
+              status: "active",
+              current_period_start: now.toISOString(),
+              current_period_end: periodEnd.toISOString(),
+            })
+            .eq("user_id", user.id);
+
+          subscription = {
+            ...subscription,
+            status: "active",
+            current_period_start: now.toISOString(),
+            current_period_end: periodEnd.toISOString(),
+          } as any;
+        }
+      }
     }
 
     // Get total forms count
