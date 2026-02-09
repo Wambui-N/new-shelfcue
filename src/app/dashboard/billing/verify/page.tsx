@@ -59,6 +59,10 @@ function VerifyContent() {
         setMessage(
           "Payment verified successfully! Your subscription is now active.",
         );
+        // Signal dashboard to refetch subscription so banner/state update immediately
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("subscription-updated"));
+        }
       } else {
         setStatus("error");
         const errorMessage =

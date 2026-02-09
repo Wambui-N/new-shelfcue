@@ -89,6 +89,11 @@ export function TrialBanner() {
     }
   };
 
+  // Never show trial/expired banner when user has an active paid subscription
+  if (subscription?.status === "active") {
+    return null;
+  }
+
   if (loading || (!isOnTrial && !isExpired)) {
     return null;
   }

@@ -50,6 +50,7 @@ export function useSubscription() {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
+        cache: "no-store",
       });
 
       if (response.ok) {
@@ -141,6 +142,13 @@ export function useSubscription() {
 
   useEffect(() => {
     fetchSubscription();
+  }, [fetchSubscription]);
+
+  // Refetch when subscription was just updated (e.g. after payment on verify page)
+  useEffect(() => {
+    const onUpdated = () => fetchSubscription();
+    window.addEventListener("subscription-updated", onUpdated);
+    return () => window.removeEventListener("subscription-updated", onUpdated);
   }, [fetchSubscription]);
 
   const isOnTrial = subscription?.status === "trial" && trialDaysRemaining > 0;
