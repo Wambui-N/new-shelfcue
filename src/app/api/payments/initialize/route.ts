@@ -19,6 +19,8 @@ export async function POST(request: Request) {
 
   console.log("👤 User:", user.email);
 
+  const supabaseAdmin = getSupabaseAdmin();
+
   try {
     const body = await request.json();
     const { amount, is_trial = false, plan_code } = body;
