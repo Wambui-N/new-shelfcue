@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { canPerformAction } from "@/lib/subscriptionLimits";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 const defaultTheme = {
   primaryColor: "#151419",
@@ -245,6 +246,25 @@ export async function PUT(
         { error: "Failed to save form" },
         { status: 500 },
       );
+    }
+
+    // PostHog: Capture form_created event for new forms (server-side)
+    if (!existingForm) {
+      try {
+        const posthog = getPostHogClient();
+        posthog.capture({
+          distinctId: user.id,
+          event: "form_created",
+          properties: {
+            form_id: formId,
+            form_title: body.title || "Untitled Form",
+            field_count: normalizedFields.length,
+          },
+        });
+        await posthog.shutdown();
+      } catch (posthogError) {
+        console.warn("PostHog capture failed:", posthogError);
+      }
     }
 
     return NextResponse.json({ success: true, data });

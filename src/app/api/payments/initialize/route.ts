@@ -3,6 +3,7 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { generatePaymentReference, getPaystackService } from "@/lib/paystack";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function POST(request: Request) {
   console.log("🔵 Payment initialization started");
@@ -143,6 +144,26 @@ export async function POST(request: Request) {
         "✅ Transaction record created successfully:",
         transactionData,
       );
+    }
+
+    // PostHog: Capture payment_initiated event (server-side)
+    try {
+      const posthog = getPostHogClient();
+      posthog.capture({
+        distinctId: user.id,
+        event: "payment_initiated",
+        properties: {
+          reference,
+          amount_cents: chargeAmount,
+          currency: "USD",
+          is_trial,
+          plan_code,
+          email: user.email,
+        },
+      });
+      await posthog.shutdown();
+    } catch (posthogError) {
+      console.warn("PostHog capture failed:", posthogError);
     }
 
     return NextResponse.json({

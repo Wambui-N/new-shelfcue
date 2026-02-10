@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { tokenStorage } from "@/lib/token-storage";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 /**
  * Store Google tokens from Supabase session
@@ -66,6 +67,22 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("✅ Successfully stored Google tokens for user:", user.id);
+
+    // PostHog: Capture google_connected event (server-side)
+    try {
+      const posthog = getPostHogClient();
+      posthog.capture({
+        distinctId: user.id,
+        event: "google_connected",
+        properties: {
+          has_refresh_token: !!provider_refresh_token,
+          email: user.email,
+        },
+      });
+      await posthog.shutdown();
+    } catch (posthogError) {
+      console.warn("PostHog capture failed:", posthogError);
+    }
 
     return NextResponse.json({
       success: true,

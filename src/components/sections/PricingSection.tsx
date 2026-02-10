@@ -5,6 +5,7 @@ import { Check } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import posthog from "posthog-js";
 
 export function PricingSection() {
   const priceMonthly = 17;
@@ -201,6 +202,14 @@ export function PricingSection() {
                   <Button
                     size="default"
                     className="w-full bg-black text-white hover:bg-dark-gray hover:shadow-xl transition-all duration-300 text-sm sm:text-base py-3 sm:py-4 font-semibold"
+                    onClick={() => {
+                      // PostHog: Capture pricing CTA click
+                      posthog.capture("pricing_cta_clicked", {
+                        price_monthly: priceMonthly,
+                        cta_text: pricing.ctaText,
+                        location: "pricing_section",
+                      });
+                    }}
                   >
                     {pricing.ctaText}
                   </Button>

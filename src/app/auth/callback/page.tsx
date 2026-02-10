@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import posthog from "posthog-js";
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -128,12 +129,31 @@ function AuthCallbackContent() {
 
         const isNewUser = !subscription;
 
+        // PostHog: Identify user on OAuth callback
+        posthog.identify(data.session.user.id, {
+          email: data.session.user.email,
+          name: data.session.user.user_metadata?.full_name,
+        });
+
         // Redirect new users to welcome page for setup
         if (isNewUser) {
           console.log("🆕 New user detected, redirecting to welcome page");
+
+          // PostHog: Capture user_signed_up event for new users
+          posthog.capture("user_signed_up", {
+            method: "google",
+            email: data.session.user.email,
+          });
+
           router.push("/auth/welcome");
           return;
         }
+
+        // PostHog: Capture user_signed_in for returning users via OAuth
+        posthog.capture("user_signed_in", {
+          method: "google",
+          email: data.session.user.email,
+        });
 
         // For returning users, continue to dashboard
         console.log("✅ Returning user, redirecting to dashboard");

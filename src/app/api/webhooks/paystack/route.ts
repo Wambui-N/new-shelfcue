@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { verifyWebhookSignature } from "@/lib/paystack";
 import { EmailService } from "@/lib/resend";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 /**
  * Paystack Webhook Handler
@@ -145,6 +146,33 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        // PostHog: Capture subscription_activated event (server-side)
+        try {
+          const posthog = getPostHogClient();
+          posthog.capture({
+            distinctId: userId,
+            event: "subscription_activated",
+            properties: {
+              subscription_code: data.subscription_code,
+              plan_name: plan?.name || "Premium",
+              amount_cents: data.amount,
+              billing_interval: plan?.billing_interval || "monthly",
+              email: (profile as any)?.email,
+            },
+          });
+          posthog.identify({
+            distinctId: userId,
+            properties: {
+              email: (profile as any)?.email,
+              subscription_status: "active",
+              plan_name: plan?.name || "Premium",
+            },
+          });
+          await posthog.shutdown();
+        } catch (posthogError) {
+          console.warn("PostHog capture failed:", posthogError);
+        }
+
         console.log(`✅ Subscription created for user ${userId}`);
         break;
       }
@@ -187,6 +215,36 @@ export async function POST(request: NextRequest) {
                 endDate: (subscriptionData as any).current_period_end,
               },
             );
+          }
+        }
+
+        // PostHog: Capture subscription_cancelled event (server-side)
+        if (subscriptionData) {
+          try {
+            const posthog = getPostHogClient();
+            const userId = (subscriptionData as any).user_id;
+            const profile = (subscriptionData as any).profiles;
+            const plan = (subscriptionData as any).plan;
+
+            posthog.capture({
+              distinctId: userId,
+              event: "subscription_cancelled",
+              properties: {
+                subscription_code: data.subscription_code,
+                plan_name: plan?.name || "Premium",
+                period_end: (subscriptionData as any).current_period_end,
+                email: profile?.email,
+              },
+            });
+            posthog.identify({
+              distinctId: userId,
+              properties: {
+                subscription_status: "cancelled",
+              },
+            });
+            await posthog.shutdown();
+          } catch (posthogError) {
+            console.warn("PostHog capture failed:", posthogError);
           }
         }
 

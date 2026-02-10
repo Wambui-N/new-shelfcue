@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { useFormStore } from "@/store/formStore";
 import type { FormData } from "@/types/form";
+import posthog from "posthog-js";
 
 interface EditorPageProps {
   params: Promise<{ formId: string }>;
@@ -156,6 +157,14 @@ function EditorPage({ params }: EditorPageProps) {
           default_calendar_id: data.default_calendar_id || undefined,
           lastSaved: new Date(),
         } as FormData);
+
+        // PostHog: Capture form_editor_opened event
+        posthog.capture("form_editor_opened", {
+          form_id: formId,
+          form_title: data.title,
+          form_status: data.status,
+          field_count: normalizedFields.length,
+        });
       } catch (error: any) {
         console.error("Error fetching form:", {
           message: error?.message,

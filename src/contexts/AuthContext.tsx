@@ -5,6 +5,7 @@ import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { GOOGLE_OAUTH_SCOPES } from "@/lib/google-oauth-url";
+import posthog from "posthog-js";
 
 interface AuthContextType {
   user: User | null;
@@ -57,10 +58,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase]);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error, data } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+
+    // PostHog: Identify user and capture sign-in event on successful login
+    if (!error && data?.user) {
+      posthog.identify(data.user.id, {
+        email: data.user.email,
+        name: data.user.user_metadata?.full_name,
+      });
+      posthog.capture("user_signed_in", {
+        method: "email",
+        email: data.user.email,
+      });
+    }
+
     return { error };
   };
 
@@ -119,6 +133,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    // PostHog: Capture sign-out event and reset identity
+    posthog.capture("user_signed_out");
+    posthog.reset();
+
     await supabase.auth.signOut();
   };
 

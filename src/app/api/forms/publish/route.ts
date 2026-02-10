@@ -3,6 +3,7 @@ import { canPerformAction } from "@/lib/subscriptionLimits";
 import { getGoogleClient } from "@/lib/google";
 import { GoogleSheetsService } from "@/lib/googleSheets";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 function isSchemaCacheError(
   error: { message?: string; details?: string } | null,
@@ -613,6 +614,25 @@ export async function POST(request: NextRequest) {
     }
     const apiEndTime = Date.now();
     console.log(`⏱️ Total publish API time: ${apiEndTime - apiStartTime}ms`);
+
+    // PostHog: Capture form_published event (server-side)
+    try {
+      const posthog = getPostHogClient();
+      posthog.capture({
+        distinctId: userId,
+        event: "form_published",
+        properties: {
+          form_id: formId,
+          form_title: (form as any).title,
+          has_meeting_field: hasMeetingField,
+          field_count: (form as any).fields.length,
+          has_google_sheet: !!results.sheet?.id || !!results.sheet?.connected,
+        },
+      });
+      await posthog.shutdown();
+    } catch (posthogError) {
+      console.warn("PostHog capture failed:", posthogError);
+    }
 
     return NextResponse.json({
       success: true,

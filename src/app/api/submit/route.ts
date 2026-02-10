@@ -5,6 +5,7 @@ import { GoogleSheetsService } from "@/lib/googleSheets";
 import { EmailService } from "@/lib/resend";
 import { canPerformAction, incrementUsage } from "@/lib/subscriptionLimits";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 type FormFieldDefinition = { id: string; type?: string | null };
 
@@ -528,6 +529,25 @@ export async function POST(request: NextRequest) {
 
     // Increment submission usage counter
     await incrementUsage(formRecord.user_id, "submissions", 1);
+
+    // PostHog: Capture form submission event (server-side)
+    try {
+      const posthog = getPostHogClient();
+      posthog.capture({
+        distinctId: formRecord.user_id,
+        event: "form_submission_received",
+        properties: {
+          form_id: formId,
+          form_title: formRecord.title,
+          submission_id: submissionRecord.id,
+          has_calendar_booking: !!calendarEventLink,
+          field_count: formRecord.fields.length,
+        },
+      });
+      await posthog.shutdown();
+    } catch (posthogError) {
+      console.warn("PostHog capture failed:", posthogError);
+    }
 
     return NextResponse.json({
       success: true,
