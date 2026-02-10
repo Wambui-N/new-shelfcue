@@ -70,9 +70,9 @@ export function HeroSection() {
           variants={itemVariants}
           className="text-sm sm:text-base md:text-lg lg:text-xl text-foreground-muted mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4"
         >
-          Shelfcue is here to relieve you of admin tasks using professional {" "}
+          Automate your intake and scheduling with professional forms that {" "}
           <span className="text-foreground font-medium">
-           forms that capture data into your Google Sheets, and books meetings directly into your Google Calendar.
+          connect directly to Google Sheets and Google Calendar.
           </span>
         </motion.p>
 
