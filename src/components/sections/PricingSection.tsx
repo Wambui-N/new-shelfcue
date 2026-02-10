@@ -10,24 +10,18 @@ import posthog from "posthog-js";
 export function PricingSection() {
   const priceMonthly = 17;
 
-  const alternatives = [
-    { name: "Zapier", price: 20 },
-    { name: "Typeform", price: 39 },
-    { name: "Calendly", price: 12 },
-  ];
-  const totalAlternatives = alternatives.reduce((sum, a) => sum + a.price, 0);
-  const savings = totalAlternatives - priceMonthly;
-
   const pricing = {
     headline: "One Simple Plan, Everything You Need",
     subhead: "No tiers. No surprises. Just one price and everything included.",
     benefits: [
+      "Unlimited forms for all your clients",
+      "Unlimited bookings and submissions",
       "Clients book calls without back-and-forth",
       "Submissions organized automatically in Google Sheets",
-      "Works quietly in the background",
       "Professional, customizable forms for every client",
       "All future updates and improvements included",
     ],
+    includedLine: "Unlimited forms and unlimited bookings included.",
     simplicityLine:
       "No extra tools. No fragile automations. Just one system that works.",
     ctaText: "Start your 14-day free trial",
@@ -144,6 +138,9 @@ export function PricingSection() {
                     /month
                   </span>
                 </div>
+            <p className="text-sm text-foreground mt-1">
+              {pricing.includedLine}
+            </p>
                 <p className="text-sm font-medium text-foreground">
                   {pricing.trialLine}
                 </p>
@@ -238,7 +235,7 @@ export function PricingSection() {
             <span>5-minute setup</span>
           </div>
         </motion.div>
-        {/* Comparison: alternatives vs Shelfcue */}
+        {/* Comparison: ShelfCue vs stitching tools together */}
         <motion.div
           className="max-w-2xl mx-auto my-4"
           initial={{ opacity: 0, y: 20 }}
@@ -252,29 +249,12 @@ export function PricingSection() {
             aria-label="Compare cost"
           >
             <p className="text-xs text-foreground-muted text-center mb-3 sm:mb-4">
-              Forms + scheduling + automation elsewhere can cost 3–4x more.
+              Simpler and cheaper than stitching together multiple tools for
+              forms, scheduling, and automations.
             </p>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-3 sm:gap-4 flex-wrap">
-              <div className="flex items-center justify-center gap-2 sm:gap-4 text-sm text-foreground-muted">
-                {alternatives.map((alt, i) => (
-                  <span key={alt.name}>
-                    {alt.name} ${alt.price}
-                    {i < alternatives.length - 1 && (
-                      <span className="hidden sm:inline mx-1">·</span>
-                    )}
-                  </span>
-                ))}
-              </div>
-              <span className="text-sm text-foreground-muted text-center sm:text-left">
-                = ${totalAlternatives}/mo elsewhere
-              </span>
-              <span className="text-sm font-semibold text-foreground text-center sm:text-left">
-                Shelfcue ${priceMonthly}/mo — Save ${savings}/mo
-              </span>
-            </div>
             <p className="text-xs text-foreground-muted text-center mt-3">
-              Based on entry-level plan pricing. Check each provider for current
-              pricing.
+              One simple subscription instead of 3–4 different tools to keep in
+              sync.
             </p>
           </div>
         </motion.div>
