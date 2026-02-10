@@ -2,6 +2,7 @@
 
 import { Calendar, CheckCircle, FileSpreadsheet } from "lucide-react";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,6 +36,11 @@ export default function SignUpPage() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     setError("");
+
+    // PostHog: Capture Google sign-up attempt
+    posthog.capture("google_signup_started", {
+      page: "signup",
+    });
 
     const { error } = await signUpWithGoogle();
 

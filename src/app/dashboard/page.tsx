@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { Badge } from "@/components/ui/badge";
@@ -70,6 +71,15 @@ export default function DashboardPage() {
   const [historicalStats, _setHistoricalStats] = useState({
     submissionsLastWeek: 0,
   });
+
+  useEffect(() => {
+    // PostHog: Capture dashboard view
+    if (user) {
+      posthog.capture("dashboard_viewed", {
+        user_id: user.id,
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchData = async () => {

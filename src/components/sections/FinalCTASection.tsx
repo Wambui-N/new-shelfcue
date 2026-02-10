@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { Button } from "@/components/ui/button";
 
 export function FinalCTASection() {
@@ -45,7 +46,8 @@ export function FinalCTASection() {
         >
           {/* Headline */}
           <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground mb-4 leading-tight">
-          Schedule calls, capture client info, and organize everything automatically. All in one place.
+            Schedule calls, capture client info, and organize everything
+            automatically. All in one place.
           </h2>
 
           {/* Sub-headline */}
@@ -69,7 +71,16 @@ export function FinalCTASection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Link href="/auth/signup">
+            <Link
+              href="/auth/signup"
+              onClick={() => {
+                // PostHog: Capture final CTA click
+                posthog.capture("final_cta_clicked", {
+                  cta_text: "Start My 14-Day Free Trial",
+                  location: "final_cta_section",
+                });
+              }}
+            >
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -140,7 +151,7 @@ export function FinalCTASection() {
           >
             <div className="w-2 h-2 bg-black rounded-full"></div>
             <span className="text-sm font-semibold text-foreground">
-            Works with your Google Calendar and Sheets
+              Works with your Google Calendar and Sheets
             </span>
           </motion.div>
 

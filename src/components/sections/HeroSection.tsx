@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
@@ -58,10 +59,10 @@ export function HeroSection() {
           className="text-md sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold tracking-tight mb-3 sm:mb-4 leading-tight px-2"
         >
           <span className="block text-foreground">
-          Handle Client Intake & Scheduling in One Motion, 
+            Handle Client Intake & Scheduling in One Motion,
           </span>
           <span className="block text-dark-gray">
-          Using Professional and Branded Forms
+            Using Professional and Branded Forms
           </span>
         </motion.h1>
 
@@ -70,9 +71,9 @@ export function HeroSection() {
           variants={itemVariants}
           className="text-sm sm:text-base md:text-lg lg:text-xl text-foreground-muted mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4"
         >
-          Automate your intake and scheduling with professional forms that {" "}
+          Automate your intake and scheduling with professional forms that{" "}
           <span className="text-foreground font-medium">
-          connect directly to Google Sheets and Google Calendar.
+            connect directly to Google Sheets and Google Calendar.
           </span>
         </motion.p>
 
@@ -81,7 +82,16 @@ export function HeroSection() {
           variants={itemVariants}
           className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-6 sm:mb-8 px-4"
         >
-          <Link href="/auth/signup">
+          <Link
+            href="/auth/signup"
+            onClick={() => {
+              // PostHog: Capture hero CTA click
+              posthog.capture("hero_cta_clicked", {
+                cta_text: "Build Your First Form Now",
+                location: "hero_section",
+              });
+            }}
+          >
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 size="default"
@@ -100,6 +110,10 @@ export function HeroSection() {
           </Link>
           <motion.button
             onClick={() => {
+              // PostHog: Capture demo video played event
+              posthog.capture("demo_video_played", {
+                location: "hero_section",
+              });
               const demoSection = document.querySelector("#demo");
               demoSection?.scrollIntoView({ behavior: "smooth" });
             }}

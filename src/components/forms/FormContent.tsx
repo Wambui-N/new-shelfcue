@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import posthog from "posthog-js";
 import { cn } from "@/lib/utils";
 import type { FormField } from "@/types/form";
 import {
@@ -63,6 +64,13 @@ export function FormContent({
 
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
+      // PostHog: Capture form step completion in conversational forms
+      posthog.capture("form_step_completed", {
+        form_id: formId,
+        step_number: currentStep + 1,
+        total_steps: totalSteps,
+        layout: layout,
+      });
       onStepChange(currentStep + 1);
     }
   };
@@ -78,6 +86,13 @@ export function FormContent({
       e.preventDefault();
       handleNext();
     } else {
+      // PostHog: Capture form submission attempt (client-side)
+      posthog.capture("form_submitted_public", {
+        form_id: formId,
+        layout: layout,
+        total_fields: fields.length,
+        is_embedded: isEmbedded,
+      });
       onSubmit(e);
     }
   };

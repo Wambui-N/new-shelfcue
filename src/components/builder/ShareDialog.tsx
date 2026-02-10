@@ -13,6 +13,7 @@ import {
   QrCode as QrCodeIcon,
   Share2,
 } from "lucide-react";
+import posthog from "posthog-js";
 import { useRef, useState } from "react";
 import QRCode from "react-qr-code";
 import { Badge } from "@/components/ui/badge";
@@ -59,6 +60,13 @@ export function ShareDialog({
     navigator.clipboard.writeText(text);
     setCopied(type);
     setTimeout(() => setCopied(null), 2000);
+
+    // PostHog: Capture form link/embed code copy
+    posthog.capture("form_link_copied", {
+      form_id: formId,
+      copy_type: type,
+      form_title: formTitle,
+    });
   };
 
   const embedCode = `<iframe

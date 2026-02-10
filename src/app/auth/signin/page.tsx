@@ -2,6 +2,7 @@
 
 import { Calendar, FileSpreadsheet, Shield } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import posthog from "posthog-js";
 import { Suspense, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,6 +26,11 @@ function SignInForm() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     setError("");
+
+    // PostHog: Capture Google sign-in attempt
+    posthog.capture("google_signin_started", {
+      page: "signin",
+    });
 
     const { error } = await signInWithGoogle();
 
