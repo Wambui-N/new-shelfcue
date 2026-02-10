@@ -4,6 +4,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { CookieBanner } from "@/components/CookieBanner";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { PostHogInit } from "@/components/PostHogInit";
 
 const satoshi = localFont({
   src: [
@@ -208,6 +209,7 @@ export default function RootLayout({
         className={`${satoshi.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
+        <PostHogInit />
         <AuthProvider>{children}</AuthProvider>
         <CookieBanner />
         <Analytics />

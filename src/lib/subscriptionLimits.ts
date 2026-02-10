@@ -162,6 +162,12 @@ export async function canPerformAction(
     `${limitType === "forms" ? "forms_count" : `${limitType.replace("_per_month", "")}_count`}`
   ];
 
+  // If the plan has no configured limit for this metric, treat it as unlimited
+  // so users aren't blocked due to a misconfigured `subscription_plans.limits` JSON.
+  if (limit == null || typeof limit !== "number") {
+    return { allowed: true };
+  }
+
   // -1 means unlimited
   if (limit === -1) {
     return { allowed: true };
