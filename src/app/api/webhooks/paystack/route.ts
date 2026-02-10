@@ -133,8 +133,9 @@ export async function POST(request: NextRequest) {
           .eq("user_id", userId)
           .single();
 
+        const plan = (subscription as any)?.plan;
+
         if ((profile as any)?.email && subscription) {
-          const plan = (subscription as any).plan;
           await EmailService.sendSubscriptionConfirmation(
             (profile as any).email,
             {
