@@ -44,6 +44,7 @@ interface FormDisplayProps {
   showWatermark?: boolean;
   deviceView?: "desktop" | "mobile";
   fitPreview?: boolean;
+  constrainToViewport?: boolean;
   calendarId?: string;
   userId?: string;
 }
@@ -65,6 +66,7 @@ export function FormDisplay({
   showWatermark = true,
   deviceView = "desktop",
   fitPreview = false,
+  constrainToViewport = false,
   calendarId,
   userId,
 }: FormDisplayProps) {
@@ -164,7 +166,8 @@ export function FormDisplay({
     <StandaloneForm theme={displayTheme}>
       <div
         className={cn(
-          "flex flex-col overflow-x-hidden w-full min-h-screen",
+          "flex flex-col overflow-x-hidden w-full",
+          constrainToViewport ? "h-screen overflow-hidden" : "min-h-screen",
           deviceView === "desktop" && "md:flex-row",
         )}
       >
@@ -218,7 +221,12 @@ export function FormDisplay({
             )}
 
             {/* Headline, Description and Link */}
-            <div className="flex-1 flex flex-col justify-end items-start">
+            <div
+              className={cn(
+                "flex-1 flex flex-col items-start",
+                fitPreview ? "justify-center" : "justify-end",
+              )}
+            >
               {leftSectionHeadline && (
                 <p
                   className={cn(

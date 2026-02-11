@@ -287,6 +287,7 @@ export default function PublicFormPage({ params }: PublicFormPageProps) {
           showWatermark={formData.settings.showWatermark !== false}
           userId={userId}
           calendarId={calendarId}
+          constrainToViewport
         />
       </>
     );
