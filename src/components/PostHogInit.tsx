@@ -18,7 +18,6 @@ export function PostHogInit() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Avoid double-initializing in React Strict Mode / multiple mounts
     if (window.__POSTHOG_INITIALIZED__) {
       return;
     }
@@ -38,14 +37,15 @@ export function PostHogInit() {
     }
 
     posthog.init(apiKey, {
-      api_host: apiHost,
+      api_host: "/ingest",
+      ui_host: apiHost,
       autocapture: true,
       capture_pageview: true,
+      capture_exceptions: true,
+      debug: process.env.NODE_ENV === "development",
     });
 
     if (process.env.NODE_ENV === "development") {
-      // Expose posthog for easy testing in DevTools:
-      // posthog.capture('my_custom_event', { property: 'value' })
       window.posthog = posthog;
       // eslint-disable-next-line no-console
       console.log("[PostHog] Initialized and attached to window.posthog");
@@ -56,4 +56,3 @@ export function PostHogInit() {
 
   return null;
 }
-
