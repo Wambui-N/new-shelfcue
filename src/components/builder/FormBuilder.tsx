@@ -52,6 +52,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   ); // Mobile toggle between preview and edit
   const [showFABLabel, setShowFABLabel] = useState(true); // Show "Edit"/"View" on FAB for a few seconds for discoverability
   const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [viewportSize, setViewportSize] = useState<{ w: number; h: number } | null>(null);
   const [saveStatus, setSaveStatus] = useState<
     "idle" | "saving" | "saved" | "error"
   >("idle");
@@ -75,6 +76,19 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, []);
+
+  // Track viewport dimensions when on mobile (for phone preview frame)
+  useEffect(() => {
+    if (!isMobileViewport) {
+      setViewportSize(null);
+      return;
+    }
+    const update = () =>
+      setViewportSize({ w: window.innerWidth, h: window.innerHeight });
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [isMobileViewport]);
 
   // FAB label: show "Edit"/"View" for 4s on load, then hide
   useEffect(() => {
@@ -825,13 +839,22 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         {/* Left Side - Preview (Larger Width) */}
         <div
           className={cn(
-            "flex-1 border-r border-border overflow-y-auto bg-gradient-to-br from-background via-background to-muted/40",
+            "flex-1 border-r border-border bg-gradient-to-br from-background via-background to-muted/40",
             "lg:block",
             mobileViewMode === "preview" ? "block" : "hidden",
-            "smooth-scroll",
+            !isMobileViewport && deviceView === "desktop"
+              ? "overflow-hidden min-h-0 flex flex-col max-h-[calc(100vh-96px)]"
+              : "overflow-y-auto smooth-scroll",
           )}
         >
-          <div className="p-0 min-h-full pb-20 lg:pb-6">
+          <div
+            className={cn(
+              "p-0 pb-20 lg:pb-6",
+              !isMobileViewport && deviceView === "desktop"
+                ? "flex-1 min-h-0 flex flex-col"
+                : "min-h-full",
+            )}
+          >
             {/* Device Toggle - hidden on phone so only phone preview is shown */}
             {!isMobileViewport && (
               <div className="flex items-center justify-between mb-4 sm:mb-6 px-3 sm:px-6 pt-3 sm:pt-6">
@@ -862,7 +885,14 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
             )}
 
             {/* Preview Container - on phone always use mobile view */}
-            <div className="flex justify-center items-start w-full overflow-hidden px-3 sm:px-6">
+            <div
+              className={cn(
+                "w-full overflow-hidden px-3 sm:px-6",
+                !isMobileViewport && deviceView === "desktop"
+                  ? "flex-1 min-h-0 flex items-center justify-center py-6 max-h-[calc(100vh-220px)]"
+                  : "flex justify-center items-start",
+              )}
+            >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={isMobileViewport ? "mobile" : deviceView}
@@ -871,13 +901,20 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   exit={{ opacity: 0, scale: 0.97 }}
                   transition={{ duration: 0.18 }}
                   className={
-                    isMobileViewport || deviceView === "mobile"
-                      ? "w-[340px] sm:w-[380px]"
-                      : "w-full max-w-6xl"
+                    !isMobileViewport && deviceView === "desktop"
+                      ? "aspect-video max-h-[calc(100vh-240px)] w-auto max-w-full min-w-0"
+                      : isMobileViewport && viewportSize
+                        ? "w-full max-w-full min-w-0 max-h-[calc(100dvh-120px)]"
+                        : "w-[340px] sm:w-[380px] aspect-[9/19.5]"
+                  }
+                  style={
+                    isMobileViewport && viewportSize
+                      ? { aspectRatio: `${viewportSize.w}/${viewportSize.h}` }
+                      : undefined
                   }
                 >
-                  <div className="w-full rounded-3xl border border-border/60 bg-card/80 shadow-2xl overflow-hidden">
-                    <div className="w-full">
+                  <div className="w-full h-full rounded-3xl border border-border/60 bg-card/80 shadow-2xl overflow-hidden flex flex-col min-h-0">
+                    <div className="flex-1 min-h-0 overflow-y-auto">
                       <FormPreview
                         deviceView={isMobileViewport ? "mobile" : deviceView}
                       />
