@@ -50,6 +50,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
   const [mobileViewMode, setMobileViewMode] = useState<"preview" | "edit">(
     "preview",
   ); // Mobile toggle between preview and edit
+  const [showFABLabel, setShowFABLabel] = useState(true); // Show "Edit"/"View" on FAB for a few seconds for discoverability
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [saveStatus, setSaveStatus] = useState<
     "idle" | "saving" | "saved" | "error"
@@ -74,6 +75,24 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, []);
+
+  // FAB label: show "Edit"/"View" for 4s on load, then hide
+  useEffect(() => {
+    const t = setTimeout(() => setShowFABLabel(false), 4000);
+    return () => clearTimeout(t);
+  }, []);
+
+  // When user switches preview/edit, show FAB label again for 2s (skip on initial mount)
+  const fabModeChangeRef = useRef(false);
+  useEffect(() => {
+    if (!fabModeChangeRef.current) {
+      fabModeChangeRef.current = true;
+      return;
+    }
+    setShowFABLabel(true);
+    const t = setTimeout(() => setShowFABLabel(false), 2000);
+    return () => clearTimeout(t);
+  }, [mobileViewMode]);
 
   // Ensure email field exists if a meeting field is present
   useEffect(() => {
@@ -783,17 +802,25 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
               )
             }
             size="lg"
-            className="h-14 w-14 rounded-full shadow-lg touch-target"
+            className={cn(
+              "h-14 rounded-full shadow-lg touch-target",
+              showFABLabel ? "px-4 gap-2 min-w-0" : "w-14",
+            )}
             aria-label={
               mobileViewMode === "preview"
                 ? "Switch to Edit"
                 : "Switch to Preview"
             }
           >
+            {showFABLabel && (
+              <span className="font-medium">
+                {mobileViewMode === "preview" ? "Edit" : "View"}
+              </span>
+            )}
             {mobileViewMode === "preview" ? (
-              <Edit className="w-6 h-6" />
+              <Edit className="w-6 h-6 shrink-0" />
             ) : (
-              <Eye className="w-6 h-6" />
+              <Eye className="w-6 h-6 shrink-0" />
             )}
           </Button>
         </div>
