@@ -171,6 +171,11 @@ export default function RootLayout({
         />
         <link rel="manifest" href="/site.webmanifest" />
 
+        <meta
+          name="facebook-domain-verification"
+          content="3wc689ao9pne7gcgc3ibabqgkdmm90"
+        />
+
         <PostHogSnippet />
 
         {/* Schema.org structured data */}
