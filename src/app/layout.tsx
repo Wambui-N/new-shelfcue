@@ -4,7 +4,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { CookieBanner } from "@/components/CookieBanner";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { PostHogInit } from "@/components/PostHogInit";
+import { PostHogSnippet } from "@/components/PostHogSnippet";
 
 const satoshi = localFont({
   src: [
@@ -171,6 +171,8 @@ export default function RootLayout({
         />
         <link rel="manifest" href="/site.webmanifest" />
 
+        <PostHogSnippet />
+
         {/* Schema.org structured data */}
         <script
           type="application/ld+json"
@@ -209,7 +211,6 @@ export default function RootLayout({
         className={`${satoshi.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
-        <PostHogInit />
         <AuthProvider>{children}</AuthProvider>
         <CookieBanner />
         <Analytics />
