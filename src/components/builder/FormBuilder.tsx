@@ -710,15 +710,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   variant="outline"
                   size="sm"
                   className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
-                  onClick={() => {
-                    const origin =
-                      typeof window !== "undefined"
-                        ? window.location.origin
-                        : "";
-                    if (origin) {
-                      window.open(`${origin}/form/${formData.id}`, "_blank", "noopener,noreferrer");
-                    }
-                  }}
+                  onClick={() => router.push(`/dashboard/forms/${formData.id}`)}
                 >
                   <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">View form</span>
@@ -749,8 +741,13 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                 disabled={isSaving || formData.fields.length === 0}
                 size="sm"
                 className="bg-primary text-primary-foreground hover:bg-primary/80 text-xs sm:text-sm"
+                title={
+                  formData.status === "published"
+                    ? "Changes to your form are saved automatically. Use Re-publish when you've changed the linked Google Sheet or Calendar so responses and events stay in sync."
+                    : undefined
+                }
               >
-                {formData.status === "published" ? "Update" : "Publish"}
+                {formData.status === "published" ? "Re-publish" : "Publish"}
               </Button>
             </div>
           </div>
