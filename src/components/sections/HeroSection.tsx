@@ -32,21 +32,6 @@ export function HeroSection() {
 
   return (
     <section className="relative min-h-96 flex items-center justify-center overflow-hidden bg-background pt-36">
-      {/* Background Video */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/bg.webm" type="video/webm" />
-        </video>
-        {/* Smooth gradient transition at bottom */}
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background via-background/80 to-transparent" />
-      </div>
-
       <motion.div
         className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 py-6 sm:py-8 max-w-4xl"
         variants={containerVariants}
