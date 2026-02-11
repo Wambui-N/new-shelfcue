@@ -192,7 +192,7 @@ function EditorPage({ params }: EditorPageProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-background">
+    <div className="min-h-screen bg-background">
       <FormBuilder onBack={handleBack} />
     </div>
   );

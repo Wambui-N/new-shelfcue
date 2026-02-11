@@ -144,7 +144,8 @@ export function FormContent({
                 className="mt-1 text-sm sm:text-base"
                 style={{
                   fontFamily: theme.fontFamily,
-                  color: theme.descriptionColor || theme.textColor,
+                  // Use main text color so Branding Text Color remains scoped to left branding
+                  color: theme.textColor,
                 }}
               >
                 {description}

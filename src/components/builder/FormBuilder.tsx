@@ -745,7 +745,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden min-h-[calc(100vh-80px)]">
         {/* Mobile Toggle Button - Only visible on mobile */}
         <div className="lg:hidden fixed bottom-4 right-4 z-50 safe-bottom">
           <Button
@@ -842,7 +842,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
           className={cn(
             "w-full lg:w-[420px] flex-1 lg:flex-none min-h-0 flex flex-col bg-background border-t lg:border-t-0 lg:border-l border-border overflow-hidden",
             // On mobile, cap height so tab content scroll container gets a definite height for touch scroll
-            "max-h-[calc(100dvh-8rem)] lg:max-h-none",
+            "max-h-[calc(100dvh-8rem)] lg:max-h-none lg:h-[calc(100vh-96px)]",
             "lg:block",
             mobileViewMode === "edit" ? "block" : "hidden",
           )}
@@ -886,11 +886,11 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
             </div>
           </div>
 
-          {/* Tab Content - Scrollable (explicit height on mobile so scroll context is established for touch) */}
+          {/* Tab Content - Scrollable (explicit height so scroll context is established for touch and desktop) */}
           <div
             className={cn(
               "flex-1 min-h-0 p-4 overflow-y-auto overflow-x-hidden smooth-scroll",
-              "h-[calc(100dvh-13rem)] min-h-[200px] lg:h-auto lg:min-h-0",
+              "h-[calc(100dvh-13rem)] min-h-[200px] lg:h-[calc(100vh-160px)] lg:min-h-0",
             )}
           >
             {activeTab === "fields" && <FieldEditor />}
