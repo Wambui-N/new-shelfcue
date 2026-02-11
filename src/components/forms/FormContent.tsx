@@ -31,6 +31,7 @@ interface FormContentProps {
   isEmbedded?: boolean;
   timeZone?: string;
   showWatermark?: boolean;
+  fitPreview?: boolean;
 }
 
 export function FormContent({
@@ -52,6 +53,7 @@ export function FormContent({
   isEmbedded = false,
   timeZone,
   showWatermark = false,
+  fitPreview = false,
 }: FormContentProps) {
   const layoutConfig = layoutPresets[layout];
   const isConversational = layout === "conversational";
@@ -101,11 +103,17 @@ export function FormContent({
     <div
       className={cn(
         "w-full max-w-full md:max-w-4xl mx-auto overflow-x-hidden min-h-full",
-        isEmbedded
-          ? "px-3 sm:px-4 py-4 sm:py-6"
-          : "px-3 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 md:py-12",
-        !isEmbedded && layoutConfig.spacing === "tight" && "py-4 sm:py-6 md:py-8",
-        !isEmbedded &&
+        fitPreview && "px-2 py-3",
+        !fitPreview && isEmbedded && "px-3 sm:px-4 py-4 sm:py-6",
+        !fitPreview &&
+          !isEmbedded &&
+          "px-3 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 md:py-12",
+        !fitPreview &&
+          !isEmbedded &&
+          layoutConfig.spacing === "tight" &&
+          "py-4 sm:py-6 md:py-8",
+        !fitPreview &&
+          !isEmbedded &&
           layoutConfig.spacing === "loose" &&
           "py-8 sm:py-12 md:py-16",
       )}
@@ -122,18 +130,22 @@ export function FormContent({
       {/* Form Container */}
       <div
         className={cn(
-          "p-3 sm:p-6 md:p-8",
+          fitPreview ? "p-2" : "p-3 sm:p-6 md:p-8",
           layout === "hero" && "md:max-w-2xl mx-auto",
           layout === "conversational" &&
+            !fitPreview &&
             "min-h-[300px] sm:min-h-[400px] flex flex-col justify-center",
         )}
       >
         {/* Title/Description inside the form container */}
         {(title || description) && (
-          <div className="mb-4 sm:mb-6">
+          <div className={cn(fitPreview ? "mb-2" : "mb-4 sm:mb-6")}>
             {title && (
               <h2
-                className="text-lg sm:text-xl md:text-2xl font-semibold"
+                className={cn(
+                  "font-semibold",
+                  fitPreview ? "text-base" : "text-lg sm:text-xl md:text-2xl",
+                )}
                 style={{ fontFamily: theme.fontFamily, color: theme.textColor }}
               >
                 {title}
@@ -141,10 +153,12 @@ export function FormContent({
             )}
             {description && (
               <p
-                className="mt-1 text-sm sm:text-base"
+                className={cn(
+                  "mt-1",
+                  fitPreview ? "text-xs" : "text-sm sm:text-base",
+                )}
                 style={{
                   fontFamily: theme.fontFamily,
-                  // Use main text color so Branding Text Color remains scoped to left branding
                   color: theme.textColor,
                 }}
               >
@@ -154,15 +168,19 @@ export function FormContent({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className={cn(fitPreview ? "space-y-2" : "space-y-4 sm:space-y-6")}
+        >
           {/* Fields Grid */}
           <div
             className={cn(
-              "grid gap-4 sm:gap-6",
+              "grid",
+              fitPreview ? "gap-2" : "gap-4 sm:gap-6",
+              !fitPreview && layoutConfig.spacing === "tight" && "gap-3 sm:gap-4",
+              !fitPreview && layoutConfig.spacing === "loose" && "gap-6 sm:gap-8",
               layoutConfig.columns === 1 && "grid-cols-1",
               layoutConfig.columns === 2 && "grid-cols-1 md:grid-cols-2",
-              layoutConfig.spacing === "tight" && "gap-3 sm:gap-4",
-              layoutConfig.spacing === "loose" && "gap-6 sm:gap-8",
             )}
           >
             {currentFields.map((field) => (
@@ -170,7 +188,6 @@ export function FormContent({
                 key={field.id}
                 className={cn(
                   layoutConfig.columns === 2 && "md:col-span-1",
-                  // For conversational, some fields might span full width
                   isConversational &&
                     field.type === "meeting" &&
                     "col-span-full",
@@ -187,6 +204,7 @@ export function FormContent({
                   userId={userId}
                   isEmbedded={isEmbedded}
                   timeZone={timeZone}
+                  compact={fitPreview}
                 />
               </div>
             ))}
@@ -195,7 +213,8 @@ export function FormContent({
           {/* Action Buttons */}
           <div
             className={cn(
-              "flex justify-between items-center pt-4 sm:pt-6",
+              "flex justify-between items-center",
+              fitPreview ? "pt-2" : "pt-4 sm:pt-6",
               isConversational && "border-t border-gray-200",
             )}
           >
@@ -206,8 +225,9 @@ export function FormContent({
                   onClick={handlePrevious}
                   disabled={currentStep === 0}
                   className={cn(
-                    "min-h-[44px] min-w-[44px]", // Touch-friendly minimum size
-                    "px-4 sm:px-6 py-3 sm:py-3 text-sm sm:text-base font-medium transition-colors",
+                    fitPreview
+                      ? "min-h-9 min-w-9 px-3 py-2 text-sm font-medium transition-colors"
+                      : "min-h-[44px] min-w-[44px] px-4 sm:px-6 py-3 text-sm sm:text-base font-medium transition-colors",
                     currentStep === 0
                       ? "text-gray-400 cursor-not-allowed"
                       : "text-gray-600 hover:text-gray-800 hover:bg-gray-100",
@@ -221,8 +241,9 @@ export function FormContent({
                   type="submit"
                   disabled={isSubmitting}
                   className={cn(
-                    "min-h-[44px] min-w-[44px]", // Touch-friendly minimum size
-                    "px-6 sm:px-8 py-3 sm:py-3 text-sm sm:text-base font-medium text-white transition-colors",
+                    fitPreview
+                      ? "min-h-9 min-w-9 px-4 py-2 text-sm font-medium text-white transition-colors"
+                      : "min-h-[44px] min-w-[44px] px-6 sm:px-8 py-3 text-sm sm:text-base font-medium text-white transition-colors",
                     "bg-[var(--shelf-primary)] hover:opacity-90",
                     "disabled:opacity-50 disabled:cursor-not-allowed",
                   )}
@@ -240,11 +261,13 @@ export function FormContent({
                 type="submit"
                 disabled={isSubmitting}
                 className={cn(
-                  "w-full min-h-[44px]", // Touch-friendly minimum size
-                  "px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-white transition-colors",
+                  "w-full font-medium text-white transition-colors",
                   "bg-[var(--shelf-primary)] hover:opacity-90",
                   "disabled:opacity-50 disabled:cursor-not-allowed",
-                  layout === "hero" && "sm:text-lg sm:py-5",
+                  fitPreview
+                    ? "min-h-9 py-2 px-4 text-sm"
+                    : "min-h-[44px] px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base",
+                  layout === "hero" && !fitPreview && "sm:text-lg sm:py-5",
                 )}
                 style={{ borderRadius: "var(--shelf-radius)" }}
               >
@@ -255,14 +278,19 @@ export function FormContent({
         </form>
 
         {showWatermark && (
-          <div className="w-full text-center pt-6 mt-6 border-t border-border">
+          <div
+            className={cn(
+              "w-full text-center border-t border-border",
+              fitPreview ? "pt-2 mt-2" : "pt-6 mt-6",
+            )}
+          >
             <div className="flex items-center justify-center gap-2">
               <img
                 src="/1.png"
                 alt="ShelfCue Logo"
-                className="h-4 w-auto opacity-70"
+                className={cn("w-auto opacity-70", fitPreview ? "h-3" : "h-4")}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className={cn("text-muted-foreground", fitPreview ? "text-[10px]" : "text-xs")}>
                 Powered by{" "}
                 <a
                   href="https://shelfcue.com"

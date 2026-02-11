@@ -16,6 +16,7 @@ interface FieldRendererProps {
   userId?: string;
   isEmbedded?: boolean;
   timeZone?: string;
+  compact?: boolean;
 }
 
 export function FieldRenderer({
@@ -29,25 +30,24 @@ export function FieldRenderer({
   userId,
   isEmbedded = false,
   timeZone,
+  compact = false,
 }: FieldRendererProps) {
   const baseClasses = cn(
     "w-full rounded-lg border border-gray-300",
     "focus:outline-none focus:ring-2 focus:ring-[var(--shelf-primary)] focus:border-transparent",
     "transition-colors duration-200",
     "text-gray-900 placeholder-gray-500",
-    isEmbedded
-      ? "px-3 py-2 min-h-[38px] text-xs sm:text-sm"
-      : "px-3 py-2 sm:px-4 sm:py-3 min-h-[44px] text-sm sm:text-base",
+    compact && "px-2 py-1.5 min-h-9 text-sm",
+    isEmbedded && !compact && "px-3 py-2 min-h-[38px] text-xs sm:text-sm",
+    !compact && !isEmbedded && "px-3 py-2 sm:px-4 sm:py-3 min-h-[44px] text-sm sm:text-base",
   );
 
   const labelClasses = cn(
     "font-medium text-gray-700",
-    isEmbedded
-      ? "text-[11px] mb-1"
-      : "block text-xs sm:text-sm mb-1.5 sm:mb-2",
-    !isEmbedded &&
-      isConversational &&
-      "text-lg font-semibold text-gray-900",
+    compact && "text-xs mb-0.5",
+    isEmbedded && !compact && "text-[11px] mb-1",
+    !compact && !isEmbedded && "block text-xs sm:text-sm mb-1.5 sm:mb-2",
+    !compact && !isEmbedded && isConversational && "text-lg font-semibold text-gray-900",
   );
 
   const renderField = () => {
@@ -83,11 +83,11 @@ export function FieldRenderer({
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder}
             required={field.required}
-            rows={4}
+            rows={compact ? 2 : 4}
             className={cn(
               baseClasses,
-              "resize-none min-h-[100px]", // Minimum height for textarea
-              "text-base", // Prevent zoom on iOS
+              "resize-none",
+              compact ? "min-h-[60px] text-sm" : "min-h-[100px] text-base",
             )}
           />
         );

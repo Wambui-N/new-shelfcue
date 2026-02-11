@@ -902,7 +902,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   transition={{ duration: 0.18 }}
                   className={
                     !isMobileViewport && deviceView === "desktop"
-                      ? "aspect-video max-h-[calc(100vh-240px)] w-auto max-w-full min-w-0"
+                      ? "aspect-[21/9] max-h-[calc(100vh-240px)] w-auto max-w-full min-w-[920px]"
                       : isMobileViewport && viewportSize
                         ? "w-full max-w-full min-w-0 max-h-[calc(100dvh-120px)]"
                         : "w-[340px] sm:w-[380px] aspect-[9/19.5]"
@@ -914,9 +914,17 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   }
                 >
                   <div className="w-full h-full rounded-3xl border border-border/60 bg-card/80 shadow-2xl overflow-hidden flex flex-col min-h-0">
-                    <div className="flex-1 min-h-0 overflow-y-auto">
+                    <div
+                      className={cn(
+                        "flex-1 min-h-0",
+                        !isMobileViewport && deviceView === "desktop"
+                          ? "overflow-hidden"
+                          : "overflow-y-auto",
+                      )}
+                    >
                       <FormPreview
                         deviceView={isMobileViewport ? "mobile" : deviceView}
+                        fitPreview={!isMobileViewport && deviceView === "desktop"}
                       />
                     </div>
                   </div>

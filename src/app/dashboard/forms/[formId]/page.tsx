@@ -319,17 +319,17 @@ function FormViewPage({ params }: FormViewPageProps) {
           </div>
         </div>
 
-        {/* Form Preview - 16:9 on large screens with scroll inside frame */}
+        {/* Form Preview - 16:9 on large screens, fit content no scroll */}
         <div className="flex items-center justify-center overflow-hidden py-8 px-4 min-h-[calc(100vh-200px)] max-h-[calc(100vh-180px)]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="w-full max-w-2xl min-w-0 lg:aspect-video lg:max-h-[calc(100vh-220px)] lg:w-auto lg:max-w-full"
+            className="w-full max-w-2xl min-w-0 lg:aspect-[21/9] lg:max-h-[calc(100vh-220px)] lg:w-auto lg:max-w-full lg:min-w-[920px]"
           >
             <Card className="p-6 lg:p-0 lg:h-full lg:overflow-hidden lg:flex lg:flex-col min-h-0">
-              <div className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:p-6">
-                <FormPreview />
+              <div className="lg:flex-1 lg:min-h-0 lg:overflow-hidden lg:p-4">
+                <FormPreview fitPreview />
               </div>
             </Card>
           </motion.div>

@@ -43,6 +43,7 @@ interface FormDisplayProps {
   leftSectionLink?: string;
   showWatermark?: boolean;
   deviceView?: "desktop" | "mobile";
+  fitPreview?: boolean;
   calendarId?: string;
   userId?: string;
 }
@@ -63,6 +64,7 @@ export function FormDisplay({
   leftSectionLink,
   showWatermark = true,
   deviceView = "desktop",
+  fitPreview = false,
   calendarId,
   userId,
 }: FormDisplayProps) {
@@ -154,6 +156,7 @@ export function FormDisplay({
       isEmbedded={isEmbedded}
       timeZone={settings.timezone}
       showWatermark={showWatermark}
+      fitPreview={fitPreview}
     />
   );
 
@@ -172,7 +175,7 @@ export function FormDisplay({
             "w-full h-[30vh] min-h-[30vh] md:h-auto",
             deviceView === "desktop" &&
               "md:w-1/2 md:min-h-screen md:sticky md:top-0",
-            "p-4 md:p-12",
+            fitPreview ? "p-3" : "p-4 md:p-12",
           )}
           style={
             autoGradient
@@ -199,13 +202,16 @@ export function FormDisplay({
           <div className="relative z-10 flex flex-col h-full">
             {/* Logo */}
             {displayTheme.logoUrl && (
-              <div className="mb-4 md:mb-8">
+              <div className={cn(fitPreview ? "mb-2" : "mb-4 md:mb-8")}>
                 <img
                   src={displayTheme.logoUrl}
                   alt="Logo"
-                  className="h-8 md:h-12 w-auto" // Smaller on mobile
+                  className={cn(
+                    "w-auto",
+                    fitPreview ? "h-6 max-h-6" : "h-8 md:h-12",
+                  )}
                   style={{
-                    maxHeight: "32px", // Reduced max height on mobile
+                    maxHeight: fitPreview ? "24px" : "32px",
                   }}
                 />
               </div>
@@ -215,7 +221,10 @@ export function FormDisplay({
             <div className="flex-1 flex flex-col justify-end items-start">
               {leftSectionHeadline && (
                 <p
-                  className="text-white text-sm sm:text-base md:text-lg font-semibold mb-2 text-left"
+                  className={cn(
+                    "text-white font-semibold text-left",
+                    fitPreview ? "text-xs mb-1" : "text-sm sm:text-base md:text-lg mb-2",
+                  )}
                   style={{
                     fontFamily: displayTheme.fontFamily,
                     color:
@@ -229,7 +238,10 @@ export function FormDisplay({
               )}
               {leftSectionDescription && (
                 <p
-                  className="text-white text-xs md:text-sm mb-2 md:mb-3 text-left" // Smaller text, left-aligned
+                  className={cn(
+                    "text-white text-left",
+                    fitPreview ? "text-[10px] mb-0.5" : "text-xs md:text-sm mb-2 md:mb-3",
+                  )}
                   style={{
                     fontFamily: displayTheme.fontFamily,
                     color:
@@ -246,7 +258,10 @@ export function FormDisplay({
                   href={leftSectionLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white text-xs md:text-sm underline hover:no-underline text-left" // Smaller text, left-aligned
+                  className={cn(
+                    "text-white underline hover:no-underline text-left",
+                    fitPreview ? "text-[10px]" : "text-xs md:text-sm",
+                  )}
                   style={{
                     fontFamily: displayTheme.fontFamily,
                     color:
@@ -273,7 +288,12 @@ export function FormDisplay({
               "backgroundColor" in theme ? theme.backgroundColor : "#ffffff",
           }}
         >
-          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+          <div
+            className={cn(
+              "flex-1 min-h-0 overflow-x-hidden",
+              fitPreview ? "overflow-hidden" : "overflow-y-auto",
+            )}
+          >
             <div className="min-h-full">
               {formContent}
             </div>
