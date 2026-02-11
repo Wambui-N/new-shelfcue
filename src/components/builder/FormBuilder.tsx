@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Edit,
   Eye,
+  ExternalLink,
   Loader2,
   Monitor,
   Palette,
@@ -672,7 +673,11 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
                   {saveStatus === "idle" && isDirty && (
                     <>
                       <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
-                      <span className="text-orange-600">Unsaved</span>
+                      <span className="text-orange-600">
+                        {formData.status === "published"
+                          ? "Unpublished changes"
+                          : "Unsaved"}
+                      </span>
                     </>
                   )}
                 </div>
@@ -681,6 +686,25 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
 
             {/* Action Buttons */}
             <div className="flex items-center gap-2">
+              {formData.status === "published" && formData.id && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
+                  onClick={() => {
+                    const origin =
+                      typeof window !== "undefined"
+                        ? window.location.origin
+                        : "";
+                    if (origin) {
+                      window.open(`${origin}/form/${formData.id}`, "_blank", "noopener,noreferrer");
+                    }
+                  }}
+                >
+                  <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">View form</span>
+                </Button>
+              )}
               <Button
                 onClick={() => setShowShareDialog(true)}
                 variant="outline"
@@ -736,7 +760,11 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
               {saveStatus === "idle" && isDirty && (
                 <>
                   <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
-                  <span className="text-orange-600">Unsaved</span>
+                  <span className="text-orange-600">
+                    {formData.status === "published"
+                      ? "Unpublished changes"
+                      : "Unsaved"}
+                  </span>
                 </>
               )}
             </div>
