@@ -15,13 +15,13 @@ export default function HomePage() {
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Navigation />
       <HeroSection />
-      <DemoSection />
-      <ProblemSection />
+      {/* <DemoSection /> */}
       {/* <SolutionSection /> */}
       <FeaturesSection />
       {/* <HowItWorksSection /> */}
       {/* <TestimonialsSection /> */}
       <PricingSection />
+      <ProblemSection />
       <FAQSection />
       <FinalCTASection />
       <Footer />

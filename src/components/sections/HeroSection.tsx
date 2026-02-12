@@ -93,7 +93,7 @@ export function HeroSection() {
               </Button>
             </motion.div>
           </Link>
-          <motion.button
+          {/* <motion.button
             onClick={() => {
               // PostHog: Capture demo video played event
               posthog.capture("demo_video_played", {
@@ -113,7 +113,7 @@ export function HeroSection() {
               <Play className="w-4 h-4 text-black" fill="currentColor" />
             </motion.div>
             <span>Watch 1-Min Demo</span>
-          </motion.button>
+          </motion.button> */}
         </motion.div>
 
         {/* Social Proof */}

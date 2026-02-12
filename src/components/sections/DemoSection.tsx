@@ -2,12 +2,13 @@
 
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import Image from "next/image";
-import { Pause, Play, RotateCcw } from "lucide-react";
+import { Pause, Play, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export function DemoSection() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [mobileStep, setMobileStep] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, amount: 0.3 });
 
@@ -33,6 +34,24 @@ export function DemoSection() {
     },
   ];
 
+  const mobileDemoSteps = [
+    {
+      title: "Create",
+      description: "Launch your form in seconds with our mobile-first builder.",
+      image: "/Create.png",
+    },
+    {
+      title: "Customize",
+      description: "Design and customize on the go with our mobile app.",
+      image: "/Customize.png",
+    },
+    {
+      title: "Capture Leads",
+      description: "Manage submissions right from your phone.",
+      image: "/Publish.png",
+    },
+  ];
+
   useEffect(() => {
     if (isPlaying) {
       const interval = setInterval(() => {
@@ -42,61 +61,70 @@ export function DemoSection() {
     }
   }, [isPlaying]);
 
+  useEffect(() => {
+    if (inView) {
+      const interval = setInterval(() => {
+        setMobileStep((prev) => (prev + 1) % mobileDemoSteps.length);
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [inView]);
+
   return (
     <section
       ref={sectionRef}
       id="demo"
-      className="py-16 px-4 sm:px-6 lg:px-8 bg-background"
+      className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-background"
     >
-      <div className="container mx-auto max-w-7xl">
-        {/* Section Intro */}
+      <div className="container mx-auto max-w-6xl">
+        {/* Section Header */}
         <motion.div
-          className="text-center mb-12 lg:hidden"
+          className="text-center mb-8 sm:mb-10 lg:mb-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
           <motion.h2
-            className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4"
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-3 sm:mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+          >
+            See It In <span className="text-dark-gray">Action</span>
+          </motion.h2>
+          <motion.p
+            className="text-base sm:text-lg text-foreground-muted max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            See It In <span className="text-dark-gray">Action</span>
-          </motion.h2>
-          <motion.p
-            className="text-base md:text-lg text-foreground-muted max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            Watch how easy it is to create professional lead capture forms that
-            convert.
+            Watch how easy it is to create professional lead capture forms that convert.
           </motion.p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-center min-h-[60vh] lg:min-h-[80vh]">
-          {/* Left Side - Demo Preview (Just over half screen height) */}
+        {/* DESKTOP DEMO */}
+        <div className="hidden sm:block">
+          {/* Demo Preview - Centered */}
           <motion.div
-            className="lg:col-span-7 relative lg:sticky lg:top-0 lg:min-h-[55vh] lg:flex lg:items-center lg:justify-center mb-8 lg:mb-0"
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            className="mb-8 sm:mb-10 lg:mb-12"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
             {/* Laptop Frame */}
-            <motion.div className="relative mx-auto bg-dark-gray rounded-xl lg:rounded-2xl p-2 lg:p-3 shadow-2xl border-2 border-light-gray w-full max-w-4xl">
+            <motion.div className="relative mx-auto bg-dark-gray rounded-lg sm:rounded-xl lg:rounded-2xl p-2 sm:p-3 shadow-2xl border-2 border-light-gray w-full max-w-5xl">
               {/* Browser Header */}
-              <div className="flex items-center gap-2 mb-2 lg:mb-3 pb-2 border-b border-light-gray/50">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3 pb-2 sm:pb-3 border-b border-light-gray/50">
                 <div className="flex gap-1.5">
-                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-[#ff5f57]" aria-hidden />
-                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-[#febc2e]" aria-hidden />
-                  <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-[#28c840]" aria-hidden />
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#ff5f57]" aria-hidden />
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#febc2e]" aria-hidden />
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#28c840]" aria-hidden />
                 </div>
-                <div className="flex-1 bg-background rounded-md px-2 lg:px-3 py-1 lg:py-1.5 text-xs text-foreground-muted">
+                <div className="flex-1 bg-background rounded-md px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm text-foreground-muted truncate">
                   {`shelfcue.com/${demoSteps[currentStep].title.toLowerCase().replace(/\s+/g, "-")}`}
                 </div>
               </div>
@@ -105,15 +133,14 @@ export function DemoSection() {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentStep}
-                  className="h-[220px] sm:h-[275px] lg:h-[380px] flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-background/95 overflow-hidden"
-                  style={{ minHeight: "55vh" }}
+                  className="h-[280px] sm:h-[360px] lg:h-[480px] flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-background/95 overflow-hidden"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.8 }}
+                  transition={{ duration: 0.6 }}
                 >
                   <motion.div
-                    className="relative w-full h-full max-w-2xl mx-auto rounded-lg overflow-hidden border border-light-gray shadow-sm bg-white"
+                    className="relative w-full h-full max-w-3xl mx-auto rounded-lg overflow-hidden border border-light-gray shadow-sm bg-white"
                     animate={{
                       boxShadow: [
                         "0 2px 8px rgba(0,0,0,0.05)",
@@ -131,7 +158,7 @@ export function DemoSection() {
                       alt={demoSteps[currentStep].title}
                       fill
                       className="object-contain object-center"
-                      sizes="(max-width: 1024px) 100vw, 672px"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 85vw"
                       priority={currentStep === 0}
                     />
                   </motion.div>
@@ -140,102 +167,67 @@ export function DemoSection() {
             </motion.div>
           </motion.div>
 
-          {/* Right Side - Descriptions & Controls */}
+          {/* Navigation Tabs & Controls */}
           <motion.div
-            className="lg:col-span-5 space-y-8 lg:pl-8"
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            className="space-y-6 sm:space-y-8"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
           >
-            {/* Section Intro - Desktop Only */}
-            <motion.div
-              className="hidden lg:block"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <motion.h2
-                className="text-2xl sm:text-3xl font-bold text-foreground mb-4"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                See It In <span className="text-dark-gray">Action</span>
-              </motion.h2>
-              <motion.p
-                className="text-sm text-foreground-muted"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                Watch how easy it is to create professional lead capture forms
-                that convert.
-              </motion.p>
-            </motion.div>
-
-            {/* Demo Steps - Descriptive Areas */}
-            <motion.div
-              className="space-y-3"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-            >
+            {/* Tab Navigation */}
+            <div className="flex flex-row gap-0 justify-center items-center">
               {demoSteps.map((step, index) => (
-                <motion.div
+                <motion.button
                   key={index}
-                  className={`p-3 rounded-lg border-2 transition-all duration-500 ${
-                    currentStep === index
-                      ? "border-black bg-light-gray/20 shadow-md"
-                      : "border-light-gray hover:border-dark-gray"
-                  }`}
-                  animate={{
-                    scale: currentStep === index ? 1.02 : 1,
+                  onClick={() => {
+                    setCurrentStep(index);
+                    setIsPlaying(false);
                   }}
-                  transition={{ duration: 0.3 }}
-                  whileHover={{ x: 4 }}
+                  className="relative flex-none group"
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <div className="flex items-start gap-3">
-                    <motion.div
-                      className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                        currentStep === index
-                          ? "bg-black text-white"
-                          : "bg-light-gray text-dark-gray"
-                      }`}
-                      animate={{
-                        backgroundColor:
-                          currentStep === index ? "#151419" : "#cfcecb",
-                        color: currentStep === index ? "#fafafa" : "#585552",
-                      }}
-                    >
-                      {index + 1}
-                    </motion.div>
-                    <div className="flex-1">
-                      <h3
-                        className={`font-semibold mb-1 text-xs transition-colors duration-300 ${
-                          currentStep === index
-                            ? "text-foreground"
-                            : "text-foreground-muted"
-                        }`}
-                      >
-                        {step.title}
-                      </h3>
-                      <p className="text-foreground-muted text-xs leading-relaxed">
-                        {step.description}
-                      </p>
-                    </div>
+                  {/* Tab button */}
+                  <div className={`px-6 py-4 rounded-t-xl transition-all duration-300 ${
+                    currentStep === index
+                      ? "bg-black text-white shadow-md"
+                      : "bg-light-gray text-dark-gray hover:bg-light-gray/80"
+                  }`}>
+                    <h3 className="font-semibold text-base whitespace-nowrap">
+                      {step.title}
+                    </h3>
                   </div>
-                </motion.div>
+                </motion.button>
               ))}
+            </div>
+
+            {/* Step Descriptions - Below Tabs */}
+            <motion.div
+              className="bg-light-gray/30 rounded-b-lg sm:rounded-b-xl p-4 sm:p-6 lg:p-8 border border-light-gray border-t-0 sm:border-t"
+              animate={{
+                minHeight: "auto",
+              }}
+              transition={{ duration: 0.3 }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentStep}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <p className="text-foreground-muted text-base sm:text-lg leading-relaxed max-w-2xl">
+                    {demoSteps[currentStep].description}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
             </motion.div>
 
             {/* Controls */}
             <motion.div
-              className="flex flex-col sm:flex-row justify-center lg:justify-start gap-2"
+              className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 pt-4 sm:pt-2"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -243,14 +235,14 @@ export function DemoSection() {
             >
               <motion.button
                 onClick={() => setIsPlaying(!isPlaying)}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-dark-gray transition-colors duration-300 text-xs sm:text-sm font-medium w-full sm:w-auto"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-black text-white rounded-lg hover:bg-dark-gray transition-colors duration-300 font-medium text-sm sm:text-base w-full sm:w-auto"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 {isPlaying ? (
-                  <Pause className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
                 ) : (
-                  <Play className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5" />
                 )}
                 {isPlaying ? "Pause" : "Play Demo"}
               </motion.button>
@@ -259,13 +251,112 @@ export function DemoSection() {
                   setCurrentStep(0);
                   setIsPlaying(false);
                 }}
-                className="flex items-center justify-center gap-2 px-4 py-2 border border-light-gray text-foreground-muted rounded-lg hover:bg-light-gray/30 transition-all duration-300 text-xs sm:text-sm font-medium w-full sm:w-auto"
+                className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-light-gray text-foreground-muted rounded-lg hover:bg-light-gray/50 transition-all duration-300 font-medium text-sm sm:text-base w-full sm:w-auto"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
+                <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
                 Reset
               </motion.button>
+            </motion.div>
+          </motion.div>
+        </div>
+
+        {/* MOBILE DEMO */}
+        <div className="sm:hidden">
+          <motion.div
+            className="flex flex-col items-center gap-8"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            {/* Phone Frame */}
+            <div className="relative mx-auto w-full max-w-xs">
+              {/* Phone Bezel */}
+              <div className="relative bg-black rounded-[2.5rem] p-3 shadow-2xl border-8 border-dark-gray">
+                {/* Notch */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-10" />
+                
+                {/* Screen */}
+                <div className="relative bg-background rounded-[2rem] overflow-hidden aspect-[9/19.5] flex flex-col items-center justify-center">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={mobileStep}
+                      className="w-full h-full flex items-center justify-center p-4"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      <div className="relative w-full h-full rounded-lg overflow-hidden border border-light-gray bg-white">
+                        <Image
+                          src={mobileDemoSteps[mobileStep].image}
+                          alt={mobileDemoSteps[mobileStep].title}
+                          fill
+                          className="object-cover object-center"
+                          sizes="100vw"
+                          priority={mobileStep === 0}
+                        />
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Navigation & Description */}
+            <motion.div
+              className="w-full space-y-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              {/* Arrow Navigation */}
+              <div className="flex justify-center items-center gap-3">
+                <motion.button
+                  onClick={() => {
+                    setMobileStep((prev) => (prev - 1 + mobileDemoSteps.length) % mobileDemoSteps.length);
+                  }}
+                  className="flex items-center justify-center w-10 h-10 rounded-lg bg-light-gray text-dark-gray hover:bg-dark-gray hover:text-white transition-colors duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </motion.button>
+                <div className="text-center min-w-[140px]">
+                  <p className="font-semibold text-foreground text-sm">{mobileDemoSteps[mobileStep].title}</p>
+                  <p className="text-xs text-foreground-muted">{mobileStep + 1} of {mobileDemoSteps.length}</p>
+                </div>
+                <motion.button
+                  onClick={() => {
+                    setMobileStep((prev) => (prev + 1) % mobileDemoSteps.length);
+                  }}
+                  className="flex items-center justify-center w-10 h-10 rounded-lg bg-light-gray text-dark-gray hover:bg-dark-gray hover:text-white transition-colors duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </motion.button>
+              </div>
+
+              {/* Description */}
+              <div className="bg-light-gray/30 rounded-lg p-4 border border-light-gray text-center">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={mobileStep}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <p className="text-foreground-muted text-sm leading-relaxed">
+                      {mobileDemoSteps[mobileStep].description}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </motion.div>
           </motion.div>
         </div>
