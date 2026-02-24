@@ -24,7 +24,7 @@ Used by `/api/subscriptions/plans`, billing UI, and trial/payment flows.
 | name              | text    | e.g. `"professional"`                      |
 | display_name      | text    | e.g. `"Professional"`                     |
 | description       | text    | optional                                   |
-| price_monthly     | number  | e.g. 17                                    |
+| price_monthly     | number  | e.g. 8                                     |
 | is_active         | boolean | filter active plans                        |
 | features          | jsonb   | optional array/object                       |
 | paystack_plan_code| text    | **Required for payments** – Paystack plan  |

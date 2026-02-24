@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import posthog from "posthog-js";
 
 export function PricingSection() {
-  const priceMonthly = 17;
+  const priceMonthly = 8;
 
   const pricing = {
     headline: "One Simple Plan, Everything You Need",
