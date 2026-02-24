@@ -8,6 +8,7 @@ import { HeroSection } from "@/components/sections/HeroSection";
 import { HowItWorksSection } from "@/components/sections/HowItWorksSection";
 import { PricingSection } from "@/components/sections/PricingSection";
 import { ProblemSection } from "@/components/sections/ProblemSection";
+import { UseCasesSection } from "@/components/sections/UseCasesSection";
 import { SolutionSection } from "@/components/sections/SolutionSection";
 
 export default function HomePage() {
@@ -20,6 +21,7 @@ export default function HomePage() {
       <FeaturesSection />
       {/* <HowItWorksSection /> */}
       {/* <TestimonialsSection /> */}
+      <UseCasesSection />
       <PricingSection />
       <ProblemSection />
       <FAQSection />

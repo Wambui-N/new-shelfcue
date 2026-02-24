@@ -71,7 +71,7 @@ const BASE_URL =
 
 export const metadata: Metadata = {
   title:
-    "ShelfCue - Beautiful Google Sheets Form Builder | The Best Google Forms Alternative",
+    "ShelfCue - Beautiful Google Sheets Form Builder",
   description:
     "Create branded, responsive forms that connect directly to Google Sheets. No Zapier needed. The perfect Google Forms alternative for small businesses. Custom form builder with file uploads, mobile-first design, and automatic Google Sheets sync.",
   keywords: [
