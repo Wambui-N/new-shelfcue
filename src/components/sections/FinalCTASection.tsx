@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 export function FinalCTASection() {
   const benefits = [
-    "Free forever",
+    "Free",
     "No credit card required",
     "Unlimited everything",
   ];
@@ -100,7 +100,7 @@ export function FinalCTASection() {
               </motion.div>
             </Link>
             <p className="text-xs text-center text-muted-foreground mt-3">
-              Free forever — no credit card required
+              Free!
             </p>
           </motion.div>
 

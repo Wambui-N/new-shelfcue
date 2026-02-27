@@ -8,7 +8,7 @@ import posthog from "posthog-js";
 
 export function PricingSection() {
   const pricing = {
-    headline: "Free. Forever.",
+    headline: "Free",
     subhead:
       "No credit card. No trials. No surprises. ShelfCue is completely free to use.",
     benefits: [
@@ -126,9 +126,7 @@ export function PricingSection() {
                 <p className="text-2xl sm:text-3xl font-bold text-foreground">
                   Free
                 </p>
-                <p className="text-xs sm:text-sm text-foreground-muted mt-1">
-                  Forever
-                </p>
+
               </div>
               <div>
                 <p className="text-2xl sm:text-3xl font-bold text-foreground">

@@ -147,7 +147,7 @@ export default function SignUpPage() {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-primary font-bold">3.</span>
-            <span>Cancel anytime during your Free forever</span>
+            <span>Cancel anytime</span>
           </li>
         </ul>
       </div>
