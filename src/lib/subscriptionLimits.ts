@@ -1,22 +1,13 @@
 /**
- * Subscription Limits Enforcement
- * Utilities to check and enforce subscription limits
+ * Subscription Limits — Free Plan
+ *
+ * ShelfCue is fully free. All limit checks return allowed: true.
+ * Usage tracking (incrementUsage) is preserved for analytics.
  */
 
 import { getSupabaseAdmin } from "./supabase/admin";
 
 type LimitType = "forms" | "submissions_per_month" | "storage_mb" | "api_calls";
-
-interface SubscriptionLimits {
-  forms: number;
-  submissions_per_month: number;
-  storage_mb: number;
-  team_members: number;
-  analytics: string;
-  support: string;
-  custom_branding?: boolean;
-  api_access?: boolean;
-}
 
 interface UsageData {
   forms_count: number;
@@ -26,102 +17,32 @@ interface UsageData {
 }
 
 /**
- * Get user's subscription limits
+ * Always returns unlimited limits — the app is free.
  */
-export async function getUserLimits(
-  userId: string,
-): Promise<SubscriptionLimits> {
-  const supabase = getSupabaseAdmin();
-
-  // Get user's subscription with plan details (.maybeSingle() avoids throw when no row)
-  const { data: subscription, error: subError } = await (supabase as any)
-    .from("user_subscriptions")
-    .select(
-      `
-      *,
-      plan:subscription_plans(*)
-    `,
-    )
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (subError) {
-    console.error("getUserLimits subscription fetch error:", subError);
-    return {
-      forms: 0,
-      submissions_per_month: 0,
-      storage_mb: 0,
-      team_members: 0,
-      analytics: "none",
-      support: "none",
-    };
-  }
-
-  if ((subscription as any)?.plan) {
-    // Check if trial has expired
-    if (
-      (subscription as any).status === "trial" &&
-      (subscription as any).trial_end &&
-      new Date((subscription as any).trial_end) < new Date()
-    ) {
-      // Trial expired - return no access
-      return {
-        forms: 0,
-        submissions_per_month: 0,
-        storage_mb: 0,
-        team_members: 0,
-        analytics: "none",
-        support: "none",
-      };
-    }
-
-    // Check if subscription is expired or cancelled
-    if (
-      (subscription as any).status === "expired" ||
-      (subscription as any).status === "cancelled"
-    ) {
-      return {
-        forms: 0,
-        submissions_per_month: 0,
-        storage_mb: 0,
-        team_members: 0,
-        analytics: "none",
-        support: "none",
-      };
-    }
-
-    // Return plan limits for all valid subscriptions
-    // This includes:
-    // - Active paid subscriptions (status="active")
-    // - Active trials (status="trial" with trial_end in the future)
-    // - Any other non-expired/non-cancelled status
-    return (subscription as any).plan.limits as SubscriptionLimits;
-  }
-
-  // No subscription found - deny access
+export async function getUserLimits(_userId: string) {
   return {
-    forms: 0,
-    submissions_per_month: 0,
-    storage_mb: 0,
-    team_members: 0,
-    analytics: "none",
-    support: "none",
+    forms: -1,
+    submissions_per_month: -1,
+    storage_mb: -1,
+    team_members: -1,
+    analytics: "advanced",
+    support: "standard",
+    custom_branding: true,
+    api_access: true,
   };
 }
 
 /**
- * Get user's current usage
+ * Get user's current usage (for analytics only).
  */
 export async function getUserUsage(userId: string): Promise<UsageData> {
   const supabase = getSupabaseAdmin();
 
-  // Get forms count
   const { count: formsCount } = await supabase
     .from("forms")
     .select("*", { count: "exact", head: true })
     .eq("user_id", userId);
 
-  // Get current period usage (.maybeSingle() - no row is valid for new users)
   const now = new Date();
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
@@ -143,59 +64,17 @@ export async function getUserUsage(userId: string): Promise<UsageData> {
 }
 
 /**
- * Check if user can perform an action based on their limits
+ * Always allows the action — the app is free.
  */
 export async function canPerformAction(
-  userId: string,
-  limitType: LimitType,
-): Promise<{
-  allowed: boolean;
-  message?: string;
-  limit?: number;
-  usage?: number;
-}> {
-  const limits = await getUserLimits(userId);
-  const usage = await getUserUsage(userId);
-
-  const limit = (limits as any)[limitType];
-  const currentUsage = (usage as any)[
-    `${limitType === "forms" ? "forms_count" : `${limitType.replace("_per_month", "")}_count`}`
-  ];
-
-  // If the plan has no configured limit for this metric, treat it as unlimited
-  // so users aren't blocked due to a misconfigured `subscription_plans.limits` JSON.
-  if (limit == null || typeof limit !== "number") {
-    return { allowed: true };
-  }
-
-  // -1 means unlimited
-  if (limit === -1) {
-    return { allowed: true };
-  }
-
-  const allowed = currentUsage < limit;
-
-  if (!allowed) {
-    const messages: Record<LimitType, string> = {
-      forms: `You've reached your form limit (${limit} forms). Upgrade to create more forms.`,
-      submissions_per_month: `You've reached your monthly submission limit (${limit} submissions). Upgrade for more capacity.`,
-      storage_mb: `You've reached your storage limit (${limit} MB). Upgrade for more storage.`,
-      api_calls: `You've reached your API call limit (${limit} calls). Upgrade for more API access.`,
-    };
-
-    return {
-      allowed: false,
-      message: messages[limitType],
-      limit,
-      usage: currentUsage,
-    };
-  }
-
-  return { allowed: true, limit, usage: currentUsage };
+  _userId: string,
+  _limitType: LimitType,
+): Promise<{ allowed: boolean; message?: string; limit?: number; usage?: number }> {
+  return { allowed: true };
 }
 
 /**
- * Increment usage counter for a specific metric
+ * Increment usage counter for analytics tracking.
  */
 export async function incrementUsage(
   userId: string,
@@ -204,12 +83,10 @@ export async function incrementUsage(
 ): Promise<void> {
   const supabase = getSupabaseAdmin();
 
-  // Get current period
   const now = new Date();
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-  // Try to get existing usage record
   const { data: existingUsage } = await supabase
     .from("usage_tracking")
     .select("*")
@@ -226,7 +103,6 @@ export async function incrementUsage(
         : "api_calls_count";
 
   if (existingUsage) {
-    // Update existing record
     await (supabase as any)
       .from("usage_tracking")
       .update({
@@ -234,7 +110,6 @@ export async function incrementUsage(
       })
       .eq("id", (existingUsage as any).id);
   } else {
-    // Create new record for this period
     await (supabase as any).from("usage_tracking").insert({
       user_id: userId,
       period_start: periodStart.toISOString(),
@@ -244,82 +119,18 @@ export async function incrementUsage(
   }
 }
 
-/**
- * Check if user's subscription is in trial
- */
-export async function isTrialActive(userId: string): Promise<boolean> {
-  const supabase = getSupabaseAdmin();
-
-  const { data: subscription } = await (supabase as any)
-    .from("user_subscriptions")
-    .select("status, trial_end")
-    .eq("user_id", userId)
-    .single();
-
-  if (!subscription) return false;
-
-  if (
-    (subscription as any).status === "trial" &&
-    (subscription as any).trial_end
-  ) {
-    return new Date((subscription as any).trial_end) > new Date();
-  }
-
+/** Legacy helpers — always return free-plan values. */
+export async function isTrialActive(_userId: string): Promise<boolean> {
   return false;
 }
 
-/**
- * Get days remaining in trial
- */
-export async function getTrialDaysRemaining(userId: string): Promise<number> {
-  const supabase = getSupabaseAdmin();
-
-  const { data: subscription } = await (supabase as any)
-    .from("user_subscriptions")
-    .select("status, trial_end")
-    .eq("user_id", userId)
-    .single();
-
-  if (
-    !subscription ||
-    (subscription as any).status !== "trial" ||
-    !(subscription as any).trial_end
-  ) {
-    return 0;
-  }
-
-  const trialEnd = new Date((subscription as any).trial_end);
-  const now = new Date();
-  const daysRemaining = Math.ceil(
-    (trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-  );
-
-  return Math.max(0, daysRemaining);
+export async function getTrialDaysRemaining(_userId: string): Promise<number> {
+  return 0;
 }
 
-/**
- * Check if user has access to a premium feature
- */
 export async function hasFeatureAccess(
-  userId: string,
-  feature:
-    | "custom_branding"
-    | "api_access"
-    | "advanced_analytics"
-    | "priority_support",
+  _userId: string,
+  _feature: "custom_branding" | "api_access" | "advanced_analytics" | "priority_support",
 ): Promise<boolean> {
-  const limits = await getUserLimits(userId);
-
-  switch (feature) {
-    case "custom_branding":
-      return limits.custom_branding === true;
-    case "api_access":
-      return limits.api_access === true;
-    case "advanced_analytics":
-      return limits.analytics === "advanced";
-    case "priority_support":
-      return limits.support === "priority";
-    default:
-      return false;
-  }
+  return true;
 }

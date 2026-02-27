@@ -1,199 +1,40 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-
-interface SubscriptionPlan {
-  id: string;
-  name: string;
-  display_name: string;
-  limits: Record<string, unknown>;
-}
-
-interface Subscription {
-  id: string;
-  plan_id: string;
-  status: string;
-  billing_cycle: string;
-  trial_start: string;
-  trial_end: string;
-  current_period_end: string;
-  cancel_at_period_end: boolean;
-  plan: SubscriptionPlan;
-}
-
-interface UsageData {
-  forms_count: number;
-  submissions_count: number;
-  storage_used_mb: number;
-}
-
+/**
+ * Free-plan subscription hook.
+ * ShelfCue is fully free — every authenticated user has unlimited access.
+ * This hook preserves the same public API so callers don't need changes.
+ */
 export function useSubscription() {
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [usage, setUsage] = useState<UsageData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [trialDaysRemaining, setTrialDaysRemaining] = useState(0);
+  const hasAccess = true;
+  const isOnTrial = false;
+  const isActive = true;
+  const isExpired = false;
+  const trialDaysRemaining = 0;
+  const loading = false;
 
-  const fetchSubscription = useCallback(async () => {
-    try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch("/api/subscriptions/current", {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        cache: "no-store",
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-
-        // If user already has an active paid subscription, never run the trial auto-fix.
-        if (data.subscription?.status === "active") {
-          setSubscription(data.subscription);
-          setUsage(data.usage);
-          setTrialDaysRemaining(0);
-          setLoading(false);
-          return;
-        }
-
-        // 🔧 FALLBACK: Auto-fix broken or missing trials (never "fix" expired – they must subscribe)
-        if (
-          data.subscription?.status === "expired" ||
-          data.subscription?.status === "cancelled"
-        ) {
-          // Expired/cancelled: no auto-fix, use API data as-is
-          setSubscription(data.subscription);
-          setUsage(data.usage);
-          setTrialDaysRemaining(0);
-          setLoading(false);
-          return;
-        }
-        if (
-          !data.subscription ||
-          data.subscription?.status === "inactive" ||
-          !data.subscription?.trial_end
-        ) {
-          console.log(
-            "⚠️ Detected broken/missing trial, attempting auto-fix...",
-          );
-
-          const fixResponse = await fetch(
-            "/api/subscriptions/create-my-trial",
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${session.access_token}`,
-              },
-            },
-          );
-
-          if (fixResponse.ok) {
-            const fixData = await fixResponse.json();
-            console.log("✅ Trial auto-fixed:", fixData);
-
-            // Refetch subscription after fix
-            const refetchResponse = await fetch("/api/subscriptions/current", {
-              headers: {
-                Authorization: `Bearer ${session.access_token}`,
-              },
-            });
-
-            if (refetchResponse.ok) {
-              const refetchData = await refetchResponse.json();
-              setSubscription(refetchData.subscription);
-              setUsage(refetchData.usage);
-
-              // Calculate trial days
-              if (refetchData.subscription?.trial_end) {
-                const trialEnd = new Date(refetchData.subscription.trial_end);
-                const now = new Date();
-                const days = Math.ceil(
-                  (trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-                );
-                setTrialDaysRemaining(Math.max(0, days));
-              }
-              return;
-            }
-          }
-        }
-
-        setSubscription(data.subscription);
-        setUsage(data.usage);
-
-        // Calculate trial days remaining
-        if (
-          data.subscription?.status === "trial" &&
-          data.subscription?.trial_end
-        ) {
-          const trialEnd = new Date(data.subscription.trial_end);
-          const now = new Date();
-          const days = Math.ceil(
-            (trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-          );
-          setTrialDaysRemaining(Math.max(0, days));
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching subscription:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchSubscription();
-  }, [fetchSubscription]);
-
-  // Refetch when subscription was just updated (e.g. after payment on verify page)
-  useEffect(() => {
-    const onUpdated = () => fetchSubscription();
-    window.addEventListener("subscription-updated", onUpdated);
-    return () => window.removeEventListener("subscription-updated", onUpdated);
-  }, [fetchSubscription]);
-
-  const isOnTrial = subscription?.status === "trial" && trialDaysRemaining > 0;
-  const isActive = subscription?.status === "active";
-  const isExpired =
-    subscription?.status === "expired" ||
-    (subscription?.status === "trial" && trialDaysRemaining === 0);
-  const hasAccess = isOnTrial || isActive;
-
-  const limits = subscription?.plan?.limits || {
+  const limits = {
     forms: -1,
     submissions_per_month: -1,
   };
 
   function canCreateForm(): boolean {
-    if (!hasAccess) return false;
-    if ((limits as any).forms === -1) return true; // Unlimited
-    return (usage?.forms_count || 0) < (limits as any).forms;
+    return true;
   }
 
   function canReceiveSubmissions(): boolean {
-    if (!hasAccess) return false;
-    if ((limits as any).submissions_per_month === -1) return true; // Unlimited
-    return (
-      (usage?.submissions_count || 0) < (limits as any).submissions_per_month
-    );
+    return true;
   }
 
-  function hasFeature(feature: string): boolean {
-    if (!hasAccess) return false;
-    return limits[feature] === true;
+  function hasFeature(_feature: string): boolean {
+    return true;
   }
+
+  function refresh() {}
 
   return {
-    subscription,
-    usage,
+    subscription: null,
+    usage: null,
     loading,
     isOnTrial,
     isActive,
@@ -204,6 +45,6 @@ export function useSubscription() {
     canCreateForm,
     canReceiveSubmissions,
     hasFeature,
-    refresh: fetchSubscription,
+    refresh,
   };
 }

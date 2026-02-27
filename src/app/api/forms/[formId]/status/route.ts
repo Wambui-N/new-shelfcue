@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-import { canPerformAction } from "@/lib/subscriptionLimits";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function PUT(
@@ -30,38 +29,6 @@ export async function PUT(
         { error: "Invalid status. Must be 'draft' or 'published'" },
         { status: 400 },
       );
-    }
-
-    // If trying to publish, check subscription
-    const subscriptionMessage =
-      "You don't have an active subscription. Please subscribe to publish forms and receive submissions.";
-    if (status === "published") {
-      try {
-        const limitCheck = await canPerformAction(
-          user.id,
-          "submissions_per_month",
-        );
-        if (!limitCheck.allowed) {
-          return NextResponse.json(
-            {
-              error: "Subscription required",
-              message:
-                limitCheck.message ||
-                subscriptionMessage,
-            },
-            { status: 403 },
-          );
-        }
-      } catch (subErr) {
-        console.error("Subscription check failed in form status:", subErr);
-        return NextResponse.json(
-          {
-            error: "Subscription required",
-            message: subscriptionMessage,
-          },
-          { status: 403 },
-        );
-      }
     }
 
     // Verify form ownership

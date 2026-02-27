@@ -7,11 +7,10 @@ import { Button } from "@/components/ui/button";
 import posthog from "posthog-js";
 
 export function PricingSection() {
-  const priceMonthly = 8;
-
   const pricing = {
-    headline: "One Simple Plan, Everything You Need",
-    subhead: "No tiers. No surprises. Just one price and everything included.",
+    headline: "Free. Forever.",
+    subhead:
+      "No credit card. No trials. No surprises. ShelfCue is completely free to use.",
     benefits: [
       "Unlimited forms for all your clients",
       "Unlimited bookings and submissions",
@@ -21,9 +20,9 @@ export function PricingSection() {
       "All future updates and improvements included",
     ],
     ctaHeadline: "Ready to streamline your client intake?",
-    ctaSubtext: "Join other professionals using ShelfCue to save time.",
-    ctaText: "Start your 14-day free trial",
-    trialLine: "No credit card required",
+    ctaSubtext:
+      "Join other professionals using ShelfCue to save time — completely free.",
+    ctaText: "Get started free",
   };
 
   const containerVariants = {
@@ -86,7 +85,7 @@ export function PricingSection() {
           <div className="mb-8">
             <div className="flex items-baseline gap-2 mb-4">
               <span className="text-6xl sm:text-7xl font-bold text-foreground">
-                ${priceMonthly}
+                $0
               </span>
               <span className="text-2xl text-foreground-muted">/month</span>
             </div>
@@ -94,7 +93,7 @@ export function PricingSection() {
               One plan. Unlimited everything.
             </p>
             <p className="text-sm text-foreground-muted/70">
-              No setup fees. No hidden costs. Cancel anytime.
+              No setup fees. No hidden costs. Always free.
             </p>
           </div>
 
@@ -110,7 +109,9 @@ export function PricingSection() {
                 variants={itemVariants}
               >
                 <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                <span className="text-base text-foreground-muted">{benefit}</span>
+                <span className="text-base text-foreground-muted">
+                  {benefit}
+                </span>
               </motion.div>
             ))}
           </motion.div>
@@ -122,16 +123,28 @@ export function PricingSection() {
           >
             <div className="grid grid-cols-3 gap-3 sm:gap-6 text-center">
               <div>
-                <p className="text-2xl sm:text-3xl font-bold text-foreground">14</p>
-                <p className="text-xs sm:text-sm text-foreground-muted mt-1">Day free trial</p>
+                <p className="text-2xl sm:text-3xl font-bold text-foreground">
+                  Free
+                </p>
+                <p className="text-xs sm:text-sm text-foreground-muted mt-1">
+                  Forever
+                </p>
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-bold text-foreground">0</p>
-                <p className="text-xs sm:text-sm text-foreground-muted mt-1">Credit card needed</p>
+                <p className="text-2xl sm:text-3xl font-bold text-foreground">
+                  0
+                </p>
+                <p className="text-xs sm:text-sm text-foreground-muted mt-1">
+                  Credit card needed
+                </p>
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-bold text-foreground">∞</p>
-                <p className="text-xs sm:text-sm text-foreground-muted mt-1">Cancel anytime</p>
+                <p className="text-2xl sm:text-3xl font-bold text-foreground">
+                  ∞
+                </p>
+                <p className="text-xs sm:text-sm text-foreground-muted mt-1">
+                  Unlimited use
+                </p>
               </div>
             </div>
           </motion.div>
@@ -154,7 +167,7 @@ export function PricingSection() {
               className="bg-white text-black hover:bg-white/90 font-semibold px-8 sm:px-10 py-6 sm:py-7 text-base sm:text-lg group transition-all duration-300"
               onClick={() => {
                 posthog.capture("pricing_cta_clicked", {
-                  price_monthly: priceMonthly,
+                  price_monthly: 0,
                   cta_text: pricing.ctaText,
                   location: "pricing_section",
                 });
@@ -164,7 +177,9 @@ export function PricingSection() {
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
-          <p className="text-sm text-white/50 mt-3">{pricing.trialLine}</p>
+          <p className="text-sm text-white/50 mt-3">
+            No credit card required — it&apos;s free
+          </p>
         </motion.div>
       </motion.div>
     </section>

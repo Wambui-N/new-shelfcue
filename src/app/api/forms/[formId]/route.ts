@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { canPerformAction } from "@/lib/subscriptionLimits";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getPostHogClient } from "@/lib/posthog-server";
 
@@ -202,20 +201,8 @@ export async function PUT(
       .eq("id", formId)
       .maybeSingle();
 
-    // If it's a new form, check if user can create forms
     if (!existingForm) {
-      const limitCheck = await canPerformAction(user.id, "forms");
-      if (!limitCheck.allowed) {
-        return NextResponse.json(
-          {
-            error: "Form limit reached",
-            message:
-              limitCheck.message ||
-              "You've reached your form limit. Please upgrade your plan to create more forms.",
-          },
-          { status: 403 },
-        );
-      }
+      // New form — always allowed on free plan
     } else {
       // If it's an existing form, verify ownership
       if (existingForm.user_id !== user.id) {

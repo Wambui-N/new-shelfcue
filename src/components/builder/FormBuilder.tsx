@@ -188,20 +188,7 @@ export function FormBuilder({ onBack }: FormBuilderProps) {
         if (!response.ok) {
           const errorData = await response.json();
           console.error("❌ Error saving form:", errorData);
-
-          // If it's a subscription limit error, redirect to billing
-          if (
-            response.status === 403 &&
-            errorData.error === "Form limit reached"
-          ) {
-            alert(
-              errorData.message ||
-                "You've reached your form limit. Please upgrade your plan to create more forms.",
-            );
-            router.push("/dashboard/billing");
-          } else {
-            setSaveStatus("error");
-          }
+          setSaveStatus("error");
           return null;
         }
 

@@ -23,7 +23,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
-import { useSubscription } from "@/hooks/useSubscription";
 
 interface FormRecord {
   id: string;
@@ -52,14 +51,12 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const _router = useRouter();
   const supabase = createClient();
-  const { isOnTrial, trialDaysRemaining } = useSubscription();
 
   const [forms, setForms] = useState<FormRecord[]>([]);
   const [recentSubmissions, setRecentSubmissions] = useState<
     SubmissionRecord[]
   >([]);
   const [loading, setLoading] = useState(true);
-  const [canCreateForm, setCanCreateForm] = useState(true);
 
   const [dashboardStats, setDashboardStats] = useState({
     totalForms: 0,
@@ -87,9 +84,6 @@ export default function DashboardPage() {
 
       setLoading(true);
       try {
-        // Temporarily allow form creation on the client side.
-        // Enforcement will happen on the backend.
-        setCanCreateForm(true);
         // Fetch forms data
         const { data: formsData, error: formsError } = await supabase
           .from("forms")
@@ -425,21 +419,12 @@ export default function DashboardPage() {
                     Manage and track your form performance
                   </p>
                 </div>
-                {canCreateForm ? (
-                  <Link href="/dashboard/forms">
-                    <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Go to Forms
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link href="/dashboard/billing">
-                    <Button variant="outline" className="w-full sm:w-auto">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Subscribe to Create Forms
-                    </Button>
-                  </Link>
-                )}
+                <Link href="/dashboard/forms">
+                  <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Go to Forms
+                  </Button>
+                </Link>
               </div>
 
               {forms.length === 0 ? (
@@ -454,24 +439,12 @@ export default function DashboardPage() {
                     Create your first form to start collecting data and building
                     your lead generation system.
                   </p>
-                  {canCreateForm ? (
-                    <Link href="/dashboard/forms">
-                      <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 px-6 sm:px-8 py-3 shadow-sm">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Go to Forms
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Link href="/dashboard/billing">
-                      <Button
-                        variant="outline"
-                        className="w-full sm:w-auto px-6 sm:px-8 py-3"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Subscribe to Create Forms
-                      </Button>
-                    </Link>
-                  )}
+                  <Link href="/dashboard/forms">
+                    <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 px-6 sm:px-8 py-3 shadow-sm">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Go to Forms
+                    </Button>
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-3 sm:space-y-4">

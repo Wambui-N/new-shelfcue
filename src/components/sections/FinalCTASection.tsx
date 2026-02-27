@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 
 export function FinalCTASection() {
   const benefits = [
-    "14-Day Free Trial",
+    "Free forever",
     "No credit card required",
-    "Cancel anytime",
+    "Unlimited everything",
   ];
 
   return (
@@ -74,9 +74,8 @@ export function FinalCTASection() {
             <Link
               href="/auth/signup"
               onClick={() => {
-                // PostHog: Capture final CTA click
                 posthog.capture("final_cta_clicked", {
-                  cta_text: "Start My 14-Day Free Trial",
+                  cta_text: "Get started free",
                   location: "final_cta_section",
                 });
               }}
@@ -89,7 +88,7 @@ export function FinalCTASection() {
                   size="default"
                   className="group bg-black text-white hover:bg-dark-gray hover:shadow-xl transition-all duration-300 text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold w-full sm:w-auto"
                 >
-                  <span className="mr-2">Start My 14-Day Free Trial</span>
+                  <span className="mr-2">Get started free</span>
                   <motion.div
                     className="inline-block"
                     whileHover={{ x: 2 }}
@@ -101,7 +100,7 @@ export function FinalCTASection() {
               </motion.div>
             </Link>
             <p className="text-xs text-center text-muted-foreground mt-3">
-              No credit card required
+              Free forever — no credit card required
             </p>
           </motion.div>
 

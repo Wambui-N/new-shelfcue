@@ -9,7 +9,7 @@ A powerful form builder with seamless Google Calendar and Sheets integration, su
 - 📝 **Intuitive Form Builder** - Create beautiful forms with drag-and-drop
 - 📅 **Google Calendar Integration** - Automatic meeting scheduling from form submissions
 - 📊 **Google Sheets Sync** - Real-time form data synchronization
-- 💳 **Subscription Management** - Powered by Paystack
+- ✅ **Free for everyone** - No subscriptions or payments required
 - 📧 **Email Notifications** - Automated transactional emails via Resend
 - 📱 **Responsive Design** - Works perfectly on all devices
 
@@ -19,7 +19,7 @@ A powerful form builder with seamless Google Calendar and Sheets integration, su
 
 - Node.js 18+ installed
 - npm or yarn package manager
-- Accounts for: Supabase, Google Cloud, Paystack, and Resend
+- Accounts for: Supabase, Google Cloud, and Resend
 
 ### Installation
 
@@ -64,24 +64,6 @@ The app uses Supabase for database, authentication, and storage. See [`docs/SUPA
 - Required tables and schema
 - Environment variables setup
 - TypeScript type generation
-- Paystack integration setup
-
-### Trial Expiration (Important!)
-
-The app includes automatic trial expiration after 14 days. To enable this feature:
-
-1. Run the SQL migration in your Supabase project:
-   ```
-   supabase/migrations/expire_trial_subscriptions.sql
-   ```
-2. Follow the step-by-step guide in [`docs/SETUP_TRIAL_EXPIRATION.md`](docs/SETUP_TRIAL_EXPIRATION.md)
-
-**What it does:**
-- Automatically marks trial subscriptions as `expired` after 14 days
-- Unpublishes all forms for expired users (sets them back to `draft`)
-- Users must subscribe to reactivate publishing
-
-Without this migration, trials will never expire automatically.
 
 ## Email Notifications Setup
 
@@ -108,7 +90,7 @@ src/
 │   │   ├── auth/            # Authentication endpoints
 │   │   ├── forms/           # Form management
 │   │   ├── submit/          # Form submission handler
-│   │   └── webhooks/        # Paystack webhooks
+│   │   └── webhooks/        # Webhook handlers
 │   ├── auth/                # Authentication pages
 │   ├── dashboard/           # Main dashboard
 │   └── form/                # Public form pages
@@ -120,7 +102,6 @@ src/
 │   ├── resend.ts           # Email service
 │   ├── supabase.ts         # Supabase client
 │   ├── google.ts           # Google OAuth
-│   └── paystack.ts         # Payment processing
 └── types/                   # TypeScript type definitions
 ```
 

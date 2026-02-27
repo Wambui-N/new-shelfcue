@@ -56,7 +56,7 @@ export default function SignUpPage() {
       {/* Header */}
       <div className="text-center mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
-          Start Your Free Trial
+          Create Your Free Account
         </h1>
         <p className="text-sm text-muted-foreground">
           Sign up with Google to get instant access to Sheets and Calendar
@@ -147,7 +147,7 @@ export default function SignUpPage() {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-primary font-bold">3.</span>
-            <span>Cancel anytime during your 14-day free trial</span>
+            <span>Cancel anytime during your Free forever</span>
           </li>
         </ul>
       </div>

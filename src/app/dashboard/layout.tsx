@@ -6,7 +6,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  CreditCard,
   FileText,
   Home,
   ListChecks,
@@ -140,7 +139,6 @@ function DashboardLayoutContent({ children }: DashboardLayoutProps) {
 
   const userMenuItems = [
     { href: "/dashboard/account", label: "Account Settings", icon: User },
-    { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
     { href: "#", label: "Logout", icon: LogOut, action: handleSignOut },
   ];
 

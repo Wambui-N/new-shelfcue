@@ -47,43 +47,6 @@ function EditorPage({ params }: EditorPageProps) {
           return;
         }
 
-        // Check subscription status first
-        const subscriptionResponse = await fetch("/api/subscriptions/current", {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        });
-        if (subscriptionResponse.ok) {
-          const subData = await subscriptionResponse.json();
-          const subscription = subData.subscription;
-
-          // Check if trial has expired
-          if (subscription?.status === "trial" && subscription?.trial_end) {
-            const trialEnd = new Date(subscription.trial_end);
-            const now = new Date();
-            if (trialEnd < now) {
-              // Trial expired - redirect to billing
-              alert(
-                "Your trial has expired. Please subscribe to continue using the editor.",
-              );
-              router.push("/dashboard/billing");
-              return;
-            }
-          }
-
-          // Check if subscription is expired or cancelled
-          if (
-            subscription?.status === "expired" ||
-            subscription?.status === "cancelled"
-          ) {
-            alert(
-              "Your subscription has expired. Please subscribe to continue using the editor.",
-            );
-            router.push("/dashboard/billing");
-            return;
-          }
-        }
-
         const { data, error } = await (supabase as any)
           .from("forms")
           .select("*")

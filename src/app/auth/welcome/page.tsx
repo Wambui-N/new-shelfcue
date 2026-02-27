@@ -68,46 +68,6 @@ export default function WelcomePage() {
           console.warn("⚠️ No provider_token in session");
         }
 
-        // Step 2: Ensure trial subscription exists (create if missing)
-        console.log("📝 Ensuring trial subscription exists...");
-
-        const { data: existingSubscription, error: subReadError } =
-          await supabase
-            .from("user_subscriptions")
-            .select("id")
-            .eq("user_id", session.user.id)
-            .maybeSingle();
-
-        if (subReadError) {
-          console.warn(
-            "⚠️ Failed reading subscription (will attempt create):",
-            subReadError,
-          );
-        }
-
-        if (!existingSubscription) {
-          const trialResponse = await fetch(
-            "/api/subscriptions/create-my-trial",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${session.access_token}`,
-              },
-            },
-          );
-
-          if (!trialResponse.ok) {
-            const errorText = await trialResponse.text();
-            console.error("❌ Failed to create trial:", errorText);
-            throw new Error("Failed to create trial subscription");
-          }
-
-          console.log("✅ Trial subscription created");
-        } else {
-          console.log("✅ Subscription already exists, skipping trial create");
-        }
-
         // Ensure welcome email is sent (idempotent: only sends if not already sent)
         try {
           await fetch("/api/auth/welcome-email", {
@@ -162,7 +122,7 @@ export default function WelcomePage() {
           {status === "loading" && (
             <>
               <p className="text-muted-foreground text-lg">
-                We're setting up your dashboard and trial access...
+                We're setting up your dashboard...
               </p>
               <div className="flex justify-center py-8">
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />

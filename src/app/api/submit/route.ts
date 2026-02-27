@@ -3,7 +3,7 @@ import { getGoogleClient } from "@/lib/google";
 import { createCalendarEventFromSubmission } from "@/lib/googleCalendar";
 import { GoogleSheetsService } from "@/lib/googleSheets";
 import { EmailService } from "@/lib/resend";
-import { canPerformAction, incrementUsage } from "@/lib/subscriptionLimits";
+import { incrementUsage } from "@/lib/subscriptionLimits";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getPostHogClient } from "@/lib/posthog-server";
 
@@ -77,30 +77,6 @@ export async function POST(request: NextRequest) {
     }
 
     const formRecord = form as FormRecord;
-
-    // Check submission limit for form owner
-    console.log("Checking submission limit for user:", formRecord.user_id);
-    const limitCheck = await canPerformAction(
-      formRecord.user_id,
-      "submissions_per_month",
-    );
-    console.log("Limit check result:", limitCheck);
-
-    if (!limitCheck.allowed) {
-      console.error("Submission limit reached:", {
-        userId: formRecord.user_id,
-        limit: limitCheck.limit,
-        usage: limitCheck.usage,
-      });
-      return NextResponse.json(
-        {
-          error: "Submission limit reached",
-          message:
-            "This form has reached its submission limit for this month. Please contact the form owner.",
-        },
-        { status: 429 },
-      );
-    }
 
     const formSettings = formRecord.settings ?? {};
     const formTimeZone =
