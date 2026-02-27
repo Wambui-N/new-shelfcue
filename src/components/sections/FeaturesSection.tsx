@@ -190,7 +190,6 @@ export function FeaturesSection() {
                         size="default"
                         className="bg-black text-white hover:bg-dark-gray rounded-lg font-medium w-full sm:w-auto"
                       >
-                        Get started
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </Link>

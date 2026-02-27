@@ -35,14 +35,14 @@ const useCases = [
     label: "Website",
     title: "Embed on your website",
     description:
-      "Drop an iframe snippet onto any page. Works with Squarespace, Wix, WordPress, or any custom site — no plugins needed.",
+      "Drop an iframe snippet onto any page. Works with Squarespace, Wix, WordPress, or any custom site, no plugins needed.",
   },
   {
     icon: Link2,
     label: "Direct link",
     title: "Send a direct link",
     description:
-      "Copy the form URL and paste it anywhere — email, WhatsApp, your email signature, or a 'Book me' button on social media.",
+      "Copy the form URL and paste it anywhere; email, WhatsApp, your email signature, or a 'Book me' button on social media.",
   },
 ];
 
@@ -103,7 +103,7 @@ export function UseCasesSection() {
             One form. Endless ways to share it.
           </h2>
           <p className="text-base md:text-lg text-foreground-muted max-w-2xl">
-            Build your form in as little as 5 minutes — select fields, add
+            Build your form in as little as 5 minutes, select fields, add
             labels, publish. Minimal maintenance required.
           </p>
         </motion.div>

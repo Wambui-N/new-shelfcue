@@ -21,7 +21,7 @@ export function PricingSection() {
     ],
     ctaHeadline: "Ready to streamline your client intake?",
     ctaSubtext:
-      "Join other professionals using ShelfCue to save time — completely free.",
+      "Join other professionals using ShelfCue to save time. Completely free.",
     ctaText: "Get started free",
   };
 
@@ -176,7 +176,7 @@ export function PricingSection() {
             </Button>
           </Link>
           <p className="text-sm text-white/50 mt-3">
-            No credit card required — it&apos;s free
+            No credit card required, it&apos;s free
           </p>
         </motion.div>
       </motion.div>
